@@ -17,102 +17,108 @@ export const tarotCards: TarotCard[] = [
     title: "THE FOOL",
     roman: "0",
     image: "/cards/the-fool.png",
-    coreMeaning: "A threshold, a first step, and the courage to move before every answer is visible.",
+    coreMeaning:
+      "Core Message: You are standing at the edge of a new path. The Fool does not promise certainty; it invites movement, trust, and the willingness to learn by stepping forward.",
     uprightMessage:
-      "Your question is asking for openness rather than certainty. The Fool suggests that a fresh path is forming, but it will only reveal itself once you begin. Do not confuse inexperience with weakness; your beginner's eye may be the very thing that lets you see the cleanest route.",
+      "What This Means For Your Question: Your answer may not come from planning every detail first. This card suggests that the next honest step matters more than having the whole journey mapped out.",
     shadowMessage:
-      "Naivety becomes costly when it ignores plain signals. Check whether you are calling something freedom because you do not want to face the consequences of a choice.",
+      "What To Notice: Pay attention to the difference between courage and carelessness. Excitement is useful, but ignoring clear risks or repeated warnings may create avoidable difficulty.",
     loveMessage:
-      "In love, this card points to honesty, lightness, and emotional risk. Let curiosity lead, but do not abandon your boundaries just to keep the feeling alive.",
+      "This reading favors openness, curiosity, and a lighter grip. If the situation feels too heavy too soon, return to what is simple, direct, and true.",
     practicalAdvice:
-      "Take one small reversible step. Write down what you need to know next, then act in a way that gives you real feedback within the next few days.",
+      "A Practical Next Step: Take one small action that is reversible. Send the message, ask the question, make the first draft, or test the idea before making a larger commitment.",
     reflectionQuestion:
-      "Where am I being invited to trust the path, and where do I still need a simple safeguard?",
+      "Ask yourself: What would I try if I did not need to look certain before beginning?",
   },
   {
     id: "the-lovers",
     title: "THE LOVERS",
     roman: "VI",
     image: "/cards/the-lovers.png",
-    coreMeaning: "Choice, alignment, devotion, and the moment where values become visible.",
+    coreMeaning:
+      "Core Message: The Lovers is about alignment. A meaningful choice is asking you to bring desire, values, and responsibility into the same conversation.",
     uprightMessage:
-      "The Lovers asks you to choose from the part of yourself that can live with the outcome. This is not only about attraction or desire; it is about whether your decision reflects your deeper values. A clear yes requires an equally clear no to what pulls you away from integrity.",
+      "What This Means For Your Question: The answer depends on what you are truly choosing, not only what you want in the moment. Look for the option that lets you remain honest with yourself afterward.",
     shadowMessage:
-      "Avoid letting harmony become avoidance. If you are keeping peace by silencing a true need, the imbalance will eventually speak louder.",
+      "What To Notice: Notice where you may be confusing harmony with avoidance. If you are keeping the peace by hiding your needs, the decision is not yet fully honest.",
     loveMessage:
-      "This card favors sincere connection and mutual recognition. The strongest bond here is not intensity alone, but the willingness to choose each other consciously.",
+      "This card highlights connection, consent, and mutual recognition. A bond becomes stronger when both people can choose it freely, not when one person disappears into it.",
     practicalAdvice:
-      "Name your non-negotiables. Compare your next action against them before you make a promise, accept an offer, or reopen a door.",
+      "A Practical Next Step: Write down your non-negotiables before responding. Then compare your next action with those values instead of reacting only to pressure or longing.",
     reflectionQuestion:
-      "What choice would make my outer life match my inner truth more closely?",
+      "Ask yourself: Which choice would make my outer life match my inner truth more closely?",
   },
   {
     id: "death",
     title: "DEATH",
     roman: "XIII",
     image: "/cards/death.png",
-    coreMeaning: "Ending, release, transformation, and the quiet dignity of letting a cycle close.",
+    coreMeaning:
+      "Core Message: Something is ready to end, change form, or be released. Death is not here to punish you; it clears what can no longer keep growing.",
     uprightMessage:
-      "Death rarely speaks of sudden ruin; it speaks of what has already completed itself. Your question may be tied to something that can no longer grow in its current form. Letting go is not failure here. It is the necessary clearing that allows a more honest life to emerge.",
+      "What This Means For Your Question: The situation may be asking for surrender rather than repair. If a pattern has already completed its lesson, holding it tighter will not make it alive again.",
     shadowMessage:
-      "Resistance may be keeping you attached to a version of the situation that no longer exists. Grief is valid, but denial is draining your strength.",
+      "What To Notice: Notice what you keep reviving out of fear, guilt, or habit. Grief may be real, but denial can keep you tied to a version of life that has already passed.",
     loveMessage:
-      "In relationships, Death marks a serious transition. A pattern must end, whether that means renewal through truth or separation from what cannot be repaired.",
+      "In matters of the heart, this card points to transformation. A relationship, expectation, or emotional pattern must change honestly if it is going to continue.",
     practicalAdvice:
-      "Choose one thing to stop feeding: an old expectation, repeated argument, stale plan, or identity that has become too small.",
+      "A Practical Next Step: Choose one thing to stop feeding this week: an old argument, a stale plan, a false obligation, or a self-image that has become too small.",
     reflectionQuestion:
-      "What am I still carrying because I have not admitted that its season has passed?",
+      "Ask yourself: What am I still carrying because I have not admitted that its season is over?",
   },
   {
     id: "the-tower",
     title: "THE TOWER",
     roman: "XVI",
     image: "/cards/the-tower.png",
-    coreMeaning: "Disruption, revelation, collapse of false structures, and necessary truth.",
+    coreMeaning:
+      "Core Message: The Tower reveals what was unstable. A truth, interruption, or sudden clarity may be uncomfortable, but it can also protect you from building further on a weak foundation.",
     uprightMessage:
-      "The Tower shows where a weak structure can no longer hold. It may feel harsh, but the card is not interested in punishment; it is interested in reality. Your question benefits from directness. What is unstable, exaggerated, or built on avoidance needs to be seen clearly now.",
+      "What This Means For Your Question: The answer may arrive through disruption rather than reassurance. Look at what the situation has exposed, especially where appearances were hiding pressure or imbalance.",
     shadowMessage:
-      "The danger is not the truth itself, but your attempt to preserve appearances after the truth has arrived. Do not rebuild too quickly on the same foundation.",
+      "What To Notice: Notice the urge to rebuild too quickly. If you rush back to the old structure, you may recreate the same problem with a new surface.",
     loveMessage:
-      "In love, hidden tension may surface. If a bond survives this moment, it must do so with more honesty and fewer illusions.",
+      "In relationships, The Tower brings buried tension into the open. What survives this moment must become more truthful, less performative, and less dependent on denial.",
     practicalAdvice:
-      "Separate facts from panic. List what actually changed, what you now know, and what decision can wait until your nervous system settles.",
+      "A Practical Next Step: Separate facts from panic. List what actually happened, what you now know, and what decision can wait until you are steadier.",
     reflectionQuestion:
-      "What truth have I been treating as a threat when it may be a form of protection?",
+      "Ask yourself: What truth have I been treating as a threat when it may be a form of protection?",
   },
   {
     id: "the-star",
     title: "THE STAR",
     roman: "XVII",
     image: "/cards/the-star.png",
-    coreMeaning: "Healing, renewal, spiritual steadiness, and a future that can be trusted again.",
+    coreMeaning:
+      "Core Message: The Star brings quiet restoration. It does not erase the past, but it helps you trust that healing, clarity, and possibility can return gradually.",
     uprightMessage:
-      "The Star brings a quiet kind of hope. It does not erase what happened; it restores your relationship with possibility. Your question is asking for patience, care, and faith in gradual repair. The next answer may arrive through calm consistency rather than dramatic proof.",
+      "What This Means For Your Question: The situation may need patience more than force. Your answer is likely to come through steadiness, care, and a renewed relationship with hope.",
     shadowMessage:
-      "Hope becomes fragile when it avoids practical care. Do not wait for a sign while neglecting the small routines that help you recover.",
+      "What To Notice: Notice whether you are waiting for a sign while neglecting the simple care that would help you recover. Hope needs daily support.",
     loveMessage:
-      "In love, The Star favors tenderness, forgiveness, and emotional space. It asks for connection that lets both people breathe.",
+      "In love, The Star points to tenderness, forgiveness, and emotional breathing room. Connection grows best when both people feel safe enough to be honest.",
     practicalAdvice:
-      "Return to one restorative habit and protect it. Sleep, water, honest conversation, or a quiet walk may be more useful than another analysis loop.",
+      "A Practical Next Step: Return to one restorative habit and protect it. Sleep, water, a quiet walk, or a sincere conversation may do more than another round of overthinking.",
     reflectionQuestion:
-      "What would I do differently if I truly believed healing was already underway?",
+      "Ask yourself: What would I do differently if I trusted that healing was already underway?",
   },
   {
     id: "the-moon",
     title: "THE MOON",
     roman: "XVIII",
     image: "/cards/the-moon.png",
-    coreMeaning: "Intuition, uncertainty, dreams, projection, and the path through partial light.",
+    coreMeaning:
+      "Core Message: The Moon speaks through uncertainty, dreams, instinct, and hidden feeling. Not everything is visible yet, so move carefully through partial light.",
     uprightMessage:
-      "The Moon says the full picture is not available yet. Your instincts are active, but so are fear, memory, and imagination. Move gently. This is a time to observe patterns, track emotional signals, and resist forcing a final answer before the fog begins to thin.",
+      "What This Means For Your Question: The answer is not ready to be forced. Your intuition may be active, but so are fear, memory, and projection. Give the truth time to separate itself from anxiety.",
     shadowMessage:
-      "Not every intense feeling is a prophecy. Check where anxiety may be dressing itself as intuition.",
+      "What To Notice: Notice what repeats. A single intense feeling may not be reliable, but a pattern that appears again and again deserves attention.",
     loveMessage:
-      "In relationships, The Moon points to ambiguity, longing, and unspoken material. Ask clear questions, but allow time for the truth to surface.",
+      "In relationships, The Moon can show ambiguity, longing, or unspoken material. Ask clear questions, but do not demand instant certainty from a situation still covered in fog.",
     practicalAdvice:
-      "Do not make a major irreversible decision at peak emotion. Record what you notice, sleep on it, and look for repeated evidence.",
+      "A Practical Next Step: Do not make a major irreversible decision at peak emotion. Write down what you notice, sleep on it, and look for evidence in the morning.",
     reflectionQuestion:
-      "Which part of my fear is protecting me, and which part is only repeating an old story?",
+      "Ask yourself: Which part of my fear is protecting me, and which part is only repeating an old story?",
   },
 ];
 
