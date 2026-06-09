@@ -142,6 +142,9 @@ export function DrawClient({
               Your Question
             </p>
             <p className="mt-3 text-[#efe8d9]">{question}</p>
+            <p className="mt-3 text-sm leading-6 text-[#a9a59d]">
+              Keep your question gently in mind as you move through the ritual.
+            </p>
             <div className="atelier-divider my-5" />
             <div className="space-y-3">
               {onlineSteps.map((step, index) => (
@@ -201,6 +204,9 @@ export function DrawClient({
             Your Question
           </p>
           <p className="mt-3 text-[#efe8d9]">{question}</p>
+          <p className="mt-3 text-sm leading-6 text-[#a9a59d]">
+            Keep your question gently in mind as you move through the ritual.
+          </p>
           <div className="atelier-divider my-5" />
           <ol className="space-y-4">
             <li>

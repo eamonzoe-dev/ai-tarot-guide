@@ -21,7 +21,7 @@ export default function AiGuidePage() {
           <div className="atelier-worktop w-full max-w-sm p-4">
             <div className="grid grid-cols-2 gap-3">
               <TarotButton
-                href="/ai-guide/ask?mode=physical&spread=single&orientation=upright"
+                href="/ai-guide/prepare?mode=physical&spread=single&orientation=upright"
                 className="min-h-52 flex-col gap-3 p-3 tracking-[0.16em]"
               >
                 <span className="flex h-24 w-20 items-center justify-center border border-[#8c724b] bg-[linear-gradient(160deg,#21160f,#0d0906)] shadow-[0_14px_28px_rgba(0,0,0,0.48),inset_0_1px_0_rgba(255,245,224,0.1)]">
@@ -34,7 +34,7 @@ export default function AiGuidePage() {
               </TarotButton>
 
               <TarotButton
-                href="/ai-guide/ask?mode=online&spread=single&orientation=upright"
+                href="/ai-guide/prepare?mode=online&spread=single&orientation=upright"
                 variant="ghost"
                 className="min-h-52 flex-col gap-3 p-3 tracking-[0.16em]"
               >
