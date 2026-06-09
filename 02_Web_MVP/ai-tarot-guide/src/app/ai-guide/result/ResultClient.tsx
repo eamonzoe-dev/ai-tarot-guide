@@ -10,9 +10,16 @@ import { getTarotCardById } from "@/data/tarotCards";
 
 const SELECTED_CARD_KEY = "aiTarot:selectedCard";
 const USER_QUESTION_KEY = "aiTarot:userQuestion";
+const READING_MODE_KEY = "aiTarot:readingMode";
+const READING_SPREAD_KEY = "aiTarot:readingSpread";
+const CARD_ORIENTATION_KEY = "aiTarot:cardOrientation";
+const LATEST_RITUAL_KEY = "aiTarot:latestRitual";
 
 type ResultClientProps = {
+  initialMode: "physical" | "online" | "";
+  initialSpread: string;
   initialCard: string;
+  initialOrientation: string;
   initialQuestion: string;
 };
 
@@ -23,11 +30,45 @@ function cleanParagraph(paragraph: string) {
   return paragraph.replace(READING_LABEL_PATTERN, "").trim();
 }
 
+type StoredRitual = {
+  mode?: "physical" | "online";
+  spread?: string;
+  orientation?: string;
+  question?: string;
+  card?: string;
+};
+
+function readStoredRitual(): StoredRitual {
+  const rawRitual = localStorage.getItem(LATEST_RITUAL_KEY);
+
+  if (!rawRitual) {
+    return {};
+  }
+
+  try {
+    return JSON.parse(rawRitual) as StoredRitual;
+  } catch {
+    return {};
+  }
+}
+
 export function ResultClient({
+  initialMode,
+  initialSpread,
   initialCard,
+  initialOrientation,
   initialQuestion,
 }: ResultClientProps) {
   const router = useRouter();
+  const [mode, setMode] = useState<"physical" | "online" | undefined>(
+    initialMode || undefined,
+  );
+  const [spread, setSpread] = useState<string | undefined>(
+    initialSpread || undefined,
+  );
+  const [orientation, setOrientation] = useState<string | undefined>(
+    initialOrientation || undefined,
+  );
   const [selectedCard, setSelectedCard] = useState<string | null | undefined>(
     initialCard || undefined,
   );
@@ -37,33 +78,104 @@ export function ResultClient({
   const card = selectedCard ? getTarotCardById(selectedCard) : undefined;
 
   useEffect(() => {
+    const storedRitual = readStoredRitual();
+    const storedMode = localStorage.getItem(READING_MODE_KEY);
+    const storedSpread = localStorage.getItem(READING_SPREAD_KEY);
     const storedSelectedCard = localStorage.getItem(SELECTED_CARD_KEY);
+    const storedOrientation = localStorage.getItem(CARD_ORIENTATION_KEY);
     const storedUserQuestion = localStorage.getItem(USER_QUESTION_KEY);
-    const resolvedCard = initialCard || storedSelectedCard;
-    const resolvedQuestion = initialQuestion || storedUserQuestion;
+    const resolvedMode =
+      initialMode ||
+      storedRitual.mode ||
+      (storedMode === "online" ? "online" : "physical");
+    const resolvedSpread =
+      initialSpread || storedRitual.spread || storedSpread || "single";
+    const resolvedCard = initialCard || storedRitual.card || storedSelectedCard;
+    const resolvedOrientation =
+      initialOrientation ||
+      storedRitual.orientation ||
+      storedOrientation ||
+      "upright";
+    const resolvedQuestion =
+      initialQuestion || storedRitual.question || storedUserQuestion;
+
+    if (initialMode) {
+      localStorage.setItem(READING_MODE_KEY, initialMode);
+    }
 
     if (initialCard) {
       localStorage.setItem(SELECTED_CARD_KEY, initialCard);
+    }
+
+    if (initialSpread) {
+      localStorage.setItem(READING_SPREAD_KEY, initialSpread);
+    }
+
+    if (initialOrientation) {
+      localStorage.setItem(CARD_ORIENTATION_KEY, initialOrientation);
     }
 
     if (initialQuestion) {
       localStorage.setItem(USER_QUESTION_KEY, initialQuestion);
     }
 
+    if (resolvedQuestion || resolvedCard) {
+      localStorage.setItem(
+        LATEST_RITUAL_KEY,
+        JSON.stringify({
+          mode: resolvedMode,
+          spread: resolvedSpread,
+          orientation: resolvedOrientation,
+          question: resolvedQuestion,
+          card: resolvedCard,
+        }),
+      );
+    }
+
     queueMicrotask(() => {
+      setMode(resolvedMode);
+      setSpread(resolvedSpread);
       setSelectedCard(resolvedCard);
+      setOrientation(resolvedOrientation);
       setQuestion(resolvedQuestion);
     });
 
     if (!resolvedCard) {
-      router.replace("/ai-guide/select-card");
+      router.replace(
+        resolvedMode === "online"
+          ? `/ai-guide/draw?mode=online${
+              resolvedQuestion
+                ? `&spread=single&orientation=upright&question=${encodeURIComponent(
+                    resolvedQuestion,
+                  )}`
+                : ""
+            }`
+          : `/ai-guide/reveal?mode=physical&spread=single&orientation=upright${
+              resolvedQuestion
+                ? `&question=${encodeURIComponent(resolvedQuestion)}`
+                : ""
+            }`,
+      );
     }
-  }, [initialCard, initialQuestion, router]);
+  }, [
+    initialMode,
+    initialSpread,
+    initialCard,
+    initialOrientation,
+    initialQuestion,
+    router,
+  ]);
 
-  if (selectedCard === undefined || question === undefined) {
+  if (
+    mode === undefined ||
+    spread === undefined ||
+    selectedCard === undefined ||
+    orientation === undefined ||
+    question === undefined
+  ) {
     return (
       <PageContainer
-        eyebrow="Step 03"
+        eyebrow="Your reading"
         title="Reading the card"
         description="Gathering your saved card and question."
       >
@@ -98,7 +210,7 @@ export function ResultClient({
       >
         <Link
           className="inline-flex min-h-12 w-full items-center justify-center rounded-full border border-white/15 bg-white/[0.04] px-5 text-center text-xs font-semibold uppercase tracking-[0.25em] text-stone-100 transition hover:bg-white/[0.08]"
-          href={`/ai-guide/ask?card=${card.id}`}
+          href={`/ai-guide/ask?mode=${mode ?? "physical"}`}
         >
           BACK TO QUESTION
         </Link>
@@ -109,39 +221,47 @@ export function ResultClient({
   const readingSections = [
     { title: "Core Message", body: [card.coreMeaning] },
     {
-      title: "What This Means For Your Question",
+      title: "What This Card Reflects",
       body: [card.uprightMessage, card.loveMessage],
     },
     {
-      title: "What To Notice",
-      body: [card.shadowMessage, card.reflectionQuestion],
+      title: "Shadow / Challenge",
+      body: [card.shadowMessage],
     },
-    { title: "A Practical Next Step", body: [card.practicalAdvice] },
+    { title: "Guidance", body: [card.practicalAdvice] },
+    { title: "Reflection Prompt", body: [card.reflectionQuestion] },
   ];
+  const modeLabel =
+    mode === "online" ? "Online Draw Mode" : "Physical Card Mode";
+  const readingTypeLabel =
+    spread === "single" ? "Single Card Reading" : "Single Card Reading";
+  const orientationLabel =
+    orientation === "upright" ? "Upright" : "Upright";
 
   return (
-    <main className="min-h-screen bg-black text-zinc-100">
+    <main className="atelier-page relative min-h-screen overflow-hidden text-zinc-100">
+      <div className="atelier-grain pointer-events-none absolute inset-0" />
       <div className="mx-auto max-w-5xl px-5 py-8 sm:px-6 lg:py-14">
-        <header className="flex items-center justify-between text-xs font-semibold uppercase tracking-widest text-zinc-500">
+        <header className="atelier-label relative flex items-center justify-between text-xs font-semibold">
           <p>Your reading</p>
-          <p>Step 03</p>
+          <p>{mode === "online" ? "Online Draw" : "Physical Deck"}</p>
         </header>
 
-        <div className="mt-8 grid gap-10 lg:grid-cols-5 lg:items-start lg:gap-16">
+        <div className="relative mt-8 grid gap-10 lg:grid-cols-5 lg:items-start lg:gap-16">
           <aside className="lg:col-span-2">
             <div className="text-center lg:sticky lg:top-10">
-              <div className="mx-auto">
+              <div className="atelier-worktop mx-auto max-w-xs p-4">
                 <Image
                   src={card.image}
                   alt={`${card.title} tarot card`}
                   width={320}
                   height={569}
                   priority
-                  className="mx-auto block h-auto w-36 rounded-2xl border border-zinc-900 object-cover shadow-2xl sm:w-44 lg:w-72 xl:w-80"
+                  className="mx-auto block h-auto w-36 border border-[#4a3b28] object-cover shadow-[0_22px_48px_rgba(0,0,0,0.55)] sm:w-44 lg:w-60 xl:w-64"
                 />
               </div>
 
-              <p className="mt-6 text-xs font-semibold uppercase tracking-widest text-zinc-500">
+              <p className="atelier-label mt-6 text-xs font-semibold">
                 {card.roman}
               </p>
               <h1 className="mt-2 font-serif text-4xl leading-tight text-zinc-100 sm:text-5xl">
@@ -151,12 +271,48 @@ export function ResultClient({
           </aside>
 
           <section className="lg:col-span-3">
-            <div className="rounded-2xl border border-zinc-900/70 bg-zinc-950/80 p-5 lg:p-6">
-              <h2 className="text-xs font-semibold uppercase tracking-widest text-zinc-500">
+            <div className="atelier-paper p-5 lg:p-6">
+              <h2 className="text-xs font-semibold uppercase tracking-[0.24em] text-[#6d5532]">
                 Your Question
               </h2>
-              <p className="mt-3 text-base leading-7 text-zinc-100 sm:text-lg">
+              <p className="mt-3 text-base leading-7 text-[#17110d] sm:text-lg">
                 {question}
+              </p>
+            </div>
+
+            <div className="atelier-panel mt-4 p-5">
+              <h2 className="atelier-label text-xs font-semibold">
+                Reading Type
+              </h2>
+              <p className="mt-3 text-base leading-7 text-zinc-100">
+                Reading Type: {readingTypeLabel}
+              </p>
+            </div>
+
+            <div className="atelier-panel mt-4 p-5">
+              <h2 className="atelier-label text-xs font-semibold">
+                Reading Mode
+              </h2>
+              <p className="mt-3 text-base leading-7 text-zinc-100">
+                Reading Mode: {modeLabel}
+              </p>
+            </div>
+
+            <div className="atelier-panel mt-4 p-5">
+              <h2 className="atelier-label text-xs font-semibold">
+                Card Orientation
+              </h2>
+              <p className="mt-3 text-base leading-7 text-zinc-100">
+                Card Orientation: {orientationLabel}
+              </p>
+            </div>
+
+            <div className="atelier-panel mt-4 p-5">
+              <h2 className="atelier-label text-xs font-semibold">
+                The Card You Drew
+              </h2>
+              <p className="mt-3 font-serif text-2xl leading-tight text-zinc-100">
+                {card.title}
               </p>
             </div>
 
@@ -164,9 +320,9 @@ export function ResultClient({
               {readingSections.map((section) => (
                 <section
                   key={section.title}
-                  className="rounded-2xl border border-zinc-900/70 bg-zinc-950/80 p-5"
+                  className="atelier-paper-dark p-5"
                 >
-                  <h2 className="text-xs font-semibold uppercase tracking-widest text-zinc-500">
+                  <h2 className="atelier-label text-xs font-semibold">
                     {section.title}
                   </h2>
                   <div className="mt-3 space-y-4 text-[15px] leading-7 text-zinc-200 sm:text-base sm:leading-8">
@@ -180,18 +336,28 @@ export function ResultClient({
 
             <div className="mt-6 grid gap-3 sm:grid-cols-2">
               <Link
-                className="flex min-h-12 items-center justify-center rounded-full border border-zinc-700 bg-zinc-950 px-5 text-center text-xs font-semibold uppercase tracking-widest text-zinc-200 transition hover:border-zinc-500 hover:bg-zinc-900"
-                href={`/ai-guide/ask?card=${card.id}`}
+                className="flex min-h-12 touch-manipulation items-center justify-center border border-[#3f4e47] bg-[linear-gradient(180deg,#111715,#090b0a)] px-5 text-center text-xs font-semibold uppercase tracking-widest text-zinc-200 shadow-[0_10px_24px_rgba(0,0,0,0.32),inset_0_1px_0_rgba(255,255,255,0.05)] transition hover:border-[#7d927d] hover:bg-zinc-900"
+                href={`/ai-guide/ask?mode=${mode ?? "physical"}`}
               >
                 ASK ANOTHER QUESTION
               </Link>
               <Link
-                className="flex min-h-12 items-center justify-center rounded-full border border-zinc-700 bg-zinc-950 px-5 text-center text-xs font-semibold uppercase tracking-widest text-zinc-200 transition hover:border-zinc-500 hover:bg-zinc-900"
+                className="flex min-h-12 touch-manipulation items-center justify-center border border-[#3f4e47] bg-[linear-gradient(180deg,#111715,#090b0a)] px-5 text-center text-xs font-semibold uppercase tracking-widest text-zinc-200 shadow-[0_10px_24px_rgba(0,0,0,0.32),inset_0_1px_0_rgba(255,255,255,0.05)] transition hover:border-[#7d927d] hover:bg-zinc-900"
                 href="/ai-guide"
               >
                 START AGAIN
               </Link>
             </div>
+
+            <section className="mt-4 border-t border-[#3d3020] pt-5">
+              <h2 className="atelier-label text-xs font-semibold">
+                Closing Note
+              </h2>
+              <p className="mt-3 text-sm leading-6 text-[#9f947f]">
+                Tarot offers symbolic reflection, not fixed prediction. Use
+                this reading as a mirror, not as a command.
+              </p>
+            </section>
           </section>
         </div>
       </div>

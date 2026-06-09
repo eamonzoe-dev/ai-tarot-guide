@@ -1,34 +1,29 @@
-import { ResultClient } from "./ResultClient";
+import { RevealClient } from "./RevealClient";
 
 function normalizeValue(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] ?? "" : value ?? "";
 }
 
-function normalizeMode(value: string | string[] | undefined) {
-  const mode = normalizeValue(value);
-  return mode === "online" || mode === "physical" ? mode : "";
-}
-
-export default async function ResultPage({
+export default async function RevealPage({
   searchParams,
 }: {
   searchParams: Promise<{
     mode?: string | string[];
+    question?: string | string[];
     spread?: string | string[];
     card?: string | string[];
     orientation?: string | string[];
-    question?: string | string[];
   }>;
 }) {
-  const { mode, spread, card, orientation, question } = await searchParams;
+  const { mode, question, spread, card, orientation } = await searchParams;
 
   return (
-    <ResultClient
-      initialMode={normalizeMode(mode)}
+    <RevealClient
+      initialMode={normalizeValue(mode)}
+      initialQuestion={normalizeValue(question)}
       initialSpread={normalizeValue(spread)}
       initialCard={normalizeValue(card)}
       initialOrientation={normalizeValue(orientation)}
-      initialQuestion={normalizeValue(question)}
     />
   );
 }

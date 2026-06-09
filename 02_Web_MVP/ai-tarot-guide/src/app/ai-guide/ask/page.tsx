@@ -1,11 +1,38 @@
 import { AskForm } from "./AskForm";
 
+type ReadingMode = "physical" | "online";
+type Spread = "single";
+type Orientation = "upright";
+
+function normalizeMode(mode: string | string[] | undefined): ReadingMode {
+  const value = Array.isArray(mode) ? mode[0] : mode;
+  return value === "online" ? "online" : "physical";
+}
+
+function normalizeValue(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] ?? "" : value ?? "";
+}
+
 export default async function AskPage({
   searchParams,
 }: {
-  searchParams: Promise<{ card?: string }>;
+  searchParams: Promise<{
+    mode?: string | string[];
+    spread?: string | string[];
+    orientation?: string | string[];
+  }>;
 }) {
-  const { card } = await searchParams;
+  const {
+    mode: modeParam,
+    spread: spreadParam,
+    orientation: orientationParam,
+  } = await searchParams;
+  const mode = normalizeMode(modeParam);
+  const spreadValue = normalizeValue(spreadParam);
+  const orientationValue = normalizeValue(orientationParam);
+  const spread: Spread = spreadValue === "single" ? "single" : "single";
+  const orientation: Orientation =
+    orientationValue === "upright" ? "upright" : "upright";
 
-  return <AskForm initialCard={card ?? ""} />;
+  return <AskForm mode={mode} spread={spread} orientation={orientation} />;
 }
