@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 
 import { CardChoice } from "@/components/ai-guide/CardChoice";
 import { PageContainer } from "@/components/ai-guide/PageContainer";
-import { tarotCards } from "@/data/tarotCards";
+import { tarotCardGroups } from "@/data/tarotCards";
 
 const SELECTED_CARD_KEY = "aiTarot:selectedCard";
 const USER_QUESTION_KEY = "aiTarot:userQuestion";
@@ -89,14 +89,23 @@ export function SelectCardClient({
       title="Select the Card You Drew"
       description="Choose the same card you just drew from your physical deck."
     >
-      <div className="atelier-panel mx-auto grid w-full max-w-sm grid-cols-2 gap-3 p-3 pb-8">
-        {tarotCards.map((card) => (
-          <CardChoice
-            key={card.id}
-            card={card}
-            href={buildResultHref(card.id)}
-            onSelect={handleSelect}
-          />
+      <div className="space-y-6 pb-8">
+        {tarotCardGroups.map((group) => (
+          <section key={group.title} className="atelier-panel p-3">
+            <h2 className="atelier-label mb-3 px-1 text-xs font-semibold">
+              {group.title}
+            </h2>
+            <div className="grid grid-cols-2 gap-3">
+              {group.cards.map((card) => (
+                <CardChoice
+                  key={card.id}
+                  card={card}
+                  href={buildResultHref(card.id)}
+                  onSelect={handleSelect}
+                />
+              ))}
+            </div>
+          </section>
         ))}
       </div>
     </PageContainer>

@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { CardChoice } from "@/components/ai-guide/CardChoice";
 import { PageContainer } from "@/components/ai-guide/PageContainer";
 import { TarotButton } from "@/components/ai-guide/TarotButton";
-import { getTarotCardById, tarotCards } from "@/data/tarotCards";
+import { getTarotCardById, tarotCardGroups } from "@/data/tarotCards";
 
 const USER_QUESTION_KEY = "aiTarot:userQuestion";
 const SELECTED_CARD_KEY = "aiTarot:selectedCard";
@@ -145,14 +145,23 @@ export function RevealClient({
         title="Reveal Your Physical Card"
         description="Select the card you drew from your physical deck. The reading will be based on that card, your question, and the single-card format."
       >
-        <div className="atelier-panel mx-auto grid w-full max-w-sm grid-cols-2 gap-3 p-3 pb-8">
-          {tarotCards.map((tarotCard) => (
-            <CardChoice
-              key={tarotCard.id}
-              card={tarotCard}
-              href={buildPhysicalHref(tarotCard.id)}
-              onSelect={handleSelect}
-            />
+        <div className="space-y-6 pb-8">
+          {tarotCardGroups.map((group) => (
+            <section key={group.title} className="atelier-panel p-3">
+              <h2 className="atelier-label mb-3 px-1 text-xs font-semibold">
+                {group.title}
+              </h2>
+              <div className="grid grid-cols-2 gap-3">
+                {group.cards.map((tarotCard) => (
+                  <CardChoice
+                    key={tarotCard.id}
+                    card={tarotCard}
+                    href={buildPhysicalHref(tarotCard.id)}
+                    onSelect={handleSelect}
+                  />
+                ))}
+              </div>
+            </section>
           ))}
         </div>
       </PageContainer>
@@ -196,14 +205,16 @@ export function RevealClient({
           <p className="mt-2 text-sm leading-6 text-[#c8c0b4]">
             A single card has been drawn inside the atelier.
           </p>
-          <Image
-            src={card.image}
-            alt={`${card.title} tarot card`}
-            width={120}
-            height={213}
-            priority
-            className="sr-only"
-          />
+          {card.image && (
+            <Image
+              src={card.image}
+              alt={`${card.title} tarot card`}
+              width={120}
+              height={213}
+              priority
+              className="sr-only"
+            />
+          )}
         </div>
 
         <TarotButton href={buildResultHref(ritual)}>OPEN THE READING</TarotButton>

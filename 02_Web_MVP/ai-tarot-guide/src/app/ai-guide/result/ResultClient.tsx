@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { PageContainer } from "@/components/ai-guide/PageContainer";
-import { getTarotCardById } from "@/data/tarotCards";
+import { getTarotCardById, getTarotCardLabel } from "@/data/tarotCards";
 
 const SELECTED_CARD_KEY = "aiTarot:selectedCard";
 const USER_QUESTION_KEY = "aiTarot:userQuestion";
@@ -236,6 +236,7 @@ export function ResultClient({
     spread === "single" ? "Single Card Reading" : "Single Card Reading";
   const orientationLabel =
     orientation === "upright" ? "Upright" : "Upright";
+  const cardLabel = getTarotCardLabel(card);
 
   return (
     <main className="atelier-page relative min-h-screen overflow-hidden text-zinc-100">
@@ -250,18 +251,34 @@ export function ResultClient({
           <aside className="lg:col-span-2">
             <div className="text-center lg:sticky lg:top-10">
               <div className="atelier-worktop mx-auto max-w-xs p-4">
-                <Image
-                  src={card.image}
-                  alt={`${card.title} tarot card`}
-                  width={320}
-                  height={569}
-                  priority
-                  className="mx-auto block h-auto w-36 border border-[#4a3b28] object-cover shadow-[0_22px_48px_rgba(0,0,0,0.55)] sm:w-44 lg:w-60 xl:w-64"
-                />
+                {card.image ? (
+                  <Image
+                    src={card.image}
+                    alt={`${card.title} tarot card`}
+                    width={320}
+                    height={569}
+                    priority
+                    className="mx-auto block h-auto w-36 border border-[#4a3b28] object-cover shadow-[0_22px_48px_rgba(0,0,0,0.55)] sm:w-44 lg:w-60 xl:w-64"
+                  />
+                ) : (
+                  <div className="mx-auto flex aspect-[9/16] w-36 items-center justify-center border border-[#4a3b28] bg-[linear-gradient(160deg,#17110d,#070707)] p-4 shadow-[0_22px_48px_rgba(0,0,0,0.55)] sm:w-44 lg:w-60 xl:w-64">
+                    <div className="flex h-full w-full flex-col justify-between border border-[#8c724b]/70 p-5 text-center">
+                      <span className="atelier-label text-xs font-semibold">
+                        {cardLabel}
+                      </span>
+                      <span className="font-serif text-3xl leading-tight text-[#efe8d9]">
+                        {card.title}
+                      </span>
+                      <span className="text-xs uppercase tracking-[0.24em] text-[#bca77f]">
+                        {card.rank}
+                      </span>
+                    </div>
+                  </div>
+                )}
               </div>
 
               <p className="atelier-label mt-6 text-xs font-semibold">
-                {card.roman}
+                {cardLabel}
               </p>
               <h1 className="mt-2 font-serif text-4xl leading-tight text-zinc-100 sm:text-5xl">
                 {card.title}
