@@ -1,4 +1,5 @@
 import { AskForm } from "./AskForm";
+import { normalizeLanguage } from "@/lib/ai-guide/i18n";
 
 type ReadingMode = "physical" | "online";
 type Spread = "single";
@@ -20,19 +21,30 @@ export default async function AskPage({
     mode?: string | string[];
     spread?: string | string[];
     orientation?: string | string[];
+    lang?: string | string[];
   }>;
 }) {
   const {
     mode: modeParam,
     spread: spreadParam,
     orientation: orientationParam,
+    lang: langParam,
   } = await searchParams;
   const mode = normalizeMode(modeParam);
+  const lang = normalizeLanguage(langParam);
   const spreadValue = normalizeValue(spreadParam);
   const orientationValue = normalizeValue(orientationParam);
   const spread: Spread = spreadValue === "single" ? "single" : "single";
   const orientation: Orientation =
     orientationValue === "upright" ? "upright" : "upright";
 
-  return <AskForm mode={mode} spread={spread} orientation={orientation} />;
+  return (
+    <AskForm
+      mode={mode}
+      spread={spread}
+      orientation={orientation}
+      lang={lang}
+      hasLangParam={Boolean(langParam)}
+    />
+  );
 }

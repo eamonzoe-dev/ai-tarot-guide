@@ -1,4 +1,5 @@
 import { RevealClient } from "./RevealClient";
+import { normalizeLanguage } from "@/lib/ai-guide/i18n";
 
 function normalizeValue(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] ?? "" : value ?? "";
@@ -13,9 +14,11 @@ export default async function RevealPage({
     spread?: string | string[];
     card?: string | string[];
     orientation?: string | string[];
+    lang?: string | string[];
   }>;
 }) {
-  const { mode, question, spread, card, orientation } = await searchParams;
+  const { mode, question, spread, card, orientation, lang } =
+    await searchParams;
 
   return (
     <RevealClient
@@ -24,6 +27,8 @@ export default async function RevealPage({
       initialSpread={normalizeValue(spread)}
       initialCard={normalizeValue(card)}
       initialOrientation={normalizeValue(orientation)}
+      initialLang={normalizeLanguage(lang)}
+      hasLangParam={Boolean(lang)}
     />
   );
 }

@@ -4,11 +4,13 @@ export type TarotSuit = "major" | "wands" | "cups" | "swords" | "pentacles";
 export type TarotCard = {
   id: string;
   title: string;
+  titleZh: string;
   roman: string;
   arcana: TarotArcana;
   suit: TarotSuit;
   rank: string;
   keywords: string[];
+  keywordsZh: string[];
   reflection: string;
   suggestion: string;
   image?: string;
@@ -23,11 +25,13 @@ export type TarotCard = {
 type CardSeed = {
   id: string;
   title: string;
+  titleZh?: string;
   roman: string;
   arcana: TarotArcana;
   suit: TarotSuit;
   rank: string;
   keywords: string[];
+  keywordsZh?: string[];
   reflection: string;
   suggestion: string;
   image?: string;
@@ -50,12 +54,198 @@ const suitLabels: Record<TarotSuit, string> = {
   pentacles: "Pentacles",
 };
 
+const suitLabelsZh: Record<TarotSuit, string> = {
+  major: "大阿尔卡那",
+  wands: "权杖",
+  cups: "圣杯",
+  swords: "宝剑",
+  pentacles: "星币",
+};
+
+const majorZh: Record<string, { titleZh: string; keywordsZh: string[] }> = {
+  "the-fool": {
+    titleZh: "愚者",
+    keywordsZh: ["开始", "开放", "冒险", "信任"],
+  },
+  "the-magician": {
+    titleZh: "魔术师",
+    keywordsZh: ["意志", "专注", "技能", "行动"],
+  },
+  "the-high-priestess": {
+    titleZh: "女祭司",
+    keywordsZh: ["直觉", "静默", "神秘", "内在知晓"],
+  },
+  "the-empress": {
+    titleZh: "女皇",
+    keywordsZh: ["滋养", "成长", "创造", "身体感受"],
+  },
+  "the-emperor": {
+    titleZh: "皇帝",
+    keywordsZh: ["结构", "责任", "边界", "稳定"],
+  },
+  "the-hierophant": {
+    titleZh: "教皇",
+    keywordsZh: ["传统", "教导", "价值", "归属"],
+  },
+  "the-lovers": {
+    titleZh: "恋人",
+    keywordsZh: ["选择", "一致", "关系", "价值"],
+  },
+  "the-chariot": {
+    titleZh: "战车",
+    keywordsZh: ["方向", "自律", "推进", "意志"],
+  },
+  strength: {
+    titleZh: "力量",
+    keywordsZh: ["耐心", "勇气", "温柔", "自信"],
+  },
+  "the-hermit": {
+    titleZh: "隐者",
+    keywordsZh: ["独处", "反思", "指引", "内在之光"],
+  },
+  "wheel-of-fortune": {
+    titleZh: "命运之轮",
+    keywordsZh: ["改变", "循环", "时机", "转折"],
+  },
+  justice: {
+    titleZh: "正义",
+    keywordsZh: ["真实", "平衡", "责任", "清晰"],
+  },
+  "the-hanged-man": {
+    titleZh: "倒吊人",
+    keywordsZh: ["停顿", "放下", "视角", "等待"],
+  },
+  death: {
+    titleZh: "死神",
+    keywordsZh: ["结束", "释放", "转变", "更新"],
+  },
+  temperance: {
+    titleZh: "节制",
+    keywordsZh: ["平衡", "整合", "适度", "疗愈"],
+  },
+  "the-devil": {
+    titleZh: "恶魔",
+    keywordsZh: ["执着", "模式", "阴影", "束缚"],
+  },
+  "the-tower": {
+    titleZh: "高塔",
+    keywordsZh: ["扰动", "真相", "崩塌", "释放"],
+  },
+  "the-star": {
+    titleZh: "星星",
+    keywordsZh: ["希望", "更新", "疗愈", "信任"],
+  },
+  "the-moon": {
+    titleZh: "月亮",
+    keywordsZh: ["不确定", "直觉", "梦境", "投射"],
+  },
+  "the-sun": {
+    titleZh: "太阳",
+    keywordsZh: ["清晰", "温暖", "活力", "信心"],
+  },
+  judgement: {
+    titleZh: "审判",
+    keywordsZh: ["觉醒", "回顾", "召唤", "更新"],
+  },
+  "the-world": {
+    titleZh: "世界",
+    keywordsZh: ["完成", "整合", "完整", "抵达"],
+  },
+};
+
+const keywordZh: Record<string, string> = {
+  agency: "行动力",
+  focus: "专注",
+  skill: "技能",
+  intention: "意图",
+  beginning: "开始",
+  openness: "开放",
+  risk: "冒险",
+  trust: "信任",
+  seed: "种子",
+  potential: "潜能",
+  choice: "选择",
+  balance: "平衡",
+  relationship: "关系",
+  growth: "成长",
+  collaboration: "协作",
+  expression: "表达",
+  structure: "结构",
+  pause: "停顿",
+  foundation: "基础",
+  tension: "张力",
+  change: "改变",
+  challenge: "挑战",
+  support: "支持",
+  repair: "修复",
+  movement: "行动",
+  assessment: "评估",
+  defense: "守护",
+  discernment: "分辨",
+  practice: "练习",
+  momentum: "推进",
+  integration: "整合",
+  resilience: "韧性",
+  reflection: "反思",
+  completion: "完成",
+  burden: "负担",
+  threshold: "门槛",
+  learning: "学习",
+  message: "信息",
+  curiosity: "好奇",
+  pursuit: "追求",
+  devotion: "投入",
+  maturity: "成熟",
+  receptivity: "接纳",
+  care: "照料",
+  mastery: "掌握",
+  responsibility: "责任",
+  leadership: "领导",
+  spark: "火花",
+  courage: "勇气",
+  "creative will": "创造意志",
+  feeling: "感受",
+  connection: "连接",
+  tenderness: "温柔",
+  "emotional truth": "情感真实",
+  clarity: "清晰",
+  language: "语言",
+  "mental focus": "思维聚焦",
+  stability: "稳定",
+  resources: "资源",
+  "daily care": "日常照料",
+};
+
+const rankZh: Record<string, string> = {
+  Ace: "王牌",
+  Two: "二",
+  Three: "三",
+  Four: "四",
+  Five: "五",
+  Six: "六",
+  Seven: "七",
+  Eight: "八",
+  Nine: "九",
+  Ten: "十",
+  Page: "侍从",
+  Knight: "骑士",
+  Queen: "王后",
+  King: "国王",
+};
+
+function translateKeywords(keywords: string[]) {
+  return keywords.map((keyword) => keywordZh[keyword] ?? keyword);
+}
+
 function toReadingCard(seed: CardSeed): TarotCard {
   const focus = seed.keywords.slice(0, 3).join(", ");
   const firstKeyword = seed.keywords[0].toLowerCase();
+  const zh = majorZh[seed.id];
 
   return {
     ...seed,
+    titleZh: seed.titleZh ?? zh?.titleZh ?? seed.title,
+    keywordsZh: seed.keywordsZh ?? zh?.keywordsZh ?? translateKeywords(seed.keywords),
     image: seed.image ?? existingImages[seed.id],
     coreMeaning: `Core Message: ${seed.reflection}`,
     uprightMessage: `What This Means For Your Question: In this single-card reading, ${seed.title} may invite reflection on ${focus}. Notice how this theme appears in the situation you brought to the deck.`,
@@ -541,15 +731,18 @@ function minorSeed(
     ...rankProfile.keywords.slice(0, 2),
     ...suitProfile.qualities.slice(0, 2),
   ];
+  const titleZh = `${suitLabelsZh[suit]}${rankZh[rankProfile.rank]}`;
 
   return {
     id: `${rankProfile.slug}-of-${suit}`,
     title,
+    titleZh,
     roman: rankProfile.rank,
     arcana: "minor",
     suit,
     rank: rankProfile.rank,
     keywords,
+    keywordsZh: translateKeywords(keywords),
     reflection: `${title} may point to ${rankProfile.reflection
       .replace("This card may point to ", "")
       .replace(/\.$/, "")} within ${suitProfile.domain}. In this reading, it reflects ${keywords
@@ -597,8 +790,22 @@ export const tarotCardGroups = [
   },
 ];
 
-export function getTarotCardLabel(card: TarotCard) {
-  return card.arcana === "major" ? suitLabels.major : suitLabels[card.suit];
+export function getTarotCardLabel(card: TarotCard, lang: "en" | "zh" = "en") {
+  const labels = lang === "zh" ? suitLabelsZh : suitLabels;
+  return card.arcana === "major" ? labels.major : labels[card.suit];
+}
+
+export function getTarotCardTitle(card: TarotCard, lang: "en" | "zh" = "en") {
+  return lang === "zh" ? card.titleZh || card.title : card.title;
+}
+
+export function getTarotCardKeywords(
+  card: TarotCard,
+  lang: "en" | "zh" = "en",
+) {
+  return lang === "zh" && card.keywordsZh.length > 0
+    ? card.keywordsZh
+    : card.keywords;
 }
 
 export function getTarotCardById(id: string | null) {

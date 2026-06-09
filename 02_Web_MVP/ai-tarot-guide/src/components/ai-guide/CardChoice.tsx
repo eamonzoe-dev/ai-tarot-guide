@@ -3,16 +3,28 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import { getTarotCardLabel, type TarotCard } from "@/data/tarotCards";
+import {
+  getTarotCardLabel,
+  getTarotCardTitle,
+  type TarotCard,
+} from "@/data/tarotCards";
+import { type Language } from "@/lib/ai-guide/i18n";
 
 type CardChoiceProps = {
   card: TarotCard;
   onSelect: (cardId: string) => void;
   href: string;
+  lang?: Language;
 };
 
-export function CardChoice({ card, href, onSelect }: CardChoiceProps) {
-  const cardLabel = getTarotCardLabel(card);
+export function CardChoice({
+  card,
+  href,
+  onSelect,
+  lang = "en",
+}: CardChoiceProps) {
+  const cardLabel = getTarotCardLabel(card, lang);
+  const cardTitle = getTarotCardTitle(card, lang);
 
   return (
     <Link
@@ -26,7 +38,7 @@ export function CardChoice({ card, href, onSelect }: CardChoiceProps) {
         {card.image ? (
           <Image
             src={card.image}
-            alt={`${card.title} tarot card`}
+            alt={`${cardTitle} tarot card`}
             width={180}
             height={320}
             sizes="(max-width: 768px) 45vw, 180px"
@@ -39,7 +51,7 @@ export function CardChoice({ card, href, onSelect }: CardChoiceProps) {
                 {cardLabel}
               </span>
               <span className="font-serif text-lg leading-tight text-[#efe8d9]">
-                {card.title}
+                {cardTitle}
               </span>
               <span className="text-[0.58rem] uppercase tracking-[0.22em] text-[#bca77f]">
                 {card.rank}
@@ -55,7 +67,7 @@ export function CardChoice({ card, href, onSelect }: CardChoiceProps) {
           {cardLabel}
         </p>
         <h2 className="mt-1 font-serif text-lg leading-none text-[#efe8d9]">
-          {card.title}
+          {cardTitle}
         </h2>
       </div>
     </Link>

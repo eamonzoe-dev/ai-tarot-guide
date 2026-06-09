@@ -5,8 +5,21 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
+import { LanguageToggle } from "@/components/ai-guide/LanguageToggle";
 import { PageContainer } from "@/components/ai-guide/PageContainer";
-import { getTarotCardById, getTarotCardLabel } from "@/data/tarotCards";
+import { ReadingNav } from "@/components/ai-guide/ReadingNav";
+import {
+  getTarotCardById,
+  getTarotCardKeywords,
+  getTarotCardLabel,
+  getTarotCardTitle,
+} from "@/data/tarotCards";
+import {
+  LANGUAGE_STORAGE_KEY,
+  type Language,
+  text,
+  withLang,
+} from "@/lib/ai-guide/i18n";
 
 const SELECTED_CARD_KEY = "aiTarot:selectedCard";
 const USER_QUESTION_KEY = "aiTarot:userQuestion";
@@ -21,6 +34,8 @@ type ResultClientProps = {
   initialCard: string;
   initialOrientation: string;
   initialQuestion: string;
+  initialLang: Language;
+  hasLangParam: boolean;
 };
 
 const READING_LABEL_PATTERN =
@@ -36,6 +51,7 @@ type StoredRitual = {
   orientation?: string;
   question?: string;
   card?: string;
+  lang?: Language;
 };
 
 function readStoredRitual(): StoredRitual {
@@ -58,8 +74,11 @@ export function ResultClient({
   initialCard,
   initialOrientation,
   initialQuestion,
+  initialLang,
+  hasLangParam,
 }: ResultClientProps) {
   const router = useRouter();
+  const copy = text(initialLang);
   const [mode, setMode] = useState<"physical" | "online" | undefined>(
     initialMode || undefined,
   );
@@ -84,6 +103,7 @@ export function ResultClient({
     const storedSelectedCard = localStorage.getItem(SELECTED_CARD_KEY);
     const storedOrientation = localStorage.getItem(CARD_ORIENTATION_KEY);
     const storedUserQuestion = localStorage.getItem(USER_QUESTION_KEY);
+    const storedLanguage = localStorage.getItem(LANGUAGE_STORAGE_KEY);
     const resolvedMode =
       initialMode ||
       storedRitual.mode ||
@@ -98,6 +118,12 @@ export function ResultClient({
       "upright";
     const resolvedQuestion =
       initialQuestion || storedRitual.question || storedUserQuestion;
+    const resolvedLang =
+      hasLangParam || !storedLanguage
+        ? initialLang
+        : storedLanguage === "zh"
+          ? "zh"
+          : "en";
 
     if (initialMode) {
       localStorage.setItem(READING_MODE_KEY, initialMode);
@@ -119,6 +145,8 @@ export function ResultClient({
       localStorage.setItem(USER_QUESTION_KEY, initialQuestion);
     }
 
+    localStorage.setItem(LANGUAGE_STORAGE_KEY, resolvedLang);
+
     if (resolvedQuestion || resolvedCard) {
       localStorage.setItem(
         LATEST_RITUAL_KEY,
@@ -128,6 +156,7 @@ export function ResultClient({
           orientation: resolvedOrientation,
           question: resolvedQuestion,
           card: resolvedCard,
+          lang: resolvedLang,
         }),
       );
     }
@@ -149,12 +178,12 @@ export function ResultClient({
                     resolvedQuestion,
                   )}`
                 : ""
-            }`
+            }&lang=${initialLang}`
           : `/ai-guide/reveal?mode=physical&spread=single&orientation=upright${
               resolvedQuestion
                 ? `&question=${encodeURIComponent(resolvedQuestion)}`
                 : ""
-            }`,
+            }&lang=${initialLang}`,
       );
     }
   }, [
@@ -163,6 +192,8 @@ export function ResultClient({
     initialCard,
     initialOrientation,
     initialQuestion,
+    initialLang,
+    hasLangParam,
     router,
   ]);
 
@@ -175,11 +206,12 @@ export function ResultClient({
   ) {
     return (
       <PageContainer
-        eyebrow="Your reading"
-        title="Reading the card"
-        description="Gathering your saved card and question."
+        eyebrow={copy.readingDossier}
+        title={copy.readingCard}
+        description={copy.gatheringReading}
       >
-        <p className="text-sm text-[#a9a59d]">Preparing your message...</p>
+        <ReadingNav lang={initialLang} />
+        <p className="text-sm text-[#a9a59d]">{copy.preparingMessage}</p>
       </PageContainer>
     );
   }
@@ -187,39 +219,74 @@ export function ResultClient({
   if (!card) {
     return (
       <PageContainer
-        eyebrow="Reading Dossier"
-        title="The reading could not be opened."
-        description="The selected card was not found. You can return to the reading room and begin again."
+        eyebrow={copy.readingDossier}
+        title={copy.invalidReadingTitle}
+        description={copy.invalidReadingDescription}
       >
+        <ReadingNav lang={initialLang} />
+        <div className="mb-5 flex justify-end">
+          <LanguageToggle
+            lang={initialLang}
+            pathname="/ai-guide/result"
+            params={{
+              mode,
+              spread,
+              orientation,
+              question: question ?? undefined,
+              card: selectedCard ?? undefined,
+            }}
+            hasLangParam={hasLangParam}
+          />
+        </div>
         <Link
           className="inline-flex min-h-12 w-full touch-manipulation items-center justify-center border border-[#b08c58]/70 bg-[linear-gradient(180deg,#2a1d15,#120d0a)] px-5 text-center text-xs font-semibold uppercase tracking-[0.24em] text-[#f0eadf] shadow-[0_12px_28px_rgba(0,0,0,0.42),inset_0_1px_0_rgba(255,235,204,0.12),inset_0_-1px_0_rgba(0,0,0,0.72)]"
-          href="/ai-guide"
+          href={withLang("/ai-guide", {}, initialLang)}
         >
-          Return to Reading Room
+          {copy.returnToReadingRoom}
         </Link>
       </PageContainer>
     );
   }
 
   const modeLabel =
-    mode === "online" ? "Online Draw Mode" : "Physical Card Mode";
+    mode === "online" ? copy.onlineDrawMode : copy.physicalCardMode;
   const readingTypeLabel =
-    spread === "single" ? "Single Card Reading" : "Single Card Reading";
+    spread === "single" ? copy.singleCardReading : copy.singleCardReading;
   const orientationLabel =
-    orientation === "upright" ? "Upright" : "Upright";
-  const cardLabel = getTarotCardLabel(card);
-  const questionText = question || "No question was recorded for this reading.";
+    orientation === "upright" ? copy.upright : copy.upright;
+  const cardLabel = getTarotCardLabel(card, initialLang);
+  const cardTitle = getTarotCardTitle(card, initialLang);
+  const cardKeywords = getTarotCardKeywords(card, initialLang);
+  const questionText = question || copy.noQuestion;
   const reflectionPrompt =
-    card.reflectionQuestion || "What is this card asking you to notice?";
+    card.reflectionQuestion || copy.reflectionFallback;
+  const homeHref = withLang("/ai-guide", {}, initialLang);
 
   return (
     <main className="atelier-page relative min-h-screen overflow-hidden text-zinc-100">
       <div className="atelier-grain pointer-events-none absolute inset-0" />
       <div className="mx-auto max-w-5xl px-5 py-8 sm:px-6 lg:py-14">
         <header className="atelier-label relative flex items-center justify-between text-xs font-semibold">
-          <p>Reading Dossier</p>
-          <p>{mode === "online" ? "Online Draw" : "Physical Deck"}</p>
+          <p>{copy.readingDossier}</p>
+          <p>{mode === "online" ? copy.onlineDrawMode : copy.physicalDeck}</p>
         </header>
+        <div className="relative mt-6">
+          <ReadingNav lang={initialLang} />
+          <div className="flex justify-end">
+            <LanguageToggle
+              lang={initialLang}
+              pathname="/ai-guide/result"
+              params={{
+                mode,
+                spread,
+                orientation,
+                question: question ?? undefined,
+                card: selectedCard ?? undefined,
+              }}
+              hasLangParam={hasLangParam}
+            />
+          </div>
+        </div>
 
         <div className="relative mt-8 grid gap-10 lg:grid-cols-5 lg:items-start lg:gap-16">
           <aside className="lg:col-span-2">
@@ -228,7 +295,7 @@ export function ResultClient({
                 {card.image ? (
                   <Image
                     src={card.image}
-                    alt={`${card.title} tarot card`}
+                    alt={`${cardTitle} tarot card`}
                     width={320}
                     height={569}
                     priority
@@ -241,7 +308,7 @@ export function ResultClient({
                         {cardLabel}
                       </span>
                       <span className="font-serif text-3xl leading-tight text-[#efe8d9]">
-                        {card.title}
+                        {cardTitle}
                       </span>
                       <span className="text-xs uppercase tracking-[0.24em] text-[#bca77f]">
                         {card.rank}
@@ -255,7 +322,7 @@ export function ResultClient({
                 {cardLabel}
               </p>
               <h1 className="mt-2 font-serif text-4xl leading-tight text-zinc-100 sm:text-5xl">
-                {card.title}
+                {cardTitle}
               </h1>
             </div>
           </aside>
@@ -263,7 +330,7 @@ export function ResultClient({
           <section className="lg:col-span-3">
             <div className="atelier-paper p-5 lg:p-6">
               <h2 className="text-xs font-semibold uppercase tracking-[0.24em] text-[#6d5532]">
-                Your Question
+                {copy.yourQuestion}
               </h2>
               <p className="mt-3 text-base leading-7 text-[#17110d] sm:text-lg">
                 {questionText}
@@ -272,19 +339,19 @@ export function ResultClient({
 
             <div className="atelier-panel mt-4 border-[#a98552]/35 p-5">
               <h2 className="atelier-label text-xs font-semibold">
-                Reading Dossier
+                {copy.readingDossier}
               </h2>
               <div className="mt-4 grid gap-4 text-sm leading-6 sm:grid-cols-3">
                 <div>
-                  <p className="text-[#bca77f]">Reading Type</p>
+                  <p className="text-[#bca77f]">{copy.readingType}</p>
                   <p className="mt-1 text-zinc-100">{readingTypeLabel}</p>
                 </div>
                 <div>
-                  <p className="text-[#bca77f]">Reading Mode</p>
+                  <p className="text-[#bca77f]">{copy.readingMode}</p>
                   <p className="mt-1 text-zinc-100">{modeLabel}</p>
                 </div>
                 <div>
-                  <p className="text-[#bca77f]">Card Orientation</p>
+                  <p className="text-[#bca77f]">{copy.cardOrientation}</p>
                   <p className="mt-1 text-zinc-100">{orientationLabel}</p>
                 </div>
               </div>
@@ -292,16 +359,16 @@ export function ResultClient({
 
             <div className="atelier-panel mt-4 p-5">
               <h2 className="atelier-label text-xs font-semibold">
-                The Card
+                {copy.theCard}
               </h2>
               <p className="mt-3 font-serif text-2xl leading-tight text-zinc-100">
-                {card.title}
+                {cardTitle}
               </p>
               <p className="mt-2 text-sm leading-6 text-[#bca77f]">
                 {cardLabel} / {card.rank}
               </p>
               <div className="mt-4 flex flex-wrap gap-2">
-                {card.keywords.map((keyword) => (
+                {cardKeywords.map((keyword) => (
                   <span
                     key={keyword}
                     className="border border-[#4a3b28] bg-[#0f0b08] px-3 py-1 text-xs text-[#d8c9ae]"
@@ -318,7 +385,7 @@ export function ResultClient({
             <div className="mt-4 space-y-4">
               <section className="atelier-paper-dark p-5">
                 <h2 className="atelier-label text-xs font-semibold">
-                  Reading Reflection
+                  {copy.readingReflection}
                 </h2>
                 <p className="mt-3 text-[15px] leading-7 text-zinc-200 sm:text-base sm:leading-8">
                   In relation to your question, {card.reflection}
@@ -327,7 +394,7 @@ export function ResultClient({
 
               <section className="atelier-paper-dark p-5">
                 <h2 className="atelier-label text-xs font-semibold">
-                  Quiet Suggestion
+                  {copy.quietSuggestion}
                 </h2>
                 <p className="mt-3 text-[15px] leading-7 text-zinc-200 sm:text-base sm:leading-8">
                   {card.suggestion}
@@ -336,7 +403,7 @@ export function ResultClient({
 
               <section className="atelier-paper-dark p-5">
                 <h2 className="atelier-label text-xs font-semibold">
-                  Reflection Prompt
+                  {copy.reflectionPrompt}
                 </h2>
                 <p className="mt-3 text-[15px] leading-7 text-zinc-200 sm:text-base sm:leading-8">
                   {cleanParagraph(reflectionPrompt).replace(/^Ask yourself:\s*/i, "")}
@@ -347,32 +414,29 @@ export function ResultClient({
             <div className="mt-6 grid gap-3 sm:grid-cols-2">
               <Link
                 className="flex min-h-12 touch-manipulation items-center justify-center border border-[#3f4e47] bg-[linear-gradient(180deg,#111715,#090b0a)] px-5 text-center text-xs font-semibold uppercase tracking-widest text-zinc-200 shadow-[0_10px_24px_rgba(0,0,0,0.32),inset_0_1px_0_rgba(255,255,255,0.05)] transition hover:border-[#7d927d] hover:bg-zinc-900"
-                href={`/ai-guide/ask?mode=${mode ?? "physical"}`}
+                href={`/ai-guide/ask?mode=${
+                  mode ?? "physical"
+                }&spread=single&orientation=upright&lang=${initialLang}`}
               >
-                ASK ANOTHER QUESTION
+                {copy.continueToQuestion}
               </Link>
               <Link
                 className="flex min-h-12 touch-manipulation items-center justify-center border border-[#3f4e47] bg-[linear-gradient(180deg,#111715,#090b0a)] px-5 text-center text-xs font-semibold uppercase tracking-widest text-zinc-200 shadow-[0_10px_24px_rgba(0,0,0,0.32),inset_0_1px_0_rgba(255,255,255,0.05)] transition hover:border-[#7d927d] hover:bg-zinc-900"
-                href="/ai-guide"
+                href={homeHref}
               >
-                START AGAIN
+                {copy.startAnotherReading}
               </Link>
             </div>
 
             <section className="mt-4 border-t border-[#3d3020] pt-5">
               <h2 className="atelier-label text-xs font-semibold">
-                Closing Note
+                {copy.closingNote}
               </h2>
               <p className="mt-3 text-sm leading-6 text-[#9f947f]">
-                This reading is a symbolic reflection, not a fixed prediction.
-                Use it as a quiet prompt for attention, choice, and
-                self-understanding.
+                {copy.closingReflection}
               </p>
               <p className="mt-4 text-xs leading-5 text-[#777063]">
-                Tarot readings on this site are symbolic reflections for
-                personal insight. They are not medical, legal, financial, or
-                psychological advice, and they should not replace professional
-                support.
+                {copy.disclaimer}
               </p>
             </section>
           </section>

@@ -3,9 +3,12 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
+import { LanguageToggle } from "@/components/ai-guide/LanguageToggle";
 import { PageContainer } from "@/components/ai-guide/PageContainer";
+import { ReadingNav } from "@/components/ai-guide/ReadingNav";
 import { TarotButton } from "@/components/ai-guide/TarotButton";
 import { tarotCards } from "@/data/tarotCards";
+import { type Language, text } from "@/lib/ai-guide/i18n";
 
 const USER_QUESTION_KEY = "aiTarot:userQuestion";
 const SELECTED_CARD_KEY = "aiTarot:selectedCard";
@@ -16,29 +19,22 @@ type ReadingMode = "physical" | "online";
 type DrawClientProps = {
   initialMode: ReadingMode;
   initialQuestion: string;
+  initialLang: Language;
+  hasLangParam: boolean;
 };
 
-const onlineSteps = [
-  {
-    title: "SHUFFLE",
-    description: "Quiet the deck and return to your question.",
-  },
-  {
-    title: "CUT",
-    description: "Mark the moment of choice.",
-  },
-  {
-    title: "DRAW",
-    description: "Draw one card from the online deck.",
-  },
-] as const;
-
-function buildQuery(mode: ReadingMode, question: string, card?: string) {
+function buildQuery(
+  mode: ReadingMode,
+  question: string,
+  lang: Language,
+  card?: string,
+) {
   const params = new URLSearchParams({
     mode,
     spread: "single",
     orientation: "upright",
     question,
+    lang,
   });
 
   if (card) {
@@ -51,6 +47,7 @@ function buildQuery(mode: ReadingMode, question: string, card?: string) {
 function saveLatestRitual(
   mode: ReadingMode,
   question: string,
+  lang: Language,
   card?: string,
 ) {
   localStorage.setItem(
@@ -60,6 +57,7 @@ function saveLatestRitual(
       spread: "single",
       orientation: "upright",
       question,
+      lang,
       card,
     }),
   );
@@ -68,8 +66,25 @@ function saveLatestRitual(
 export function DrawClient({
   initialMode,
   initialQuestion,
+  initialLang,
+  hasLangParam,
 }: DrawClientProps) {
   const router = useRouter();
+  const copy = text(initialLang);
+  const onlineSteps = [
+    {
+      title: copy.shuffleAction,
+      description: copy.onlineShuffleDescription,
+    },
+    {
+      title: copy.cutAction,
+      description: copy.onlineCutDescription,
+    },
+    {
+      title: copy.drawAction,
+      description: copy.onlineDrawStepDescription,
+    },
+  ] as const;
   const [question, setQuestion] = useState<string | undefined>(
     initialQuestion || undefined,
   );
@@ -82,7 +97,7 @@ export function DrawClient({
 
     if (initialQuestion) {
       localStorage.setItem(USER_QUESTION_KEY, initialQuestion);
-      saveLatestRitual(initialMode, initialQuestion);
+      saveLatestRitual(initialMode, initialQuestion, initialLang);
     }
 
     queueMicrotask(() => {
@@ -90,13 +105,17 @@ export function DrawClient({
     });
 
     if (!resolvedQuestion) {
-      router.replace(`/ai-guide/ask?mode=${initialMode}`);
+      router.replace(
+        `/ai-guide/ask?mode=${initialMode}&spread=single&orientation=upright&lang=${initialLang}`,
+      );
     }
-  }, [initialMode, initialQuestion, router]);
+  }, [initialLang, initialMode, initialQuestion, router]);
 
   function handleOnlineRitual() {
     if (!question) {
-      router.replace(`/ai-guide/ask?mode=${initialMode}`);
+      router.replace(
+        `/ai-guide/ask?mode=${initialMode}&spread=single&orientation=upright&lang=${initialLang}`,
+      );
       return;
     }
 
@@ -109,14 +128,14 @@ export function DrawClient({
       tarotCards[Math.floor(Math.random() * tarotCards.length)];
     localStorage.setItem(SELECTED_CARD_KEY, selectedCard.id);
     localStorage.setItem(USER_QUESTION_KEY, question);
-    saveLatestRitual("online", question, selectedCard.id);
+    saveLatestRitual("online", question, initialLang, selectedCard.id);
     setDrawnCard(selectedCard.id);
   }
 
   if (question === undefined) {
     return (
       <PageContainer
-        eyebrow="Reading Room"
+        eyebrow={copy.readingRoom}
         title="Preparing the draw"
         description="Gathering your saved question."
       >
@@ -132,18 +151,32 @@ export function DrawClient({
   if (initialMode === "online") {
     return (
       <PageContainer
-        eyebrow="Online Draw"
-        title="Draw Online"
-        description="Move through a simple online ritual before opening the reading."
+        eyebrow={copy.onlineDraw}
+        title={copy.drawOnline}
+        description={copy.onlineDrawDescription}
       >
+        <ReadingNav lang={initialLang} />
+        <div className="mb-5 flex justify-end">
+          <LanguageToggle
+            lang={initialLang}
+            pathname="/ai-guide/draw"
+            params={{
+              mode: initialMode,
+              spread: "single",
+              orientation: "upright",
+              question,
+            }}
+            hasLangParam={hasLangParam}
+          />
+        </div>
         <div className="space-y-6">
           <div className="atelier-worktop p-5 text-sm leading-7 text-[#c8c0b4]">
             <p className="atelier-label text-[0.68rem] font-semibold">
-              Your Question
+              {copy.yourQuestion}
             </p>
             <p className="mt-3 text-[#efe8d9]">{question}</p>
             <p className="mt-3 text-sm leading-6 text-[#a9a59d]">
-              Keep your question gently in mind as you move through the ritual.
+              {copy.keepQuestion}
             </p>
             <div className="atelier-divider my-5" />
             <div className="space-y-3">
@@ -182,9 +215,14 @@ export function DrawClient({
           </div>
           {drawnCard && (
             <TarotButton
-              href={`/ai-guide/reveal?${buildQuery("online", question, drawnCard)}`}
+              href={`/ai-guide/reveal?${buildQuery(
+                "online",
+                question,
+                initialLang,
+                drawnCard,
+              )}`}
             >
-              Reveal the Card
+              {copy.revealCard}
             </TarotButton>
           )}
         </div>
@@ -194,55 +232,64 @@ export function DrawClient({
 
   return (
     <PageContainer
-      eyebrow="Physical Deck"
-      title="Ritual Step"
-      description="Move through one card with a slow, deliberate physical sequence."
+      eyebrow={copy.physicalDeck}
+      title={copy.physicalDrawTitle}
+      description={copy.physicalDrawDescription}
     >
+      <ReadingNav lang={initialLang} />
+      <div className="mb-5 flex justify-end">
+        <LanguageToggle
+          lang={initialLang}
+          pathname="/ai-guide/draw"
+          params={{
+            mode: initialMode,
+            spread: "single",
+            orientation: "upright",
+            question,
+          }}
+          hasLangParam={hasLangParam}
+        />
+      </div>
       <div className="space-y-6">
         <div className="atelier-worktop p-5 text-sm leading-7 text-[#c8c0b4]">
           <p className="atelier-label text-[0.68rem] font-semibold">
-            Your Question
+            {copy.yourQuestion}
           </p>
           <p className="mt-3 text-[#efe8d9]">{question}</p>
           <p className="mt-3 text-sm leading-6 text-[#a9a59d]">
-            Keep your question gently in mind as you move through the ritual.
+            {copy.keepQuestion}
           </p>
           <div className="atelier-divider my-5" />
           <ol className="space-y-4">
             <li>
-              <p className="font-semibold text-[#efe8d9]">1. Prepare</p>
-              <p>Prepare your physical deck and place it in front of you.</p>
+              <p className="font-semibold text-[#efe8d9]">
+                1. {copy.prepareStep}
+              </p>
+              <p>{copy.prepareDeck}</p>
             </li>
             <li>
-              <p className="font-semibold text-[#efe8d9]">2. Shuffle</p>
-              <p>
-                Shuffle your physical deck slowly while keeping your question
-                in mind.
-              </p>
+              <p className="font-semibold text-[#efe8d9]">2. {copy.shuffle}</p>
+              <p>{copy.shuffleDeck}</p>
             </li>
             <li>
-              <p className="font-semibold text-[#efe8d9]">3. Cut</p>
-              <p>
-                Cut the deck once, or in the way that feels natural to your
-                reading practice.
-              </p>
+              <p className="font-semibold text-[#efe8d9]">3. {copy.cut}</p>
+              <p>{copy.cutDeck}</p>
             </li>
             <li>
-              <p className="font-semibold text-[#efe8d9]">4. Draw</p>
-              <p>
-                Draw one card from your deck. Keep it face down until you are
-                ready to select it here.
-              </p>
+              <p className="font-semibold text-[#efe8d9]">4. {copy.draw}</p>
+              <p>{copy.drawDeck}</p>
             </li>
           </ol>
-          <p className="mt-5 text-[#efe8d9]">
-            When you are ready, select the same card in the guide.
-          </p>
+          <p className="mt-5 text-[#efe8d9]">{copy.selectSameCard}</p>
         </div>
         <TarotButton
-          href={`/ai-guide/reveal?${buildQuery("physical", question)}`}
+          href={`/ai-guide/reveal?${buildQuery(
+            "physical",
+            question,
+            initialLang,
+          )}`}
         >
-          I HAVE DRAWN MY CARD
+          {copy.haveDrawnCard}
         </TarotButton>
       </div>
     </PageContainer>

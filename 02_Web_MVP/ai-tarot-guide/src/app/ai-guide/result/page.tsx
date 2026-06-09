@@ -1,4 +1,5 @@
 import { ResultClient } from "./ResultClient";
+import { normalizeLanguage } from "@/lib/ai-guide/i18n";
 
 function normalizeValue(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] ?? "" : value ?? "";
@@ -18,9 +19,11 @@ export default async function ResultPage({
     card?: string | string[];
     orientation?: string | string[];
     question?: string | string[];
+    lang?: string | string[];
   }>;
 }) {
-  const { mode, spread, card, orientation, question } = await searchParams;
+  const { mode, spread, card, orientation, question, lang } =
+    await searchParams;
 
   return (
     <ResultClient
@@ -29,6 +32,8 @@ export default async function ResultPage({
       initialCard={normalizeValue(card)}
       initialOrientation={normalizeValue(orientation)}
       initialQuestion={normalizeValue(question)}
+      initialLang={normalizeLanguage(lang)}
+      hasLangParam={Boolean(lang)}
     />
   );
 }

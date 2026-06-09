@@ -1,4 +1,5 @@
 import { DrawClient } from "./DrawClient";
+import { normalizeLanguage } from "@/lib/ai-guide/i18n";
 
 type ReadingMode = "physical" | "online";
 
@@ -17,17 +18,23 @@ export default async function DrawPage({
   searchParams: Promise<{
     mode?: string | string[];
     question?: string | string[];
+    spread?: string | string[];
+    orientation?: string | string[];
+    lang?: string | string[];
   }>;
 }) {
   const {
     mode: modeParam,
     question: questionParam,
+    lang: langParam,
   } = await searchParams;
 
   return (
     <DrawClient
       initialMode={normalizeMode(modeParam)}
       initialQuestion={normalizeValue(questionParam)}
+      initialLang={normalizeLanguage(langParam)}
+      hasLangParam={Boolean(langParam)}
     />
   );
 }
