@@ -36,9 +36,17 @@ export function AskForm({ mode, spread, orientation }: AskFormProps) {
             Ask Your Question
           </h1>
           <p className="text-sm leading-6 text-[#a9a59d]">
-            Write one clear question. Ask for guidance, reflection, or
-            direction.
+            Write one clear question. A single-card reading works best when the
+            question is focused, open-ended, and personally meaningful.
           </p>
+          <div className="atelier-panel p-4 text-sm leading-6 text-[#c8c0b4]">
+            <p className="atelier-label mb-2 text-[0.62rem] font-semibold">
+              Good questions often begin with
+            </p>
+            <p>What should I understand about...</p>
+            <p>What should I pay attention to...</p>
+            <p>How can I approach...</p>
+          </div>
         </header>
 
         <form
@@ -77,7 +85,7 @@ export function AskForm({ mode, spread, orientation }: AskFormProps) {
                   setError("");
                 }
               }}
-              placeholder="What do I need to understand about..."
+              placeholder="What should I pay attention to right now?"
               className="min-h-48 w-full resize-none border border-[#766f61] bg-[#d0c2a4] p-4 text-base leading-7 text-[#16100c] shadow-[inset_0_1px_7px_rgba(54,38,22,0.2)] outline-none placeholder:text-[#6f6048] focus:border-[#a98552] focus:ring-2 focus:ring-[#8f9b9a]/35"
             />
           </div>

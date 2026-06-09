@@ -18,7 +18,20 @@ type DrawClientProps = {
   initialQuestion: string;
 };
 
-const onlineSteps = ["Shuffle the Deck", "Cut the Deck", "Draw One Card"] as const;
+const onlineSteps = [
+  {
+    title: "SHUFFLE",
+    description: "Quiet the deck and return to your question.",
+  },
+  {
+    title: "CUT",
+    description: "Mark the moment of choice.",
+  },
+  {
+    title: "DRAW",
+    description: "Draw one card from the online deck.",
+  },
+] as const;
 
 function buildQuery(mode: ReadingMode, question: string, card?: string) {
   const params = new URLSearchParams({
@@ -121,7 +134,7 @@ export function DrawClient({
       <PageContainer
         eyebrow="Online Draw"
         title="Draw Online"
-        description="Focus on your question. When you are ready, let the guide draw one card for you."
+        description="Move through a simple online ritual before opening the reading."
       >
         <div className="space-y-6">
           <div className="atelier-worktop p-5 text-sm leading-7 text-[#c8c0b4]">
@@ -133,7 +146,7 @@ export function DrawClient({
             <div className="space-y-3">
               {onlineSteps.map((step, index) => (
                 <button
-                  key={step}
+                  key={step.title}
                   type="button"
                   disabled={Boolean(drawnCard) || index !== ritualStep}
                   onClick={() => {
@@ -154,7 +167,12 @@ export function DrawClient({
                   <span className="flex h-7 w-7 shrink-0 items-center justify-center border border-[#8c724b] text-xs text-[#d8c9ae]">
                     {index + 1}
                   </span>
-                  <span className="text-[#efe8d9]">{step}</span>
+                  <span className="text-left">
+                    <span className="block text-[#efe8d9]">{step.title}</span>
+                    <span className="block text-sm leading-6 text-[#a9a59d]">
+                      {step.description}
+                    </span>
+                  </span>
                 </button>
               ))}
             </div>
@@ -175,7 +193,7 @@ export function DrawClient({
     <PageContainer
       eyebrow="Physical Deck"
       title="Ritual Step"
-      description="Move through one card with a slow, deliberate sequence."
+      description="Move through one card with a slow, deliberate physical sequence."
     >
       <div className="space-y-6">
         <div className="atelier-worktop p-5 text-sm leading-7 text-[#c8c0b4]">
@@ -191,7 +209,10 @@ export function DrawClient({
             </li>
             <li>
               <p className="font-semibold text-[#efe8d9]">2. Shuffle</p>
-              <p>Shuffle your physical deck slowly while holding your question in mind.</p>
+              <p>
+                Shuffle your physical deck slowly while keeping your question
+                in mind.
+              </p>
             </li>
             <li>
               <p className="font-semibold text-[#efe8d9]">3. Cut</p>
@@ -202,7 +223,10 @@ export function DrawClient({
             </li>
             <li>
               <p className="font-semibold text-[#efe8d9]">4. Draw</p>
-              <p>Draw one card from your physical deck.</p>
+              <p>
+                Draw one card from your deck. Keep it face down until you are
+                ready to select it here.
+              </p>
             </li>
           </ol>
           <p className="mt-5 text-[#efe8d9]">

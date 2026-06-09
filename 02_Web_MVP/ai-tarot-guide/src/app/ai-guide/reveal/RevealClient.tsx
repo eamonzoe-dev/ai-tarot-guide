@@ -143,7 +143,7 @@ export function RevealClient({
       <PageContainer
         eyebrow="Physical Card Mode"
         title="Reveal Your Physical Card"
-        description="Select the card you drew from your physical deck."
+        description="Select the card you drew from your physical deck. The reading will be based on that card, your question, and the single-card format."
       >
         <div className="atelier-panel mx-auto grid w-full max-w-sm grid-cols-2 gap-3 p-3 pb-8">
           {tarotCards.map((tarotCard) => (
@@ -181,7 +181,7 @@ export function RevealClient({
     <PageContainer
       eyebrow="Online Draw Mode"
       title="The Card Is Drawn"
-      description="The card is selected. Open the reading when you are ready."
+      description="Your card has been drawn. Open the reading when you are ready to see the symbolic reflection."
     >
       <div className="space-y-6">
         <div className="atelier-worktop p-5 text-center">

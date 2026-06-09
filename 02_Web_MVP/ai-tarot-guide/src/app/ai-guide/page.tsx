@@ -13,7 +13,7 @@ export default function AiGuidePage() {
             A quiet symbolic reading room for physical and online tarot.
           </h1>
           <p className="mt-5 max-w-sm text-sm leading-7 text-[#aaa49b]">
-            Choose your reading method.
+            Choose how you would like to begin your single-card reading.
           </p>
         </section>
 
@@ -28,6 +28,9 @@ export default function AiGuidePage() {
                   <span className="h-16 w-12 border border-[#b49a68]/65 bg-[#080706]" />
                 </span>
                 <span className="leading-5">Use your own physical deck</span>
+                <span className="normal-case leading-5 tracking-[0] text-[#c8c0b4]">
+                  Shuffle, cut, and draw by hand, then select the card here.
+                </span>
               </TarotButton>
 
               <TarotButton
@@ -41,6 +44,9 @@ export default function AiGuidePage() {
                   <span className="relative h-20 w-14 border border-[#8aa08f] bg-[linear-gradient(160deg,#17201d,#080b0a)] shadow-[0_14px_28px_rgba(0,0,0,0.45)]" />
                 </span>
                 <span className="leading-5">Draw a card inside the atelier</span>
+                <span className="normal-case leading-5 tracking-[0] text-[#c8c0b4]">
+                  Move through shuffle, cut, draw, and reveal before the reading.
+                </span>
               </TarotButton>
             </div>
             <div className="atelier-divider mt-4" />

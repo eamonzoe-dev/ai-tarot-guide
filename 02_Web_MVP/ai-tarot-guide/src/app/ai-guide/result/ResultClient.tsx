@@ -219,16 +219,15 @@ export function ResultClient({
   }
 
   const readingSections = [
-    { title: "Core Message", body: [card.coreMeaning] },
     {
-      title: "What This Card Reflects",
+      title: "Reading Reflection",
       body: [card.uprightMessage, card.loveMessage],
     },
     {
       title: "Shadow / Challenge",
       body: [card.shadowMessage],
     },
-    { title: "Guidance", body: [card.practicalAdvice] },
+    { title: "Suggestion", body: [card.practicalAdvice] },
     { title: "Reflection Prompt", body: [card.reflectionQuestion] },
   ];
   const modeLabel =
@@ -243,7 +242,7 @@ export function ResultClient({
       <div className="atelier-grain pointer-events-none absolute inset-0" />
       <div className="mx-auto max-w-5xl px-5 py-8 sm:px-6 lg:py-14">
         <header className="atelier-label relative flex items-center justify-between text-xs font-semibold">
-          <p>Your reading</p>
+          <p>Reading Dossier</p>
           <p>{mode === "online" ? "Online Draw" : "Physical Deck"}</p>
         </header>
 
@@ -273,7 +272,7 @@ export function ResultClient({
           <section className="lg:col-span-3">
             <div className="atelier-paper p-5 lg:p-6">
               <h2 className="text-xs font-semibold uppercase tracking-[0.24em] text-[#6d5532]">
-                Your Question
+                Question
               </h2>
               <p className="mt-3 text-base leading-7 text-[#17110d] sm:text-lg">
                 {question}
@@ -282,37 +281,33 @@ export function ResultClient({
 
             <div className="atelier-panel mt-4 p-5">
               <h2 className="atelier-label text-xs font-semibold">
-                Reading Type
+                Reading Dossier
               </h2>
-              <p className="mt-3 text-base leading-7 text-zinc-100">
-                Reading Type: {readingTypeLabel}
-              </p>
+              <div className="mt-4 grid gap-4 text-sm leading-6 sm:grid-cols-3">
+                <div>
+                  <p className="text-[#bca77f]">Reading Type</p>
+                  <p className="mt-1 text-zinc-100">{readingTypeLabel}</p>
+                </div>
+                <div>
+                  <p className="text-[#bca77f]">Reading Mode</p>
+                  <p className="mt-1 text-zinc-100">{modeLabel}</p>
+                </div>
+                <div>
+                  <p className="text-[#bca77f]">Card Orientation</p>
+                  <p className="mt-1 text-zinc-100">{orientationLabel}</p>
+                </div>
+              </div>
             </div>
 
             <div className="atelier-panel mt-4 p-5">
               <h2 className="atelier-label text-xs font-semibold">
-                Reading Mode
-              </h2>
-              <p className="mt-3 text-base leading-7 text-zinc-100">
-                Reading Mode: {modeLabel}
-              </p>
-            </div>
-
-            <div className="atelier-panel mt-4 p-5">
-              <h2 className="atelier-label text-xs font-semibold">
-                Card Orientation
-              </h2>
-              <p className="mt-3 text-base leading-7 text-zinc-100">
-                Card Orientation: {orientationLabel}
-              </p>
-            </div>
-
-            <div className="atelier-panel mt-4 p-5">
-              <h2 className="atelier-label text-xs font-semibold">
-                The Card You Drew
+                Card
               </h2>
               <p className="mt-3 font-serif text-2xl leading-tight text-zinc-100">
                 {card.title}
+              </p>
+              <p className="mt-2 text-sm leading-6 text-[#c8c0b4]">
+                {cleanParagraph(card.coreMeaning)}
               </p>
             </div>
 
@@ -354,8 +349,15 @@ export function ResultClient({
                 Closing Note
               </h2>
               <p className="mt-3 text-sm leading-6 text-[#9f947f]">
-                Tarot offers symbolic reflection, not fixed prediction. Use
-                this reading as a mirror, not as a command.
+                This reading is a symbolic reflection, not a fixed prediction.
+                Use it as a quiet prompt for attention, choice, and
+                self-understanding.
+              </p>
+              <p className="mt-4 text-xs leading-5 text-[#777063]">
+                Tarot readings on this site are symbolic reflections for
+                personal insight. They are not medical, legal, financial, or
+                psychological advice, and they should not replace professional
+                support.
               </p>
             </section>
           </section>
