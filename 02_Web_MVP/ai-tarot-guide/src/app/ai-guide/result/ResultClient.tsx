@@ -187,49 +187,20 @@ export function ResultClient({
   if (!card) {
     return (
       <PageContainer
-        eyebrow="Reading error"
-        title="The card cannot be found"
-        description="The saved card is not part of this MVP deck. Return to the deck and choose again."
+        eyebrow="Reading Dossier"
+        title="The reading could not be opened."
+        description="The selected card was not found. You can return to the reading room and begin again."
       >
         <Link
-          className="inline-flex min-h-12 w-full items-center justify-center rounded-full border border-white/15 bg-white/[0.04] px-5 text-center text-xs font-semibold uppercase tracking-[0.25em] text-stone-100 transition hover:bg-white/[0.08]"
-          href="/ai-guide/select-card"
+          className="inline-flex min-h-12 w-full touch-manipulation items-center justify-center border border-[#b08c58]/70 bg-[linear-gradient(180deg,#2a1d15,#120d0a)] px-5 text-center text-xs font-semibold uppercase tracking-[0.24em] text-[#f0eadf] shadow-[0_12px_28px_rgba(0,0,0,0.42),inset_0_1px_0_rgba(255,235,204,0.12),inset_0_-1px_0_rgba(0,0,0,0.72)]"
+          href="/ai-guide"
         >
-          BACK TO CARDS
+          Return to Reading Room
         </Link>
       </PageContainer>
     );
   }
 
-  if (!question) {
-    return (
-      <PageContainer
-        eyebrow="Reading error"
-        title="Missing question from localStorage"
-        description="The selected card was found, but the question was not saved before opening the result page."
-      >
-        <Link
-          className="inline-flex min-h-12 w-full items-center justify-center rounded-full border border-white/15 bg-white/[0.04] px-5 text-center text-xs font-semibold uppercase tracking-[0.25em] text-stone-100 transition hover:bg-white/[0.08]"
-          href={`/ai-guide/ask?mode=${mode ?? "physical"}`}
-        >
-          BACK TO QUESTION
-        </Link>
-      </PageContainer>
-    );
-  }
-
-  const readingSections = [
-    {
-      title: "Reading Reflection",
-      body: [card.uprightMessage, card.loveMessage],
-    },
-    {
-      title: "Shadow / Challenge",
-      body: [card.shadowMessage],
-    },
-    { title: "Suggestion", body: [card.practicalAdvice] },
-    { title: "Reflection Prompt", body: [card.reflectionQuestion] },
-  ];
   const modeLabel =
     mode === "online" ? "Online Draw Mode" : "Physical Card Mode";
   const readingTypeLabel =
@@ -237,6 +208,9 @@ export function ResultClient({
   const orientationLabel =
     orientation === "upright" ? "Upright" : "Upright";
   const cardLabel = getTarotCardLabel(card);
+  const questionText = question || "No question was recorded for this reading.";
+  const reflectionPrompt =
+    card.reflectionQuestion || "What is this card asking you to notice?";
 
   return (
     <main className="atelier-page relative min-h-screen overflow-hidden text-zinc-100">
@@ -289,14 +263,14 @@ export function ResultClient({
           <section className="lg:col-span-3">
             <div className="atelier-paper p-5 lg:p-6">
               <h2 className="text-xs font-semibold uppercase tracking-[0.24em] text-[#6d5532]">
-                Question
+                Your Question
               </h2>
               <p className="mt-3 text-base leading-7 text-[#17110d] sm:text-lg">
-                {question}
+                {questionText}
               </p>
             </div>
 
-            <div className="atelier-panel mt-4 p-5">
+            <div className="atelier-panel mt-4 border-[#a98552]/35 p-5">
               <h2 className="atelier-label text-xs font-semibold">
                 Reading Dossier
               </h2>
@@ -318,32 +292,56 @@ export function ResultClient({
 
             <div className="atelier-panel mt-4 p-5">
               <h2 className="atelier-label text-xs font-semibold">
-                Card
+                The Card
               </h2>
               <p className="mt-3 font-serif text-2xl leading-tight text-zinc-100">
                 {card.title}
               </p>
+              <p className="mt-2 text-sm leading-6 text-[#bca77f]">
+                {cardLabel} / {card.rank}
+              </p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {card.keywords.map((keyword) => (
+                  <span
+                    key={keyword}
+                    className="border border-[#4a3b28] bg-[#0f0b08] px-3 py-1 text-xs text-[#d8c9ae]"
+                  >
+                    {keyword}
+                  </span>
+                ))}
+              </div>
               <p className="mt-2 text-sm leading-6 text-[#c8c0b4]">
                 {cleanParagraph(card.coreMeaning)}
               </p>
             </div>
 
             <div className="mt-4 space-y-4">
-              {readingSections.map((section) => (
-                <section
-                  key={section.title}
-                  className="atelier-paper-dark p-5"
-                >
-                  <h2 className="atelier-label text-xs font-semibold">
-                    {section.title}
-                  </h2>
-                  <div className="mt-3 space-y-4 text-[15px] leading-7 text-zinc-200 sm:text-base sm:leading-8">
-                    {section.body.map((paragraph) => (
-                      <p key={paragraph}>{cleanParagraph(paragraph)}</p>
-                    ))}
-                  </div>
-                </section>
-              ))}
+              <section className="atelier-paper-dark p-5">
+                <h2 className="atelier-label text-xs font-semibold">
+                  Reading Reflection
+                </h2>
+                <p className="mt-3 text-[15px] leading-7 text-zinc-200 sm:text-base sm:leading-8">
+                  In relation to your question, {card.reflection}
+                </p>
+              </section>
+
+              <section className="atelier-paper-dark p-5">
+                <h2 className="atelier-label text-xs font-semibold">
+                  Quiet Suggestion
+                </h2>
+                <p className="mt-3 text-[15px] leading-7 text-zinc-200 sm:text-base sm:leading-8">
+                  {card.suggestion}
+                </p>
+              </section>
+
+              <section className="atelier-paper-dark p-5">
+                <h2 className="atelier-label text-xs font-semibold">
+                  Reflection Prompt
+                </h2>
+                <p className="mt-3 text-[15px] leading-7 text-zinc-200 sm:text-base sm:leading-8">
+                  {cleanParagraph(reflectionPrompt).replace(/^Ask yourself:\s*/i, "")}
+                </p>
+              </section>
             </div>
 
             <div className="mt-6 grid gap-3 sm:grid-cols-2">

@@ -52,6 +52,7 @@ const suitLabels: Record<TarotSuit, string> = {
 
 function toReadingCard(seed: CardSeed): TarotCard {
   const focus = seed.keywords.slice(0, 3).join(", ");
+  const firstKeyword = seed.keywords[0].toLowerCase();
 
   return {
     ...seed,
@@ -61,7 +62,10 @@ function toReadingCard(seed: CardSeed): TarotCard {
     shadowMessage: `What To Notice: The shadow of this card may appear when ${seed.keywords[0].toLowerCase()} becomes too narrow, rushed, or disconnected from honest attention.`,
     loveMessage: `This card can be read as a quiet prompt to stay present with what is real, relational, and personally meaningful rather than forcing a quick conclusion.`,
     practicalAdvice: `A Practical Next Step: ${seed.suggestion}`,
-    reflectionQuestion: `Ask yourself: What would change if I approached this through ${seed.keywords[0].toLowerCase()} with more clarity and care?`,
+    reflectionQuestion:
+      seed.arcana === "major"
+        ? `Ask yourself: Where is ${firstKeyword} asking for more honest attention now?`
+        : `Ask yourself: How is ${firstKeyword} showing up in this situation?`,
   };
 }
 
@@ -551,7 +555,14 @@ function minorSeed(
       .replace(/\.$/, "")} within ${suitProfile.domain}. In this reading, it reflects ${keywords
       .slice(0, 3)
       .join(", ")} in a practical, symbolic way.`,
-    suggestion: rankProfile.suggestion,
+    suggestion:
+      suit === "wands"
+        ? `${rankProfile.suggestion} Let your energy stay intentional rather than reactive.`
+        : suit === "cups"
+          ? `${rankProfile.suggestion} Give the emotional truth enough room to be heard.`
+          : suit === "swords"
+            ? `${rankProfile.suggestion} Let clarity guide the words or decisions that follow.`
+            : `${rankProfile.suggestion} Keep the next step grounded in what can be tended today.`,
   };
 }
 
