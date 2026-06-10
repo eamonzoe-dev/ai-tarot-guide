@@ -33,7 +33,6 @@ type RevealClientProps = {
   initialOrientation: string;
   initialLang: Language;
   hasLangParam: boolean;
-  initialSearchParams: Record<string, string>;
 };
 
 type RitualState = {
@@ -44,8 +43,6 @@ type RitualState = {
   card: string;
   lang: Language;
 };
-
-const isDevelopment = process.env.NODE_ENV !== "production";
 
 function isReadingMode(value: string): value is ReadingMode {
   return value === "online" || value === "physical";
@@ -87,7 +84,7 @@ function resolveInitialRitual({
   initialLang,
 }: Omit<
   RevealClientProps,
-  "hasLangParam" | "initialSearchParams"
+  "hasLangParam"
 >): RitualState {
   const mode: ReadingMode = isReadingMode(initialMode)
     ? initialMode
@@ -103,35 +100,6 @@ function resolveInitialRitual({
   };
 }
 
-function DevelopmentRevealDebug({
-  hydrated,
-  initialSearchParams,
-  ritual,
-  foundCard,
-}: {
-  hydrated: boolean;
-  initialSearchParams: Record<string, string>;
-  ritual: RitualState;
-  foundCard: boolean;
-}) {
-  if (!isDevelopment) {
-    return null;
-  }
-
-  return (
-    <div className="mt-6 border border-[#4a3b28] bg-[#090806]/95 p-3 font-mono text-[0.68rem] leading-5 text-[#d8c9ae]">
-      <p>reveal debug</p>
-      <p>hydrated: {hydrated ? "true" : "false"}</p>
-      <p>search: {JSON.stringify(initialSearchParams)}</p>
-      <p>card param: {initialSearchParams.card || "none"}</p>
-      <p>foundCard: {foundCard ? "yes" : "no"}</p>
-      <p>mode: {ritual.mode}</p>
-      <p>lang: {ritual.lang}</p>
-      <p>question: {ritual.question || "none"}</p>
-    </div>
-  );
-}
-
 export function RevealClient({
   initialMode,
   initialQuestion,
@@ -140,7 +108,6 @@ export function RevealClient({
   initialOrientation,
   initialLang,
   hasLangParam,
-  initialSearchParams,
 }: RevealClientProps) {
   const router = useRouter();
   const copy = text(initialLang);
@@ -155,11 +122,8 @@ export function RevealClient({
     }),
   );
   const [selectedPhysicalCard, setSelectedPhysicalCard] = useState("");
-  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
-    setHydrated(true);
-
     const stored = readLatestRitual();
     const storedQuestion = localStorage.getItem(USER_QUESTION_KEY) ?? "";
     const storedCard = localStorage.getItem(SELECTED_CARD_KEY) ?? "";
@@ -264,12 +228,6 @@ export function RevealClient({
             </section>
           ))}
         </div>
-        <DevelopmentRevealDebug
-          hydrated={hydrated}
-          initialSearchParams={initialSearchParams}
-          ritual={ritual}
-          foundCard={Boolean(card)}
-        />
       </PageContainer>
     );
   }
@@ -299,12 +257,6 @@ export function RevealClient({
             {copy.returnToReadingRoom}
           </TarotButton>
         </div>
-        <DevelopmentRevealDebug
-          hydrated={hydrated}
-          initialSearchParams={initialSearchParams}
-          ritual={ritual}
-          foundCard={Boolean(card)}
-        />
       </PageContainer>
     );
   }
@@ -358,12 +310,6 @@ export function RevealClient({
         <TarotButton href={buildResultHref(ritual)}>
           {copy.openReading}
         </TarotButton>
-        <DevelopmentRevealDebug
-          hydrated={hydrated}
-          initialSearchParams={initialSearchParams}
-          ritual={ritual}
-          foundCard={Boolean(card)}
-        />
       </div>
     </PageContainer>
   );

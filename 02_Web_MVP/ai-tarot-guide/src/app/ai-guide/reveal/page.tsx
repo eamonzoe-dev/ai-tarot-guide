@@ -5,14 +5,6 @@ function normalizeValue(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] ?? "" : value ?? "";
 }
 
-function buildDebugSearchParams(
-  params: Record<string, string | string[] | undefined>,
-) {
-  return Object.fromEntries(
-    Object.entries(params).map(([key, value]) => [key, normalizeValue(value)]),
-  );
-}
-
 export default async function RevealPage({
   searchParams,
 }: {
@@ -27,14 +19,6 @@ export default async function RevealPage({
 }) {
   const { mode, question, spread, card, orientation, lang } =
     await searchParams;
-  const initialSearchParams = buildDebugSearchParams({
-    mode,
-    question,
-    spread,
-    card,
-    orientation,
-    lang,
-  });
 
   return (
     <RevealClient
@@ -45,7 +29,6 @@ export default async function RevealPage({
       initialOrientation={normalizeValue(orientation)}
       initialLang={normalizeLanguage(lang)}
       hasLangParam={Boolean(lang)}
-      initialSearchParams={initialSearchParams}
     />
   );
 }
