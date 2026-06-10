@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import type { MouseEvent } from "react";
 
 type TarotButtonProps = {
   children: React.ReactNode;
   href?: string;
-  onClick?: () => void;
+  onClick?: (event: MouseEvent<HTMLAnchorElement | HTMLButtonElement>) => void;
   disabled?: boolean;
   variant?: "primary" | "ghost";
   className?: string;
@@ -30,17 +31,38 @@ export function TarotButton({
   className = "",
 }: TarotButtonProps) {
   const classes = `${baseClasses} ${variantClasses[variant]} ${className}`;
+  const handleClick = (
+    event: MouseEvent<HTMLAnchorElement | HTMLButtonElement>,
+  ) => {
+    if (disabled) {
+      event.preventDefault();
+      return;
+    }
+
+    onClick?.(event);
+  };
 
   if (href) {
     return (
-      <Link className={classes} href={href}>
+      <Link
+        aria-disabled={disabled}
+        className={classes}
+        href={href}
+        onClick={handleClick}
+        tabIndex={disabled ? -1 : undefined}
+      >
         {children}
       </Link>
     );
   }
 
   return (
-    <button className={classes} disabled={disabled} type="button" onClick={onClick}>
+    <button
+      className={classes}
+      disabled={disabled}
+      type="button"
+      onClick={handleClick}
+    >
       {children}
     </button>
   );

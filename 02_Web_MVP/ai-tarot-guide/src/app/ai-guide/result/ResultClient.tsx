@@ -291,7 +291,7 @@ export function ResultClient({
         <div className="relative mt-8 grid gap-10 lg:grid-cols-5 lg:items-start lg:gap-16">
           <aside className="lg:col-span-2">
             <div className="text-center lg:sticky lg:top-10">
-              <div className="atelier-worktop mx-auto max-w-xs p-4">
+              <div className="ritual-result-stage-1 atelier-worktop mx-auto max-w-xs p-4">
                 {card.image ? (
                   <Image
                     src={card.image}
@@ -318,17 +318,17 @@ export function ResultClient({
                 )}
               </div>
 
-              <p className="atelier-label mt-6 text-xs font-semibold">
+              <p className="ritual-result-stage-1 atelier-label mt-6 text-xs font-semibold">
                 {cardLabel}
               </p>
-              <h1 className="mt-2 font-serif text-4xl leading-tight text-zinc-100 sm:text-5xl">
+              <h1 className="ritual-result-stage-1 mt-2 font-serif text-4xl leading-tight text-zinc-100 sm:text-5xl">
                 {cardTitle}
               </h1>
             </div>
           </aside>
 
           <section className="lg:col-span-3">
-            <div className="atelier-paper p-5 lg:p-6">
+            <div className="ritual-result-stage-2 atelier-paper p-5 lg:p-6">
               <h2 className="text-xs font-semibold uppercase tracking-[0.24em] text-[#6d5532]">
                 {copy.yourQuestion}
               </h2>
@@ -337,7 +337,7 @@ export function ResultClient({
               </p>
             </div>
 
-            <div className="atelier-panel mt-4 border-[#a98552]/35 p-5">
+            <div className="ritual-result-stage-2 atelier-panel mt-4 border-[#a98552]/35 p-5">
               <h2 className="atelier-label text-xs font-semibold">
                 {copy.readingDossier}
               </h2>
@@ -357,7 +357,7 @@ export function ResultClient({
               </div>
             </div>
 
-            <div className="atelier-panel mt-4 p-5">
+            <div className="ritual-result-stage-3 atelier-panel mt-4 p-5">
               <h2 className="atelier-label text-xs font-semibold">
                 {copy.theCard}
               </h2>
@@ -382,7 +382,7 @@ export function ResultClient({
               </p>
             </div>
 
-            <div className="mt-4 space-y-4">
+            <div className="ritual-result-stage-4 mt-4 space-y-4">
               <section className="atelier-paper-dark p-5">
                 <h2 className="atelier-label text-xs font-semibold">
                   {copy.readingReflection}

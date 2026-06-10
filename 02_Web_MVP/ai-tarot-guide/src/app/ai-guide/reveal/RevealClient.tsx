@@ -33,6 +33,7 @@ type RevealClientProps = {
   initialOrientation: string;
   initialLang: Language;
   hasLangParam: boolean;
+  initialSearchParams: Record<string, string>;
 };
 
 type RitualState = {
@@ -43,6 +44,12 @@ type RitualState = {
   card: string;
   lang: Language;
 };
+
+const isDevelopment = process.env.NODE_ENV !== "production";
+
+function isReadingMode(value: string): value is ReadingMode {
+  return value === "online" || value === "physical";
+}
 
 function readLatestRitual(): Partial<RitualState> {
   const rawRitual = localStorage.getItem(LATEST_RITUAL_KEY);
@@ -78,23 +85,51 @@ function resolveInitialRitual({
   initialCard,
   initialOrientation,
   initialLang,
-}: Omit<RevealClientProps, "hasLangParam">): RitualState {
-  const stored = readLatestRitual();
-  const storedQuestion = localStorage.getItem(USER_QUESTION_KEY) ?? "";
-  const storedCard = localStorage.getItem(SELECTED_CARD_KEY) ?? "";
-  const mode: ReadingMode =
-    initialMode === "online" || stored.mode === "online"
-      ? "online"
-      : "physical";
+}: Omit<
+  RevealClientProps,
+  "hasLangParam" | "initialSearchParams"
+>): RitualState {
+  const mode: ReadingMode = isReadingMode(initialMode)
+    ? initialMode
+    : "physical";
 
   return {
     mode,
     spread: initialSpread === "single" ? "single" : "single",
     orientation: initialOrientation === "upright" ? "upright" : "upright",
-    question: initialQuestion || stored.question || storedQuestion,
-    card: initialCard || stored.card || storedCard,
+    question: initialQuestion,
+    card: initialCard,
     lang: initialLang,
   };
+}
+
+function DevelopmentRevealDebug({
+  hydrated,
+  initialSearchParams,
+  ritual,
+  foundCard,
+}: {
+  hydrated: boolean;
+  initialSearchParams: Record<string, string>;
+  ritual: RitualState;
+  foundCard: boolean;
+}) {
+  if (!isDevelopment) {
+    return null;
+  }
+
+  return (
+    <div className="mt-6 border border-[#4a3b28] bg-[#090806]/95 p-3 font-mono text-[0.68rem] leading-5 text-[#d8c9ae]">
+      <p>reveal debug</p>
+      <p>hydrated: {hydrated ? "true" : "false"}</p>
+      <p>search: {JSON.stringify(initialSearchParams)}</p>
+      <p>card param: {initialSearchParams.card || "none"}</p>
+      <p>foundCard: {foundCard ? "yes" : "no"}</p>
+      <p>mode: {ritual.mode}</p>
+      <p>lang: {ritual.lang}</p>
+      <p>question: {ritual.question || "none"}</p>
+    </div>
+  );
 }
 
 export function RevealClient({
@@ -105,10 +140,11 @@ export function RevealClient({
   initialOrientation,
   initialLang,
   hasLangParam,
+  initialSearchParams,
 }: RevealClientProps) {
   const router = useRouter();
   const copy = text(initialLang);
-  const [ritual] = useState<RitualState>(() =>
+  const [ritual, setRitual] = useState<RitualState>(() =>
     resolveInitialRitual({
       initialMode,
       initialQuestion,
@@ -118,9 +154,37 @@ export function RevealClient({
       initialLang,
     }),
   );
+  const [selectedPhysicalCard, setSelectedPhysicalCard] = useState("");
+  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
-    if (!ritual.question) {
+    setHydrated(true);
+
+    const stored = readLatestRitual();
+    const storedQuestion = localStorage.getItem(USER_QUESTION_KEY) ?? "";
+    const storedCard = localStorage.getItem(SELECTED_CARD_KEY) ?? "";
+    const hasInitialMode = isReadingMode(initialMode);
+    const nextRitual: RitualState = {
+      ...ritual,
+      mode: hasInitialMode
+        ? ritual.mode
+        : stored.mode === "online"
+          ? "online"
+          : ritual.mode,
+      question: ritual.question || stored.question || storedQuestion,
+      card: ritual.card || stored.card || storedCard,
+    };
+
+    if (
+      nextRitual.mode !== ritual.mode ||
+      nextRitual.question !== ritual.question ||
+      nextRitual.card !== ritual.card
+    ) {
+      setRitual(nextRitual);
+      return;
+    }
+
+    if (!ritual.question && !ritual.card) {
       router.replace(
         `/ai-guide/ask?mode=${ritual.mode}&spread=single&orientation=upright&lang=${ritual.lang}`,
       );
@@ -137,7 +201,7 @@ export function RevealClient({
     }
 
     localStorage.setItem(LATEST_RITUAL_KEY, JSON.stringify(ritual));
-  }, [ritual, router]);
+  }, [initialMode, ritual, router]);
 
   const card = ritual.card ? getTarotCardById(ritual.card) : undefined;
 
@@ -148,6 +212,7 @@ export function RevealClient({
         card: cardId,
       };
 
+      setSelectedPhysicalCard(cardId);
       localStorage.setItem(SELECTED_CARD_KEY, cardId);
       localStorage.setItem(LATEST_RITUAL_KEY, JSON.stringify(nextRitual));
     }
@@ -189,6 +254,8 @@ export function RevealClient({
                     key={tarotCard.id}
                     card={tarotCard}
                     href={buildPhysicalHref(tarotCard.id)}
+                    isSelected={selectedPhysicalCard === tarotCard.id}
+                    isSelectionActive={Boolean(selectedPhysicalCard)}
                     onSelect={handleSelect}
                     lang={initialLang}
                   />
@@ -197,25 +264,47 @@ export function RevealClient({
             </section>
           ))}
         </div>
+        <DevelopmentRevealDebug
+          hydrated={hydrated}
+          initialSearchParams={initialSearchParams}
+          ritual={ritual}
+          foundCard={Boolean(card)}
+        />
       </PageContainer>
     );
   }
 
   if (!ritual.card || !card) {
+    const title = ritual.card ? copy.invalidReadingTitle : copy.noCardDrawn;
+    const description = ritual.card
+      ? copy.invalidReadingDescription
+      : copy.noCardDrawnDescription;
+
     return (
       <PageContainer
         eyebrow={copy.onlineDrawMode}
-        title={copy.noCardDrawn}
-        description={copy.noCardDrawnDescription}
+        title={title}
+        description={description}
       >
         <ReadingNav lang={initialLang} />
-        <TarotButton
-          href={`/ai-guide/draw?mode=online&spread=single&orientation=upright&question=${encodeURIComponent(
-            ritual.question,
-          )}&lang=${initialLang}`}
-        >
-          {copy.backToDraw}
-        </TarotButton>
+        <div className="space-y-3">
+          <TarotButton
+            href={`/ai-guide/draw?mode=online&spread=single&orientation=upright&question=${encodeURIComponent(
+              ritual.question,
+            )}&lang=${initialLang}`}
+          >
+            {copy.backToDraw}
+          </TarotButton>
+          <TarotButton href={`/ai-guide?lang=${initialLang}`} variant="ghost">
+            {copy.returnToReadingRoom}
+          </TarotButton>
+        </div>
+        <DevelopmentRevealDebug
+          hydrated={hydrated}
+          initialSearchParams={initialSearchParams}
+          ritual={ritual}
+          foundCard={Boolean(card)}
+        />
       </PageContainer>
     );
   }
@@ -243,7 +332,7 @@ export function RevealClient({
       </div>
       <div className="space-y-6">
         <div className="atelier-worktop p-5 text-center">
-          <div className="mx-auto flex h-64 w-44 items-center justify-center border border-[#4a3b28] bg-[linear-gradient(160deg,#17110d,#070707)] shadow-[0_22px_48px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,245,224,0.08)]">
+          <div className="ritual-reveal-card mx-auto flex h-64 w-44 items-center justify-center border border-[#4a3b28] bg-[linear-gradient(160deg,#17110d,#070707)] shadow-[0_22px_48px_rgba(0,0,0,0.55),0_0_34px_rgba(169,133,82,0.12),inset_0_1px_0_rgba(255,245,224,0.08)]">
             <div className="h-52 w-32 border border-[#8c724b] bg-[#090806] p-4">
               <div className="h-full border border-[#3f3324]" />
             </div>
@@ -269,6 +358,12 @@ export function RevealClient({
         <TarotButton href={buildResultHref(ritual)}>
           {copy.openReading}
         </TarotButton>
+        <DevelopmentRevealDebug
+          hydrated={hydrated}
+          initialSearchParams={initialSearchParams}
+          ritual={ritual}
+          foundCard={Boolean(card)}
+        />
       </div>
     </PageContainer>
   );

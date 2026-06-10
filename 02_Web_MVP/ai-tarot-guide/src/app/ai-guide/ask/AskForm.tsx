@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 import { LanguageToggle } from "@/components/ai-guide/LanguageToggle";
 import { ReadingNav } from "@/components/ai-guide/ReadingNav";
+import { RitualField, RitualPrompt } from "@/components/ai-guide/RitualField";
 import { type Language, text } from "@/lib/ai-guide/i18n";
 
 const USER_QUESTION_KEY = "aiTarot:userQuestion";
@@ -40,6 +41,7 @@ export function AskForm({
   return (
     <main className="atelier-page relative min-h-screen overflow-hidden px-5 py-8 text-[#eee8dd]">
       <div className="atelier-grain pointer-events-none absolute inset-0" />
+      <RitualField variant="focus" />
       <div className="pointer-events-auto relative z-10 mx-auto flex max-w-sm flex-col gap-6">
         <div>
           <ReadingNav lang={lang} />
@@ -64,6 +66,8 @@ export function AskForm({
           </p>
         </header>
 
+        <RitualPrompt lines={[...copy.askRitualPrompt]} />
+
         <form
           action="/ai-guide/draw"
           method="get"
@@ -84,9 +88,9 @@ export function AskForm({
           <input name="spread" type="hidden" value={spread} />
           <input name="orientation" type="hidden" value={orientation} />
           <input name="lang" type="hidden" value={lang} />
-          <div className="border border-[#9c845b]/55 bg-[linear-gradient(180deg,#d6c8aa,#bda985)] p-4 text-[#17110d] shadow-[0_18px_48px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.22)]">
+          <div className="ritual-note p-4">
             <label
-              className="mb-3 block text-[0.62rem] font-semibold uppercase tracking-[0.24em] text-[#6d5532]"
+              className="ritual-note-label mb-3 block text-[0.62rem] font-semibold uppercase tracking-[0.24em]"
               htmlFor="tarot-question"
             >
               {copy.readingNote}
@@ -102,9 +106,9 @@ export function AskForm({
                 }
               }}
               placeholder={copy.askPlaceholder}
-              className="min-h-48 w-full resize-none border border-[#766f61] bg-[#d0c2a4] p-4 text-base leading-7 text-[#16100c] shadow-[inset_0_1px_7px_rgba(54,38,22,0.2)] outline-none placeholder:text-[#6f6048] focus:border-[#a98552] focus:ring-2 focus:ring-[#8f9b9a]/35"
+              className="ritual-note-field min-h-48 w-full resize-none p-4 text-base leading-7 outline-none focus:border-[#c3a069] focus:ring-2 focus:ring-[#b89a68]/25"
             />
-            <p className="mt-3 text-xs leading-5 text-[#6f6048]">
+            <p className="ritual-note-muted mt-3 text-xs leading-5">
               {copy.askHint}
             </p>
           </div>

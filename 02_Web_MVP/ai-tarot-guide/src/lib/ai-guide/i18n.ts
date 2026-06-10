@@ -32,6 +32,29 @@ export const dictionary = {
       "You will use your own physical deck after this step. For now, simply settle your attention before shaping the question.",
     prepareOnline:
       "The online deck will open after your question is formed. For now, take a quiet pause before beginning the ritual.",
+    prepareRitualPromptPhysical: [
+      "Take a breath.",
+      "Let the noise settle.",
+      "Prepare your deck when you are ready.",
+    ],
+    prepareRitualPromptOnline: [
+      "Take a breath.",
+      "Let the noise settle.",
+      "Enter the online draw when you are ready.",
+    ],
+    prepareStepBreathMain: "Take a breath.",
+    prepareStepBreathSub:
+      "Breathe slowly three times and return your attention to this moment.",
+    prepareStepSettleMain: "Let the noise settle.",
+    prepareStepSettleSub:
+      "Do not rush toward an answer. Let the question become clear first.",
+    prepareStepReadyPhysicalMain: "Prepare your physical deck.",
+    prepareStepReadyPhysicalSub:
+      "Next, you will shuffle, cut, and draw one card with your question in mind.",
+    prepareStepReadyOnlineMain: "Prepare for the online draw.",
+    prepareStepReadyOnlineSub:
+      "Next, the deck will move through shuffle, cut, and draw.",
+    prepareStepContinue: "Continue",
     continueToQuestion: "Continue to Question",
     askEyebrow: "Reading Question",
     askTitle: "Ask Your Question",
@@ -41,6 +64,11 @@ export const dictionary = {
     askPlaceholder: "What should I pay attention to right now?",
     askHint:
       "Try asking what you should understand, notice, or approach - not what is guaranteed to happen.",
+    askRitualPrompt: [
+      "Hold one question gently.",
+      "Ask for clarity, not control.",
+      "A clear question opens a clearer reading.",
+    ],
     askError: "Please write a question before continuing.",
     continueToRitual: "Continue to the Ritual",
     yourQuestion: "Your Question",
@@ -142,6 +170,26 @@ export const dictionary = {
       "接下来你将使用自己的实体牌组。在此之前，先让注意力稳定下来，再形成问题。",
     prepareOnline:
       "线上牌组会在你写下问题后开启。现在，先给自己一个安静的停顿。",
+    prepareRitualPromptPhysical: [
+      "先让呼吸落下。",
+      "让心里的杂音慢慢沉下去。",
+      "准备好实体牌后，再进入提问。",
+    ],
+    prepareRitualPromptOnline: [
+      "先让呼吸落下。",
+      "让心里的杂音慢慢沉下去。",
+      "准备好了，再进入在线抽牌。",
+    ],
+    prepareStepBreathMain: "先让呼吸落下。",
+    prepareStepBreathSub: "慢慢呼吸三次，让注意力回到当下。",
+    prepareStepSettleMain: "让心里的杂音慢慢沉下去。",
+    prepareStepSettleSub: "不用急着寻找答案，先让问题变得清楚。",
+    prepareStepReadyPhysicalMain: "准备好你的实体牌组。",
+    prepareStepReadyPhysicalSub:
+      "接下来你会带着这个问题洗牌、切牌，并抽出一张牌。",
+    prepareStepReadyOnlineMain: "准备进入线上抽牌。",
+    prepareStepReadyOnlineSub: "接下来牌组会依次完成洗牌、切牌与抽牌。",
+    prepareStepContinue: "继续",
     continueToQuestion: "继续提问",
     askEyebrow: "阅读问题",
     askTitle: "写下你的问题",
@@ -151,6 +199,11 @@ export const dictionary = {
     askPlaceholder: "我现在最需要注意什么？",
     askHint:
       "你可以询问自己需要理解什么、注意什么、如何面对，而不是询问某件事是否必然发生。",
+    askRitualPrompt: [
+      "只轻轻托住一个问题。",
+      "求清晰，不求控制。",
+      "问题越清晰，牌面越容易回应。",
+    ],
     askError: "请先写下一个问题，再继续。",
     continueToRitual: "继续进入仪式",
     yourQuestion: "你的问题",

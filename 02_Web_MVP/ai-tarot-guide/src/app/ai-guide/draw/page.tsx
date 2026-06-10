@@ -1,4 +1,5 @@
 import { DrawClient } from "./DrawClient";
+import { tarotCards } from "@/data/tarotCards";
 import { normalizeLanguage } from "@/lib/ai-guide/i18n";
 
 type ReadingMode = "physical" | "online";
@@ -12,6 +13,17 @@ function normalizeValue(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] ?? "" : value ?? "";
 }
 
+function normalizeRitualStep(value: string | string[] | undefined) {
+  const rawValue = Array.isArray(value) ? value[0] : value;
+  const parsedValue = Number.parseInt(rawValue ?? "0", 10);
+
+  if (parsedValue === 1 || parsedValue === 2) {
+    return parsedValue;
+  }
+
+  return 0;
+}
+
 export default async function DrawPage({
   searchParams,
 }: {
@@ -21,13 +33,18 @@ export default async function DrawPage({
     spread?: string | string[];
     orientation?: string | string[];
     lang?: string | string[];
+    ritualStep?: string | string[];
   }>;
 }) {
   const {
     mode: modeParam,
     question: questionParam,
     lang: langParam,
+    ritualStep: ritualStepParam,
   } = await searchParams;
+  const ritualStep = normalizeRitualStep(ritualStepParam);
+  const drawnCard =
+    tarotCards[Math.floor(Math.random() * tarotCards.length)]?.id ?? "";
 
   return (
     <DrawClient
@@ -35,6 +52,8 @@ export default async function DrawPage({
       initialQuestion={normalizeValue(questionParam)}
       initialLang={normalizeLanguage(langParam)}
       hasLangParam={Boolean(langParam)}
+      initialRitualStep={ritualStep}
+      initialDrawnCard={drawnCard}
     />
   );
 }

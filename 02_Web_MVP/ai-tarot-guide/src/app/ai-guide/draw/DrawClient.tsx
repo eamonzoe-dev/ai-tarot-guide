@@ -7,11 +7,9 @@ import { LanguageToggle } from "@/components/ai-guide/LanguageToggle";
 import { PageContainer } from "@/components/ai-guide/PageContainer";
 import { ReadingNav } from "@/components/ai-guide/ReadingNav";
 import { TarotButton } from "@/components/ai-guide/TarotButton";
-import { tarotCards } from "@/data/tarotCards";
 import { type Language, text } from "@/lib/ai-guide/i18n";
 
 const USER_QUESTION_KEY = "aiTarot:userQuestion";
-const SELECTED_CARD_KEY = "aiTarot:selectedCard";
 const LATEST_RITUAL_KEY = "aiTarot:latestRitual";
 
 type ReadingMode = "physical" | "online";
@@ -21,13 +19,30 @@ type DrawClientProps = {
   initialQuestion: string;
   initialLang: Language;
   hasLangParam: boolean;
+  initialRitualStep: number;
+  initialDrawnCard: string;
 };
+
+type DrawAction = "shuffle" | "cut" | "draw";
+
+function getDrawAction(step: number): DrawAction {
+  if (step === 0) {
+    return "shuffle";
+  }
+
+  if (step === 1) {
+    return "cut";
+  }
+
+  return "draw";
+}
 
 function buildQuery(
   mode: ReadingMode,
   question: string,
   lang: Language,
   card?: string,
+  ritualStep?: number,
 ) {
   const params = new URLSearchParams({
     mode,
@@ -39,6 +54,10 @@ function buildQuery(
 
   if (card) {
     params.set("card", card);
+  }
+
+  if (ritualStep) {
+    params.set("ritualStep", String(ritualStep));
   }
 
   return params.toString();
@@ -68,6 +87,8 @@ export function DrawClient({
   initialQuestion,
   initialLang,
   hasLangParam,
+  initialRitualStep,
+  initialDrawnCard,
 }: DrawClientProps) {
   const router = useRouter();
   const copy = text(initialLang);
@@ -88,8 +109,23 @@ export function DrawClient({
   const [question, setQuestion] = useState<string | undefined>(
     initialQuestion || undefined,
   );
-  const [ritualStep, setRitualStep] = useState(0);
-  const [drawnCard, setDrawnCard] = useState("");
+  const currentOnlineStep = onlineSteps[initialRitualStep];
+  const currentDrawAction = getDrawAction(initialRitualStep);
+  const onlineActionHref =
+    initialRitualStep < 2
+      ? `/ai-guide/draw?${buildQuery(
+          "online",
+          question ?? initialQuestion,
+          initialLang,
+          undefined,
+          initialRitualStep + 1,
+        )}`
+      : `/ai-guide/reveal?${buildQuery(
+          "online",
+          question ?? initialQuestion,
+          initialLang,
+          initialDrawnCard,
+        )}`;
 
   useEffect(() => {
     const storedQuestion = localStorage.getItem(USER_QUESTION_KEY) ?? "";
@@ -97,7 +133,12 @@ export function DrawClient({
 
     if (initialQuestion) {
       localStorage.setItem(USER_QUESTION_KEY, initialQuestion);
-      saveLatestRitual(initialMode, initialQuestion, initialLang);
+      saveLatestRitual(
+        initialMode,
+        initialQuestion,
+        initialLang,
+        initialRitualStep === 2 ? initialDrawnCard : undefined,
+      );
     }
 
     queueMicrotask(() => {
@@ -109,28 +150,14 @@ export function DrawClient({
         `/ai-guide/ask?mode=${initialMode}&spread=single&orientation=upright&lang=${initialLang}`,
       );
     }
-  }, [initialLang, initialMode, initialQuestion, router]);
-
-  function handleOnlineRitual() {
-    if (!question) {
-      router.replace(
-        `/ai-guide/ask?mode=${initialMode}&spread=single&orientation=upright&lang=${initialLang}`,
-      );
-      return;
-    }
-
-    if (ritualStep < 2) {
-      setRitualStep((step) => step + 1);
-      return;
-    }
-
-    const selectedCard =
-      tarotCards[Math.floor(Math.random() * tarotCards.length)];
-    localStorage.setItem(SELECTED_CARD_KEY, selectedCard.id);
-    localStorage.setItem(USER_QUESTION_KEY, question);
-    saveLatestRitual("online", question, initialLang, selectedCard.id);
-    setDrawnCard(selectedCard.id);
-  }
+  }, [
+    initialDrawnCard,
+    initialLang,
+    initialMode,
+    initialQuestion,
+    initialRitualStep,
+    router,
+  ]);
 
   if (question === undefined) {
     return (
@@ -151,8 +178,8 @@ export function DrawClient({
   if (initialMode === "online") {
     return (
       <PageContainer
-        eyebrow={copy.onlineDraw}
-        title={copy.drawOnline}
+        eyebrow={copy.onlineDrawMode}
+        title={copy.onlineDraw}
         description={copy.onlineDrawDescription}
       >
         <ReadingNav lang={initialLang} />
@@ -165,66 +192,47 @@ export function DrawClient({
               spread: "single",
               orientation: "upright",
               question,
+              ritualStep: String(initialRitualStep),
             }}
             hasLangParam={hasLangParam}
           />
         </div>
         <div className="space-y-6">
-          <div className="atelier-worktop p-5 text-sm leading-7 text-[#c8c0b4]">
+          <div className="atelier-worktop p-5">
             <p className="atelier-label text-[0.68rem] font-semibold">
               {copy.yourQuestion}
             </p>
-            <p className="mt-3 text-[#efe8d9]">{question}</p>
-            <p className="mt-3 text-sm leading-6 text-[#a9a59d]">
-              {copy.keepQuestion}
-            </p>
+            <p className="mt-3 text-sm leading-6 text-[#efe8d9]">{question}</p>
             <div className="atelier-divider my-5" />
-            <div className="space-y-3">
+            <div className="grid grid-cols-3 gap-2 text-center text-[0.62rem] font-semibold uppercase tracking-[0.16em] text-[#8f856f]">
               {onlineSteps.map((step, index) => (
-                <button
+                <div
                   key={step.title}
-                  type="button"
-                  disabled={Boolean(drawnCard) || index !== ritualStep}
-                  onClick={() => {
-                    if (!drawnCard && index === ritualStep) {
-                      handleOnlineRitual();
-                    }
-                  }}
-                  className={`flex items-center gap-3 border px-3 py-3 ${
-                    index <= ritualStep
-                      ? "border-[#a98552]/55 bg-[#17110d]"
-                      : "border-[#3f3324] bg-[#090806]"
-                  } ${
-                    !drawnCard && index === ritualStep
-                      ? "touch-manipulation text-left"
-                      : "cursor-not-allowed opacity-55"
+                  className={`border px-2 py-2 ${
+                    index === initialRitualStep
+                      ? "border-[#b08c58]/70 text-[#efe8d9]"
+                      : "border-[#3d3328]"
                   }`}
                 >
-                  <span className="flex h-7 w-7 shrink-0 items-center justify-center border border-[#8c724b] text-xs text-[#d8c9ae]">
-                    {index + 1}
-                  </span>
-                  <span className="text-left">
-                    <span className="block text-[#efe8d9]">{step.title}</span>
-                    <span className="block text-sm leading-6 text-[#a9a59d]">
-                      {step.description}
-                    </span>
-                  </span>
-                </button>
+                  {step.title}
+                </div>
               ))}
             </div>
+            <div className="mt-6 text-center">
+              <p className="atelier-label text-[0.68rem] font-semibold">
+                {currentDrawAction}
+              </p>
+              <p className="mt-3 font-serif text-3xl text-[#f4efe5]">
+                {currentOnlineStep.title}
+              </p>
+              <p className="mt-3 text-sm leading-6 text-[#c8c0b4]">
+                {currentOnlineStep.description}
+              </p>
+            </div>
           </div>
-          {drawnCard && (
-            <TarotButton
-              href={`/ai-guide/reveal?${buildQuery(
-                "online",
-                question,
-                initialLang,
-                drawnCard,
-              )}`}
-            >
-              {copy.revealCard}
-            </TarotButton>
-          )}
+          <TarotButton href={onlineActionHref}>
+            {initialRitualStep < 2 ? currentOnlineStep.title : copy.revealCard}
+          </TarotButton>
         </div>
       </PageContainer>
     );

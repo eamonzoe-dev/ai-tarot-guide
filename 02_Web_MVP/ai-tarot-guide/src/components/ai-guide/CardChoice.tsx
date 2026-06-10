@@ -2,6 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 
 import {
   getTarotCardLabel,
@@ -14,25 +16,56 @@ type CardChoiceProps = {
   card: TarotCard;
   onSelect: (cardId: string) => void;
   href: string;
+  isSelectionActive?: boolean;
+  isSelected?: boolean;
   lang?: Language;
 };
 
 export function CardChoice({
   card,
   href,
+  isSelectionActive = false,
+  isSelected = false,
   onSelect,
   lang = "en",
 }: CardChoiceProps) {
+  const router = useRouter();
+  const navigationTimer = useRef<number | undefined>(undefined);
+  const [isNavigating, setIsNavigating] = useState(false);
   const cardLabel = getTarotCardLabel(card, lang);
   const cardTitle = getTarotCardTitle(card, lang);
+
+  useEffect(() => {
+    return () => {
+      if (navigationTimer.current) {
+        window.clearTimeout(navigationTimer.current);
+      }
+    };
+  }, []);
 
   return (
     <Link
       href={href}
-      onClick={() => {
+      onClick={(event) => {
+        if (isNavigating || isSelectionActive) {
+          event.preventDefault();
+          return;
+        }
+
+        event.preventDefault();
+        setIsNavigating(true);
         onSelect(card.id);
+
+        navigationTimer.current = window.setTimeout(() => {
+          router.push(href);
+        }, 640);
       }}
-      className="group relative z-10 flex flex-col border border-[#4a3b28] bg-[linear-gradient(180deg,#15100d,#080706)] p-2.5 text-left shadow-[0_16px_34px_rgba(0,0,0,0.36),inset_0_1px_0_rgba(255,245,224,0.06)] transition duration-200 hover:-translate-y-0.5 hover:border-[#a98552]/75 hover:shadow-[0_22px_48px_rgba(0,0,0,0.45),0_0_22px_rgba(169,133,82,0.12)] focus:outline-none focus:ring-2 focus:ring-[#b89a68]/55"
+      aria-disabled={isNavigating || isSelectionActive}
+      className={`group relative z-10 flex flex-col border border-[#4a3b28] bg-[linear-gradient(180deg,#15100d,#080706)] p-2.5 text-left shadow-[0_16px_34px_rgba(0,0,0,0.36),inset_0_1px_0_rgba(255,245,224,0.06)] transition duration-300 hover:-translate-y-0.5 hover:border-[#a98552]/75 hover:shadow-[0_22px_48px_rgba(0,0,0,0.45),0_0_22px_rgba(169,133,82,0.12)] focus:outline-none focus:ring-2 focus:ring-[#b89a68]/55 ${
+        isSelected ? "ritual-draw-card-selected" : ""
+      } ${
+        isSelectionActive && !isSelected ? "ritual-draw-card-dimmed" : ""
+      }`}
     >
       <div className="relative aspect-[9/16] w-full overflow-hidden border border-[#302719] bg-[#050506]">
         {card.image ? (
