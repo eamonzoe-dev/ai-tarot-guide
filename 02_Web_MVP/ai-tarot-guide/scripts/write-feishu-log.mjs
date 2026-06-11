@@ -104,44 +104,16 @@ function readCommitMessage() {
   }
 }
 
-function isTextField(field) {
-  return field.field_type === FEISHU_FIELD_TYPES.TEXT;
+function fieldType(field) {
+  return field.field_type ?? field.type;
 }
 
-function optionNames(field) {
-  return new Set((field.property?.options || []).map((option) => option.name));
-}
-
-function singleSelectValue(field, value) {
-  return optionNames(field).has(value) ? value : undefined;
-}
-
-function multiSelectValue(field, value) {
-  return optionNames(field).has(value) ? [value] : undefined;
-}
-
-function textLikeValue(field, value) {
-  if (!value) {
-    return undefined;
-  }
-
-  if (isTextField(field)) {
-    return value;
-  }
-
-  if (field.field_type === FEISHU_FIELD_TYPES.SINGLE_SELECT) {
-    return singleSelectValue(field, value);
-  }
-
-  if (field.field_type === FEISHU_FIELD_TYPES.MULTI_SELECT) {
-    return multiSelectValue(field, value);
-  }
-
-  return undefined;
+function stringValue(value) {
+  return value || undefined;
 }
 
 function dateValue(field, value) {
-  return field.field_type === FEISHU_FIELD_TYPES.DATE ? value : undefined;
+  return fieldType(field) === FEISHU_FIELD_TYPES.DATE ? value : undefined;
 }
 
 function urlValue(field, url, text) {
@@ -149,18 +121,14 @@ function urlValue(field, url, text) {
     return undefined;
   }
 
-  if (field.field_type === FEISHU_FIELD_TYPES.URL) {
+  if (fieldType(field) === FEISHU_FIELD_TYPES.URL) {
     return {
       link: url,
       text: text || url,
     };
   }
 
-  if (isTextField(field)) {
-    return url;
-  }
-
-  return undefined;
+  return url;
 }
 
 function buildFields(existingFields, values) {
@@ -181,12 +149,12 @@ function buildFields(existingFields, values) {
   }
 
   set("日期", (field) => dateValue(field, values.now));
-  set("Commit", (field) => textLikeValue(field, values.commitSummary));
-  set("AI总结", (field) => textLikeValue(field, values.aiSummary));
+  set("Commit", () => stringValue(values.commitSummary));
+  set("AI总结", () => stringValue(values.aiSummary));
   set("GitHub链接", (field) => urlValue(field, values.githubUrl, values.githubLinkText));
-  set("备注", (field) => textLikeValue(field, values.note));
-  set("分支", (field) => textLikeValue(field, values.branch));
-  set("来源", (field) => textLikeValue(field, values.source));
+  set("备注", () => stringValue(values.note));
+  set("分支", () => stringValue(values.branch));
+  set("来源", () => stringValue(values.source));
 
   const fallbackValues = {
     项目: "AI Tarot Guide",
@@ -208,10 +176,10 @@ function buildFields(existingFields, values) {
       }
 
       if (name === "记录时间") {
-        return field.field_type === FEISHU_FIELD_TYPES.DATE ? values.now : textLikeValue(field, value);
+        return fieldType(field) === FEISHU_FIELD_TYPES.DATE ? values.now : stringValue(value);
       }
 
-      return textLikeValue(field, value);
+      return stringValue(value);
     });
   }
 
@@ -275,6 +243,7 @@ async function main() {
 
   const token = await getTenantAccessToken();
   const tableFields = await getTableFields(token);
+  console.log("Feishu fields:", tableFields.map((field) => ({ name: field.field_name, type: field.type })));
   const fields = buildFields(tableFields, values);
 
   if (Object.keys(fields).length === 0) {
