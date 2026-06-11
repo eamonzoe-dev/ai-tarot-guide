@@ -1,9 +1,12 @@
+import { readFileSync } from "node:fs";
+
 const {
   FEISHU_APP_ID,
   FEISHU_APP_SECRET,
   FEISHU_TABLE_ID,
   FEISHU_APP_TOKEN,
   FEISHU_BASE_ID,
+  GITHUB_EVENT_PATH,
   GITHUB_REPOSITORY,
   GITHUB_REF_NAME,
   GITHUB_SHA,
@@ -13,6 +16,13 @@ const {
 } = process.env;
 
 const appToken = FEISHU_APP_TOKEN || FEISHU_BASE_ID;
+const FEISHU_FIELD_TYPES = {
+  TEXT: 1,
+  SINGLE_SELECT: 3,
+  MULTI_SELECT: 4,
+  DATE: 5,
+  URL: 15,
+};
 
 function requireEnv(name, value) {
   if (!value) {
@@ -80,14 +90,129 @@ async function getTableFields(token) {
   return data.data?.items || [];
 }
 
-function pickExistingFields(existingFields, candidateValues) {
-  const existingNames = new Set(existingFields.map((field) => field.field_name));
+function readCommitMessage() {
+  if (!GITHUB_EVENT_PATH) {
+    return "";
+  }
+
+  try {
+    const event = JSON.parse(readFileSync(GITHUB_EVENT_PATH, "utf8"));
+    return event.head_commit?.message || "";
+  } catch (error) {
+    console.warn(`Could not read GitHub event commit message: ${error.message}`);
+    return "";
+  }
+}
+
+function isTextField(field) {
+  return field.field_type === FEISHU_FIELD_TYPES.TEXT;
+}
+
+function optionNames(field) {
+  return new Set((field.property?.options || []).map((option) => option.name));
+}
+
+function singleSelectValue(field, value) {
+  return optionNames(field).has(value) ? value : undefined;
+}
+
+function multiSelectValue(field, value) {
+  return optionNames(field).has(value) ? [value] : undefined;
+}
+
+function textLikeValue(field, value) {
+  if (!value) {
+    return undefined;
+  }
+
+  if (isTextField(field)) {
+    return value;
+  }
+
+  if (field.field_type === FEISHU_FIELD_TYPES.SINGLE_SELECT) {
+    return singleSelectValue(field, value);
+  }
+
+  if (field.field_type === FEISHU_FIELD_TYPES.MULTI_SELECT) {
+    return multiSelectValue(field, value);
+  }
+
+  return undefined;
+}
+
+function dateValue(field, value) {
+  return field.field_type === FEISHU_FIELD_TYPES.DATE ? value : undefined;
+}
+
+function urlValue(field, url, text) {
+  if (!url) {
+    return undefined;
+  }
+
+  if (field.field_type === FEISHU_FIELD_TYPES.URL) {
+    return {
+      link: url,
+      text: text || url,
+    };
+  }
+
+  if (isTextField(field)) {
+    return url;
+  }
+
+  return undefined;
+}
+
+function buildFields(existingFields, values) {
+  const fieldsByName = new Map(existingFields.map((field) => [field.field_name, field]));
   const fields = {};
 
-  for (const [name, value] of Object.entries(candidateValues)) {
-    if (existingNames.has(name) && value !== undefined && value !== null && value !== "") {
+  function set(name, valueFactory) {
+    const field = fieldsByName.get(name);
+
+    if (!field) {
+      return;
+    }
+
+    const value = valueFactory(field);
+    if (value !== undefined && value !== null && value !== "") {
       fields[name] = value;
     }
+  }
+
+  set("日期", (field) => dateValue(field, values.now));
+  set("Commit", (field) => textLikeValue(field, values.commitSummary));
+  set("AI总结", (field) => textLikeValue(field, values.aiSummary));
+  set("GitHub链接", (field) => urlValue(field, values.githubUrl, values.githubLinkText));
+  set("备注", (field) => textLikeValue(field, values.note));
+  set("分支", (field) => textLikeValue(field, values.branch));
+  set("来源", (field) => textLikeValue(field, values.source));
+
+  const fallbackValues = {
+    项目: "AI Tarot Guide",
+    版本: values.shortSha,
+    提交哈希: values.sha,
+    提交人: values.actor,
+    仓库: values.repository,
+    运行链接: values.runUrl,
+    提交链接: values.commitUrl,
+    状态: values.status,
+    记录时间: values.isoTime,
+    说明: values.aiSummary,
+  };
+
+  for (const [name, value] of Object.entries(fallbackValues)) {
+    set(name, (field) => {
+      if (name.includes("链接")) {
+        return urlValue(field, value, name === "提交链接" ? values.githubLinkText : name);
+      }
+
+      if (name === "记录时间") {
+        return field.field_type === FEISHU_FIELD_TYPES.DATE ? values.now : textLikeValue(field, value);
+      }
+
+      return textLikeValue(field, value);
+    });
   }
 
   return fields;
@@ -114,6 +239,7 @@ async function createRecord(token, fields) {
 
 async function main() {
   const shortSha = GITHUB_SHA ? GITHUB_SHA.slice(0, 7) : "";
+  const commitMessage = readCommitMessage().split("\n")[0].trim();
   const runUrl =
     GITHUB_SERVER_URL && GITHUB_REPOSITORY && GITHUB_RUN_ID
       ? `${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}`
@@ -122,24 +248,34 @@ async function main() {
     GITHUB_SERVER_URL && GITHUB_REPOSITORY && GITHUB_SHA
       ? `${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/commit/${GITHUB_SHA}`
       : "";
+  const githubUrl = commitUrl || runUrl;
+  const commitSummary = [shortSha || "unknown", commitMessage].filter(Boolean).join(" - ");
+  const aiSummary = commitMessage
+    ? `自动记录本次 GitHub commit：${commitMessage}`
+    : `自动记录本次 GitHub commit：${shortSha || "unknown"}`;
 
-  const candidateValues = {
-    项目: "AI Tarot Guide",
-    版本: shortSha,
-    提交哈希: GITHUB_SHA || "",
-    分支: GITHUB_REF_NAME || "",
-    提交人: GITHUB_ACTOR || "",
-    仓库: GITHUB_REPOSITORY || "",
-    运行链接: runUrl,
-    提交链接: commitUrl,
-    状态: "已自动记录",
-    记录时间: new Date().toISOString(),
-    说明: `GitHub Actions 自动记录版本：${shortSha || "unknown"}`,
+  const values = {
+    actor: GITHUB_ACTOR || "",
+    aiSummary,
+    branch: GITHUB_REF_NAME || "",
+    commitSummary,
+    commitUrl,
+    githubLinkText: shortSha ? `Commit ${shortSha}` : "GitHub commit",
+    githubUrl,
+    isoTime: new Date().toISOString(),
+    note: "GitHub Actions 自动记录版本日志",
+    now: Date.now(),
+    repository: GITHUB_REPOSITORY || "",
+    runUrl,
+    sha: GITHUB_SHA || "",
+    shortSha,
+    source: "GitHub Actions",
+    status: "已自动记录",
   };
 
   const token = await getTenantAccessToken();
   const tableFields = await getTableFields(token);
-  const fields = pickExistingFields(tableFields, candidateValues);
+  const fields = buildFields(tableFields, values);
 
   if (Object.keys(fields).length === 0) {
     const existingNames = tableFields.map((field) => field.field_name).join(", ");
