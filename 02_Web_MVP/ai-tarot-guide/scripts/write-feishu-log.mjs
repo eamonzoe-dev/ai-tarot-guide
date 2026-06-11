@@ -25,22 +25,47 @@ requireEnv("FEISHU_APP_SECRET", FEISHU_APP_SECRET);
 requireEnv("FEISHU_TABLE_ID", FEISHU_TABLE_ID);
 requireEnv("FEISHU_APP_TOKEN or FEISHU_BASE_ID", appToken);
 
+async function readJsonResponse(res, action) {
+  let data;
+
+  try {
+    data = await res.json();
+  } catch (error) {
+    throw new Error(`Failed to parse Feishu response while ${action}: ${error.message}`);
+  }
+
+  if (!res.ok || data.code !== 0) {
+    throw new Error(`Failed while ${action}: ${JSON.stringify(data)}`);
+  }
+
+  return data;
+}
+
 async function getTenantAccessToken() {
-  const res = await fetch("https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      app_id: FEISHU_APP_ID,
-      app_secret: FEISHU_APP_SECRET,
-    }),
-  });
+  const res = await fetch(
+    "https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        app_id: FEISHU_APP_ID,
+        app_secret: FEISHU_APP_SECRET,
+      }),
+    }
+  );
 
-  const data = await res.json()  const data = await res.json()  const daata.tenant  const doken) {
-  const data = rror(`  const data = rnan  const data =: ${JS  const data = ta)  const data = rrn da  const datccess_to  cons
+  const data = await readJsonResponse(res, "getting tenant access token");
 
-async async as getTablasync async as {
+  if (!data.tenant_access_token) {
+    throw new Error(`Feishu response did not include tenant_access_token: ${JSON.stringify(data)}`);
+  }
+
+  return data.tenant_access_token;
+}
+
+async function getTableFields(token) {
   const res = await fetch(
     `https://open.feishu.cn/open-apis/bitable/v1/apps/${appToken}/tables/${FEISHU_TABLE_ID}/fields?page_size=100`,
     {
@@ -51,21 +76,21 @@ async async as getTablasync async as {
     }
   );
 
-  const data = await res.json();
+  const data = await readJsonResponse(res, "getting Feishu table fields");
+  return data.data?.items || [];
+}
 
-  if (!res.ok || data.code !== 0) {
-    throw new Error(`Failed to get table fields: ${JSON.stringify(data)}`);
-  }
-
-  return data.data.items ||  return data.dn pickExistingFields(existingFields, candidateValues) {
+function pickExistingFields(existingFields, candidateValues) {
   const existingNames = new Set(existingFields.map((field) => field.field_name));
-  const result = {};
+  const fields = {};
 
   for (const [name, value] of Object.entries(candidateValues)) {
     if (existingNames.has(name) && value !== undefined && value !== null && value !== "") {
-                                    }
+      fields[name] = value;
+    }
+  }
 
-  return result;
+  return fields;
 }
 
 async function createRecord(token, fields) {
@@ -81,32 +106,38 @@ async function createRecord(token, fields) {
         fields,
       }),
     }
-    }
-  const data = await res.json();
+  );
 
-  if (!res.ok || data.code !== 0) {
-    throw new Error(`Failed to create     th record: ${JSON.stringify(data)}`);
-  }
+  const data = await readJsonResponse(res, "creating Feishu record");
+  console.log("Feishu record created:", data.data?.record?.record_id || "unknown record id");
+}
 
-  console.log("Feishu record created:", data.data.record.record_id);
-}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}} runUrl =
+async function main() {
+  const shortSha = GITHUB_SHA ? GITHUB_SHA.slice(0, 7) : "";
+  const runUrl =
     GITHUB_SERVER_URL && GITHUB_REPOSITORY && GITHUB_RUN_ID
       ? `${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}`
       : "";
+  const commitUrl =
+    GITHUB_SERVER_URL && GITHUB_REPOSITORY && GITHUB_SHA
+      ? `${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/commit/${GITHUB_SHA}`
+      : "";
 
   const candidateValues = {
-    "项目": "AI Tarot Guide",
-    "版本": shortSha,
-    "提交哈�    "提UB_SHA || "",
-    "分支": GITHUB_REF_NAME || "",
-    "提交人": GITHUB_ACTOR || "",
-    "仓库": GITHUB_REPOSITORY ||     "仓庿�行链接": runUrl,
-    "状态": "已自动记录",
-    "记录时间": new Date().toISOString(),
-    "说明": `GitHub Actions 自动记录版本：${shortSha}`,
+    项目: "AI Tarot Guide",
+    版本: shortSha,
+    提交哈希: GITHUB_SHA || "",
+    分支: GITHUB_REF_NAME || "",
+    提交人: GITHUB_ACTOR || "",
+    仓库: GITHUB_REPOSITORY || "",
+    运行链接: runUrl,
+    提交链接: commitUrl,
+    状态: "已自动记录",
+    记录时间: new Date().toISOString(),
+    说明: `GitHub Actions 自动记录版本：${shortSha || "unknown"}`,
   };
 
-  const  const  const  etTenantAccessToken();
+  const token = await getTenantAccessToken();
   const tableFields = await getTableFields(token);
   const fields = pickExistingFields(tableFields, candidateValues);
 
