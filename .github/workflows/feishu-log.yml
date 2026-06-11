@@ -19,7 +19,7 @@ jobs:
           node-version: 20
 
       - name: Write Feishu log
-        run: node scripts/write-feishu-log.mjs
+        run: node 02_Web_MVP/ai-tarot-guide/scripts/write-feishu-log.mjs
         env:
           FEISHU_APP_ID: ${{ secrets.FEISHU_APP_ID }}
           FEISHU_APP_SECRET: ${{ secrets.FEISHU_APP_SECRET }}
