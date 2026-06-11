@@ -25,3 +25,12 @@ jobs:
           FEISHU_APP_SECRET: ${{ secrets.FEISHU_APP_SECRET }}
           FEISHU_APP_TOKEN: ${{ secrets.FEISHU_APP_TOKEN }}
           FEISHU_TABLE_ID: ${{ secrets.FEISHU_TABLE_ID }}
+
+      - name: Write Feishu project board task
+        continue-on-error: true
+        run: node 02_Web_MVP/ai-tarot-guide/scripts/write-feishu-board-task.mjs
+        env:
+          FEISHU_APP_ID: ${{ secrets.FEISHU_APP_ID }}
+          FEISHU_APP_SECRET: ${{ secrets.FEISHU_APP_SECRET }}
+          FEISHU_APP_TOKEN: ${{ secrets.FEISHU_APP_TOKEN }}
+          FEISHU_PROJECT_BOARD_TABLE_ID: ${{ secrets.FEISHU_PROJECT_BOARD_TABLE_ID }}
