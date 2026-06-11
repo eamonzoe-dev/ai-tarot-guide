@@ -235,6 +235,60 @@ function classifyCommit(message) {
   };
 }
 
+function getChineseTaskTitle(commitMessage) {
+  const normalized = commitMessage.toLowerCase();
+
+  if (normalized.includes("feishu") && normalized.includes("board")) {
+    return "新增飞书项目看板自动写入功能";
+  }
+
+  if (normalized.includes("feishu") && normalized.includes("log")) {
+    return "修复飞书版本日志自动化";
+  }
+
+  if (normalized.includes("workflow") || normalized.includes("action")) {
+    return "调整 GitHub Actions 自动化流程";
+  }
+
+  if (normalized.includes("galaxy") || normalized.includes("background")) {
+    return "优化网页视觉背景效果";
+  }
+
+  if (/(draw|reveal|ask|result|prepare)/.test(normalized)) {
+    return "优化塔罗抽牌流程页面";
+  }
+
+  if (/(i18n|lang|nav)/.test(normalized)) {
+    return "优化多语言与导航体验";
+  }
+
+  if (/(deploy|vercel|build)/.test(normalized)) {
+    return "调整部署与构建配置";
+  }
+
+  if (/(card|tarotcards|reading)/.test(normalized)) {
+    return "优化塔罗牌数据与解读内容";
+  }
+
+  const firstWord = normalized.match(/^[a-z]+/)?.[0];
+  const verbPrefixes = {
+    add: "新增",
+    cleanup: "清理",
+    fix: "修复",
+    improve: "优化",
+    map: "调整",
+    polish: "优化",
+    refactor: "重构",
+    remove: "移除",
+    repair: "修复",
+    update: "更新",
+  };
+
+  return firstWord && verbPrefixes[firstWord]
+    ? `${verbPrefixes[firstWord]}项目功能`
+    : "项目维护更新";
+}
+
 function buildRecordFields(existingFields, values) {
   const fieldsByName = new Map(existingFields.map((field) => [field.field_name, field]));
   const recordFields = {};
@@ -303,6 +357,7 @@ async function main() {
       : "";
   const githubUrl = commitUrl || runUrl;
   const classification = classifyCommit(commitMessage);
+  const taskTitle = getChineseTaskTitle(commitMessage);
   const values = {
     acceptance: "未验收",
     branch: GITHUB_REF_NAME || "",
@@ -311,14 +366,14 @@ async function main() {
     githubUrl,
     module: classification.module,
     milestone: classification.milestone,
-    note: "GitHub Actions 自动创建，待人工验收。",
+    note: `原始提交信息：${commitMessage}。GitHub Actions 自动创建，待人工验收。`,
     now: Date.now(),
     parentTask: classification.parentTask,
     priority: "中",
     source: "GitHub Actions",
     status: "待验收",
     taskLevel: "子任务",
-    taskName: commitMessage,
+    taskName: taskTitle,
     taskNumber: `AUTO-${shortSha || "unknown"}`,
   };
 
