@@ -27,6 +27,7 @@ const READING_MODE_KEY = "aiTarot:readingMode";
 const READING_SPREAD_KEY = "aiTarot:readingSpread";
 const CARD_ORIENTATION_KEY = "aiTarot:cardOrientation";
 const LATEST_RITUAL_KEY = "aiTarot:latestRitual";
+const AI_READING_CACHE_PREFIX = "aiTarot:aiReading:v1";
 
 type ResultClientProps = {
   initialMode: "physical" | "online" | "";
@@ -53,6 +54,17 @@ type StoredRitual = {
   card?: string;
   lang?: Language;
 };
+
+type AiReading = {
+  summary: string;
+  cardMeaning: string;
+  situationReading: string;
+  advice: string;
+  reflectionQuestion: string;
+  closingNote: string;
+};
+
+type AiReadingStatus = "idle" | "loading" | "ready" | "error";
 
 function readStoredRitual(): StoredRitual {
   const rawRitual = localStorage.getItem(LATEST_RITUAL_KEY);
@@ -94,7 +106,85 @@ export function ResultClient({
   const [question, setQuestion] = useState<string | null | undefined>(
     initialQuestion || undefined,
   );
+  const [aiReading, setAiReading] = useState<AiReading | null>(null);
+  const [aiReadingStatus, setAiReadingStatus] =
+    useState<AiReadingStatus>("idle");
   const card = selectedCard ? getTarotCardById(selectedCard) : undefined;
+
+  useEffect(() => {
+    if (!card || !question || !mode || orientation !== "upright") {
+      setAiReading(null);
+      setAiReadingStatus("idle");
+      return;
+    }
+
+    const cacheKey = [
+      AI_READING_CACHE_PREFIX,
+      initialLang,
+      mode,
+      orientation,
+      card.id,
+      question,
+    ].join(":");
+    const cachedReading = sessionStorage.getItem(cacheKey);
+
+    if (cachedReading) {
+      try {
+        setAiReading(JSON.parse(cachedReading) as AiReading);
+        setAiReadingStatus("ready");
+        return;
+      } catch {
+        sessionStorage.removeItem(cacheKey);
+      }
+    }
+
+    const controller = new AbortController();
+    setAiReading(null);
+    setAiReadingStatus("loading");
+
+    fetch("/api/ai-reading", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        cardId: card.id,
+        question,
+        lang: initialLang,
+        mode,
+        orientation,
+      }),
+      signal: controller.signal,
+    })
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new Error("AI reading request failed.");
+        }
+
+        return response.json() as Promise<{ reading?: AiReading }>;
+      })
+      .then((payload) => {
+        if (!payload.reading) {
+          throw new Error("AI reading response was empty.");
+        }
+
+        sessionStorage.setItem(cacheKey, JSON.stringify(payload.reading));
+        setAiReading(payload.reading);
+        setAiReadingStatus("ready");
+      })
+      .catch((error) => {
+        if (error instanceof DOMException && error.name === "AbortError") {
+          return;
+        }
+
+        setAiReading(null);
+        setAiReadingStatus("error");
+      });
+
+    return () => {
+      controller.abort();
+    };
+  }, [card, question, mode, orientation, initialLang]);
 
   useEffect(() => {
     const storedRitual = readStoredRitual();
@@ -410,6 +500,77 @@ export function ResultClient({
                 </p>
               </section>
             </div>
+
+            <section className="ritual-result-stage-4 atelier-panel mt-4 border-[#7d927d]/45 p-5">
+              <h2 className="atelier-label text-xs font-semibold">
+                {copy.aiPersonalizedReading}
+              </h2>
+
+              {aiReadingStatus === "loading" ? (
+                <p className="mt-3 text-sm leading-6 text-[#bca77f]">
+                  {copy.aiReadingLoading}
+                </p>
+              ) : null}
+
+              {aiReadingStatus === "error" ? (
+                <p className="mt-3 text-sm leading-6 text-[#bca77f]">
+                  {copy.aiReadingUnavailable}
+                </p>
+              ) : null}
+
+              {aiReadingStatus === "ready" && aiReading ? (
+                <div className="mt-4 space-y-5">
+                  <div>
+                    <h3 className="text-xs font-semibold uppercase tracking-[0.2em] text-[#bca77f]">
+                      {copy.aiSummary}
+                    </h3>
+                    <p className="mt-2 text-[15px] leading-7 text-zinc-200">
+                      {aiReading.summary}
+                    </p>
+                  </div>
+                  <div>
+                    <h3 className="text-xs font-semibold uppercase tracking-[0.2em] text-[#bca77f]">
+                      {copy.aiCardMeaning}
+                    </h3>
+                    <p className="mt-2 text-[15px] leading-7 text-zinc-200">
+                      {aiReading.cardMeaning}
+                    </p>
+                  </div>
+                  <div>
+                    <h3 className="text-xs font-semibold uppercase tracking-[0.2em] text-[#bca77f]">
+                      {copy.aiSituationReading}
+                    </h3>
+                    <p className="mt-2 text-[15px] leading-7 text-zinc-200">
+                      {aiReading.situationReading}
+                    </p>
+                  </div>
+                  <div>
+                    <h3 className="text-xs font-semibold uppercase tracking-[0.2em] text-[#bca77f]">
+                      {copy.aiAdvice}
+                    </h3>
+                    <p className="mt-2 text-[15px] leading-7 text-zinc-200">
+                      {aiReading.advice}
+                    </p>
+                  </div>
+                  <div>
+                    <h3 className="text-xs font-semibold uppercase tracking-[0.2em] text-[#bca77f]">
+                      {copy.aiReflectionQuestion}
+                    </h3>
+                    <p className="mt-2 text-[15px] leading-7 text-zinc-200">
+                      {aiReading.reflectionQuestion}
+                    </p>
+                  </div>
+                  <div>
+                    <h3 className="text-xs font-semibold uppercase tracking-[0.2em] text-[#bca77f]">
+                      {copy.closingNote}
+                    </h3>
+                    <p className="mt-2 text-[15px] leading-7 text-zinc-200">
+                      {aiReading.closingNote}
+                    </p>
+                  </div>
+                </div>
+              ) : null}
+            </section>
 
             <div className="mt-6 grid gap-3 sm:grid-cols-2">
               <Link
