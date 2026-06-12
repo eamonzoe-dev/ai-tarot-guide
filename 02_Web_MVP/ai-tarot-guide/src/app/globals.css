@@ -1,13 +1,15 @@
 @import "tailwindcss";
 
 :root {
-  --background: #050506;
+  --background: #030303;
   --foreground: #eee8dd;
   --atelier-ink: #050506;
   --atelier-wood: #100b08;
   --atelier-wood-soft: #1a130e;
   --atelier-leather: #17110d;
-  --atelier-brass: #a98552;
+  --atelier-brass: #c39b58;
+  --ritual-gold: #d9bd80;
+  --ritual-gold-muted: #9a7b42;
   --atelier-paper: #d8c9ae;
   --atelier-paper-deep: #b9a789;
   --atelier-blue: #6f8da3;
@@ -35,27 +37,103 @@ input {
 }
 
 .atelier-page {
+  isolation: isolate;
   background:
-    radial-gradient(circle at 50% 0%, rgba(169, 133, 82, 0.13), transparent 30%),
-    radial-gradient(circle at 0% 100%, rgba(111, 141, 163, 0.1), transparent 34%),
-    linear-gradient(145deg, #050506 0%, #0d0907 48%, #060607 100%);
+    radial-gradient(ellipse at 50% 18%, rgba(172, 134, 70, 0.12), transparent 34%),
+    radial-gradient(circle at 50% -10%, rgba(198, 158, 84, 0.08), transparent 35%),
+    radial-gradient(circle at 18% 82%, rgba(119, 95, 53, 0.06), transparent 32%),
+    radial-gradient(circle at 82% 72%, rgba(91, 80, 62, 0.06), transparent 28%),
+    linear-gradient(145deg, #020202 0%, #070604 46%, #020202 100%);
+}
+
+.atelier-page::before,
+.atelier-page::after {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.atelier-page::before {
+  opacity: 0.5;
+  background:
+    radial-gradient(circle at 13% 18%, rgba(238, 232, 221, 0.13) 0 1px, transparent 1.35px),
+    radial-gradient(circle at 71% 26%, rgba(214, 179, 109, 0.11) 0 1px, transparent 1.45px),
+    radial-gradient(circle at 38% 74%, rgba(238, 232, 221, 0.07) 0 1px, transparent 1.4px),
+    radial-gradient(circle at 86% 82%, rgba(214, 179, 109, 0.08) 0 1px, transparent 1.5px);
+  background-size: 83px 97px, 127px 109px, 151px 139px, 191px 173px;
+  animation: ritual-star-drift 72s linear infinite;
+}
+
+.atelier-page::after {
+  inset: auto;
+  left: 50%;
+  top: 50%;
+  width: min(58rem, 155vw);
+  aspect-ratio: 1;
+  border-radius: 9999px;
+  opacity: 0.18;
+  transform: translate(-50%, -50%);
+  background:
+    repeating-radial-gradient(circle, transparent 0 4.8rem, rgba(214, 179, 109, 0.12) 4.86rem 4.9rem, transparent 4.98rem 7.2rem),
+    conic-gradient(from 0deg, transparent 0deg 38deg, rgba(214, 179, 109, 0.14) 42deg, transparent 47deg 124deg, rgba(214, 179, 109, 0.1) 129deg, transparent 134deg 246deg, rgba(214, 179, 109, 0.11) 252deg, transparent 258deg 360deg);
+  mask-image: radial-gradient(circle, transparent 0 18%, black 30%, black 62%, transparent 75%);
+  animation: ritual-orbit-slow 160s linear infinite;
 }
 
 .atelier-grain {
-  opacity: 0.18;
+  opacity: 0.2;
   mix-blend-mode: screen;
   background-image:
-    radial-gradient(circle at 18% 22%, rgba(238, 232, 221, 0.08) 0 1px, transparent 1.2px),
-    radial-gradient(circle at 64% 38%, rgba(169, 133, 82, 0.08) 0 1px, transparent 1.4px),
-    radial-gradient(circle at 42% 78%, rgba(111, 141, 163, 0.05) 0 1px, transparent 1.3px);
+    radial-gradient(circle at 18% 22%, rgba(238, 232, 221, 0.06) 0 1px, transparent 1.2px),
+    radial-gradient(circle at 64% 38%, rgba(214, 179, 109, 0.08) 0 1px, transparent 1.4px),
+    radial-gradient(circle at 42% 78%, rgba(238, 232, 221, 0.04) 0 1px, transparent 1.3px);
   background-size: 17px 19px, 23px 29px, 31px 37px;
 }
 
-.atelier-worktop {
-  border: 1px solid rgba(169, 133, 82, 0.24);
+.galaxy-background {
+  z-index: 0;
+  overflow: hidden;
+  mix-blend-mode: screen;
+  filter: saturate(0.48) sepia(0.08);
+}
+
+.galaxy-background canvas {
+  pointer-events: none;
+}
+
+.ritual-room-container {
+  z-index: 1;
+  overflow: visible;
+  border: 0;
+  border-radius: 0;
   background:
-    linear-gradient(180deg, rgba(31, 23, 17, 0.96), rgba(12, 9, 8, 0.98)),
-    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.025) 0 1px, transparent 1px 9px);
+    radial-gradient(ellipse at 50% 14%, rgba(217, 189, 128, 0.07), transparent 38%),
+    radial-gradient(ellipse at 50% 46%, rgba(4, 4, 4, 0.42), transparent 72%);
+  box-shadow: none;
+  outline: 0;
+  backdrop-filter: none;
+}
+
+@media (max-width: 639px) {
+  .ritual-room-container {
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    background:
+      radial-gradient(ellipse at 50% 12%, rgba(217, 189, 128, 0.05), transparent 36%),
+      radial-gradient(ellipse at 50% 44%, rgba(4, 4, 4, 0.32), transparent 72%);
+  }
+}
+
+.atelier-worktop {
+  border: 1px solid rgba(214, 179, 109, 0.26);
+  border-radius: 24px;
+  background:
+    radial-gradient(ellipse at 50% 20%, rgba(217, 189, 128, 0.07), transparent 55%),
+    linear-gradient(180deg, rgba(18, 14, 10, 0.9), rgba(7, 7, 6, 0.96)),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.018) 0 1px, transparent 1px 9px);
   box-shadow:
     0 24px 70px rgba(0, 0, 0, 0.48),
     inset 0 1px 0 rgba(255, 245, 224, 0.06),
@@ -63,15 +141,19 @@ input {
 }
 
 .atelier-panel {
-  border: 1px solid rgba(169, 133, 82, 0.26);
-  background: linear-gradient(180deg, rgba(20, 16, 13, 0.96), rgba(9, 8, 7, 0.98));
+  border: 1px solid rgba(214, 179, 109, 0.24);
+  border-radius: 22px;
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(217, 189, 128, 0.06), transparent 48%),
+    linear-gradient(180deg, rgba(17, 14, 10, 0.92), rgba(7, 7, 6, 0.98));
   box-shadow:
     0 18px 46px rgba(0, 0, 0, 0.36),
     inset 0 1px 0 rgba(255, 245, 224, 0.06);
 }
 
 .atelier-paper {
-  border: 1px solid rgba(169, 133, 82, 0.36);
+  border: 1px solid rgba(214, 179, 109, 0.34);
+  border-radius: 18px;
   background:
     linear-gradient(180deg, rgba(216, 201, 174, 0.98), rgba(181, 162, 130, 0.98)),
     repeating-linear-gradient(0deg, rgba(75, 55, 36, 0.08) 0 1px, transparent 1px 28px);
@@ -82,7 +164,8 @@ input {
 }
 
 .atelier-paper-dark {
-  border: 1px solid rgba(169, 133, 82, 0.28);
+  border: 1px solid rgba(214, 179, 109, 0.24);
+  border-radius: 18px;
   background:
     linear-gradient(180deg, rgba(25, 21, 17, 0.98), rgba(13, 10, 9, 0.98)),
     repeating-linear-gradient(0deg, rgba(216, 201, 174, 0.025) 0 1px, transparent 1px 26px);
@@ -92,9 +175,169 @@ input {
 }
 
 .atelier-label {
-  color: #bca77f;
-  letter-spacing: 0.24em;
+  color: #d2b06d;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
+}
+
+.ritual-action-link {
+  display: flex;
+  min-height: 3rem;
+  touch-action: manipulation;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(217, 189, 128, 0.46);
+  border-radius: 9999px;
+  background: linear-gradient(180deg, rgba(18, 14, 10, 0.9), rgba(7, 7, 6, 0.96));
+  padding: 0.85rem 1.25rem;
+  text-align: center;
+  color: #ead9b4;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  box-shadow:
+    0 10px 24px rgba(0, 0, 0, 0.34),
+    inset 0 1px 0 rgba(255, 245, 224, 0.06);
+  transition:
+    border-color 200ms ease,
+    color 200ms ease,
+    transform 200ms ease,
+    box-shadow 200ms ease;
+}
+
+.ritual-action-link:hover {
+  border-color: rgba(240, 214, 158, 0.76);
+  color: #fff7e8;
+  box-shadow:
+    0 12px 28px rgba(0, 0, 0, 0.38),
+    0 0 20px rgba(217, 189, 128, 0.1),
+    inset 0 1px 0 rgba(255, 245, 224, 0.08);
+}
+
+.ritual-action-link:active {
+  transform: scale(0.985);
+}
+
+.ritual-step-track {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.ritual-step-track::before {
+  content: "";
+  position: absolute;
+  left: 16%;
+  right: 16%;
+  top: 0.43rem;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(217, 189, 128, 0.34), transparent);
+}
+
+.ritual-step-dot {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.55rem;
+  color: #7f7464;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.ritual-step-dot::before {
+  content: "";
+  width: 0.86rem;
+  height: 0.86rem;
+  border: 1px solid rgba(217, 189, 128, 0.34);
+  border-radius: 9999px;
+  background: #16110b;
+}
+
+.ritual-step-dot-active {
+  color: #d9bd80;
+}
+
+.ritual-step-dot-active::before {
+  border-color: rgba(217, 189, 128, 0.9);
+  background: #d9bd80;
+  box-shadow: 0 0 18px rgba(217, 189, 128, 0.32);
+}
+
+.ritual-card-back {
+  position: relative;
+  aspect-ratio: 9 / 16;
+  width: min(11.25rem, 46vw);
+  overflow: hidden;
+  border: 1px solid rgba(217, 189, 128, 0.42);
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 50% 46%, transparent 0 17%, rgba(217, 189, 128, 0.2) 17.3% 17.8%, transparent 18.2%),
+    radial-gradient(circle at 50% 46%, transparent 0 30%, rgba(217, 189, 128, 0.16) 30.3% 30.8%, transparent 31.2%),
+    conic-gradient(from 0deg, transparent 0deg 42deg, rgba(217, 189, 128, 0.2) 45deg, transparent 49deg 132deg, rgba(217, 189, 128, 0.16) 136deg, transparent 141deg 224deg, rgba(217, 189, 128, 0.18) 228deg, transparent 233deg 314deg, rgba(217, 189, 128, 0.14) 318deg, transparent 323deg),
+    linear-gradient(160deg, #12100c, #050505);
+  box-shadow:
+    0 28px 76px rgba(0, 0, 0, 0.62),
+    0 0 52px rgba(217, 189, 128, 0.16),
+    inset 0 0 0 10px rgba(0, 0, 0, 0.22),
+    inset 0 0 0 11px rgba(217, 189, 128, 0.2),
+    inset 0 1px 0 rgba(255, 245, 224, 0.1);
+}
+
+.ritual-card-back::before,
+.ritual-card-back::after {
+  content: "";
+  position: absolute;
+  inset: 1.05rem;
+  border: 1px solid rgba(217, 189, 128, 0.26);
+  border-radius: 13px;
+}
+
+.ritual-card-back::after {
+  inset: 2.4rem 1.9rem;
+  border-radius: 9999px;
+  border-color: rgba(217, 189, 128, 0.22);
+  mask-image: conic-gradient(black 0 72deg, transparent 74deg 112deg, black 114deg 246deg, transparent 248deg 292deg, black 294deg);
+}
+
+.ritual-card-back-mark {
+  position: absolute;
+  left: 50%;
+  top: 48%;
+  width: 34%;
+  aspect-ratio: 1;
+  border: 1px solid rgba(217, 189, 128, 0.38);
+  border-radius: 9999px;
+  transform: translate(-50%, -50%);
+}
+
+.ritual-card-back-mark::before {
+  content: "";
+  position: absolute;
+  inset: -1px 44% -1px -1px;
+  border: 1px solid rgba(217, 189, 128, 0.44);
+  border-right: 0;
+  border-radius: 9999px 0 0 9999px;
+  background: #080806;
+}
+
+.ritual-result-card-glow {
+  position: relative;
+}
+
+.ritual-result-card-glow::before {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: -4rem -3rem;
+  z-index: -1;
+  border-radius: 9999px;
+  background: radial-gradient(ellipse at 50% 45%, rgba(217, 189, 128, 0.2), transparent 62%);
 }
 
 .atelier-divider {
@@ -298,7 +541,8 @@ input {
 .ritual-note {
   position: relative;
   z-index: 1;
-  border: 1px solid rgba(169, 133, 82, 0.38);
+  border: 1px solid rgba(214, 179, 109, 0.34);
+  border-radius: 18px;
   background:
     linear-gradient(180deg, rgba(28, 22, 17, 0.9), rgba(13, 10, 8, 0.94)),
     radial-gradient(circle at 50% 0%, rgba(169, 133, 82, 0.16), transparent 62%);
@@ -318,7 +562,8 @@ input {
 }
 
 .ritual-note-field {
-  border-color: rgba(188, 167, 127, 0.34);
+  border-color: rgba(214, 179, 109, 0.28);
+  border-radius: 14px;
   background: rgba(13, 10, 8, 0.68);
   color: #efe8d9;
   box-shadow: inset 0 1px 12px rgba(0, 0, 0, 0.26);
@@ -331,7 +576,8 @@ input {
 .ritual-step-card {
   position: relative;
   z-index: 1;
-  border: 1px solid rgba(169, 133, 82, 0.34);
+  border: 1px solid rgba(214, 179, 109, 0.34);
+  border-radius: 18px;
   background:
     linear-gradient(180deg, rgba(18, 13, 10, 0.76), rgba(8, 7, 6, 0.82)),
     radial-gradient(circle at 50% 0%, rgba(216, 201, 174, 0.11), transparent 60%);
@@ -363,6 +609,26 @@ input {
   50% {
     opacity: 0.72;
     transform: scale(1.04);
+  }
+}
+
+@keyframes ritual-star-drift {
+  from {
+    background-position: 0 0, 0 0, 0 0, 0 0;
+  }
+
+  to {
+    background-position: 83px 97px, -127px 109px, 151px -139px, -191px -173px;
+  }
+}
+
+@keyframes ritual-orbit-slow {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
   }
 }
 
@@ -442,6 +708,10 @@ input {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .galaxy-background {
+    opacity: 0.06 !important;
+  }
+
   .ritual-glow,
   .ritual-halo,
   .ritual-ring,

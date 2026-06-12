@@ -1,3 +1,5 @@
+import { GalaxyBackground } from "@/components/ai-guide/GalaxyBackground";
+
 type PageContainerProps = {
   children: React.ReactNode;
   eyebrow?: string;
@@ -14,11 +16,12 @@ export function PageContainer({
   compact = false,
 }: PageContainerProps) {
   return (
-    <main className="atelier-page relative flex min-h-dvh flex-1 overflow-hidden text-[#eee8dd]">
+    <main className="atelier-page relative flex min-h-svh flex-1 overflow-hidden px-0 py-0 text-[#eee8dd] sm:px-6 sm:py-6 lg:px-8">
+      <GalaxyBackground />
       <div className="atelier-grain pointer-events-none absolute inset-0" />
 
       <section
-        className={`relative mx-auto flex w-full max-w-md flex-col px-5 ${
+        className={`ritual-room-container relative mx-auto flex min-h-svh w-full max-w-[520px] flex-col px-5 sm:min-h-0 sm:px-6 ${
           compact ? "py-6" : "py-8"
         }`}
       >

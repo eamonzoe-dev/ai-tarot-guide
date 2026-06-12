@@ -284,9 +284,9 @@ export function RevealClient({
       </div>
       <div className="space-y-6">
         <div className="atelier-worktop p-5 text-center">
-          <div className="ritual-reveal-card mx-auto flex h-64 w-44 items-center justify-center border border-[#4a3b28] bg-[linear-gradient(160deg,#17110d,#070707)] shadow-[0_22px_48px_rgba(0,0,0,0.55),0_0_34px_rgba(169,133,82,0.12),inset_0_1px_0_rgba(255,245,224,0.08)]">
-            <div className="h-52 w-32 border border-[#8c724b] bg-[#090806] p-4">
-              <div className="h-full border border-[#3f3324]" />
+          <div className="flex justify-center py-3">
+            <div className="ritual-card-back ritual-reveal-card">
+              <span className="ritual-card-back-mark" />
             </div>
           </div>
           <p className="atelier-label mt-5 text-xs font-semibold">

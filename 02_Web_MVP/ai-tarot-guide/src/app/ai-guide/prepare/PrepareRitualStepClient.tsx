@@ -72,7 +72,7 @@ export function PrepareRitualStepClient({
   }
 
   return (
-    <section className="ritual-prepare-section relative isolate z-10 flex min-h-[calc(100dvh-12rem)] flex-col justify-center py-8">
+    <section className="ritual-prepare-section relative isolate z-10 flex min-h-[calc(100svh-12rem)] flex-col justify-center py-8 sm:min-h-[34rem]">
       <RitualCoreV2 pulseCount={pulseCount} state={step} />
 
       <div

@@ -22,17 +22,17 @@ export function ReadingNav({ lang }: ReadingNavProps) {
   }
 
   return (
-    <nav className="mb-6 flex items-center justify-between gap-3 text-xs font-semibold uppercase tracking-[0.2em] text-[#bca77f]">
+    <nav className="mb-6 flex items-center justify-between gap-3 text-xs font-semibold uppercase tracking-[0.16em] text-[#bca77f]">
       <button
         type="button"
         onClick={goBack}
-        className="min-h-10 touch-manipulation border border-[#3f3324] bg-[#090806]/75 px-3 text-left transition hover:border-[#8c724b] hover:text-[#efe8d9]"
+        className="min-h-10 touch-manipulation rounded-full border border-[#6d5a35]/55 bg-[#080706]/70 px-3 text-left transition hover:border-[#c7a463] hover:text-[#efe8d9]"
       >
         &larr; {copy.back}
       </button>
       <Link
         href={homeHref}
-        className="flex min-h-10 touch-manipulation items-center border border-[#3f3324] bg-[#090806]/75 px-3 transition hover:border-[#8c724b] hover:text-[#efe8d9]"
+        className="flex min-h-10 touch-manipulation items-center rounded-full border border-[#6d5a35]/55 bg-[#080706]/70 px-3 transition hover:border-[#c7a463] hover:text-[#efe8d9]"
       >
         {copy.home}
       </Link>

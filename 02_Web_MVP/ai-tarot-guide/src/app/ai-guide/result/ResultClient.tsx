@@ -5,9 +5,11 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
+import { GalaxyBackground } from "@/components/ai-guide/GalaxyBackground";
 import { LanguageToggle } from "@/components/ai-guide/LanguageToggle";
 import { PageContainer } from "@/components/ai-guide/PageContainer";
 import { ReadingNav } from "@/components/ai-guide/ReadingNav";
+import { ReadingThinkingState } from "@/components/ai-guide/ReadingThinkingState";
 import {
   getTarotCardById,
   getTarotCardKeywords,
@@ -56,12 +58,17 @@ type StoredRitual = {
 };
 
 type AiReading = {
-  summary: string;
-  cardMeaning: string;
-  situationReading: string;
-  advice: string;
-  reflectionQuestion: string;
-  closingNote: string;
+  fullReading?: string;
+  summary?: string;
+  directAnswer?: string;
+  cardMessage?: string;
+  situationReading?: string;
+  hiddenTension?: string;
+  advice?: string;
+  nextStep?: string;
+  reflectionQuestion?: string;
+  closingNote?: string;
+  cardMeaning?: string;
 };
 
 type AiReadingStatus = "idle" | "loading" | "ready" | "error";
@@ -78,6 +85,65 @@ function readStoredRitual(): StoredRitual {
   } catch {
     return {};
   }
+}
+
+function firstText(...values: Array<string | undefined>) {
+  return values.find((value) => value && value.trim().length > 0)?.trim() ?? "";
+}
+
+function normalizeAiReadingForDisplay(reading: AiReading) {
+  const cardMessage = firstText(reading.cardMessage, reading.cardMeaning);
+
+  return {
+    fullReading: firstText(reading.fullReading),
+    summary: firstText(reading.summary),
+    directAnswer: firstText(reading.directAnswer, reading.summary),
+    cardMessage,
+    situationReading: firstText(reading.situationReading),
+    hiddenTension: firstText(reading.hiddenTension, reading.situationReading),
+    advice: firstText(reading.advice),
+    nextStep: firstText(reading.nextStep, reading.advice),
+    reflectionQuestion: firstText(reading.reflectionQuestion),
+    closingNote: firstText(reading.closingNote),
+  };
+}
+
+function isDisplayableAiReading(value: unknown): value is AiReading {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  const reading = value as AiReading;
+  const display = normalizeAiReadingForDisplay(reading);
+  return Boolean(
+    display.fullReading ||
+      (display.summary &&
+        display.directAnswer &&
+        display.situationReading &&
+        display.advice),
+  );
+}
+
+function buildFallbackFullReading(
+  aiDisplay: ReturnType<typeof normalizeAiReadingForDisplay>,
+) {
+  return [
+    aiDisplay.directAnswer,
+    aiDisplay.situationReading,
+    aiDisplay.hiddenTension,
+    aiDisplay.advice,
+    aiDisplay.nextStep,
+    aiDisplay.closingNote,
+  ]
+    .filter(Boolean)
+    .join("\n\n");
+}
+
+function splitReadingParagraphs(reading: string) {
+  return reading
+    .split(/\n{2,}|\r?\n/)
+    .map((paragraph) => paragraph.trim())
+    .filter(Boolean);
 }
 
 export function ResultClient({
@@ -109,6 +175,7 @@ export function ResultClient({
   const [aiReading, setAiReading] = useState<AiReading | null>(null);
   const [aiReadingStatus, setAiReadingStatus] =
     useState<AiReadingStatus>("idle");
+  const [aiRetryKey, setAiRetryKey] = useState(0);
   const card = selectedCard ? getTarotCardById(selectedCard) : undefined;
 
   useEffect(() => {
@@ -130,13 +197,22 @@ export function ResultClient({
 
     if (cachedReading) {
       try {
-        setAiReading(JSON.parse(cachedReading) as AiReading);
-        setAiReadingStatus("ready");
-        return;
+        const parsedCachedReading = JSON.parse(cachedReading) as unknown;
+
+        if (!isDisplayableAiReading(parsedCachedReading)) {
+          sessionStorage.removeItem(cacheKey);
+        } else {
+          setAiReading(parsedCachedReading);
+          setAiReadingStatus("ready");
+          return;
+        }
       } catch {
         sessionStorage.removeItem(cacheKey);
       }
     }
+
+    const cachedFailureKey = `${cacheKey}:error`;
+    sessionStorage.removeItem(cachedFailureKey);
 
     const controller = new AbortController();
     setAiReading(null);
@@ -164,7 +240,7 @@ export function ResultClient({
         return response.json() as Promise<{ reading?: AiReading }>;
       })
       .then((payload) => {
-        if (!payload.reading) {
+        if (!payload.reading || !isDisplayableAiReading(payload.reading)) {
           throw new Error("AI reading response was empty.");
         }
 
@@ -184,7 +260,7 @@ export function ResultClient({
     return () => {
       controller.abort();
     };
-  }, [card, question, mode, orientation, initialLang]);
+  }, [card, question, mode, orientation, initialLang, aiRetryKey]);
 
   useEffect(() => {
     const storedRitual = readStoredRitual();
@@ -329,7 +405,7 @@ export function ResultClient({
           />
         </div>
         <Link
-          className="inline-flex min-h-12 w-full touch-manipulation items-center justify-center border border-[#b08c58]/70 bg-[linear-gradient(180deg,#2a1d15,#120d0a)] px-5 text-center text-xs font-semibold uppercase tracking-[0.24em] text-[#f0eadf] shadow-[0_12px_28px_rgba(0,0,0,0.42),inset_0_1px_0_rgba(255,235,204,0.12),inset_0_-1px_0_rgba(0,0,0,0.72)]"
+          className="ritual-action-link"
           href={withLang("/ai-guide", {}, initialLang)}
         >
           {copy.returnToReadingRoom}
@@ -340,8 +416,6 @@ export function ResultClient({
 
   const modeLabel =
     mode === "online" ? copy.onlineDrawMode : copy.physicalCardMode;
-  const readingTypeLabel =
-    spread === "single" ? copy.singleCardReading : copy.singleCardReading;
   const orientationLabel =
     orientation === "upright" ? copy.upright : copy.upright;
   const cardLabel = getTarotCardLabel(card, initialLang);
@@ -350,12 +424,69 @@ export function ResultClient({
   const questionText = question || copy.noQuestion;
   const reflectionPrompt =
     card.reflectionQuestion || copy.reflectionFallback;
+  const practicalAdvice = card.practicalAdvice || card.suggestion;
   const homeHref = withLang("/ai-guide", {}, initialLang);
-
+  const displayKeywords = cardKeywords.slice(0, 2);
+  const aiDisplay = aiReading
+    ? normalizeAiReadingForDisplay(aiReading)
+    : undefined;
+  const fullReadingText = aiDisplay
+    ? firstText(
+        aiDisplay.fullReading,
+        buildFallbackFullReading(aiDisplay),
+      )
+    : "";
+  const readingParagraphs = fullReadingText
+    ? splitReadingParagraphs(fullReadingText)
+    : [];
+  const referenceItems =
+    initialLang === "zh"
+      ? [
+          {
+            title: copy.coreInterpretation,
+            body: `${cardTitle}的辅助关键词是：${cardKeywords
+              .slice(0, 4)
+              .join("、")}。牌面资料只作为参考，具体判断以上方本次解读为主。`,
+          },
+          {
+            title: copy.situationMapping,
+            body: "先观察这些关键词是否对应你正在经历的处境，不要把牌义当成固定答案。",
+          },
+          {
+            title: copy.reflectionPrompt,
+            body: copy.reflectionFallback,
+          },
+          {
+            title: copy.quietSuggestion,
+            body: "把最有触动的一个关键词写下来，再对照你的问题看它指向哪个选择、边界或行动。",
+          },
+        ]
+      : [
+          {
+            title: copy.coreInterpretation,
+            body: cleanParagraph(card.coreMeaning),
+          },
+          {
+            title: copy.situationMapping,
+            body: cleanParagraph(card.uprightMessage),
+          },
+          {
+            title: copy.reflectionPrompt,
+            body: cleanParagraph(reflectionPrompt).replace(
+              /^Ask yourself:\s*/i,
+              "",
+            ),
+          },
+          {
+            title: copy.quietSuggestion,
+            body: cleanParagraph(practicalAdvice),
+          },
+        ];
   return (
-    <main className="atelier-page relative min-h-screen overflow-hidden text-zinc-100">
+    <main className="atelier-page relative min-h-svh overflow-hidden px-0 py-0 text-[#eee8dd] sm:px-6 sm:py-6 lg:px-8">
+      <GalaxyBackground opacity={0.2} />
       <div className="atelier-grain pointer-events-none absolute inset-0" />
-      <div className="mx-auto max-w-5xl px-5 py-8 sm:px-6 lg:py-14">
+      <div className="ritual-room-container relative mx-auto min-h-svh w-full max-w-6xl px-5 py-8 sm:min-h-0 sm:px-6 lg:py-12">
         <header className="atelier-label relative flex items-center justify-between text-xs font-semibold">
           <p>{copy.readingDossier}</p>
           <p>{mode === "online" ? copy.onlineDrawMode : copy.physicalDeck}</p>
@@ -378,10 +509,10 @@ export function ResultClient({
           </div>
         </div>
 
-        <div className="relative mt-8 grid gap-10 lg:grid-cols-5 lg:items-start lg:gap-16">
-          <aside className="lg:col-span-2">
-            <div className="text-center lg:sticky lg:top-10">
-              <div className="ritual-result-stage-1 atelier-worktop mx-auto max-w-xs p-4">
+        <section className="ritual-result-stage-1 relative mt-6 border-b border-[#3d3020] pb-5">
+          <div className="grid gap-4 sm:grid-cols-[auto_1fr] sm:items-center">
+            <div className="flex items-center gap-4">
+              <div className="w-14 shrink-0 sm:w-16">
                 {card.image ? (
                   <Image
                     src={card.image}
@@ -389,219 +520,197 @@ export function ResultClient({
                     width={320}
                     height={569}
                     priority
-                    className="mx-auto block h-auto w-36 border border-[#4a3b28] object-cover shadow-[0_22px_48px_rgba(0,0,0,0.55)] sm:w-44 lg:w-60 xl:w-64"
+                    className="block h-auto w-full rounded-[0.55rem] border border-[#d9bd80]/28 object-cover shadow-[0_12px_28px_rgba(0,0,0,0.42)]"
                   />
                 ) : (
-                  <div className="mx-auto flex aspect-[9/16] w-36 items-center justify-center border border-[#4a3b28] bg-[linear-gradient(160deg,#17110d,#070707)] p-4 shadow-[0_22px_48px_rgba(0,0,0,0.55)] sm:w-44 lg:w-60 xl:w-64">
-                    <div className="flex h-full w-full flex-col justify-between border border-[#8c724b]/70 p-5 text-center">
-                      <span className="atelier-label text-xs font-semibold">
-                        {cardLabel}
-                      </span>
-                      <span className="font-serif text-3xl leading-tight text-[#efe8d9]">
+                  <div className="flex aspect-[9/16] w-full items-center justify-center rounded-[0.55rem] border border-[#d9bd80]/28 bg-[linear-gradient(160deg,#17110d,#070707)] p-1 shadow-[0_12px_28px_rgba(0,0,0,0.42)]">
+                    <div className="flex h-full w-full items-center justify-center rounded-[0.4rem] border border-[#8c724b]/60 p-1 text-center">
+                      <span className="font-serif text-[0.68rem] leading-tight text-[#efe8d9]">
                         {cardTitle}
-                      </span>
-                      <span className="text-xs uppercase tracking-[0.24em] text-[#bca77f]">
-                        {card.rank}
                       </span>
                     </div>
                   </div>
                 )}
               </div>
-
-              <p className="ritual-result-stage-1 atelier-label mt-6 text-xs font-semibold">
-                {cardLabel}
-              </p>
-              <h1 className="ritual-result-stage-1 mt-2 font-serif text-4xl leading-tight text-zinc-100 sm:text-5xl">
-                {cardTitle}
-              </h1>
-            </div>
-          </aside>
-
-          <section className="lg:col-span-3">
-            <div className="ritual-result-stage-2 atelier-paper p-5 lg:p-6">
-              <h2 className="text-xs font-semibold uppercase tracking-[0.24em] text-[#6d5532]">
-                {copy.yourQuestion}
-              </h2>
-              <p className="mt-3 text-base leading-7 text-[#17110d] sm:text-lg">
-                {questionText}
-              </p>
-            </div>
-
-            <div className="ritual-result-stage-2 atelier-panel mt-4 border-[#a98552]/35 p-5">
-              <h2 className="atelier-label text-xs font-semibold">
-                {copy.readingDossier}
-              </h2>
-              <div className="mt-4 grid gap-4 text-sm leading-6 sm:grid-cols-3">
-                <div>
-                  <p className="text-[#bca77f]">{copy.readingType}</p>
-                  <p className="mt-1 text-zinc-100">{readingTypeLabel}</p>
-                </div>
-                <div>
-                  <p className="text-[#bca77f]">{copy.readingMode}</p>
-                  <p className="mt-1 text-zinc-100">{modeLabel}</p>
-                </div>
-                <div>
-                  <p className="text-[#bca77f]">{copy.cardOrientation}</p>
-                  <p className="mt-1 text-zinc-100">{orientationLabel}</p>
-                </div>
+              <div className="min-w-0">
+                <p className="atelier-label text-[0.62rem] font-semibold">
+                  {copy.theCard}
+                </p>
+                <h1 className="mt-1 font-serif text-xl leading-tight text-[#f4efe5] sm:text-2xl">
+                  {cardTitle}
+                </h1>
+                <p className="mt-1 text-xs leading-5 text-[#bca77f]">
+                  {cardLabel}
+                </p>
               </div>
             </div>
 
-            <div className="ritual-result-stage-3 atelier-panel mt-4 p-5">
-              <h2 className="atelier-label text-xs font-semibold">
-                {copy.theCard}
+            <div className="min-w-0">
+              <h2 className="atelier-label text-[0.62rem] font-semibold">
+                {copy.yourQuestion}
               </h2>
-              <p className="mt-3 font-serif text-2xl leading-tight text-zinc-100">
-                {cardTitle}
+              <p className="mt-2 text-sm leading-6 text-[#efe8d9] sm:text-base">
+                {questionText}
               </p>
-              <p className="mt-2 text-sm leading-6 text-[#bca77f]">
-                {cardLabel} / {card.rank}
-              </p>
-              <div className="mt-4 flex flex-wrap gap-2">
-                {cardKeywords.map((keyword) => (
+              <div className="mt-3 flex flex-wrap gap-2">
+                <span className="rounded-full border border-[#6d5a35]/55 bg-[#0f0b08]/55 px-3 py-1 text-[0.66rem] text-[#c9b895]">
+                  {modeLabel} / {orientationLabel}
+                </span>
+                {displayKeywords.map((keyword) => (
                   <span
                     key={keyword}
-                    className="border border-[#4a3b28] bg-[#0f0b08] px-3 py-1 text-xs text-[#d8c9ae]"
+                    className="rounded-full border border-[#314433]/55 bg-[#0b120d]/55 px-3 py-1 text-[0.66rem] text-[#aebdaa]"
                   >
                     {keyword}
                   </span>
                 ))}
               </div>
-              <p className="mt-2 text-sm leading-6 text-[#c8c0b4]">
-                {cleanParagraph(card.coreMeaning)}
+            </div>
+          </div>
+        </section>
+
+        <section className="ritual-result-stage-2 relative mx-auto mt-8 max-w-[840px]">
+          {aiReadingStatus === "loading" ? (
+            <ReadingThinkingState
+              subtitle={copy.aiReadingLoading}
+              title={copy.aiReadingTitle}
+            />
+          ) : null}
+
+          {aiReadingStatus === "error" ? (
+            <div className="mt-6 border-l border-[#d9bd80]/45 pl-4">
+              <p className="text-sm leading-6 text-[#d8c9ae]">
+                {copy.aiReadingUnavailable}
               </p>
+              <button
+                className="ritual-action-link mt-4 w-full sm:w-auto"
+                type="button"
+                onClick={() => {
+                  if (card && question && mode) {
+                    const retryCacheKey = [
+                      AI_READING_CACHE_PREFIX,
+                      initialLang,
+                      mode,
+                      orientation,
+                      card.id,
+                      question,
+                    ].join(":");
+                    sessionStorage.removeItem(retryCacheKey);
+                    sessionStorage.removeItem(`${retryCacheKey}:error`);
+                  }
+
+                  setAiRetryKey((value) => value + 1);
+                }}
+              >
+                {copy.aiRetryReading}
+              </button>
             </div>
+          ) : null}
 
-            <div className="ritual-result-stage-4 mt-4 space-y-4">
-              <section className="atelier-paper-dark p-5">
-                <h2 className="atelier-label text-xs font-semibold">
-                  {copy.readingReflection}
-                </h2>
-                <p className="mt-3 text-[15px] leading-7 text-zinc-200 sm:text-base sm:leading-8">
-                  In relation to your question, {card.reflection}
-                </p>
-              </section>
-
-              <section className="atelier-paper-dark p-5">
-                <h2 className="atelier-label text-xs font-semibold">
-                  {copy.quietSuggestion}
-                </h2>
-                <p className="mt-3 text-[15px] leading-7 text-zinc-200 sm:text-base sm:leading-8">
-                  {card.suggestion}
-                </p>
-              </section>
-
-              <section className="atelier-paper-dark p-5">
-                <h2 className="atelier-label text-xs font-semibold">
-                  {copy.reflectionPrompt}
-                </h2>
-                <p className="mt-3 text-[15px] leading-7 text-zinc-200 sm:text-base sm:leading-8">
-                  {cleanParagraph(reflectionPrompt).replace(/^Ask yourself:\s*/i, "")}
-                </p>
-              </section>
-            </div>
-
-            <section className="ritual-result-stage-4 atelier-panel mt-4 border-[#7d927d]/45 p-5">
-              <h2 className="atelier-label text-xs font-semibold">
+          {aiReadingStatus === "ready" && aiDisplay ? (
+            <article className="border border-[#d9bd80]/24 bg-[linear-gradient(180deg,rgba(17,13,10,0.9),rgba(7,7,6,0.96))] px-5 py-6 shadow-[0_22px_58px_rgba(0,0,0,0.34),inset_0_1px_0_rgba(255,245,224,0.05)] sm:px-8 sm:py-8 lg:px-10 lg:py-10">
+              <p className="atelier-label text-[0.68rem] font-semibold">
                 {copy.aiPersonalizedReading}
+              </p>
+              <h2 className="mt-2 font-serif text-3xl leading-tight text-[#f7efdf] sm:text-4xl">
+                {copy.aiReadingTitle}
               </h2>
 
-              {aiReadingStatus === "loading" ? (
-                <p className="mt-3 text-sm leading-6 text-[#bca77f]">
-                  {copy.aiReadingLoading}
+              {aiDisplay.summary ? (
+                <p className="mt-6 border-l border-[#d9bd80]/45 pl-4 font-serif text-[1.15rem] leading-8 text-[#f5ecd9] sm:text-[1.35rem] sm:leading-9">
+                  {aiDisplay.summary}
                 </p>
               ) : null}
 
-              {aiReadingStatus === "error" ? (
-                <p className="mt-3 text-sm leading-6 text-[#bca77f]">
-                  {copy.aiReadingUnavailable}
-                </p>
-              ) : null}
+              <div className="mt-7 space-y-6 text-[15px] leading-8 text-[#ddd5c8] sm:text-base sm:leading-9">
+                {readingParagraphs.map((paragraph, index) => (
+                  <p key={`${index}-${paragraph.slice(0, 16)}`}>
+                    {paragraph}
+                  </p>
+                ))}
+              </div>
 
-              {aiReadingStatus === "ready" && aiReading ? (
-                <div className="mt-4 space-y-5">
-                  <div>
-                    <h3 className="text-xs font-semibold uppercase tracking-[0.2em] text-[#bca77f]">
-                      {copy.aiSummary}
-                    </h3>
-                    <p className="mt-2 text-[15px] leading-7 text-zinc-200">
-                      {aiReading.summary}
-                    </p>
-                  </div>
-                  <div>
-                    <h3 className="text-xs font-semibold uppercase tracking-[0.2em] text-[#bca77f]">
-                      {copy.aiCardMeaning}
-                    </h3>
-                    <p className="mt-2 text-[15px] leading-7 text-zinc-200">
-                      {aiReading.cardMeaning}
-                    </p>
-                  </div>
-                  <div>
-                    <h3 className="text-xs font-semibold uppercase tracking-[0.2em] text-[#bca77f]">
-                      {copy.aiSituationReading}
-                    </h3>
-                    <p className="mt-2 text-[15px] leading-7 text-zinc-200">
-                      {aiReading.situationReading}
-                    </p>
-                  </div>
-                  <div>
-                    <h3 className="text-xs font-semibold uppercase tracking-[0.2em] text-[#bca77f]">
-                      {copy.aiAdvice}
-                    </h3>
-                    <p className="mt-2 text-[15px] leading-7 text-zinc-200">
-                      {aiReading.advice}
-                    </p>
-                  </div>
-                  <div>
-                    <h3 className="text-xs font-semibold uppercase tracking-[0.2em] text-[#bca77f]">
-                      {copy.aiReflectionQuestion}
-                    </h3>
-                    <p className="mt-2 text-[15px] leading-7 text-zinc-200">
-                      {aiReading.reflectionQuestion}
-                    </p>
-                  </div>
-                  <div>
-                    <h3 className="text-xs font-semibold uppercase tracking-[0.2em] text-[#bca77f]">
-                      {copy.closingNote}
-                    </h3>
-                    <p className="mt-2 text-[15px] leading-7 text-zinc-200">
-                      {aiReading.closingNote}
-                    </p>
-                  </div>
+              {aiDisplay.reflectionQuestion ? (
+                <div className="mt-8 border-t border-[#3d3020] pt-5">
+                  <p className="atelier-label text-[0.68rem] font-semibold">
+                    {copy.aiReflectionQuestion}
+                  </p>
+                  <p className="mt-3 text-sm leading-7 text-[#e5dbc9] sm:text-base">
+                    {aiDisplay.reflectionQuestion}
+                  </p>
                 </div>
               ) : null}
-            </section>
 
-            <div className="mt-6 grid gap-3 sm:grid-cols-2">
-              <Link
-                className="flex min-h-12 touch-manipulation items-center justify-center border border-[#3f4e47] bg-[linear-gradient(180deg,#111715,#090b0a)] px-5 text-center text-xs font-semibold uppercase tracking-widest text-zinc-200 shadow-[0_10px_24px_rgba(0,0,0,0.32),inset_0_1px_0_rgba(255,255,255,0.05)] transition hover:border-[#7d927d] hover:bg-zinc-900"
-                href={`/ai-guide/ask?mode=${
-                  mode ?? "physical"
-                }&spread=single&orientation=upright&lang=${initialLang}`}
-              >
-                {copy.continueToQuestion}
-              </Link>
-              <Link
-                className="flex min-h-12 touch-manipulation items-center justify-center border border-[#3f4e47] bg-[linear-gradient(180deg,#111715,#090b0a)] px-5 text-center text-xs font-semibold uppercase tracking-widest text-zinc-200 shadow-[0_10px_24px_rgba(0,0,0,0.32),inset_0_1px_0_rgba(255,255,255,0.05)] transition hover:border-[#7d927d] hover:bg-zinc-900"
-                href={homeHref}
-              >
-                {copy.startAnotherReading}
-              </Link>
-            </div>
+              <div className="mt-6 rounded-2xl border border-[#3d3020] bg-[#070706]/70 p-3 sm:flex sm:items-center sm:gap-3">
+                <input
+                  className="min-h-11 w-full rounded-full border border-[#3d3020] bg-[#0d0a08]/80 px-4 text-sm text-[#837866] outline-none"
+                  disabled
+                  placeholder={copy.aiFollowUpPlaceholder}
+                  type="text"
+                />
+                <button
+                  className="ritual-action-link mt-3 w-full opacity-55 sm:mt-0 sm:w-auto"
+                  disabled
+                  type="button"
+                >
+                  {copy.aiFollowUpSoon}
+                </button>
+              </div>
+            </article>
+          ) : null}
+        </section>
 
-            <section className="mt-4 border-t border-[#3d3020] pt-5">
-              <h2 className="atelier-label text-xs font-semibold">
-                {copy.closingNote}
-              </h2>
-              <p className="mt-3 text-sm leading-6 text-[#9f947f]">
-                {copy.closingReflection}
-              </p>
-              <p className="mt-4 text-xs leading-5 text-[#777063]">
-                {copy.disclaimer}
-              </p>
-            </section>
-          </section>
+        <details className="ritual-result-stage-3 atelier-panel relative mt-5 p-5">
+          <summary className="cursor-pointer select-none list-none">
+            <span className="atelier-label text-xs font-semibold">
+              {copy.cardReference}
+            </span>
+            <span className="mt-2 block text-sm leading-6 text-[#bca77f]">
+              {copy.showCardReference}
+            </span>
+          </summary>
+          <div className="mt-5 grid gap-4 lg:grid-cols-2">
+            {referenceItems.map((item) => (
+              <section
+                key={item.title}
+                className="border-t border-[#3d3020] pt-4"
+              >
+                <h3 className="atelier-label text-[0.68rem] font-semibold">
+                  {item.title}
+                </h3>
+                <p className="mt-2 text-sm leading-6 text-[#a9a095]">
+                  {item.body}
+                </p>
+              </section>
+            ))}
+          </div>
+        </details>
+
+        <div className="mt-6 grid gap-3 sm:grid-cols-2">
+          <Link
+            className="ritual-action-link"
+            href={`/ai-guide/ask?mode=${
+              mode ?? "physical"
+            }&spread=single&orientation=upright&lang=${initialLang}`}
+          >
+            {copy.continueToQuestion}
+          </Link>
+          <Link className="ritual-action-link" href={homeHref}>
+            {copy.startAnotherReading}
+          </Link>
         </div>
+
+        <section className="mt-4 border-t border-[#3d3020] pt-5">
+          <h2 className="atelier-label text-xs font-semibold">
+            {copy.closingNote}
+          </h2>
+          <p className="mt-3 text-sm leading-6 text-[#9f947f]">
+            {copy.closingReflection}
+          </p>
+          <p className="mt-4 text-xs leading-5 text-[#777063]">
+            {copy.disclaimer}
+          </p>
+        </section>
       </div>
     </main>
   );

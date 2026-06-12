@@ -23,20 +23,6 @@ type DrawClientProps = {
   initialDrawnCard: string;
 };
 
-type DrawAction = "shuffle" | "cut" | "draw";
-
-function getDrawAction(step: number): DrawAction {
-  if (step === 0) {
-    return "shuffle";
-  }
-
-  if (step === 1) {
-    return "cut";
-  }
-
-  return "draw";
-}
-
 function buildQuery(
   mode: ReadingMode,
   question: string,
@@ -94,15 +80,24 @@ export function DrawClient({
   const copy = text(initialLang);
   const onlineSteps = [
     {
-      title: copy.shuffleAction,
+      label: copy.shuffle,
+      title: copy.drawStepShuffleTitle,
+      lines: [copy.drawStepShuffleLine1, copy.drawStepShuffleLine2],
+      button: copy.shuffleAction,
       description: copy.onlineShuffleDescription,
     },
     {
-      title: copy.cutAction,
+      label: copy.cut,
+      title: copy.drawStepCutTitle,
+      lines: [copy.drawStepCutLine1, copy.drawStepCutLine2],
+      button: copy.cutAction,
       description: copy.onlineCutDescription,
     },
     {
-      title: copy.drawAction,
+      label: copy.draw,
+      title: copy.drawStepDrawTitle,
+      lines: [copy.drawStepDrawLine1, copy.drawStepDrawLine2],
+      button: copy.drawAction,
       description: copy.onlineDrawStepDescription,
     },
   ] as const;
@@ -110,7 +105,6 @@ export function DrawClient({
     initialQuestion || undefined,
   );
   const currentOnlineStep = onlineSteps[initialRitualStep];
-  const currentDrawAction = getDrawAction(initialRitualStep);
   const onlineActionHref =
     initialRitualStep < 2
       ? `/ai-guide/draw?${buildQuery(
@@ -163,10 +157,10 @@ export function DrawClient({
     return (
       <PageContainer
         eyebrow={copy.readingRoom}
-        title="Preparing the draw"
-        description="Gathering your saved question."
+        title={copy.readingCard}
+        description={copy.gatheringReading}
       >
-        <p className="text-sm text-[#a9a59d]">Preparing...</p>
+        <p className="text-sm text-[#a9a59d]">{copy.preparingMessage}</p>
       </PageContainer>
     );
   }
@@ -204,34 +198,41 @@ export function DrawClient({
             </p>
             <p className="mt-3 text-sm leading-6 text-[#efe8d9]">{question}</p>
             <div className="atelier-divider my-5" />
-            <div className="grid grid-cols-3 gap-2 text-center text-[0.62rem] font-semibold uppercase tracking-[0.16em] text-[#8f856f]">
+            <div className="ritual-step-track text-center">
               {onlineSteps.map((step, index) => (
                 <div
-                  key={step.title}
-                  className={`border px-2 py-2 ${
+                  key={step.label}
+                  className={`ritual-step-dot ${
                     index === initialRitualStep
-                      ? "border-[#b08c58]/70 text-[#efe8d9]"
-                      : "border-[#3d3328]"
+                      ? "ritual-step-dot-active"
+                      : ""
                   }`}
                 >
-                  {step.title}
+                  {step.label}
                 </div>
               ))}
             </div>
-            <div className="mt-6 text-center">
+            <div className="mt-8 text-center">
               <p className="atelier-label text-[0.68rem] font-semibold">
-                {currentDrawAction}
+                {copy.shuffle} - {copy.cut} - {copy.draw}
               </p>
-              <p className="mt-3 font-serif text-3xl text-[#f4efe5]">
+              <p className="mt-4 font-serif text-4xl leading-tight text-[#f6ecd8]">
                 {currentOnlineStep.title}
               </p>
-              <p className="mt-3 text-sm leading-6 text-[#c8c0b4]">
-                {currentOnlineStep.description}
-              </p>
+              <div className="mt-4 space-y-1 text-sm leading-6 text-[#c8c0b4]">
+                {currentOnlineStep.lines.map((line) => (
+                  <p key={line}>{line}</p>
+                ))}
+              </div>
+            </div>
+            <div className="mt-10 flex justify-center py-3">
+              <div className="ritual-card-back ritual-draw-card ritual-draw-card-active">
+                <span className="ritual-card-back-mark" />
+              </div>
             </div>
           </div>
           <TarotButton href={onlineActionHref}>
-            {initialRitualStep < 2 ? currentOnlineStep.title : copy.revealCard}
+            {initialRitualStep < 2 ? currentOnlineStep.button : copy.revealCard}
           </TarotButton>
         </div>
       </PageContainer>

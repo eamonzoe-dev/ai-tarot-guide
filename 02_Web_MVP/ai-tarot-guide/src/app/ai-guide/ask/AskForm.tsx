@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 
+import { GalaxyBackground } from "@/components/ai-guide/GalaxyBackground";
 import { LanguageToggle } from "@/components/ai-guide/LanguageToggle";
 import { ReadingNav } from "@/components/ai-guide/ReadingNav";
 import { RitualField, RitualPrompt } from "@/components/ai-guide/RitualField";
@@ -39,10 +40,11 @@ export function AskForm({
   }, []);
 
   return (
-    <main className="atelier-page relative min-h-screen overflow-hidden px-5 py-8 text-[#eee8dd]">
+    <main className="atelier-page relative min-h-svh overflow-hidden px-0 py-0 text-[#eee8dd] sm:px-6 sm:py-6 lg:px-8">
+      <GalaxyBackground />
       <div className="atelier-grain pointer-events-none absolute inset-0" />
       <RitualField variant="focus" />
-      <div className="pointer-events-auto relative z-10 mx-auto flex max-w-sm flex-col gap-6">
+      <div className="ritual-room-container pointer-events-auto relative z-10 mx-auto flex min-h-svh w-full max-w-[520px] flex-col gap-6 px-5 py-8 sm:min-h-0 sm:px-6">
         <div>
           <ReadingNav lang={lang} />
           <div className="flex justify-end">
@@ -58,10 +60,10 @@ export function AskForm({
           <p className="atelier-label text-[0.68rem] font-semibold">
             {copy.askEyebrow}
           </p>
-          <h1 className="font-serif text-4xl leading-tight text-[#f4efe5]">
+          <h1 className="font-serif text-[2.65rem] leading-tight text-[#f6ecd8]">
             {copy.askTitle}
           </h1>
-          <p className="text-sm leading-6 text-[#a9a59d]">
+          <p className="text-sm leading-7 text-[#b7aa94]">
             {copy.askDescription}
           </p>
         </header>
@@ -106,7 +108,7 @@ export function AskForm({
                 }
               }}
               placeholder={copy.askPlaceholder}
-              className="ritual-note-field min-h-48 w-full resize-none p-4 text-base leading-7 outline-none focus:border-[#c3a069] focus:ring-2 focus:ring-[#b89a68]/25"
+              className="ritual-note-field min-h-48 w-full resize-none p-4 text-base leading-7 outline-none focus:border-[#d6b36d] focus:ring-2 focus:ring-[#d6b36d]/20"
             />
             <p className="ritual-note-muted mt-3 text-xs leading-5">
               {copy.askHint}
@@ -118,7 +120,7 @@ export function AskForm({
             </p>
           )}
           <button
-            className="pointer-events-auto min-h-12 touch-manipulation select-none border border-[#b08c58]/70 bg-[linear-gradient(180deg,#2a1d15,#120d0a)] px-5 text-xs font-semibold uppercase tracking-[0.24em] text-[#f0eadf] shadow-[0_12px_28px_rgba(0,0,0,0.42),inset_0_1px_0_rgba(255,235,204,0.12),inset_0_-1px_0_rgba(0,0,0,0.72)] focus:outline-none focus:ring-2 focus:ring-[#b89a68]/55 focus:ring-offset-2 focus:ring-offset-[#050506]"
+            className="pointer-events-auto min-h-12 touch-manipulation select-none rounded-full border border-[#d6b36d]/60 bg-[linear-gradient(180deg,rgba(48,35,20,0.95),rgba(13,10,8,0.98))] px-5 text-xs font-semibold uppercase tracking-[0.18em] text-[#f5ead2] shadow-[0_14px_34px_rgba(0,0,0,0.44),inset_0_1px_0_rgba(255,236,188,0.14)] focus:outline-none focus:ring-2 focus:ring-[#d6b36d]/45 focus:ring-offset-2 focus:ring-offset-[#050506]"
             type="submit"
           >
             {copy.continueToRitual}
