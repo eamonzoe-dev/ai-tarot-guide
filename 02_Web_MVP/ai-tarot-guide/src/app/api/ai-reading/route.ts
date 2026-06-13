@@ -286,6 +286,43 @@ function getErrorDiagnostics(error: unknown) {
   };
 }
 
+function formatSupabaseErrorForLog(error: unknown) {
+  if (!error || typeof error !== "object") {
+    return null;
+  }
+
+  const supabaseError = error as {
+    name?: unknown;
+    code?: unknown;
+    message?: unknown;
+    details?: unknown;
+    hint?: unknown;
+  };
+
+  return {
+    name:
+      typeof supabaseError.name === "string"
+        ? supabaseError.name
+        : undefined,
+    code:
+      typeof supabaseError.code === "string"
+        ? supabaseError.code
+        : undefined,
+    message:
+      typeof supabaseError.message === "string"
+        ? supabaseError.message
+        : undefined,
+    details:
+      typeof supabaseError.details === "string"
+        ? supabaseError.details
+        : undefined,
+    hint:
+      typeof supabaseError.hint === "string"
+        ? supabaseError.hint
+        : undefined,
+  };
+}
+
 function chatCompletionsUrl(baseURL: string) {
   return `${baseURL.replace(/\/+$/, "")}/chat/completions`;
 }
@@ -826,6 +863,7 @@ export async function POST(request: Request) {
         model,
         questionLength: question.length,
         hasCustomBaseURL: Boolean(customBaseURL),
+        error: formatSupabaseErrorForLog(usageResult.error),
       });
 
       return NextResponse.json(
@@ -882,6 +920,7 @@ export async function POST(request: Request) {
         model,
         questionLength: question.length,
         hasCustomBaseURL: Boolean(customBaseURL),
+        error: formatSupabaseErrorForLog(fallbackUsageResult.error),
       });
     }
 
