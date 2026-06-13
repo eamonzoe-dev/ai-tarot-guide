@@ -44,7 +44,7 @@ type UserQuota = {
 
 type UsageEventInput = {
   user_id: string;
-  source: "ai-reading";
+  source: "free_daily";
   card_id: string;
   mode: "physical" | "online";
   spread: "single";
@@ -811,7 +811,7 @@ export async function POST(request: Request) {
   const startedAt = Date.now();
   const usageEventBase = {
     user_id: user.id,
-    source: "ai-reading",
+    source: "free_daily",
     card_id: cardId,
     mode,
     spread: "single",
