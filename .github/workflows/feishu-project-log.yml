@@ -60,4 +60,4 @@ jobs:
           PROJECT_LOG_SUMMARY: ${{ inputs.summary }}
           PROJECT_LOG_NEXT_STEP: ${{ inputs.next_step }}
           PROJECT_LOG_NOTE: ${{ inputs.note }}
-        run: node scripts/write-feishu-project-log.mjs
+        run: node 02_Web_MVP/ai-tarot-guide/scripts/write-feishu-project-log.mjs
