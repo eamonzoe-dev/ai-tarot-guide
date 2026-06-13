@@ -1,7 +1,7 @@
+import { ActivationCodePanel } from "@/components/ai-guide/ActivationCodePanel";
 import { LanguageToggle } from "@/components/ai-guide/LanguageToggle";
 import { PageContainer } from "@/components/ai-guide/PageContainer";
 import { TarotButton } from "@/components/ai-guide/TarotButton";
-import { EmailSignInPanel } from "@/components/ai-guide/EmailSignInPanel";
 import { normalizeLanguage, text, withLang } from "@/lib/ai-guide/i18n";
 
 export default async function AiGuidePage({
@@ -77,7 +77,7 @@ export default async function AiGuidePage({
             </div>
             <div className="atelier-divider mt-4" />
             <div className="mt-4">
-              <EmailSignInPanel compact />
+              <ActivationCodePanel />
             </div>
             <div className="atelier-divider mt-4" />
             <p className="pt-4 text-center text-[0.58rem] uppercase tracking-[0.32em] text-[#a19072]">
