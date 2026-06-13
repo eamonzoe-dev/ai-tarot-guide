@@ -73,6 +73,55 @@ type AiReading = {
 
 type AiReadingStatus = "idle" | "loading" | "ready" | "error";
 
+type AiReadingApiErrorCode =
+  | "auth_required"
+  | "daily_limit_reached"
+  | "no_credits_remaining"
+  | "quota_check_failed"
+  | "usage_record_failed";
+
+type AiReadingApiErrorPayload = {
+  error?: unknown;
+  code?: unknown;
+};
+
+function getAiReadingErrorMessage(code: string | undefined) {
+  switch (code) {
+    case "auth_required":
+      return "Please sign in to generate your AI reading.";
+    case "daily_limit_reached":
+      return "You have reached today's free AI reading limit.";
+    case "no_credits_remaining":
+      return "You have no AI reading credits remaining.";
+    case "quota_check_failed":
+    case "usage_record_failed":
+      return "AI reading quota check failed. Please try again later.";
+    default:
+      return "AI reading request failed.";
+  }
+}
+
+async function readAiReadingApiError(response: Response) {
+  try {
+    const payload = (await response.json()) as AiReadingApiErrorPayload;
+    const code = typeof payload.code === "string" ? payload.code : undefined;
+    const message =
+      typeof payload.error === "string"
+        ? payload.error
+        : getAiReadingErrorMessage(code);
+
+    return {
+      code: code as AiReadingApiErrorCode | undefined,
+      message: code ? getAiReadingErrorMessage(code) : message,
+    };
+  } catch {
+    return {
+      code: undefined,
+      message: "AI reading request failed.",
+    };
+  }
+}
+
 function readStoredRitual(): StoredRitual {
   const rawRitual = localStorage.getItem(LATEST_RITUAL_KEY);
 
@@ -175,6 +224,9 @@ export function ResultClient({
   const [aiReading, setAiReading] = useState<AiReading | null>(null);
   const [aiReadingStatus, setAiReadingStatus] =
     useState<AiReadingStatus>("idle");
+  const [aiReadingErrorMessage, setAiReadingErrorMessage] = useState<
+    string | null
+  >(null);
   const [aiRetryKey, setAiRetryKey] = useState(0);
   const card = selectedCard ? getTarotCardById(selectedCard) : undefined;
 
@@ -182,6 +234,7 @@ export function ResultClient({
     if (!card || !question || !mode || orientation !== "upright") {
       setAiReading(null);
       setAiReadingStatus("idle");
+      setAiReadingErrorMessage(null);
       return;
     }
 
@@ -217,6 +270,7 @@ export function ResultClient({
     const controller = new AbortController();
     setAiReading(null);
     setAiReadingStatus("loading");
+    setAiReadingErrorMessage(null);
 
     fetch("/api/ai-reading", {
       method: "POST",
@@ -229,12 +283,14 @@ export function ResultClient({
         lang: initialLang,
         mode,
         orientation,
+        spread: "single",
       }),
       signal: controller.signal,
     })
       .then(async (response) => {
         if (!response.ok) {
-          throw new Error("AI reading request failed.");
+          const apiError = await readAiReadingApiError(response);
+          throw new Error(apiError.message);
         }
 
         return response.json() as Promise<{ reading?: AiReading }>;
@@ -254,6 +310,11 @@ export function ResultClient({
         }
 
         setAiReading(null);
+        setAiReadingErrorMessage(
+          error instanceof Error
+            ? error.message
+            : "AI reading request failed.",
+        );
         setAiReadingStatus("error");
       });
 
@@ -580,8 +641,17 @@ export function ResultClient({
           {aiReadingStatus === "error" ? (
             <div className="mt-6 border-l border-[#d9bd80]/45 pl-4">
               <p className="text-sm leading-6 text-[#d8c9ae]">
-                {copy.aiReadingUnavailable}
+                {aiReadingErrorMessage || copy.aiReadingUnavailable}
               </p>
+              {aiReadingErrorMessage ===
+              "Please sign in to generate your AI reading." ? (
+                <Link
+                  className="mt-3 inline-block text-sm font-semibold text-[#d9bd80] underline-offset-4 hover:underline"
+                  href="/auth-test"
+                >
+                  Sign in on the temporary auth test page
+                </Link>
+              ) : null}
               <button
                 className="ritual-action-link mt-4 w-full sm:w-auto"
                 type="button"

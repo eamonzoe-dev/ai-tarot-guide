@@ -8,6 +8,8 @@ import {
   getTarotCardTitle,
 } from "@/data/tarotCards";
 import type { Language } from "@/lib/ai-guide/i18n";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 type AiReadingRequest = {
   cardId?: unknown;
@@ -30,6 +32,27 @@ type AiReading = {
   cardMessage?: string;
   cardMeaning?: string;
   closingNote?: string;
+};
+
+type UserQuota = {
+  user_id: string;
+  plan_type: string;
+  remaining_credits: number | null;
+  daily_limit: number;
+  valid_until: string | null;
+};
+
+type UsageEventInput = {
+  user_id: string;
+  source: "ai-reading";
+  card_id: string;
+  mode: "physical" | "online";
+  spread: "single";
+  orientation: "upright";
+  question_length: number;
+  ai_success: boolean;
+  charged: boolean;
+  fallback_used: boolean;
 };
 
 export const maxDuration = 60;
@@ -267,6 +290,146 @@ function chatCompletionsUrl(baseURL: string) {
   return `${baseURL.replace(/\/+$/, "")}/chat/completions`;
 }
 
+function getUtcDayWindow() {
+  const dayStart = new Date();
+  dayStart.setUTCHours(0, 0, 0, 0);
+
+  const nextDayStart = new Date(dayStart);
+  nextDayStart.setUTCDate(nextDayStart.getUTCDate() + 1);
+
+  return {
+    dayStartIso: dayStart.toISOString(),
+    retryAfterSeconds: Math.max(
+      Math.ceil((nextDayStart.getTime() - Date.now()) / 1000),
+      1,
+    ),
+  };
+}
+
+function normalizeQuota(value: unknown): UserQuota | null {
+  if (!isRecord(value)) {
+    return null;
+  }
+
+  if (
+    typeof value.user_id !== "string" ||
+    typeof value.plan_type !== "string" ||
+    typeof value.daily_limit !== "number"
+  ) {
+    return null;
+  }
+
+  return {
+    user_id: value.user_id,
+    plan_type: value.plan_type,
+    remaining_credits:
+      typeof value.remaining_credits === "number"
+        ? value.remaining_credits
+        : null,
+    daily_limit: value.daily_limit,
+    valid_until:
+      typeof value.valid_until === "string" ? value.valid_until : null,
+  };
+}
+
+async function getOrCreateUserQuota(
+  admin: ReturnType<typeof createSupabaseAdminClient>,
+  userId: string,
+) {
+  const quotaResult = await admin
+    .from("user_quotas")
+    .select("user_id,plan_type,remaining_credits,daily_limit,valid_until")
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  if (quotaResult.error) {
+    return { quota: null, error: quotaResult.error };
+  }
+
+  const existingQuota = normalizeQuota(quotaResult.data);
+
+  if (existingQuota) {
+    return { quota: existingQuota, error: null };
+  }
+
+  const createdQuotaResult = await admin
+    .from("user_quotas")
+    .insert({
+      user_id: userId,
+      plan_type: "free",
+      daily_limit: 1,
+      remaining_credits: null,
+      valid_until: null,
+    })
+    .select("user_id,plan_type,remaining_credits,daily_limit,valid_until")
+    .single();
+
+  if (createdQuotaResult.error) {
+    return { quota: null, error: createdQuotaResult.error };
+  }
+
+  return {
+    quota: normalizeQuota(createdQuotaResult.data),
+    error: null,
+  };
+}
+
+async function getChargedUsageCountForToday(
+  admin: ReturnType<typeof createSupabaseAdminClient>,
+  userId: string,
+) {
+  const { dayStartIso, retryAfterSeconds } = getUtcDayWindow();
+  const usageResult = await admin
+    .from("usage_events")
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", userId)
+    .eq("charged", true)
+    .gte("created_at", dayStartIso);
+
+  return {
+    count: usageResult.count ?? 0,
+    retryAfterSeconds,
+    error: usageResult.error,
+  };
+}
+
+async function insertUsageEvent(
+  admin: ReturnType<typeof createSupabaseAdminClient>,
+  usageEvent: UsageEventInput,
+) {
+  return admin.from("usage_events").insert(usageEvent);
+}
+
+async function recordSuccessfulUsage({
+  admin,
+  quota,
+  usageEvent,
+}: {
+  admin: ReturnType<typeof createSupabaseAdminClient>;
+  quota: UserQuota;
+  usageEvent: UsageEventInput;
+}) {
+  const usageResult = await insertUsageEvent(admin, usageEvent);
+
+  if (usageResult.error) {
+    return { error: usageResult.error };
+  }
+
+  if (typeof quota.remaining_credits === "number") {
+    const nextCredits = Math.max(quota.remaining_credits - 1, 0);
+    const quotaUpdateResult = await admin
+      .from("user_quotas")
+      .update({ remaining_credits: nextCredits })
+      .eq("user_id", quota.user_id);
+
+    if (quotaUpdateResult.error) {
+      return { error: quotaUpdateResult.error };
+    }
+  }
+
+  return { error: null };
+}
+
 function stripJsonCodeFence(content: string) {
   return content
     .trim()
@@ -492,6 +655,22 @@ export async function POST(request: Request) {
     );
   }
 
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
+
+  if (authError || !user) {
+    return NextResponse.json(
+      {
+        error: "Please sign in to generate an AI reading.",
+        code: "auth_required",
+      },
+      { status: 401 },
+    );
+  }
+
   const clientIp = getClientIp(request);
   const rateLimit = checkRateLimit(clientIp);
 
@@ -506,6 +685,62 @@ export async function POST(request: Request) {
           ),
         },
       },
+    );
+  }
+
+  const admin = createSupabaseAdminClient();
+  const { quota, error: quotaError } = await getOrCreateUserQuota(
+    admin,
+    user.id,
+  );
+
+  if (quotaError || !quota) {
+    return NextResponse.json(
+      {
+        error: "Unable to check reading quota.",
+        code: "quota_check_failed",
+      },
+      { status: 500 },
+    );
+  }
+
+  const chargedUsage = await getChargedUsageCountForToday(admin, user.id);
+
+  if (chargedUsage.error) {
+    return NextResponse.json(
+      {
+        error: "Unable to check reading quota.",
+        code: "quota_check_failed",
+      },
+      { status: 500 },
+    );
+  }
+
+  if (chargedUsage.count >= quota.daily_limit) {
+    return NextResponse.json(
+      {
+        error: "Daily AI reading limit reached.",
+        code: "daily_limit_reached",
+      },
+      {
+        status: 429,
+        headers: {
+          "Retry-After": String(chargedUsage.retryAfterSeconds),
+        },
+      },
+    );
+  }
+
+  if (
+    typeof quota.remaining_credits === "number" &&
+    quota.remaining_credits <= 0
+  ) {
+    return NextResponse.json(
+      {
+        error: "No AI reading credits remaining.",
+        code: "no_credits_remaining",
+      },
+      { status: 402 },
     );
   }
 
@@ -537,6 +772,19 @@ export async function POST(request: Request) {
   };
 
   const startedAt = Date.now();
+  const usageEventBase = {
+    user_id: user.id,
+    source: "ai-reading",
+    card_id: cardId,
+    mode,
+    spread: "single",
+    orientation,
+    question_length: question.length,
+  } satisfies Omit<
+    UsageEventInput,
+    "ai_success" | "charged" | "fallback_used"
+  >;
+
   console.info("AI reading request started:", {
     cardId,
     lang,
@@ -559,6 +807,35 @@ export async function POST(request: Request) {
       cardData,
     };
     const reading = await requestAiReading(payload);
+    const usageResult = await recordSuccessfulUsage({
+      admin,
+      quota,
+      usageEvent: {
+        ...usageEventBase,
+        ai_success: true,
+        charged: true,
+        fallback_used: false,
+      },
+    });
+
+    if (usageResult.error) {
+      console.error("AI reading usage record failed:", {
+        cardId,
+        lang,
+        mode,
+        model,
+        questionLength: question.length,
+        hasCustomBaseURL: Boolean(customBaseURL),
+      });
+
+      return NextResponse.json(
+        {
+          error: "Unable to record AI reading usage.",
+          code: "usage_record_failed",
+        },
+        { status: 500 },
+      );
+    }
 
     console.info("AI reading request completed:", {
       cardId,
@@ -590,6 +867,24 @@ export async function POST(request: Request) {
         ? "OpenAI-compatible request timed out."
         : "OpenAI-compatible request failed.",
     });
+    const fallbackUsageResult = await insertUsageEvent(admin, {
+      ...usageEventBase,
+      ai_success: false,
+      charged: false,
+      fallback_used: true,
+    });
+
+    if (fallbackUsageResult.error) {
+      console.error("AI fallback usage record failed:", {
+        cardId,
+        lang,
+        mode,
+        model,
+        questionLength: question.length,
+        hasCustomBaseURL: Boolean(customBaseURL),
+      });
+    }
+
     return NextResponse.json({
       reading: buildFallbackReading({ card, lang }),
       fallback: true,
