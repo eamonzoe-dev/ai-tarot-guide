@@ -2,8 +2,27 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "AI Tarot Guide",
-  description: "A mobile-first static tarot reading MVP.",
+  metadataBase: new URL("https://oraarcana.com"),
+  title: {
+    default: "Ora Arcana",
+    template: "%s | Ora Arcana",
+  },
+  description:
+    "Ora Arcana is a mobile tarot reading companion for physical decks and online single-card readings.",
+  openGraph: {
+    title: "Ora Arcana",
+    description:
+      "A quiet tarot reading companion for physical decks and online single-card readings.",
+    url: "https://oraarcana.com",
+    siteName: "Ora Arcana",
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: "Ora Arcana",
+    description:
+      "A quiet tarot reading companion for physical decks and online single-card readings.",
+  },
 };
 
 export default function RootLayout({

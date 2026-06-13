@@ -99,7 +99,7 @@ export function RitualParticleDemo() {
         <header className="ritual-demo-header flex items-start justify-between gap-4">
           <div className="min-w-0 text-center">
             <p className="atelier-label text-[0.58rem] font-semibold">
-              AI Tarot Guide
+              Ora Arcana
             </p>
             <h1 className="mt-3 font-serif text-2xl leading-tight text-[#d9bd80]">
               Ritual Particle Core

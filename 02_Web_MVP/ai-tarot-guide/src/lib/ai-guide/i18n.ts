@@ -8,7 +8,7 @@ export const dictionary = {
   en: {
     back: "Back",
     home: "Reading Room",
-    homeTitle: "AI Tarot Guide",
+    homeTitle: "Ora Arcana",
     homeSubtitle: "The cards hold what you have not yet said.",
     homeDescription: "A quiet space for reflection. Enter, and let the reading begin.",
     homePhysicalTitle: "Use your own physical deck",
@@ -178,7 +178,7 @@ export const dictionary = {
   zh: {
     back: "返回",
     home: "阅读室",
-    homeTitle: "AI Tarot Guide",
+    homeTitle: "Ora Arcana",
     homeSubtitle: "牌中藏着你尚未说出口的事。",
     homeDescription: "一个安静的反思空间。进入，让解读开始。",
     homePhysicalTitle: "使用你的实体牌组",
