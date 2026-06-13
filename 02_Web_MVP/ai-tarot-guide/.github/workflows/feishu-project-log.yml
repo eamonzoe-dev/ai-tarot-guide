@@ -1,0 +1,63 @@
+name: Feishu Project Log
+
+on:
+  workflow_dispatch:
+    inputs:
+      title:
+        description: "Project log title"
+        required: true
+        type: string
+      category:
+        description: "Project log category"
+        required: true
+        type: string
+      status:
+        description: "Project log status"
+        required: true
+        type: string
+      priority:
+        description: "Project log priority"
+        required: true
+        type: string
+      summary:
+        description: "Project log summary"
+        required: true
+        type: string
+      next_step:
+        description: "Next step"
+        required: false
+        type: string
+      note:
+        description: "Additional note"
+        required: false
+        type: string
+
+jobs:
+  write-project-log:
+    name: Write Project Log
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Write Feishu project log
+        env:
+          FEISHU_APP_ID: ${{ secrets.FEISHU_APP_ID }}
+          FEISHU_APP_SECRET: ${{ secrets.FEISHU_APP_SECRET }}
+          FEISHU_APP_TOKEN: ${{ secrets.FEISHU_APP_TOKEN }}
+          FEISHU_BASE_ID: ${{ secrets.FEISHU_BASE_ID }}
+          FEISHU_PROJECT_LOG_TABLE_ID: ${{ secrets.FEISHU_PROJECT_LOG_TABLE_ID }}
+          PROJECT_LOG_TITLE: ${{ inputs.title }}
+          PROJECT_LOG_CATEGORY: ${{ inputs.category }}
+          PROJECT_LOG_STATUS: ${{ inputs.status }}
+          PROJECT_LOG_PRIORITY: ${{ inputs.priority }}
+          PROJECT_LOG_SUMMARY: ${{ inputs.summary }}
+          PROJECT_LOG_NEXT_STEP: ${{ inputs.next_step }}
+          PROJECT_LOG_NOTE: ${{ inputs.note }}
+        run: node scripts/write-feishu-project-log.mjs
