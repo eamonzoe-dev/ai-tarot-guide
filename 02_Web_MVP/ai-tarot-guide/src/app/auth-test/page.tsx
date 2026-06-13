@@ -99,7 +99,7 @@ export default function AuthTestPage() {
       email: trimmedEmail,
       options: {
         shouldCreateUser: true,
-        emailRedirectTo: `${window.location.origin}/auth/callback?next=/auth-test`,
+        emailRedirectTo: `${window.location.origin}/auth/confirm?next=/auth-test`,
       },
     });
 
