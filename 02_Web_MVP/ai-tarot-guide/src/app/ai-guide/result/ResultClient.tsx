@@ -78,7 +78,10 @@ type AiReadingApiErrorCode =
   | "auth_required"
   | "daily_limit_reached"
   | "no_credits_remaining"
+  | "insufficient_credits"
   | "quota_check_failed"
+  | "credits_check_failed"
+  | "credit_consume_failed"
   | "usage_record_failed";
 
 type AiReadingApiErrorPayload = {
@@ -93,8 +96,11 @@ function getAiReadingErrorMessage(code: string | undefined) {
     case "daily_limit_reached":
       return "You have reached today's free AI reading limit.";
     case "no_credits_remaining":
-      return "You have no AI reading credits remaining.";
+    case "insufficient_credits":
+      return "You do not have enough AI readings. Please redeem a deck code to continue.";
     case "quota_check_failed":
+    case "credits_check_failed":
+    case "credit_consume_failed":
     case "usage_record_failed":
       return "AI reading quota check failed. Please try again later.";
     default:

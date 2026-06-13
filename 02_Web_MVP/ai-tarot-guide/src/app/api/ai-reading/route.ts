@@ -42,6 +42,11 @@ type UserQuota = {
   valid_until: string | null;
 };
 
+type UserCredits = {
+  remaining_credits: number;
+  total_credits: number;
+};
+
 type UsageEventInput = {
   user_id: string;
   source: "free_daily";
@@ -369,6 +374,94 @@ function normalizeQuota(value: unknown): UserQuota | null {
   };
 }
 
+function normalizeCredits(value: unknown): UserCredits | null {
+  if (!isRecord(value)) {
+    return null;
+  }
+
+  if (
+    typeof value.remaining_credits !== "number" ||
+    typeof value.total_credits !== "number"
+  ) {
+    return null;
+  }
+
+  return {
+    remaining_credits: value.remaining_credits,
+    total_credits: value.total_credits,
+  };
+}
+
+async function getOrCreateUserCredits(
+  admin: ReturnType<typeof createSupabaseAdminClient>,
+  userId: string,
+) {
+  const creditsResult = await admin
+    .from("user_credits")
+    .select("remaining_credits,total_credits")
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  if (creditsResult.error) {
+    return { credits: null, error: creditsResult.error };
+  }
+
+  const existingCredits = normalizeCredits(creditsResult.data);
+
+  if (existingCredits) {
+    return { credits: existingCredits, error: null };
+  }
+
+  const createdCreditsResult = await admin
+    .from("user_credits")
+    .insert({
+      user_id: userId,
+      remaining_credits: 0,
+      total_credits: 0,
+    })
+    .select("remaining_credits,total_credits")
+    .single();
+
+  if (createdCreditsResult.error) {
+    return { credits: null, error: createdCreditsResult.error };
+  }
+
+  return {
+    credits: normalizeCredits(createdCreditsResult.data),
+    error: null,
+  };
+}
+
+function isInsufficientCreditsError(error: unknown) {
+  return (
+    isRecord(error) &&
+    typeof error.message === "string" &&
+    error.message.includes("insufficient_credits")
+  );
+}
+
+async function consumeAiReadingCredit(
+  admin: ReturnType<typeof createSupabaseAdminClient>,
+  userId: string,
+) {
+  const consumeResult = await admin.rpc("consume_ai_reading_credit", {
+    p_user_id: userId,
+  });
+
+  if (consumeResult.error) {
+    return { credits: null, error: consumeResult.error };
+  }
+
+  const firstResult = Array.isArray(consumeResult.data)
+    ? consumeResult.data[0]
+    : consumeResult.data;
+
+  return {
+    credits: normalizeCredits(firstResult),
+    error: null,
+  };
+}
+
 async function getOrCreateUserQuota(
   admin: ReturnType<typeof createSupabaseAdminClient>,
   userId: string,
@@ -439,29 +532,15 @@ async function insertUsageEvent(
 
 async function recordSuccessfulUsage({
   admin,
-  quota,
   usageEvent,
 }: {
   admin: ReturnType<typeof createSupabaseAdminClient>;
-  quota: UserQuota;
   usageEvent: UsageEventInput;
 }) {
   const usageResult = await insertUsageEvent(admin, usageEvent);
 
   if (usageResult.error) {
     return { error: usageResult.error };
-  }
-
-  if (typeof quota.remaining_credits === "number") {
-    const nextCredits = Math.max(quota.remaining_credits - 1, 0);
-    const quotaUpdateResult = await admin
-      .from("user_quotas")
-      .update({ remaining_credits: nextCredits })
-      .eq("user_id", quota.user_id);
-
-    if (quotaUpdateResult.error) {
-      return { error: quotaUpdateResult.error };
-    }
   }
 
   return { error: null };
@@ -726,56 +805,27 @@ export async function POST(request: Request) {
   }
 
   const admin = createSupabaseAdminClient();
-  const { quota, error: quotaError } = await getOrCreateUserQuota(
+  const { credits, error: creditsError } = await getOrCreateUserCredits(
     admin,
     user.id,
   );
 
-  if (quotaError || !quota) {
+  if (creditsError || !credits) {
     return NextResponse.json(
       {
-        error: "Unable to check reading quota.",
-        code: "quota_check_failed",
+        error: "Unable to check AI reading credits.",
+        code: "credits_check_failed",
       },
       { status: 500 },
     );
   }
 
-  const chargedUsage = await getChargedUsageCountForToday(admin, user.id);
-
-  if (chargedUsage.error) {
+  if (credits.remaining_credits <= 0) {
     return NextResponse.json(
       {
-        error: "Unable to check reading quota.",
-        code: "quota_check_failed",
-      },
-      { status: 500 },
-    );
-  }
-
-  if (chargedUsage.count >= quota.daily_limit) {
-    return NextResponse.json(
-      {
-        error: "Daily AI reading limit reached.",
-        code: "daily_limit_reached",
-      },
-      {
-        status: 429,
-        headers: {
-          "Retry-After": String(chargedUsage.retryAfterSeconds),
-        },
-      },
-    );
-  }
-
-  if (
-    typeof quota.remaining_credits === "number" &&
-    quota.remaining_credits <= 0
-  ) {
-    return NextResponse.json(
-      {
-        error: "No AI reading credits remaining.",
-        code: "no_credits_remaining",
+        error:
+          "You do not have enough AI readings. Please redeem a deck code to continue.",
+        code: "insufficient_credits",
       },
       { status: 402 },
     );
@@ -844,9 +894,34 @@ export async function POST(request: Request) {
       cardData,
     };
     const reading = await requestAiReading(payload);
+    const creditConsumeResult = await consumeAiReadingCredit(admin, user.id);
+
+    if (creditConsumeResult.error || !creditConsumeResult.credits) {
+      console.error("AI reading credit consume failed:", {
+        cardId,
+        lang,
+        mode,
+        model,
+        questionLength: question.length,
+        hasCustomBaseURL: Boolean(customBaseURL),
+        error: formatSupabaseErrorForLog(creditConsumeResult.error),
+      });
+
+      return NextResponse.json(
+        {
+          error: isInsufficientCreditsError(creditConsumeResult.error)
+            ? "You do not have enough AI readings. Please redeem a deck code to continue."
+            : "Unable to consume AI reading credit.",
+          code: isInsufficientCreditsError(creditConsumeResult.error)
+            ? "insufficient_credits"
+            : "credit_consume_failed",
+        },
+        { status: isInsufficientCreditsError(creditConsumeResult.error) ? 402 : 500 },
+      );
+    }
+
     const usageResult = await recordSuccessfulUsage({
       admin,
-      quota,
       usageEvent: {
         ...usageEventBase,
         ai_success: true,
@@ -885,7 +960,10 @@ export async function POST(request: Request) {
       elapsedMs: Date.now() - startedAt,
     });
 
-    return NextResponse.json({ reading });
+    return NextResponse.json({
+      reading,
+      credits: creditConsumeResult.credits,
+    });
   } catch (error) {
     const timedOut = isTimeoutError(error);
     const diagnostics = getErrorDiagnostics(error);
