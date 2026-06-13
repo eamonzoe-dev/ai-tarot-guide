@@ -27,6 +27,23 @@ export function EmailSignInPanel({
     setIsLoadingUser(true);
     setError(null);
 
+    const { data: sessionData, error: getSessionError } =
+      await supabase.auth.getSession();
+
+    if (getSessionError) {
+      setUser(null);
+      setError(getSessionError.message);
+      setIsLoadingUser(false);
+      return;
+    }
+
+    if (!sessionData.session) {
+      setUser(null);
+      setError(null);
+      setIsLoadingUser(false);
+      return;
+    }
+
     const { data, error: getUserError } = await supabase.auth.getUser();
 
     setUser(data.user ?? null);
@@ -76,6 +93,7 @@ export function EmailSignInPanel({
     } else {
       setUser(null);
       setEmail("");
+      setError(null);
       setStatus("Signed out.");
     }
 
