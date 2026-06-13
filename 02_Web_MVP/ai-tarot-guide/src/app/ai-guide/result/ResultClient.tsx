@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
+import { EmailSignInPanel } from "@/components/ai-guide/EmailSignInPanel";
 import { GalaxyBackground } from "@/components/ai-guide/GalaxyBackground";
 import { LanguageToggle } from "@/components/ai-guide/LanguageToggle";
 import { PageContainer } from "@/components/ai-guide/PageContainer";
@@ -645,12 +646,9 @@ export function ResultClient({
               </p>
               {aiReadingErrorMessage ===
               "Please sign in to generate your AI reading." ? (
-                <Link
-                  className="mt-3 inline-block text-sm font-semibold text-[#d9bd80] underline-offset-4 hover:underline"
-                  href="/auth-test"
-                >
-                  Sign in on the temporary auth test page
-                </Link>
+                <div className="mt-4">
+                  <EmailSignInPanel reason="Sign in to generate your AI reading." />
+                </div>
               ) : null}
               <button
                 className="ritual-action-link mt-4 w-full sm:w-auto"
