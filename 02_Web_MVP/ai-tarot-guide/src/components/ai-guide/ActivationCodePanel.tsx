@@ -97,7 +97,7 @@ export function ActivationCodePanel({
 
       if (!response.ok) {
         throw new Error(
-          getApiErrorMessage(payload, "Unable to load AI reading credits."),
+          getApiErrorMessage(payload, "Unable to load Reading Credits."),
         );
       }
 
@@ -107,7 +107,7 @@ export function ActivationCodePanel({
           : null;
 
       if (!isCredits(nextCredits)) {
-        throw new Error("Unable to load AI reading credits.");
+        throw new Error("Unable to load Reading Credits.");
       }
 
       setCredits(nextCredits);
@@ -116,7 +116,7 @@ export function ActivationCodePanel({
       setError(
         creditsError instanceof Error
           ? creditsError.message
-          : "Unable to load AI reading credits.",
+          : "Unable to load Reading Credits.",
       );
     } finally {
       setIsLoadingCredits(false);
@@ -225,7 +225,9 @@ export function ActivationCodePanel({
     if (signInError) {
       setError(signInError.message);
     } else {
-      setStatus("Login email sent. Check your inbox.");
+      setStatus(
+        "Sign-in email sent. Check your inbox to enter the Reading Room.",
+      );
     }
 
     setIsSendingEmail(false);
@@ -278,7 +280,7 @@ export function ActivationCodePanel({
 
       if (!response.ok) {
         throw new Error(
-          getApiErrorMessage(payload, "Unable to redeem activation code."),
+          getApiErrorMessage(payload, "That code could not be redeemed."),
         );
       }
 
@@ -288,18 +290,18 @@ export function ActivationCodePanel({
           : null;
 
       if (!isCredits(nextCredits)) {
-        throw new Error("Activation code redeemed, but credits could not load.");
+        throw new Error("Deck code redeemed, but Reading Credits could not refresh.");
       }
 
       setCredits(nextCredits);
       setActivationCode("");
       setIsRedeemFormOpen(false);
-      setStatus("Deck code redeemed.");
+      setStatus("Deck code redeemed. Credits updated.");
     } catch (redeemError) {
       setError(
         redeemError instanceof Error
           ? redeemError.message
-          : "Unable to redeem activation code.",
+          : "That code could not be redeemed. Check the code and try again.",
       );
     } finally {
       setIsRedeeming(false);
@@ -333,10 +335,10 @@ export function ActivationCodePanel({
               <span className="flex size-5 items-center justify-center rounded-full border border-[#6d5a35] bg-[#120d09] text-[0.62rem] text-[#d9bd80]">
                 {(user.email ?? "A").slice(0, 1).toUpperCase()}
               </span>
-              <span>Account</span>
+              <span>Reading Account</span>
             </>
           ) : isLoadingUser ? (
-            "Account"
+            "Reading Account"
           ) : (
             "Sign in"
           )}
@@ -352,7 +354,7 @@ export function ActivationCodePanel({
               </div>
               <div className="min-w-0">
                 <p className="atelier-label text-[0.62rem] font-semibold">
-                  Account
+                  Reading Account
                 </p>
                 {user ? (
                   <div className="mt-1 grid gap-0.5">
@@ -362,15 +364,24 @@ export function ActivationCodePanel({
                         {user.email ?? "current user"}
                       </span>
                     </p>
+                    <p className="text-sm leading-6 text-[#b7aa94]">
+                      Your readings are saved when you are signed in.
+                    </p>
                     <p className="text-sm leading-6 text-[#8f826f]">
                       {isLoadingCredits
-                        ? "Loading AI readings..."
-                        : `${credits?.remaining_credits ?? 0} AI readings left`}
+                        ? "Loading Reading Credits..."
+                        : `Reading Credits: ${credits?.remaining_credits ?? 0} remaining`}
+                    </p>
+                    <p className="text-sm leading-6 text-[#8f826f]">
+                      {credits?.remaining_credits === 0
+                        ? "Each AI reading uses 1 credit. Redeem a deck code to add credits."
+                        : "Each AI reading uses 1 credit."}
                     </p>
                   </div>
                 ) : (
                   <p className="mt-1 text-xs leading-5 text-[#b7aa94]">
-                    Sign in to redeem your deck code and unlock AI readings.
+                    Sign in to save your readings, view your credits, and redeem
+                    a deck code.
                   </p>
                 )}
               </div>
@@ -378,7 +389,7 @@ export function ActivationCodePanel({
 
             {isLoadingUser ? (
               <p className="text-xs leading-5 text-[#9f947f]">
-                Checking sign in...
+                Checking your reading account...
               </p>
             ) : user ? (
               <div className="grid gap-3">
@@ -391,13 +402,13 @@ export function ActivationCodePanel({
                   }}
                   type="button"
                 >
-                  Redeem deck code
+                  Redeem Deck Code
                 </button>
 
                 {isRedeemFormOpen ? (
                   <div className="grid gap-3 border-t border-[#3d3020] pt-3">
                     <label className="grid gap-2 text-xs text-[#cfc3ad]">
-                      Activation code
+                      Deck code
                       <input
                         autoComplete="off"
                         className="min-h-11 rounded-full border border-[#3d3020] bg-[#0d0a08]/80 px-4 text-sm text-[#f6ecd8] outline-none transition focus:border-[#d9bd80]"
@@ -409,6 +420,9 @@ export function ActivationCodePanel({
                         value={activationCode}
                       />
                     </label>
+                    <p className="text-xs leading-5 text-[#8f826f]">
+                      Physical deck activation codes add credits to your account.
+                    </p>
 
                     <div className="grid gap-2 sm:grid-cols-2">
                       <button
@@ -444,7 +458,7 @@ export function ActivationCodePanel({
                     href={withLang("/ai-guide/readings", {}, lang)}
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    <span>Reading Journal</span>
+                    <span>View Reading Journal</span>
                   </Link>
                   <div className="flex min-h-11 items-center justify-between gap-3 border-b border-[#2b241a] py-2">
                     <span className="text-[#c8bca6]">Language</span>
@@ -492,8 +506,11 @@ export function ActivationCodePanel({
                   onClick={handleSendLoginEmail}
                   type="button"
                 >
-                  {isSendingEmail ? "Sending..." : "Send login email"}
+                  {isSendingEmail ? "Sending..." : "Send sign-in email"}
                 </button>
+                <p className="text-xs leading-5 text-[#8f826f]">
+                  Your readings are saved when you are signed in.
+                </p>
               </div>
             )}
 

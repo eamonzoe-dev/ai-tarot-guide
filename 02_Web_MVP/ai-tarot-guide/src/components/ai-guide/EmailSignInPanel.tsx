@@ -12,7 +12,7 @@ type EmailSignInPanelProps = {
 
 export function EmailSignInPanel({
   compact = false,
-  reason = "Sign in to generate your free daily AI reading.",
+  reason = "Sign in to save your readings, view your credits, and redeem a deck code.",
 }: EmailSignInPanelProps) {
   const supabase = useMemo(() => createSupabaseBrowserClient(), []);
   const [email, setEmail] = useState("");
@@ -75,7 +75,9 @@ export function EmailSignInPanel({
     if (signInError) {
       setError(signInError.message);
     } else {
-      setStatus("Login email sent. Check your inbox.");
+      setStatus(
+        "Sign-in email sent. Check your inbox to enter the Reading Room.",
+      );
     }
 
     setIsSendingEmail(false);
@@ -111,7 +113,7 @@ export function EmailSignInPanel({
       <div className={compact ? "grid gap-3" : "grid gap-4"}>
         <div>
           <p className="atelier-label text-[0.62rem] font-semibold">
-            Account
+            Reading Account
           </p>
           <p
             className={
@@ -125,7 +127,9 @@ export function EmailSignInPanel({
         </div>
 
         {isLoadingUser ? (
-          <p className="text-xs leading-5 text-[#9f947f]">Checking sign in...</p>
+          <p className="text-xs leading-5 text-[#9f947f]">
+            Checking your reading account...
+          </p>
         ) : user ? (
           <div className="grid gap-3">
             <p className="text-sm leading-6 text-[#e8decb]">
@@ -162,7 +166,7 @@ export function EmailSignInPanel({
               onClick={handleSendLoginEmail}
               type="button"
             >
-              {isSendingEmail ? "Sending..." : "Send login email"}
+              {isSendingEmail ? "Sending..." : "Send sign-in email"}
             </button>
           </div>
         )}
