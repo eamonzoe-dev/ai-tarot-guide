@@ -13,6 +13,19 @@
   --atelier-paper: #d8c9ae;
   --atelier-paper-deep: #b9a789;
   --atelier-blue: #6f8da3;
+  --ora-ink-black: #030303;
+  --ora-deep-black: #070604;
+  --ora-dark-walnut: #100b08;
+  --ora-charcoal-brown: #1a130e;
+  --ora-aged-brass: #b58a48;
+  --ora-muted-gold: #d2b06d;
+  --ora-champagne-gold: #ead7a6;
+  --ora-warm-parchment: #d8c9ae;
+  --ora-bone-white: #f4efe5;
+  --ora-pearl-gray: #cfc9bc;
+  --ora-mist-taupe: #8f826f;
+  --ora-soft-ember: #c88b4a;
+  --ora-deep-verdigris: #31483f;
   --font-geist-sans: Arial, Helvetica, sans-serif;
   --font-geist-mono: ui-monospace, SFMono-Regular, Consolas, monospace;
 }
@@ -1711,4 +1724,235 @@ input {
     radial-gradient(circle at 64% 38%, rgba(238, 232, 221, 0.05) 0 1px, transparent 1.4px),
     radial-gradient(circle at 42% 78%, rgba(238, 232, 221, 0.04) 0 1px, transparent 1.3px);
   background-size: 17px 19px, 23px 29px, 31px 37px;
+}
+
+.ora-surface-archive {
+  border: 1px solid rgba(181, 138, 72, 0.24);
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(234, 215, 166, 0.07), transparent 52%),
+    linear-gradient(180deg, rgba(16, 11, 8, 0.94), rgba(7, 6, 4, 0.98));
+  box-shadow:
+    0 22px 58px rgba(0, 0, 0, 0.42),
+    inset 0 1px 0 rgba(244, 239, 229, 0.06);
+}
+
+.ora-surface-ritual {
+  border: 1px solid rgba(181, 138, 72, 0.22);
+  background:
+    radial-gradient(ellipse at 50% 18%, rgba(200, 139, 74, 0.1), transparent 50%),
+    linear-gradient(145deg, rgba(26, 19, 14, 0.96), rgba(3, 3, 3, 0.98)),
+    repeating-linear-gradient(90deg, rgba(244, 239, 229, 0.018) 0 1px, transparent 1px 11px);
+  box-shadow:
+    0 24px 64px rgba(0, 0, 0, 0.48),
+    inset 0 1px 0 rgba(244, 239, 229, 0.055),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.78);
+}
+
+.ora-surface-parchment {
+  border: 1px solid rgba(181, 138, 72, 0.34);
+  background:
+    linear-gradient(180deg, rgba(244, 239, 229, 0.96), rgba(216, 201, 174, 0.96)),
+    repeating-linear-gradient(0deg, rgba(26, 19, 14, 0.055) 0 1px, transparent 1px 30px);
+  color: var(--ora-dark-walnut);
+  box-shadow:
+    0 18px 48px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.34);
+}
+
+.ora-surface-luminous {
+  border: 1px solid rgba(234, 215, 166, 0.3);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(244, 239, 229, 0.2), transparent 46%),
+    radial-gradient(circle at 80% 18%, rgba(234, 215, 166, 0.13), transparent 32%),
+    linear-gradient(180deg, rgba(244, 239, 229, 0.08), rgba(7, 6, 4, 0.9));
+  box-shadow:
+    0 0 42px rgba(234, 215, 166, 0.1),
+    0 20px 54px rgba(0, 0, 0, 0.36),
+    inset 0 1px 0 rgba(244, 239, 229, 0.12);
+}
+
+.ora-reading-dossier-surface {
+  border: 1px solid rgba(181, 138, 72, 0.24);
+  background:
+    linear-gradient(180deg, rgba(16, 11, 8, 0.92), rgba(7, 6, 4, 0.98)),
+    repeating-linear-gradient(0deg, rgba(216, 201, 174, 0.022) 0 1px, transparent 1px 2rem);
+  box-shadow:
+    0 20px 58px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(244, 239, 229, 0.055);
+}
+
+.ora-border-brass {
+  border-color: rgba(181, 138, 72, 0.42);
+}
+
+.ora-border-soft {
+  border-color: rgba(216, 201, 174, 0.18);
+}
+
+.ora-divider-brass {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(181, 138, 72, 0.46), transparent);
+}
+
+.ora-glow-soft {
+  box-shadow:
+    0 0 28px rgba(234, 215, 166, 0.1),
+    0 18px 42px rgba(0, 0, 0, 0.34);
+}
+
+.ora-glow-ritual {
+  box-shadow:
+    0 0 34px rgba(200, 139, 74, 0.14),
+    0 22px 58px rgba(0, 0, 0, 0.42);
+}
+
+.ora-focus-ring {
+  outline: 1px solid rgba(234, 215, 166, 0.62);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 5px rgba(234, 215, 166, 0.08);
+}
+
+.ora-card-back {
+  position: relative;
+  aspect-ratio: 9 / 16;
+  overflow: hidden;
+  border: 1px solid rgba(234, 215, 166, 0.36);
+  border-radius: 1rem;
+  background:
+    radial-gradient(circle at 50% 46%, transparent 0 18%, rgba(234, 215, 166, 0.2) 18.4% 18.9%, transparent 19.4%),
+    radial-gradient(circle at 50% 46%, transparent 0 31%, rgba(181, 138, 72, 0.18) 31.4% 31.9%, transparent 32.4%),
+    conic-gradient(from 0deg, transparent 0deg 38deg, rgba(234, 215, 166, 0.18) 42deg, transparent 47deg 132deg, rgba(181, 138, 72, 0.18) 137deg, transparent 142deg 226deg, rgba(234, 215, 166, 0.16) 231deg, transparent 236deg 322deg, rgba(181, 138, 72, 0.16) 327deg, transparent 332deg),
+    linear-gradient(160deg, var(--ora-charcoal-brown), var(--ora-ink-black));
+  box-shadow:
+    0 24px 64px rgba(0, 0, 0, 0.54),
+    0 0 34px rgba(234, 215, 166, 0.1),
+    inset 0 0 0 9px rgba(0, 0, 0, 0.22),
+    inset 0 0 0 10px rgba(234, 215, 166, 0.16),
+    inset 0 1px 0 rgba(244, 239, 229, 0.12);
+}
+
+.ora-card-back::before {
+  content: "";
+  position: absolute;
+  inset: 1rem;
+  border: 1px solid rgba(234, 215, 166, 0.24);
+  border-radius: 0.75rem;
+}
+
+.ora-card-back-symbol {
+  position: absolute;
+  left: 50%;
+  top: 48%;
+  width: 34%;
+  aspect-ratio: 1;
+  border: 1px solid rgba(234, 215, 166, 0.44);
+  border-radius: 9999px;
+  transform: translate(-50%, -50%);
+}
+
+.ora-card-back-symbol::before,
+.ora-card-back-symbol::after {
+  content: "";
+  position: absolute;
+  inset: 16%;
+  border: 1px solid rgba(181, 138, 72, 0.36);
+  border-radius: 9999px;
+}
+
+.ora-card-back-symbol::after {
+  inset: 42% -18%;
+  border-width: 1px 0 0;
+  border-radius: 0;
+}
+
+.ora-motion-fade-up {
+  animation: ora-soft-fade-up 720ms ease both;
+}
+
+.ora-motion-ritual-pulse {
+  animation: ora-ritual-pulse 7s ease-in-out infinite;
+}
+
+.ora-motion-soft-glow {
+  animation: ora-soft-glow 8s ease-in-out infinite;
+}
+
+.ora-motion-card-hover {
+  transition:
+    border-color 260ms ease,
+    box-shadow 260ms ease,
+    transform 260ms ease;
+}
+
+.ora-motion-card-hover:hover {
+  border-color: rgba(234, 215, 166, 0.56);
+  box-shadow:
+    0 24px 64px rgba(0, 0, 0, 0.48),
+    0 0 28px rgba(234, 215, 166, 0.12);
+  transform: translateY(-3px);
+}
+
+@keyframes ora-soft-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ora-ritual-pulse {
+  0%,
+  100% {
+    opacity: 0.68;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.9;
+    transform: scale(1.012);
+  }
+}
+
+@keyframes ora-soft-glow {
+  0%,
+  100% {
+    box-shadow:
+      0 0 18px rgba(234, 215, 166, 0.07),
+      0 18px 42px rgba(0, 0, 0, 0.34);
+  }
+
+  50% {
+    box-shadow:
+      0 0 32px rgba(234, 215, 166, 0.14),
+      0 20px 48px rgba(0, 0, 0, 0.38);
+  }
+}
+
+@keyframes ora-card-hover {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ora-motion-fade-up,
+  .ora-motion-ritual-pulse,
+  .ora-motion-soft-glow {
+    animation: none;
+  }
+
+  .ora-motion-card-hover,
+  .ora-motion-card-hover:hover {
+    transition: none;
+    transform: none;
+  }
 }
