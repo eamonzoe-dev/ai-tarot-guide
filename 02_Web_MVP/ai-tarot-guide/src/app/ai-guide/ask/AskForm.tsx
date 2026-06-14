@@ -2,10 +2,8 @@
 
 import { useEffect, useState } from "react";
 
-import { GalaxyBackground } from "@/components/ai-guide/GalaxyBackground";
 import { LanguageToggle } from "@/components/ai-guide/LanguageToggle";
 import { ReadingNav } from "@/components/ai-guide/ReadingNav";
-import { RitualField, RitualPrompt } from "@/components/ai-guide/RitualField";
 import { type Language, text } from "@/lib/ai-guide/i18n";
 
 const USER_QUESTION_KEY = "aiTarot:userQuestion";
@@ -40,14 +38,19 @@ export function AskForm({
   }, []);
 
   return (
-    <main className="atelier-page relative min-h-svh overflow-hidden px-0 py-0 text-[#eee8dd] sm:px-6 sm:py-6 lg:px-8">
-      <GalaxyBackground />
-      <div className="atelier-grain pointer-events-none absolute inset-0" />
-      <RitualField variant="focus" />
-      <div className="ritual-room-container pointer-events-auto relative z-10 mx-auto flex min-h-svh w-full max-w-[520px] flex-col gap-6 px-5 py-8 sm:min-h-0 sm:px-6">
-        <div>
+    <main className="relative min-h-svh overflow-hidden bg-[#f6f0e5] px-0 py-0 text-[#2f261d] sm:px-6 sm:py-6 lg:px-8">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.96),rgba(246,240,229,0.86)_42%,rgba(226,213,188,0.44)_100%)]" />
+      <div className="pointer-events-none absolute left-1/2 top-20 h-[24rem] w-[24rem] -translate-x-1/2 rounded-full border border-[#c9a86a]/18 opacity-70" />
+      <div className="pointer-events-none absolute left-1/2 top-28 h-[18rem] w-[18rem] -translate-x-1/2 rounded-full border border-[#d8bd82]/22 opacity-70" />
+      <div className="pointer-events-none absolute left-1/2 top-36 h-[12rem] w-[12rem] -translate-x-1/2 rounded-full border border-[#ead7aa]/35 opacity-70" />
+
+      <div className="pointer-events-none absolute left-6 top-28 h-24 w-px bg-gradient-to-b from-transparent via-[#c9a86a]/30 to-transparent sm:left-14" />
+      <div className="pointer-events-none absolute right-6 top-40 h-24 w-px bg-gradient-to-b from-transparent via-[#c9a86a]/30 to-transparent sm:right-14" />
+
+      <div className="relative z-10 mx-auto flex min-h-svh w-full max-w-[620px] flex-col gap-6 px-5 py-7 sm:min-h-0 sm:px-6 sm:py-9">
+        <div className="rounded-[2rem] border border-[#d7bd82]/40 bg-white/42 px-4 py-3 shadow-[0_18px_60px_rgba(123,93,45,0.08)] backdrop-blur-md">
           <ReadingNav lang={lang} />
-          <div className="flex justify-end">
+          <div className="mt-3 flex justify-end">
             <LanguageToggle
               lang={lang}
               pathname="/ai-guide/ask"
@@ -56,19 +59,42 @@ export function AskForm({
             />
           </div>
         </div>
-        <header className="space-y-3">
-          <p className="atelier-label text-[0.68rem] font-semibold">
-            {copy.askEyebrow}
-          </p>
-          <h1 className="font-serif text-[2.65rem] leading-tight text-[#f6ecd8]">
+
+        <header className="space-y-4 pt-2 text-center">
+          <div className="mx-auto flex items-center justify-center gap-3 text-[#a77f3c]">
+            <span className="h-px w-10 bg-[#d2b06d]/55" />
+            <span className="text-[0.66rem] font-semibold uppercase tracking-[0.28em]">
+              {copy.askEyebrow}
+            </span>
+            <span className="h-px w-10 bg-[#d2b06d]/55" />
+          </div>
+
+          <h1 className="font-serif text-[2.55rem] leading-tight text-[#34271b] sm:text-[3rem]">
             {copy.askTitle}
           </h1>
-          <p className="text-sm leading-7 text-[#b7aa94]">
+
+          <p className="mx-auto max-w-[31rem] text-sm leading-7 text-[#7b6c58]">
             {copy.askDescription}
           </p>
         </header>
 
-        <RitualPrompt lines={[...copy.askRitualPrompt]} />
+        <section className="relative overflow-hidden rounded-[2rem] border border-[#d8bd82]/45 bg-[#fffaf1]/72 p-5 shadow-[0_24px_70px_rgba(116,83,36,0.10)] backdrop-blur-md">
+          <div className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full border border-[#d2b06d]/20" />
+          <div className="pointer-events-none absolute -right-3 top-7 h-3 w-3 rotate-45 border border-[#caa664]/40" />
+          <div className="pointer-events-none absolute bottom-5 left-5 h-px w-16 bg-[#d2b06d]/35" />
+
+          <div className="relative space-y-3">
+            <p className="text-[0.64rem] font-semibold uppercase tracking-[0.26em] text-[#a77f3c]">
+              Question Slip
+            </p>
+
+            <div className="space-y-2 text-sm leading-6 text-[#6f624f]">
+              {copy.askRitualPrompt.map((line, index) => (
+                <p key={`${line}-${index}`}>{line}</p>
+              ))}
+            </div>
+          </div>
+        </section>
 
         <form
           action="/ai-guide/draw"
@@ -90,13 +116,18 @@ export function AskForm({
           <input name="spread" type="hidden" value={spread} />
           <input name="orientation" type="hidden" value={orientation} />
           <input name="lang" type="hidden" value={lang} />
-          <div className="ritual-note p-4">
+
+          <div className="relative overflow-hidden rounded-[2.15rem] border border-[#cfad6d]/50 bg-[#fffdf7]/82 p-4 shadow-[0_28px_80px_rgba(111,78,31,0.12),inset_0_1px_0_rgba(255,255,255,0.75)] backdrop-blur-md sm:p-5">
+            <div className="pointer-events-none absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-[#d2b06d]/60 to-transparent" />
+            <div className="pointer-events-none absolute bottom-4 right-5 h-12 w-12 rounded-full border border-[#d2b06d]/18" />
+
             <label
-              className="ritual-note-label mb-3 block text-[0.62rem] font-semibold uppercase tracking-[0.24em]"
+              className="mb-3 block text-[0.62rem] font-semibold uppercase tracking-[0.26em] text-[#a77f3c]"
               htmlFor="tarot-question"
             >
               {copy.readingNote}
             </label>
+
             <textarea
               id="tarot-question"
               name="question"
@@ -108,19 +139,25 @@ export function AskForm({
                 }
               }}
               placeholder={copy.askPlaceholder}
-              className="ritual-note-field min-h-48 w-full resize-none p-4 text-base leading-7 outline-none focus:border-[#d6b36d] focus:ring-2 focus:ring-[#d6b36d]/20"
+              className="min-h-52 w-full resize-none rounded-[1.45rem] border border-[#d7bd82]/48 bg-[#fbf4e7]/78 p-4 text-base leading-7 text-[#33281d] shadow-[inset_0_1px_12px_rgba(126,93,42,0.06)] outline-none placeholder:text-[#9d8f78] focus:border-[#c49a4f] focus:bg-[#fffaf0] focus:ring-2 focus:ring-[#d6b36d]/22"
             />
-            <p className="ritual-note-muted mt-3 text-xs leading-5">
+
+            <p className="mt-3 text-xs leading-5 text-[#80715d]">
               {copy.askHint}
             </p>
           </div>
+
           {error && (
-            <p className="border border-[#755246] bg-[#1a0e0b] px-3 py-2 text-sm text-[#e2b7aa]">
+            <p
+              role="alert"
+              className="rounded-2xl border border-[#c48a73]/45 bg-[#fff1ea] px-4 py-3 text-sm leading-6 text-[#8a4634]"
+            >
               {error}
             </p>
           )}
+
           <button
-            className="pointer-events-auto min-h-12 touch-manipulation select-none rounded-full border border-[#d6b36d]/60 bg-[linear-gradient(180deg,rgba(48,35,20,0.95),rgba(13,10,8,0.98))] px-5 text-xs font-semibold uppercase tracking-[0.18em] text-[#f5ead2] shadow-[0_14px_34px_rgba(0,0,0,0.44),inset_0_1px_0_rgba(255,236,188,0.14)] focus:outline-none focus:ring-2 focus:ring-[#d6b36d]/45 focus:ring-offset-2 focus:ring-offset-[#050506]"
+            className="min-h-12 touch-manipulation select-none rounded-full border border-[#c89d4f]/70 bg-[linear-gradient(180deg,rgba(246,225,174,0.98),rgba(197,151,72,0.98))] px-5 text-xs font-semibold uppercase tracking-[0.2em] text-[#3a2a18] shadow-[0_18px_38px_rgba(148,105,39,0.22),inset_0_1px_0_rgba(255,255,255,0.55)] transition hover:-translate-y-0.5 hover:shadow-[0_22px_44px_rgba(148,105,39,0.26),inset_0_1px_0_rgba(255,255,255,0.62)] focus:outline-none focus:ring-2 focus:ring-[#c89d4f]/45 focus:ring-offset-2 focus:ring-offset-[#f6f0e5]"
             type="submit"
           >
             {copy.continueToRitual}
