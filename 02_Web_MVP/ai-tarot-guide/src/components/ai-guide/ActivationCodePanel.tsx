@@ -522,6 +522,37 @@ export function ActivationCodePanel({
               </div>
               ) : null}
 
+              <div className="flex flex-wrap gap-x-3 gap-y-1 text-[0.68rem] uppercase tracking-[0.12em] text-[#6f6658]">
+                <Link
+                  className="transition hover:text-[#d8c9ae]"
+                  href={withLang("/privacy", {}, lang)}
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Privacy
+                </Link>
+                <Link
+                  className="transition hover:text-[#d8c9ae]"
+                  href={withLang("/terms", {}, lang)}
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Terms
+                </Link>
+                <Link
+                  className="transition hover:text-[#d8c9ae]"
+                  href={withLang("/disclaimer", {}, lang)}
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Disclaimer
+                </Link>
+                <Link
+                  className="transition hover:text-[#d8c9ae]"
+                  href={withLang("/contact", {}, lang)}
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Contact
+                </Link>
+              </div>
+
               {user ? (
                 <button
                   className="justify-self-start rounded-full py-1.5 text-sm font-semibold uppercase tracking-[0.16em] text-[#8f826f] transition hover:text-[#d8c9ae] disabled:cursor-not-allowed disabled:opacity-50"

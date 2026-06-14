@@ -224,10 +224,30 @@ export default async function AiGuidePage({
                   {footerCopy.trustTitle}
                 </h3>
                 <div className="mt-3 grid gap-1.5 text-sm leading-6 text-[#6f6658]">
-                  <span>{footerCopy.privacy}</span>
-                  <span>{footerCopy.terms}</span>
-                  <span>{footerCopy.disclaimer}</span>
-                  <span>{footerCopy.contact}</span>
+                  <Link
+                    className="transition hover:text-[#d8c9ae]"
+                    href="/privacy"
+                  >
+                    {footerCopy.privacy}
+                  </Link>
+                  <Link
+                    className="transition hover:text-[#d8c9ae]"
+                    href="/terms"
+                  >
+                    {footerCopy.terms}
+                  </Link>
+                  <Link
+                    className="transition hover:text-[#d8c9ae]"
+                    href="/disclaimer"
+                  >
+                    {footerCopy.disclaimer}
+                  </Link>
+                  <Link
+                    className="transition hover:text-[#d8c9ae]"
+                    href="/contact"
+                  >
+                    {footerCopy.contact}
+                  </Link>
                 </div>
               </section>
             </div>
