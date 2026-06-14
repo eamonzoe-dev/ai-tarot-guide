@@ -32,6 +32,7 @@ const CARD_ORIENTATION_KEY = "aiTarot:cardOrientation";
 const LATEST_RITUAL_KEY = "aiTarot:latestRitual";
 const AI_READING_CACHE_PREFIX = "aiTarot:aiReading:v1";
 const AI_READING_CLIENT_REQUEST_PREFIX = "aiTarot:aiReadingRequest:v1";
+const CREDITS_UPDATED_EVENT = "ora-arcana:credits-updated";
 const activeAiReadingRequests = new Set<string>();
 
 type ResultClientProps = {
@@ -345,7 +346,10 @@ export function ResultClient({
           throw new Error(apiError.message);
         }
 
-        return response.json() as Promise<{ reading?: AiReading }>;
+        return response.json() as Promise<{
+          reading?: AiReading;
+          credits?: unknown;
+        }>;
       })
       .then((payload) => {
         if (!payload.reading || !isDisplayableAiReading(payload.reading)) {
@@ -355,6 +359,7 @@ export function ResultClient({
         sessionStorage.setItem(cacheKey, JSON.stringify(payload.reading));
         setAiReading(payload.reading);
         setAiReadingStatus("ready");
+        window.dispatchEvent(new Event(CREDITS_UPDATED_EVENT));
       })
       .catch((error) => {
         if (error instanceof DOMException && error.name === "AbortError") {

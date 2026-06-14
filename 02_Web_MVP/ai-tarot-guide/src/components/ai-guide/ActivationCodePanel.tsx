@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { User } from "@supabase/supabase-js";
 
 import {
@@ -11,6 +11,9 @@ import {
   withLang,
 } from "@/lib/ai-guide/i18n";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
+
+const CREDITS_UPDATED_EVENT = "ora-arcana:credits-updated";
+const CREDITS_REFRESH_THROTTLE_MS = 1500;
 
 type Credits = {
   remaining_credits: number;
@@ -61,6 +64,7 @@ export function ActivationCodePanel({
   const [isRedeemFormOpen, setIsRedeemFormOpen] = useState(false);
   const [isRedeeming, setIsRedeeming] = useState(false);
   const [isSigningOut, setIsSigningOut] = useState(false);
+  const lastCreditsRefreshAtRef = useRef(0);
 
   useEffect(() => {
     if (hasLangParam) {
@@ -119,6 +123,21 @@ export function ActivationCodePanel({
     }
   }, []);
 
+  const requestCreditsRefresh = useCallback(() => {
+    if (!user) {
+      return;
+    }
+
+    const now = Date.now();
+
+    if (now - lastCreditsRefreshAtRef.current < CREDITS_REFRESH_THROTTLE_MS) {
+      return;
+    }
+
+    lastCreditsRefreshAtRef.current = now;
+    void loadCredits();
+  }, [loadCredits, user]);
+
   const refreshUser = useCallback(async () => {
     setIsLoadingUser(true);
     setError(null);
@@ -157,6 +176,34 @@ export function ActivationCodePanel({
   useEffect(() => {
     void refreshUser();
   }, [refreshUser]);
+
+  useEffect(() => {
+    if (isMenuOpen) {
+      requestCreditsRefresh();
+    }
+  }, [isMenuOpen, requestCreditsRefresh]);
+
+  useEffect(() => {
+    function handleCreditsRefresh() {
+      requestCreditsRefresh();
+    }
+
+    function handleVisibilityChange() {
+      if (document.visibilityState === "visible") {
+        requestCreditsRefresh();
+      }
+    }
+
+    window.addEventListener("focus", handleCreditsRefresh);
+    window.addEventListener(CREDITS_UPDATED_EVENT, handleCreditsRefresh);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      window.removeEventListener("focus", handleCreditsRefresh);
+      window.removeEventListener(CREDITS_UPDATED_EVENT, handleCreditsRefresh);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [requestCreditsRefresh]);
 
   async function handleSendLoginEmail() {
     setIsSendingEmail(true);
