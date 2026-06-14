@@ -20,6 +20,9 @@
 # production
 /build
 
+# generated activation code exports
+/exports/activation-codes/
+
 # misc
 .DS_Store
 *.pem
