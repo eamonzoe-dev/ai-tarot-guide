@@ -24,7 +24,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 function getReadingSummary(reading: unknown) {
   if (!isRecord(reading)) {
-    return "View reading saved.";
+    return "Saved reading";
   }
 
   const candidates = [
@@ -40,10 +40,38 @@ function getReadingSummary(reading: unknown) {
   );
 
   if (!summary) {
-    return "View reading saved.";
+    return "Saved reading";
   }
 
   return summary.length > 180 ? `${summary.slice(0, 180)}...` : summary;
+}
+
+function formatReadableValue(value: string) {
+  return value
+    .split(/[-_\s]+/)
+    .filter(Boolean)
+    .map((part) => `${part.slice(0, 1).toUpperCase()}${part.slice(1)}`)
+    .join(" ");
+}
+
+function getModeLabel(mode: string | null) {
+  if (mode === "physical") {
+    return "Physical Deck";
+  }
+
+  if (mode === "online") {
+    return "Online Draw";
+  }
+
+  return mode ? formatReadableValue(mode) : "Reading";
+}
+
+function getSpreadLabel(spread: string | null) {
+  if (spread === "single") {
+    return "Single Card";
+  }
+
+  return spread ? formatReadableValue(spread) : "Single Card";
 }
 
 function formatDate(value: string, lang: "en" | "zh") {
@@ -92,7 +120,7 @@ export default async function MyReadingsPage({
       .limit(20);
 
     if (readingsResult.error) {
-      loadError = "Unable to load your saved readings.";
+      loadError = "Unable to open your Reading Journal right now.";
     } else {
       readings = (readingsResult.data ?? []) as ReadingLogRow[];
     }
@@ -119,12 +147,12 @@ export default async function MyReadingsPage({
             {lang === "zh" ? "Reading Journal" : "Reading Journal"}
           </p>
           <h1 className="font-serif text-4xl leading-tight text-[#f6ecd8] sm:text-5xl">
-            {lang === "zh" ? "My Readings" : "My Readings"}
+            {lang === "zh" ? "Reading Journal" : "Reading Journal"}
           </h1>
           <p className="mt-4 max-w-xl text-sm leading-7 text-[#b7aa94] sm:text-base">
             {lang === "zh"
-              ? "Your saved AI readings appear here after a successful generation."
-              : "Your saved AI readings appear here after a successful generation."}
+              ? "A quiet archive of your questions, cards, and Ora’s interpretations. Your saved readings are kept here for later reflection."
+              : "A quiet archive of your questions, cards, and Ora’s interpretations. Your saved readings are kept here for later reflection."}
           </p>
         </section>
 
@@ -132,25 +160,34 @@ export default async function MyReadingsPage({
           {!user || authError ? (
             <div className="atelier-worktop p-5 sm:p-6">
               <h2 className="font-serif text-2xl text-[#f6ecd8]">
-                Sign in required
+                Reading Account Required
               </h2>
               <p className="mt-3 text-sm leading-7 text-[#b7aa94]">
-                Please sign in from the Account menu to view your saved
-                readings.
+                Sign in from your Reading Account to view your saved readings.
+              </p>
+              <p className="mt-2 text-sm leading-7 text-[#9f947f]">
+                Your readings are saved when you are signed in.
               </p>
             </div>
           ) : loadError ? (
             <div className="atelier-worktop p-5 sm:p-6">
               <p className="text-sm leading-7 text-[#f0a99a]">{loadError}</p>
+              <p className="mt-2 text-sm leading-7 text-[#b7aa94]">
+                Please return to the Reading Room and try again.
+              </p>
             </div>
           ) : readings.length === 0 ? (
             <div className="atelier-worktop p-5 sm:p-6">
               <h2 className="font-serif text-2xl text-[#f6ecd8]">
-                No saved readings yet
+                Your journal is quiet for now.
               </h2>
               <p className="mt-3 text-sm leading-7 text-[#b7aa94]">
-                Complete an AI reading and it will be saved here.
+                Begin a reading, and your saved interpretation will appear here
+                for later reflection.
               </p>
+              <Link className="ritual-action-link mt-5" href={backHref}>
+                Begin a Reading
+              </Link>
             </div>
           ) : (
             <div className="grid gap-4">
@@ -169,7 +206,8 @@ export default async function MyReadingsPage({
                       </h2>
                     </div>
                     <p className="text-xs uppercase tracking-[0.16em] text-[#8f826f]">
-                      {reading.mode ?? "reading"} / {reading.spread ?? "single"}
+                      {getModeLabel(reading.mode)} /{" "}
+                      {getSpreadLabel(reading.spread)}
                     </p>
                   </div>
 
