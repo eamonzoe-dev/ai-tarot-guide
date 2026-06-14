@@ -24,6 +24,7 @@ export default async function AiGuidePage({
     { mode: "online", spread: "single", orientation: "upright" },
     lang,
   );
+  const readingsHref = withLang("/ai-guide/readings", {}, lang);
   const suggestedQuestions =
     lang === "zh"
       ? [
@@ -209,9 +210,12 @@ export default async function AiGuidePage({
                   <span className="text-[#7d7466]">
                     {footerCopy.redeem}
                   </span>
-                  <span className="text-[#6f6658]">
-                    {footerCopy.journal} · {footerCopy.comingSoon}
-                  </span>
+                  <Link
+                    className="text-[#6f6658] transition hover:text-[#d8c9ae]"
+                    href={readingsHref}
+                  >
+                    {footerCopy.journal}
+                  </Link>
                 </div>
               </section>
 

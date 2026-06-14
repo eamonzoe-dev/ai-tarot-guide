@@ -18,6 +18,7 @@ type AiReadingRequest = {
   mode?: unknown;
   orientation?: unknown;
   spread?: unknown;
+  clientRequestId?: unknown;
 };
 
 type AiReading = {
@@ -45,6 +46,10 @@ type UserQuota = {
 type UserCredits = {
   remaining_credits: number;
   total_credits: number;
+};
+
+type ConsumedCredit = UserCredits & {
+  credit_event_id: string | null;
 };
 
 type UsageEventInput = {
@@ -392,6 +397,20 @@ function normalizeCredits(value: unknown): UserCredits | null {
   };
 }
 
+function normalizeConsumedCredit(value: unknown): ConsumedCredit | null {
+  const credits = normalizeCredits(value);
+
+  if (!credits || !isRecord(value)) {
+    return null;
+  }
+
+  return {
+    ...credits,
+    credit_event_id:
+      typeof value.credit_event_id === "string" ? value.credit_event_id : null,
+  };
+}
+
 async function getOrCreateUserCredits(
   admin: ReturnType<typeof createSupabaseAdminClient>,
   userId: string,
@@ -457,7 +476,7 @@ async function consumeAiReadingCredit(
     : consumeResult.data;
 
   return {
-    credits: normalizeCredits(firstResult),
+    credits: normalizeConsumedCredit(firstResult),
     error: null,
   };
 }
@@ -544,6 +563,127 @@ async function recordSuccessfulUsage({
   }
 
   return { error: null };
+}
+
+async function recordReadingLog({
+  admin,
+  userId,
+  question,
+  cardId,
+  cardTitle,
+  mode,
+  orientation,
+  lang,
+  reading,
+  creditsEventId,
+}: {
+  admin: ReturnType<typeof createSupabaseAdminClient>;
+  userId: string;
+  question: string;
+  cardId: string;
+  cardTitle: string;
+  mode: "physical" | "online";
+  orientation: "upright";
+  lang: Language;
+  reading: AiReading;
+  creditsEventId: string | null;
+}) {
+  return admin.from("reading_logs").insert({
+    user_id: userId,
+    question,
+    card_id: cardId,
+    card_title: cardTitle,
+    mode,
+    spread: "single",
+    orientation,
+    lang,
+    reading_json: reading,
+    credits_event_id: creditsEventId,
+  });
+}
+
+async function getExistingReadingLog(
+  admin: ReturnType<typeof createSupabaseAdminClient>,
+  userId: string,
+  clientRequestId: string,
+) {
+  return admin
+    .from("reading_logs")
+    .select("reading_json,credits_event_id,created_at")
+    .eq("user_id", userId)
+    .eq("client_request_id", clientRequestId)
+    .maybeSingle();
+}
+
+async function finalizeAiReadingResult({
+  admin,
+  userId,
+  clientRequestId,
+  question,
+  cardId,
+  cardTitle,
+  mode,
+  orientation,
+  lang,
+  reading,
+  questionLength,
+}: {
+  admin: ReturnType<typeof createSupabaseAdminClient>;
+  userId: string;
+  clientRequestId: string;
+  question: string;
+  cardId: string;
+  cardTitle: string;
+  mode: "physical" | "online";
+  orientation: "upright";
+  lang: Language;
+  reading: AiReading;
+  questionLength: number;
+}) {
+  const result = await admin.rpc("finalize_ai_reading_result", {
+    p_user_id: userId,
+    p_client_request_id: clientRequestId,
+    p_question: question,
+    p_card_id: cardId,
+    p_card_title: cardTitle,
+    p_mode: mode,
+    p_spread: "single",
+    p_orientation: orientation,
+    p_lang: lang,
+    p_reading_json: reading,
+    p_question_length: questionLength,
+  });
+
+  if (result.error) {
+    return { data: null, error: result.error };
+  }
+
+  const firstResult = Array.isArray(result.data) ? result.data[0] : result.data;
+  const normalized = isRecord(firstResult)
+    ? {
+        remaining_credits:
+          typeof firstResult.remaining_credits === "number"
+            ? firstResult.remaining_credits
+            : 0,
+        total_credits:
+          typeof firstResult.total_credits === "number"
+            ? firstResult.total_credits
+            : 0,
+        credit_event_id:
+          typeof firstResult.credit_event_id === "string"
+            ? firstResult.credit_event_id
+            : null,
+        reading_json:
+          isAiReading(firstResult.reading_json) && firstResult.reading_json
+            ? normalizeAiReading(firstResult.reading_json)
+            : reading,
+      }
+    : null;
+
+  return {
+    data: normalized,
+    error: null,
+  };
 }
 
 function stripJsonCodeFence(content: string) {
@@ -723,6 +863,7 @@ export async function POST(request: Request) {
   const mode = normalizeMode(body.mode);
   const orientation = normalizeOrientation(body.orientation);
   const spread = stringValue(body.spread) || "single";
+  const clientRequestId = stringValue(body.clientRequestId);
   const card = getTarotCardById(cardId);
 
   if (typeof rawQuestion !== "string") {
@@ -787,6 +928,44 @@ export async function POST(request: Request) {
     );
   }
 
+  const admin = createSupabaseAdminClient();
+  if (clientRequestId) {
+    const existingReadingResult = await getExistingReadingLog(
+      admin,
+      user.id,
+      clientRequestId,
+    );
+
+    if (existingReadingResult.error) {
+      return NextResponse.json(
+        {
+          error: "Unable to load saved AI reading.",
+          code: "reading_log_lookup_failed",
+        },
+        { status: 500 },
+      );
+    }
+
+    if (existingReadingResult.data?.reading_json) {
+      const existingCreditsResult = await getOrCreateUserCredits(admin, user.id);
+
+      if (existingCreditsResult.error || !existingCreditsResult.credits) {
+        return NextResponse.json(
+          {
+            error: "Unable to check AI reading credits.",
+            code: "credits_check_failed",
+          },
+          { status: 500 },
+        );
+      }
+
+      return NextResponse.json({
+        reading: existingReadingResult.data.reading_json as AiReading,
+        credits: existingCreditsResult.credits,
+      });
+    }
+  }
+
   const clientIp = getClientIp(request);
   const rateLimit = checkRateLimit(clientIp);
 
@@ -804,7 +983,6 @@ export async function POST(request: Request) {
     );
   }
 
-  const admin = createSupabaseAdminClient();
   const { credits, error: creditsError } = await getOrCreateUserCredits(
     admin,
     user.id,
@@ -894,9 +1072,107 @@ export async function POST(request: Request) {
       cardData,
     };
     const reading = await requestAiReading(payload);
-    const creditConsumeResult = await consumeAiReadingCredit(admin, user.id);
+    const finalizeResult = clientRequestId
+      ? await finalizeAiReadingResult({
+          admin,
+          userId: user.id,
+          clientRequestId,
+          question,
+          cardId,
+          cardTitle: cardData.title,
+          mode,
+          orientation,
+          lang,
+          reading,
+          questionLength: question.length,
+        })
+      : null;
 
-    if (creditConsumeResult.error || !creditConsumeResult.credits) {
+    if (clientRequestId && finalizeResult?.error) {
+      if (isInsufficientCreditsError(finalizeResult.error)) {
+        return NextResponse.json(
+          {
+            error:
+              "You do not have enough AI readings. Please redeem a deck code to continue.",
+            code: "insufficient_credits",
+          },
+          { status: 402 },
+        );
+      }
+
+      const duplicateReadingResult = await getExistingReadingLog(
+        admin,
+        user.id,
+        clientRequestId,
+      );
+
+      if (duplicateReadingResult.data?.reading_json) {
+        const existingCreditsResult = await getOrCreateUserCredits(admin, user.id);
+
+        if (existingCreditsResult.error || !existingCreditsResult.credits) {
+          return NextResponse.json(
+            {
+              error: "Unable to check AI reading credits.",
+              code: "credits_check_failed",
+            },
+            { status: 500 },
+          );
+        }
+
+        return NextResponse.json({
+          reading: duplicateReadingResult.data.reading_json as AiReading,
+          credits: existingCreditsResult.credits,
+        });
+      }
+
+      console.error("AI reading finalize failed:", {
+        cardId,
+        lang,
+        mode,
+        model,
+        questionLength: question.length,
+        hasCustomBaseURL: Boolean(customBaseURL),
+        error: formatSupabaseErrorForLog(finalizeResult.error),
+      });
+
+      return NextResponse.json(
+        {
+          error: "Unable to save AI reading.",
+          code: "reading_log_failed",
+        },
+        { status: 500 },
+      );
+    }
+
+    const finalReading = finalizeResult?.data?.reading_json || reading;
+    const creditConsumeResult = clientRequestId
+      ? {
+          credits: finalizeResult?.data
+            ? {
+                remaining_credits: finalizeResult.data.remaining_credits,
+                total_credits: finalizeResult.data.total_credits,
+                credit_event_id: finalizeResult.data.credit_event_id,
+              }
+            : null,
+          error: null,
+      }
+      : await consumeAiReadingCredit(admin, user.id);
+
+    if (clientRequestId && !finalizeResult?.data) {
+      const fallbackCreditsResult = await getOrCreateUserCredits(admin, user.id);
+
+      if (fallbackCreditsResult.error || !fallbackCreditsResult.credits) {
+        return NextResponse.json(
+          {
+            error: "Unable to check AI reading credits.",
+            code: "credits_check_failed",
+          },
+          { status: 500 },
+        );
+      }
+    }
+
+    if (!creditConsumeResult.credits) {
       console.error("AI reading credit consume failed:", {
         cardId,
         lang,
@@ -916,38 +1192,77 @@ export async function POST(request: Request) {
             ? "insufficient_credits"
             : "credit_consume_failed",
         },
-        { status: isInsufficientCreditsError(creditConsumeResult.error) ? 402 : 500 },
+        {
+          status: isInsufficientCreditsError(creditConsumeResult.error)
+            ? 402
+            : 500,
+        },
       );
     }
 
-    const usageResult = await recordSuccessfulUsage({
-      admin,
-      usageEvent: {
-        ...usageEventBase,
-        ai_success: true,
-        charged: true,
-        fallback_used: false,
-      },
-    });
-
-    if (usageResult.error) {
-      console.error("AI reading usage record failed:", {
-        cardId,
-        lang,
-        mode,
-        model,
-        questionLength: question.length,
-        hasCustomBaseURL: Boolean(customBaseURL),
-        error: formatSupabaseErrorForLog(usageResult.error),
+    if (!clientRequestId) {
+      const usageResult = await recordSuccessfulUsage({
+        admin,
+        usageEvent: {
+          ...usageEventBase,
+          ai_success: true,
+          charged: true,
+          fallback_used: false,
+        },
       });
 
-      return NextResponse.json(
-        {
-          error: "Unable to record AI reading usage.",
-          code: "usage_record_failed",
-        },
-        { status: 500 },
-      );
+      if (usageResult.error) {
+        console.error("AI reading usage record failed:", {
+          cardId,
+          lang,
+          mode,
+          model,
+          questionLength: question.length,
+          hasCustomBaseURL: Boolean(customBaseURL),
+          error: formatSupabaseErrorForLog(usageResult.error),
+        });
+
+        return NextResponse.json(
+          {
+            error: "Unable to record AI reading usage.",
+            code: "usage_record_failed",
+          },
+          { status: 500 },
+        );
+      }
+
+      const readingLogResult = await recordReadingLog({
+        admin,
+        userId: user.id,
+        question,
+        cardId,
+        cardTitle: cardData.title,
+        mode,
+        orientation,
+        lang,
+        reading,
+        creditsEventId: creditConsumeResult.credits.credit_event_id,
+      });
+
+      if (readingLogResult.error) {
+        console.error("AI reading log record failed:", {
+          cardId,
+          lang,
+          mode,
+          model,
+          questionLength: question.length,
+          hasCustomBaseURL: Boolean(customBaseURL),
+          error: formatSupabaseErrorForLog(readingLogResult.error),
+        });
+
+        return NextResponse.json(
+          {
+            error: "Unable to save AI reading.",
+            code: "reading_log_failed",
+          },
+          { status: 500 },
+        );
+      }
     }
 
     console.info("AI reading request completed:", {
@@ -961,8 +1276,11 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json({
-      reading,
-      credits: creditConsumeResult.credits,
+      reading: finalReading,
+      credits: {
+        remaining_credits: creditConsumeResult.credits.remaining_credits,
+        total_credits: creditConsumeResult.credits.total_credits,
+      },
     });
   } catch (error) {
     const timedOut = isTimeoutError(error);

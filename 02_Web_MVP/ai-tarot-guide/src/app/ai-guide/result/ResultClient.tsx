@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { EmailSignInPanel } from "@/components/ai-guide/EmailSignInPanel";
@@ -31,6 +31,8 @@ const READING_SPREAD_KEY = "aiTarot:readingSpread";
 const CARD_ORIENTATION_KEY = "aiTarot:cardOrientation";
 const LATEST_RITUAL_KEY = "aiTarot:latestRitual";
 const AI_READING_CACHE_PREFIX = "aiTarot:aiReading:v1";
+const AI_READING_CLIENT_REQUEST_PREFIX = "aiTarot:aiReadingRequest:v1";
+const activeAiReadingRequests = new Set<string>();
 
 type ResultClientProps = {
   initialMode: "physical" | "online" | "";
@@ -82,6 +84,7 @@ type AiReadingApiErrorCode =
   | "quota_check_failed"
   | "credits_check_failed"
   | "credit_consume_failed"
+  | "reading_log_failed"
   | "usage_record_failed";
 
 type AiReadingApiErrorPayload = {
@@ -102,6 +105,7 @@ function getAiReadingErrorMessage(code: string | undefined) {
     case "credits_check_failed":
     case "credit_consume_failed":
     case "usage_record_failed":
+    case "reading_log_failed":
       return "AI reading quota check failed. Please try again later.";
     default:
       return "AI reading request failed.";
@@ -202,6 +206,35 @@ function splitReadingParagraphs(reading: string) {
     .filter(Boolean);
 }
 
+function createClientRequestId() {
+  const browserCrypto = globalThis.crypto;
+
+  if (browserCrypto?.randomUUID) {
+    return browserCrypto.randomUUID();
+  }
+
+  if (browserCrypto?.getRandomValues) {
+    return `${Date.now().toString(36)}-${Array.from(
+      browserCrypto.getRandomValues(new Uint32Array(2)),
+    ).join("-")}`;
+  }
+
+  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
+}
+
+function getStableClientRequestId(cacheKey: string, retryKey: number) {
+  const storageKey = `${AI_READING_CLIENT_REQUEST_PREFIX}:${cacheKey}:${retryKey}`;
+  const existingRequestId = sessionStorage.getItem(storageKey);
+
+  if (existingRequestId) {
+    return existingRequestId;
+  }
+
+  const nextRequestId = createClientRequestId();
+  sessionStorage.setItem(storageKey, nextRequestId);
+  return nextRequestId;
+}
+
 export function ResultClient({
   initialMode,
   initialSpread,
@@ -235,6 +268,7 @@ export function ResultClient({
     string | null
   >(null);
   const [aiRetryKey, setAiRetryKey] = useState(0);
+  const inFlightAiReadingKeyRef = useRef<string | null>(null);
   const card = selectedCard ? getTarotCardById(selectedCard) : undefined;
 
   useEffect(() => {
@@ -274,7 +308,18 @@ export function ResultClient({
     const cachedFailureKey = `${cacheKey}:error`;
     sessionStorage.removeItem(cachedFailureKey);
 
-    const controller = new AbortController();
+    const requestKey = `${cacheKey}:${aiRetryKey}`;
+
+    if (
+      inFlightAiReadingKeyRef.current === requestKey ||
+      activeAiReadingRequests.has(requestKey)
+    ) {
+      return;
+    }
+
+    const clientRequestId = getStableClientRequestId(cacheKey, aiRetryKey);
+    inFlightAiReadingKeyRef.current = requestKey;
+    activeAiReadingRequests.add(requestKey);
     setAiReading(null);
     setAiReadingStatus("loading");
     setAiReadingErrorMessage(null);
@@ -291,8 +336,8 @@ export function ResultClient({
         mode,
         orientation,
         spread: "single",
+        clientRequestId,
       }),
-      signal: controller.signal,
     })
       .then(async (response) => {
         if (!response.ok) {
@@ -323,10 +368,17 @@ export function ResultClient({
             : "AI reading request failed.",
         );
         setAiReadingStatus("error");
+      })
+      .finally(() => {
+        if (inFlightAiReadingKeyRef.current === requestKey) {
+          inFlightAiReadingKeyRef.current = null;
+        }
+        activeAiReadingRequests.delete(requestKey);
       });
 
     return () => {
-      controller.abort();
+      // Keep the in-flight guard active across React dev remounts.
+      // The request result is idempotent server-side via clientRequestId.
     };
   }, [card, question, mode, orientation, initialLang, aiRetryKey]);
 

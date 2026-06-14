@@ -392,12 +392,13 @@ export function ActivationCodePanel({
                   >
                     <span>Reading Room</span>
                   </button>
-                  <div className="flex min-h-11 items-center justify-between border-b border-[#2b241a] py-2 text-[#7d7466]">
+                  <Link
+                    className="flex min-h-11 items-center justify-between border-b border-[#2b241a] py-2 text-[#c8bca6] transition hover:text-[#f6ecd8]"
+                    href={withLang("/ai-guide/readings", {}, lang)}
+                    onClick={() => setIsMenuOpen(false)}
+                  >
                     <span>Reading Journal</span>
-                    <span className="text-[0.68rem] uppercase tracking-[0.14em]">
-                      Coming soon
-                    </span>
-                  </div>
+                  </Link>
                   <div className="flex min-h-11 items-center justify-between gap-3 border-b border-[#2b241a] py-2">
                     <span className="text-[#c8bca6]">Language</span>
                     <div className="inline-flex min-h-8 items-center rounded-full border border-[#6d5a35]/45 bg-[#080706]/80 p-0.5 text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-[#a9a59d]">
