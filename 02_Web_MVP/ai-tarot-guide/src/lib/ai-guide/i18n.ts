@@ -8,13 +8,16 @@ export const dictionary = {
   en: {
     back: "Back",
     home: "Reading Room",
-    homeTitle: "Ora Arcana",
-    homeSubtitle: "The cards hold what you have not yet said.",
-    homeDescription: "A quiet space for reflection. Enter, and let the reading begin.",
-    homePhysicalTitle: "Use your own physical deck",
-    homePhysicalDescription: "Scan the QR code on your deck.",
-    homeOnlineTitle: "Online Draw",
-    homeOnlineDescription: "Let the algorithm choose for you.",
+    homeTitle: "Ora Arcana Reading Room",
+    homeSubtitle: "Ora, your AI Tarot Interpreter",
+    homeDescription:
+      "A quiet AI-assisted tarot space for symbolic reflection, card interpretation, and structured insight.",
+    homePhysicalTitle: "Use a Physical Deck",
+    homePhysicalDescription:
+      "Draw a card by hand, then let Ora help interpret it in relation to your question.",
+    homeOnlineTitle: "Draw Online",
+    homeOnlineDescription:
+      "Begin with a single-card online draw and receive a structured tarot interpretation.",
     entranceDesk: "For reflection only",
     readingRoom: "Reading Room",
     centerTitle: "Center Before You Ask",

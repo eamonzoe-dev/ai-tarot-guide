@@ -34,10 +34,10 @@ export default async function AiGuidePage({
           "现在什么最值得我聚焦？",
         ]
       : [
-          "What should I pay attention to today?",
-          "What is hidden in this situation?",
-          "What should I release?",
-          "What is asking for my focus?",
+          "What should I pay attention to right now?",
+          "What is the central tension in this situation?",
+          "What am I not seeing clearly?",
+          "What next step deserves my attention?",
         ];
   const footerCopy =
     lang === "zh"
@@ -58,9 +58,9 @@ export default async function AiGuidePage({
           reflectionOnly: "仅供反思，不替代专业建议。",
         }
       : {
-          brandLine: "Made with intention.",
+          brandLine: "Ora Arcana Reading Room",
           brandDescription:
-            "AI-powered tarot readings for quiet questions and clearer days.",
+            "An AI-assisted tarot reading room for symbolic reflection and structured card interpretation.",
           readingTitle: "Reading",
           physical: "Physical Deck Reading",
           online: "Online Single Card",
@@ -72,7 +72,7 @@ export default async function AiGuidePage({
           disclaimer: "AI / Entertainment Disclaimer",
           contact: "Contact",
           comingSoon: "Coming soon",
-          reflectionOnly: "For reflection only.",
+          reflectionOnly: "For reflection only. Not a prediction or professional advice.",
         };
 
   return (
@@ -114,14 +114,14 @@ export default async function AiGuidePage({
           <div className="atelier-worktop p-4 sm:p-6">
             <div className="mb-4 flex items-center justify-between gap-4 border-b border-[#3d3020] pb-4">
               <p className="atelier-label text-[0.62rem] font-semibold">
-                Reading Portal
+                Begin a Reading
               </p>
               <p className="hidden text-sm leading-5 text-[#9f947f] sm:block">
-                Choose how you want to begin.
+                Choose your reading path. Use your own deck, or draw a single card online.
               </p>
             </div>
             <p className="mb-4 text-sm leading-6 text-[#c8bca6] sm:hidden">
-              Choose how you want to begin.
+              Choose your reading path. Use your own deck, or draw a single card online.
             </p>
             <div className="grid gap-3 sm:grid-cols-2">
               <TarotButton
@@ -156,10 +156,12 @@ export default async function AiGuidePage({
           <div className="border-t border-[#4a3926] pt-5">
             <div className="mb-3 flex items-center justify-between gap-4">
               <h2 className="atelier-label text-[0.62rem] font-semibold">
-                {lang === "zh" ? "推荐问题" : "Suggested Questions"}
+                {lang === "zh" ? "推荐问题" : "Questions to Bring Into the Room"}
               </h2>
               <p className="hidden text-xs text-[#8f826f] sm:block">
-                {lang === "zh" ? "仅作灵感提示" : "For reflection prompts only"}
+                {lang === "zh"
+                  ? "仅作灵感提示"
+                  : "Reflection prompts for your reading. Ora helps interpret the symbols, not predict a fixed future."}
               </p>
             </div>
             <div className="grid divide-y divide-[#33291d] border-y border-[#33291d]">
