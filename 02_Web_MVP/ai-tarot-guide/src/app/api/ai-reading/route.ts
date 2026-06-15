@@ -337,6 +337,10 @@ function chatCompletionsUrl(baseURL: string) {
   return `${baseURL.replace(/\/+$/, "")}/chat/completions`;
 }
 
+function normalizeOpenAiApiKey(value: string | undefined) {
+  return value?.trim().replace(/^Bearer\s+/i, "") || "";
+}
+
 function getUtcDayWindow() {
   const dayStart = new Date();
   dayStart.setUTCHours(0, 0, 0, 0);
@@ -1009,9 +1013,16 @@ export async function POST(request: Request) {
     );
   }
 
-  const apiKey = process.env.OPENAI_API_KEY;
-  const model = process.env.OPENAI_MODEL?.trim() || DEFAULT_OPENAI_MODEL;
-  const customBaseURL = process.env.OPENAI_BASE_URL?.trim();
+  const apiKey =
+    normalizeOpenAiApiKey(process.env.AI_READING_OPENAI_API_KEY) ||
+    normalizeOpenAiApiKey(process.env.OPENAI_API_KEY);
+  const model =
+    process.env.AI_READING_OPENAI_MODEL?.trim() ||
+    process.env.OPENAI_MODEL?.trim() ||
+    DEFAULT_OPENAI_MODEL;
+  const customBaseURL =
+    process.env.AI_READING_OPENAI_BASE_URL?.trim() ||
+    process.env.OPENAI_BASE_URL?.trim();
   const baseURL = customBaseURL || DEFAULT_OPENAI_BASE_URL;
 
   if (!apiKey) {
