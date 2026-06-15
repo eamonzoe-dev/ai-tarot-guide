@@ -2,7 +2,9 @@ import Link from "next/link";
 
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { normalizeLanguage, withLang } from "@/lib/ai-guide/i18n";
+import { normalizeLanguage, text, withLang } from "@/lib/ai-guide/i18n";
+
+type ReadingsText = ReturnType<typeof text>;
 
 type ReadingLogRow = {
   id: string;
@@ -21,9 +23,9 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
 }
 
-function getReadingSummary(reading: unknown) {
+function getReadingSummary(reading: unknown, t: ReadingsText) {
   if (!isRecord(reading)) {
-    return "Saved reading";
+    return t.readingsSummaryFallback;
   }
 
   const candidates = [
@@ -39,7 +41,7 @@ function getReadingSummary(reading: unknown) {
   );
 
   if (!summary) {
-    return "Saved reading";
+    return t.readingsSummaryFallback;
   }
 
   return summary.length > 180 ? `${summary.slice(0, 180)}...` : summary;
@@ -53,32 +55,34 @@ function formatReadableValue(value: string) {
     .join(" ");
 }
 
-function getModeLabel(mode: string | null) {
+function getModeLabel(mode: string | null, t: ReadingsText) {
   if (mode === "physical") {
-    return "Physical Deck";
+    return t.readingsModePhysical;
   }
 
   if (mode === "online") {
-    return "Online Draw";
+    return t.readingsModeOnline;
   }
 
-  return mode ? formatReadableValue(mode) : "Reading";
+  return mode ? formatReadableValue(mode) : t.readingsModeFallback;
 }
 
-function getSpreadLabel(spread: string | null) {
+function getSpreadLabel(spread: string | null, t: ReadingsText) {
   if (spread === "single") {
-    return "Single Card";
+    return t.readingsSpreadSingle;
   }
 
-  return spread ? formatReadableValue(spread) : "Single Card";
+  return spread ? formatReadableValue(spread) : t.readingsSpreadSingle;
 }
 
-function getOrientationLabel(orientation: string | null) {
+function getOrientationLabel(orientation: string | null, t: ReadingsText) {
   if (orientation === "upright") {
-    return "Upright";
+    return t.readingsOrientationUpright;
   }
 
-  return orientation ? formatReadableValue(orientation) : "Upright";
+  return orientation
+    ? formatReadableValue(orientation)
+    : t.readingsOrientationUpright;
 }
 
 function formatDate(value: string, lang: "en" | "zh") {
@@ -106,6 +110,7 @@ export default async function MyReadingsPage({
 }) {
   const { lang: langParam } = await searchParams;
   const lang = normalizeLanguage(langParam);
+  const t = text(lang);
   const backHref = withLang("/ai-guide", {}, lang);
   const supabase = await createSupabaseServerClient();
   const {
@@ -127,7 +132,7 @@ export default async function MyReadingsPage({
       .limit(20);
 
     if (readingsResult.error) {
-      loadError = "The journal could not open right now.";
+      loadError = t.readingsLoadError;
     } else {
       readings = (readingsResult.data ?? []) as ReadingLogRow[];
     }
@@ -166,7 +171,7 @@ export default async function MyReadingsPage({
             className="text-xs font-semibold uppercase tracking-[0.2em] text-[#9d7b3f] transition hover:text-[#5b4a36]"
             href={backHref}
           >
-            Back to Reading Room
+            {t.readingsBack}
           </Link>
           <p className="font-serif text-lg text-[#5b4a36]">Ora Arcana</p>
         </header>
@@ -174,16 +179,14 @@ export default async function MyReadingsPage({
         <section className="mx-auto w-full max-w-3xl pt-10 text-center sm:pt-14">
           <p className="mb-3 flex items-center justify-center gap-3 text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-[#9d7b3f]">
             <span className="h-px w-8 bg-gradient-to-r from-transparent via-[#d8b76a]/70 to-transparent" />
-            {lang === "zh" ? "Reading Journal" : "Reading Journal"}
+            {t.readingsEyebrow}
             <span className="h-px w-8 bg-gradient-to-r from-transparent via-[#d8b76a]/70 to-transparent" />
           </p>
           <h1 className="font-serif text-4xl leading-tight text-[#4f4235] drop-shadow-[0_1px_0_rgba(255,255,255,0.6)] sm:text-5xl">
-            {lang === "zh" ? "Reading Journal" : "Reading Journal"}
+            {t.readingsTitle}
           </h1>
           <p className="mx-auto mt-4 max-w-xl text-sm leading-7 text-[#766955] sm:text-base">
-            {lang === "zh"
-              ? "A quiet archive of your questions, cards, and Ora's interpretations. Your saved readings are kept here for later reflection."
-              : "A quiet archive of your questions, cards, and Ora's interpretations. Your saved readings are kept here for later reflection."}
+            {t.readingsIntro}
           </p>
         </section>
 
@@ -192,20 +195,19 @@ export default async function MyReadingsPage({
             <div className="relative overflow-hidden rounded-[1.75rem] border border-[#d8bd82]/42 bg-[linear-gradient(180deg,rgba(255,250,241,0.92),rgba(248,241,229,0.86))] p-5 shadow-[0_22px_64px_rgba(116,83,36,0.10),inset_0_1px_0_rgba(255,255,255,0.72)] backdrop-blur-md sm:p-6">
               <div className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-[#d2b06d]/58 to-transparent" />
               <h2 className="font-serif text-2xl text-[#4f4235]">
-                Reading Account Required
+                {t.readingsAuthTitle}
               </h2>
               <p className="mt-3 text-sm leading-7 text-[#6f624f]">
-                Return to the Reading Room and sign in from your Reading
-                Account to view your saved readings.
+                {t.readingsAuthBody}
               </p>
               <p className="mt-2 text-sm leading-7 text-[#8b7a61]">
-                Your readings are saved when you are signed in.
+                {t.readingsAuthNote}
               </p>
               <Link
                 className="mt-5 inline-flex min-h-11 items-center justify-center rounded-full border border-[#c89d4f]/72 bg-[linear-gradient(180deg,rgba(246,225,174,0.98),rgba(197,151,72,0.98))] px-5 text-xs font-semibold uppercase tracking-[0.18em] text-[#3a2a18] shadow-[0_16px_34px_rgba(148,105,39,0.18),inset_0_1px_0_rgba(255,255,255,0.58)] transition hover:-translate-y-0.5"
                 href={backHref}
               >
-                Return to Reading Room
+                {t.readingsReturn}
               </Link>
             </div>
           ) : loadError ? (
@@ -215,13 +217,13 @@ export default async function MyReadingsPage({
                 {loadError}
               </h2>
               <p className="mt-3 text-sm leading-7 text-[#7b5f52]">
-                Please return to the Reading Room or try again later.
+                {t.readingsErrorBody}
               </p>
               <Link
                 className="mt-5 inline-flex min-h-11 items-center justify-center rounded-full border border-[#c89d4f]/50 bg-white/54 px-5 text-xs font-semibold uppercase tracking-[0.18em] text-[#7b5b2a] shadow-[0_12px_28px_rgba(148,105,39,0.10)] transition hover:-translate-y-0.5 hover:bg-white/74"
                 href={backHref}
               >
-                Return to Reading Room
+                {t.readingsReturn}
               </Link>
             </div>
           ) : readings.length === 0 ? (
@@ -238,23 +240,22 @@ export default async function MyReadingsPage({
                 </div>
               </div>
               <h2 className="font-serif text-2xl text-[#4f4235]">
-                Your journal is quiet for now.
+                {t.readingsEmptyTitle}
               </h2>
               <p className="mt-3 text-sm leading-7 text-[#6f624f]">
-                Begin a reading, and your saved interpretation will appear here
-                for later reflection.
+                {t.readingsEmptyBody}
               </p>
               <Link
                 className="mt-5 inline-flex min-h-11 items-center justify-center rounded-full border border-[#c89d4f]/72 bg-[linear-gradient(180deg,rgba(246,225,174,0.98),rgba(197,151,72,0.98))] px-5 text-xs font-semibold uppercase tracking-[0.18em] text-[#3a2a18] shadow-[0_16px_34px_rgba(148,105,39,0.18),inset_0_1px_0_rgba(255,255,255,0.58)] transition hover:-translate-y-0.5"
                 href={backHref}
               >
-                Begin a Reading
+                {t.readingsEmptyCta}
               </Link>
             </div>
           ) : (
             <div className="grid gap-4">
               <p className="text-center text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-[#9d7b3f]">
-                Latest 20 saved readings
+                {t.readingsLatest}
               </p>
               {readings.map((reading) => (
                 <article
@@ -268,18 +269,20 @@ export default async function MyReadingsPage({
                         {formatDate(reading.created_at, lang)}
                       </p>
                       <h2 className="mt-2 font-serif text-2xl leading-tight text-[#4f4235]">
-                        {reading.card_title || reading.card_id || "Saved Card"}
+                        {reading.card_title ||
+                          reading.card_id ||
+                          t.readingsSavedCard}
                       </h2>
                     </div>
                     <div className="flex flex-wrap gap-2 sm:justify-end">
                       <span className="inline-flex rounded-full border border-[#d8bd82]/46 bg-[#fffaf1]/76 px-3 py-1 text-[0.62rem] font-semibold uppercase tracking-[0.14em] text-[#8d6426]">
-                        {getModeLabel(reading.mode)}
+                        {getModeLabel(reading.mode, t)}
                       </span>
                       <span className="inline-flex rounded-full border border-[#d8bd82]/38 bg-white/48 px-3 py-1 text-[0.62rem] font-semibold uppercase tracking-[0.14em] text-[#7b6c58]">
-                        {getSpreadLabel(reading.spread)}
+                        {getSpreadLabel(reading.spread, t)}
                       </span>
                       <span className="inline-flex rounded-full border border-[#d8bd82]/38 bg-white/48 px-3 py-1 text-[0.62rem] font-semibold uppercase tracking-[0.14em] text-[#7b6c58]">
-                        {getOrientationLabel(reading.orientation)}
+                        {getOrientationLabel(reading.orientation, t)}
                       </span>
                     </div>
                   </div>
@@ -287,18 +290,18 @@ export default async function MyReadingsPage({
                   <div className="mt-4 grid gap-4">
                     <section className="rounded-[1.1rem] border border-[#d8bd82]/28 bg-white/42 p-4">
                       <h3 className="text-[0.62rem] font-semibold uppercase tracking-[0.22em] text-[#9d7b3f]">
-                        Question
+                        {t.readingsQuestionLabel}
                       </h3>
                       <p className="mt-2 text-sm leading-7 text-[#4f4334]">
-                        {reading.question || "No question was recorded."}
+                        {reading.question || t.readingsNoQuestion}
                       </p>
                     </section>
                     <section className="rounded-[1.1rem] border border-[#d8bd82]/28 bg-[#fffaf1]/58 p-4">
                       <h3 className="text-[0.62rem] font-semibold uppercase tracking-[0.22em] text-[#9d7b3f]">
-                        Ora's interpretation
+                        {t.readingsInterpretationLabel}
                       </h3>
                       <p className="mt-2 text-sm leading-7 text-[#6f624f]">
-                        {getReadingSummary(reading.reading_json)}
+                        {getReadingSummary(reading.reading_json, t)}
                       </p>
                     </section>
                   </div>
