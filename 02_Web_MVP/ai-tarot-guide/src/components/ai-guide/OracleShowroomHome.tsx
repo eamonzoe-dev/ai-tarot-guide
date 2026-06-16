@@ -161,6 +161,14 @@ export function OracleShowroomHome({
   const [activeCard, setActiveCard] = useState(0);
 
   const isZh = lang === "zh";
+  const sectionNavItems = [
+    { label: "How it works", href: "#how-it-works" },
+    { label: "Deck", href: "#deck" },
+    { label: "Reading Modes", href: "#reading-modes" },
+    { label: "Journal", href: "#journal" },
+    { label: "Physical Deck", href: "#physical-deck" },
+    { label: "FAQ", href: "#faq" },
+  ];
   const copy = useMemo(
     () => ({
       room: isZh ? "Reading Room" : "Reading Room",
@@ -292,15 +300,27 @@ export function OracleShowroomHome({
             : "border-transparent bg-[#f4efe5]/88 backdrop-blur-sm",
         )}
       >
-        <div className="pointer-events-auto mx-auto grid w-full max-w-7xl grid-cols-1 items-start gap-3 px-4 py-4 sm:grid-cols-[1fr_auto_1fr] sm:gap-4 sm:px-6 lg:px-8">
+        <div className="pointer-events-auto mx-auto grid w-full max-w-7xl grid-cols-1 items-start gap-3 px-4 py-4 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:gap-4 sm:px-6 lg:px-8 sm:items-center">
           <Link
             className="inline-flex min-h-9 shrink-0 items-center justify-self-start pt-0 font-serif text-lg leading-none text-[#4f4235] transition hover:text-[#9d7b3f] sm:min-w-0"
             href={homeHref}
           >
             Ora Arcana
           </Link>
-          <nav className="hidden items-center justify-center gap-6 pt-1 text-[0.62rem] font-semibold uppercase tracking-[0.22em] text-[#9b8a73] sm:flex">
-            <span className="text-[#9d7b3f]">{copy.room}</span>
+          <nav
+            aria-label="Section navigation"
+            className="hidden items-center justify-center gap-4 text-[0.68rem] font-medium text-[#7a6b56] xl:flex xl:gap-5"
+          >
+            {sectionNavItems.map((item) => (
+              <Link
+                className="group relative whitespace-nowrap transition hover:text-[#4f4235]"
+                href={item.href}
+                key={item.label}
+              >
+                {item.label}
+                <span className="absolute inset-x-0 -bottom-1 h-px scale-x-0 bg-[#9d7b3f] transition group-hover:scale-x-100" />
+              </Link>
+            ))}
           </nav>
           <div
             className="pointer-events-auto relative z-[260] flex min-w-0 items-start justify-start [&>div]:w-full [&>div>div]:justify-start [&_button]:max-w-full [&_button]:overflow-hidden [&_button]:text-ellipsis [&_button]:whitespace-nowrap [&_button]:pointer-events-auto [&_button[aria-expanded]]:border-[#d8b76a]/45 [&_button[aria-expanded]]:bg-[#fffaf0]/78 [&_button[aria-expanded]]:text-[#5b4a36] [&_button[aria-expanded]]:shadow-[0_10px_28px_rgba(111,84,43,0.12)] [&_button[aria-expanded]]:backdrop-blur sm:justify-end sm:[&>div]:w-auto sm:[&>div>div]:justify-end sm:[&_button]:max-w-none"
@@ -314,7 +334,7 @@ export function OracleShowroomHome({
         </div>
       </header>
 
-      <main className="relative overflow-x-hidden">
+      <main className="relative scroll-smooth overflow-x-hidden">
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_-4%,rgba(255,255,255,0.96),rgba(244,239,229,0.76)_30%,transparent_58%),radial-gradient(circle_at_12%_10%,rgba(234,215,166,0.28),transparent_28%),radial-gradient(circle_at_90%_18%,rgba(49,72,63,0.13),transparent_30%),linear-gradient(180deg,#f8f4ec_0%,#efe5d4_42%,#eadfc9_66%,#f4efe5_100%)]"
@@ -617,7 +637,10 @@ export function OracleShowroomHome({
           </div>
         </section>
 
-        <section className="relative overflow-hidden bg-[linear-gradient(180deg,#21362f,#1a2b25)] py-18 text-[#f4efe5] sm:py-20">
+        <section
+          className="relative scroll-mt-24 overflow-hidden bg-[linear-gradient(180deg,#21362f,#1a2b25)] py-18 text-[#f4efe5] sm:py-20"
+          id="how-it-works"
+        >
           <div
             aria-hidden="true"
             className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_18%,rgba(216,183,106,0.16),transparent_34%),radial-gradient(circle_at_88%_82%,rgba(216,183,106,0.1),transparent_36%)]"
@@ -676,9 +699,10 @@ export function OracleShowroomHome({
         </section>
 
         <section
-          className="relative mx-auto w-full max-w-7xl px-5 py-16 sm:px-6 lg:px-8"
-          id="deck-carousel"
+          className="relative scroll-mt-24 mx-auto w-full max-w-7xl px-5 py-16 sm:px-6 lg:px-8"
+          id="deck"
         >
+          <div aria-hidden="true" className="h-0" id="deck-carousel" />
           <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p
@@ -829,7 +853,10 @@ export function OracleShowroomHome({
           </div>
         </section>
 
-        <section className="relative mx-auto w-full max-w-7xl px-5 py-16 sm:px-6 lg:px-8">
+        <section
+          className="relative scroll-mt-24 mx-auto w-full max-w-7xl px-5 py-16 sm:px-6 lg:px-8"
+          id="reading-modes"
+        >
           <p
             className={cx(
               revealClass("modes-kicker"),
@@ -919,7 +946,10 @@ export function OracleShowroomHome({
           </div>
         </section>
 
-        <section className="relative mx-auto w-full max-w-7xl px-5 py-14 sm:px-6 lg:px-8">
+        <section
+          className="relative scroll-mt-24 mx-auto w-full max-w-7xl px-5 py-14 sm:px-6 lg:px-8"
+          id="journal"
+        >
           <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
             <h2
               className={cx(
@@ -969,7 +999,10 @@ export function OracleShowroomHome({
           </div>
         </section>
 
-        <section className="relative mx-auto w-full max-w-7xl px-5 py-14 sm:px-6 lg:px-8">
+        <section
+          className="relative scroll-mt-24 mx-auto w-full max-w-7xl px-5 py-14 sm:px-6 lg:px-8"
+          id="physical-deck"
+        >
           <div className="grid gap-4 lg:grid-cols-2">
             <div
               className={cx(
@@ -1018,7 +1051,10 @@ export function OracleShowroomHome({
           </div>
         </section>
 
-        <section className="relative mx-auto w-full max-w-7xl px-5 py-14 sm:px-6 lg:px-8">
+        <section
+          className="relative scroll-mt-24 mx-auto w-full max-w-7xl px-5 py-14 sm:px-6 lg:px-8"
+          id="faq"
+        >
           <h2
             className={cx(
               revealClass("trust-title"),
