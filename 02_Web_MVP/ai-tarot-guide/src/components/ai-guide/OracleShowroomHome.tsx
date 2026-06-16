@@ -246,10 +246,8 @@ export function OracleShowroomHome({
 
   function revealClass(id: string) {
     return cx(
-      "transition-all motion-reduce:translate-y-0 motion-reduce:opacity-100",
-      visible.has(id)
-        ? "translate-y-0 opacity-100"
-        : "translate-y-8 opacity-0",
+      "translate-y-0 opacity-100 transition-all motion-reduce:translate-y-0 motion-reduce:opacity-100",
+      visible.has(id) && "will-change-transform",
     );
   }
 
@@ -288,15 +286,15 @@ export function OracleShowroomHome({
     <div className="min-h-svh bg-[#f4efe5] text-[#33291f]">
       <header
         className={cx(
-          "top-0 z-[90] border-b transition duration-300 sm:sticky",
+          "sticky top-0 isolate z-[240] border-b transition duration-300",
           compactHeader
             ? "border-[#d8b76a]/30 bg-[#fff9ee]/86 shadow-[0_10px_30px_rgba(88,64,31,0.08)] backdrop-blur"
-            : "border-transparent bg-[#f4efe5]/58",
+            : "border-transparent bg-[#f4efe5]/88 backdrop-blur-sm",
         )}
       >
-        <div className="mx-auto grid w-full max-w-6xl grid-cols-[1fr_auto] items-start gap-4 px-5 py-4 sm:grid-cols-[1fr_auto_1fr] sm:px-6 lg:px-8">
+        <div className="pointer-events-auto mx-auto grid w-full max-w-7xl grid-cols-1 items-start gap-3 px-4 py-4 sm:grid-cols-[1fr_auto_1fr] sm:gap-4 sm:px-6 lg:px-8">
           <Link
-            className="min-w-0 pt-1 font-serif text-lg leading-none text-[#4f4235] transition hover:text-[#9d7b3f]"
+            className="inline-flex min-h-9 shrink-0 items-center justify-self-start pt-0 font-serif text-lg leading-none text-[#4f4235] transition hover:text-[#9d7b3f] sm:min-w-0"
             href={homeHref}
           >
             Ora Arcana
@@ -305,7 +303,7 @@ export function OracleShowroomHome({
             <span className="text-[#9d7b3f]">{copy.room}</span>
           </nav>
           <div
-            className="relative z-[100] flex items-start justify-end [&_button[aria-expanded]]:border-[#d8b76a]/45 [&_button[aria-expanded]]:bg-[#fffaf0]/78 [&_button[aria-expanded]]:text-[#5b4a36] [&_button[aria-expanded]]:shadow-[0_10px_28px_rgba(111,84,43,0.12)] [&_button[aria-expanded]]:backdrop-blur"
+            className="pointer-events-auto relative z-[260] flex min-w-0 items-start justify-start [&>div]:w-full [&>div>div]:justify-start [&_button]:max-w-full [&_button]:overflow-hidden [&_button]:text-ellipsis [&_button]:whitespace-nowrap [&_button]:pointer-events-auto [&_button[aria-expanded]]:border-[#d8b76a]/45 [&_button[aria-expanded]]:bg-[#fffaf0]/78 [&_button[aria-expanded]]:text-[#5b4a36] [&_button[aria-expanded]]:shadow-[0_10px_28px_rgba(111,84,43,0.12)] [&_button[aria-expanded]]:backdrop-blur sm:justify-end sm:[&>div]:w-auto sm:[&>div>div]:justify-end sm:[&_button]:max-w-none"
             id="reading-account"
           >
             <ActivationCodePanel
@@ -322,9 +320,9 @@ export function OracleShowroomHome({
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_-4%,rgba(255,255,255,0.96),rgba(244,239,229,0.76)_30%,transparent_58%),radial-gradient(circle_at_12%_10%,rgba(234,215,166,0.28),transparent_28%),radial-gradient(circle_at_90%_18%,rgba(49,72,63,0.13),transparent_30%),linear-gradient(180deg,#f8f4ec_0%,#efe5d4_42%,#eadfc9_66%,#f4efe5_100%)]"
         />
 
-        <section className="relative mx-auto grid min-h-[calc(100svh-4.75rem)] w-full max-w-6xl items-center gap-6 px-5 pb-10 pt-6 sm:px-6 lg:grid-cols-[0.92fr_1.08fr] lg:px-8 lg:py-12">
+        <section className="relative mx-auto grid min-h-[calc(100svh-5.75rem)] w-full max-w-7xl items-center gap-8 px-5 pb-4 pt-6 sm:px-6 lg:grid-cols-[0.98fr_1.02fr] lg:gap-10 lg:px-8 lg:pb-6 lg:pt-8 xl:gap-14">
           <div
-            className={revealClass("hero-copy")}
+            className={cx(revealClass("hero-copy"), "min-w-0")}
             data-reveal-id="hero-copy"
             data-showroom-reveal
             style={revealStyle(0)}
@@ -332,7 +330,7 @@ export function OracleShowroomHome({
             <p className="mb-5 text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-[#9d7b3f]">
               Ora Arcana Reading Room
             </p>
-            <h1 className="font-serif text-[clamp(4.25rem,19vw,11rem)] leading-[0.76] text-[#3f352b]">
+            <h1 className="font-serif text-[clamp(4.5rem,20vw,12.5rem)] leading-[0.74] text-[#3f352b]">
               <span className="block">ASK</span>
               <span className="block">THE</span>
               <span className="block">CARD</span>
@@ -343,7 +341,7 @@ export function OracleShowroomHome({
             <p className="mt-4 max-w-xl text-base leading-8 text-[#766955] sm:text-lg">
               {copy.heroBody}
             </p>
-            <div className="mt-7 grid gap-3 sm:flex sm:flex-wrap">
+            <div className="mt-8 grid gap-3 sm:flex sm:flex-wrap">
               <Link className="showroom-action-primary" href={onlineHref}>
                 {copy.begin}
               </Link>
@@ -357,13 +355,13 @@ export function OracleShowroomHome({
           </div>
 
           <div
-            className="relative min-h-[34rem] sm:min-h-[42rem]"
+            className="relative min-h-[34rem] sm:min-h-[42rem] lg:min-h-[44rem]"
             style={{ transform: `translateY(${parallax * 0.35}px)` }}
           >
             <div
               className={cx(
                 revealClass("hero-stage"),
-                "relative mx-auto h-[34rem] w-full max-w-[31rem] sm:h-[42rem] sm:max-w-[38rem]",
+                "relative mx-auto h-[34rem] w-full max-w-[31rem] sm:h-[42rem] sm:max-w-[38rem] lg:h-[44rem] lg:max-w-[42rem]",
               )}
               data-reveal-id="hero-stage"
               data-showroom-reveal
@@ -381,7 +379,7 @@ export function OracleShowroomHome({
               <div className="absolute left-[9%] top-[8%] h-24 w-20 -rotate-[10deg] rounded-[0.45rem] border border-[#caa96a]/32 bg-[#fffaf0]/72 shadow-[0_12px_28px_rgba(102,75,33,0.12)] sm:left-[12%]" />
               <div className="absolute right-[7%] top-[19%] h-16 w-28 rotate-[8deg] rounded-[0.55rem] border border-[#caa96a]/28 bg-[#fff5e4]/72 shadow-[0_12px_28px_rgba(102,75,33,0.1)] sm:right-[10%]" />
 
-              {/* fanned deck — depth via stacked offsets */}
+              {/* fanned deck - depth via stacked offsets */}
               <div className="absolute left-1/2 top-20 w-32 -translate-x-1/2 translate-x-[-4.4rem] -rotate-[22deg] sm:top-24 sm:w-44">
                 <CardBack className="shadow-[0_18px_44px_rgba(18,13,8,0.3)]" />
               </div>
@@ -394,8 +392,8 @@ export function OracleShowroomHome({
               <div className="absolute right-[6%] top-30 w-30 rotate-[13deg] sm:right-[5%] sm:w-44">
                 <CardFace keyword="Hope" name="The Star" numeral="XVII" />
               </div>
-              {/* center hero card — thick, raised */}
-              <div className="absolute left-1/2 top-8 w-48 -translate-x-1/2 sm:w-64">
+              {/* center hero card - thick, raised */}
+              <div className="absolute left-1/2 top-8 w-48 -translate-x-1/2 sm:w-64 lg:w-72">
                 <div className="absolute inset-0 translate-x-2 translate-y-5 rounded-[1.35rem] border border-[#caa96a]/28 bg-[#3b2c1a]/18" />
                 <div className="absolute inset-0 translate-x-1 translate-y-3 rounded-[1.35rem] border border-[#caa96a]/36 bg-[#ead7a6]/30" />
                 <div className="absolute inset-0 translate-y-2 rounded-[1.35rem] bg-[#2c2016]/24 blur-[3px]" />
@@ -426,7 +424,7 @@ export function OracleShowroomHome({
           </div>
         </section>
 
-        <section className="relative mx-auto w-full max-w-6xl px-5 py-16 sm:px-6 lg:px-8">
+        <section className="relative mx-auto w-full max-w-7xl px-5 pb-14 pt-8 sm:px-6 lg:px-8 lg:pt-10">
           <p
             className={cx(
               revealClass("path-kicker"),
@@ -539,7 +537,7 @@ export function OracleShowroomHome({
           </div>
         </section>
 
-        <section className="relative mx-auto w-full max-w-6xl px-5 py-16 sm:px-6 lg:px-8">
+        <section className="relative mx-auto w-full max-w-7xl px-5 py-14 sm:px-6 lg:px-8">
           <div
             className={revealClass("question-wall")}
             data-reveal-id="question-wall"
@@ -619,12 +617,12 @@ export function OracleShowroomHome({
           </div>
         </section>
 
-        <section className="relative overflow-hidden bg-[linear-gradient(180deg,#21362f,#1a2b25)] py-24 text-[#f4efe5] sm:py-28">
+        <section className="relative overflow-hidden bg-[linear-gradient(180deg,#21362f,#1a2b25)] py-18 text-[#f4efe5] sm:py-20">
           <div
             aria-hidden="true"
             className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_18%,rgba(216,183,106,0.16),transparent_34%),radial-gradient(circle_at_88%_82%,rgba(216,183,106,0.1),transparent_36%)]"
           />
-          <div className="relative mx-auto w-full max-w-6xl px-5 sm:px-6 lg:px-8">
+          <div className="relative mx-auto w-full max-w-7xl px-5 sm:px-6 lg:px-8">
             <p
               className={cx(
                 revealClass("unfolds-title"),
@@ -647,7 +645,7 @@ export function OracleShowroomHome({
             >
               Five quiet movements, one upright card.
             </h2>
-            <div className="mt-14 grid gap-x-6 gap-y-10 md:grid-cols-5">
+            <div className="mt-10 grid gap-x-6 gap-y-8 md:grid-cols-5">
               {[
                 { step: "Settle", note: "Arrive and let the noise around the question soften." },
                 { step: "Ask", note: "Put the real question into a single clear line." },
@@ -678,7 +676,7 @@ export function OracleShowroomHome({
         </section>
 
         <section
-          className="relative mx-auto -mt-[5vh] w-full max-w-6xl px-5 py-20 sm:px-6 lg:-mt-[6vh] lg:px-8"
+          className="relative mx-auto w-full max-w-7xl px-5 py-16 sm:px-6 lg:px-8"
           id="deck-carousel"
         >
           <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
@@ -706,46 +704,69 @@ export function OracleShowroomHome({
                 <span className="block">DRAG THROUGH</span>
                 <span className="block">THE DECK</span>
               </h2>
+              <p className="mt-4 max-w-2xl text-sm leading-7 text-[#766955]">
+                Drag across the deck or step through it with the controls.
+              </p>
             </div>
-            <div className="hidden items-center gap-3 md:flex">
-              <span className="text-[0.62rem] font-semibold uppercase tracking-[0.2em] text-[#9b8a73]">
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="rounded-full border border-[#d8b76a]/36 bg-[#fffaf0]/78 px-3 py-2 text-[0.62rem] font-semibold uppercase tracking-[0.18em] text-[#8d6426]">
+                Drag / Explore
+              </span>
+              <span className="rounded-full border border-[#caa96a]/28 bg-[#fffaf0]/70 px-3 py-2 text-[0.62rem] font-semibold uppercase tracking-[0.18em] text-[#9b8a73]">
                 {String(activeCard + 1).padStart(2, "0")} / {String(deckCards.length).padStart(2, "0")}
               </span>
               <button
                 aria-label="Previous card"
-                className="flex h-12 w-12 items-center justify-center rounded-full border border-[#caa96a]/45 bg-[#fffaf0]/80 text-lg text-[#6f614d] shadow-[0_10px_26px_rgba(102,75,33,0.12)] transition duration-[260ms] hover:-translate-y-1 hover:border-[#9d7b3f] hover:text-[#3f352b] motion-reduce:transform-none"
+                className="flex min-h-12 items-center justify-center rounded-full border border-[#caa96a]/45 bg-[#fffaf0]/82 px-4 text-xs font-semibold uppercase tracking-[0.16em] text-[#6f614d] shadow-[0_10px_26px_rgba(102,75,33,0.12)] transition duration-[260ms] hover:-translate-y-1 hover:border-[#9d7b3f] hover:text-[#3f352b] motion-reduce:transform-none"
                 onClick={() => setNextCard(-1)}
                 type="button"
               >
-                ‹
+                Prev
               </button>
               <button
                 aria-label="Next card"
-                className="flex h-12 w-12 items-center justify-center rounded-full border border-[#9d7b3f]/55 bg-[linear-gradient(180deg,#f6e1ae,#c59748)] text-lg text-[#352513] shadow-[0_12px_30px_rgba(148,105,39,0.22)] transition duration-[260ms] hover:-translate-y-1 hover:scale-[1.04] motion-reduce:transform-none"
+                className="flex min-h-12 items-center justify-center rounded-full border border-[#9d7b3f]/55 bg-[linear-gradient(180deg,#f6e1ae,#c59748)] px-4 text-xs font-semibold uppercase tracking-[0.16em] text-[#352513] shadow-[0_12px_30px_rgba(148,105,39,0.22)] transition duration-[260ms] hover:-translate-y-1 hover:scale-[1.03] motion-reduce:transform-none"
                 onClick={() => setNextCard(1)}
                 type="button"
               >
-                ›
+                Next
               </button>
             </div>
           </div>
 
-          <div className="mt-10 flex snap-x snap-mandatory gap-5 overflow-x-auto px-1 pb-8 pt-4 [scrollbar-width:thin] md:gap-0 md:overflow-visible md:px-0">
+          <div className="mt-10 flex snap-x snap-mandatory gap-5 overflow-x-auto px-1 pb-8 pt-4 [scrollbar-width:thin] md:relative md:h-[31rem] md:block md:overflow-hidden md:px-0">
             {deckCards.map((card, index) => {
               const active = activeCard === index;
               const offset = index - activeCard;
+              let layeredOffset = offset;
+              const halfDeck = deckCards.length / 2;
+
+              if (layeredOffset > halfDeck) {
+                layeredOffset -= deckCards.length;
+              }
+
+              if (layeredOffset < -halfDeck) {
+                layeredOffset += deckCards.length;
+              }
+
+              const distance = Math.abs(layeredOffset);
+              const deckX = layeredOffset * 14.5;
+              const deckY =
+                distance === 0 ? -6 : distance === 1 ? 18 : distance === 2 ? 42 : 60;
+              const deckScale =
+                distance === 0 ? 1.18 : distance === 1 ? 0.93 : distance === 2 ? 0.8 : 0.68;
+              const deckRotate = distance === 0 ? 0 : layeredOffset * 7;
+              const deckOpacity =
+                distance === 0 ? 1 : distance === 1 ? 0.82 : distance === 2 ? 0.56 : 0.32;
+              const deckZ = distance === 0 ? 50 : 40 - distance * 8;
               return (
                 <Link
                   className={cx(
                     revealClass(`deck-${card.name}`),
-                    "group relative block min-w-[13.5rem] shrink-0 snap-center rounded-[1.3rem] border p-3 transition duration-[320ms] motion-reduce:transform-none md:min-w-0 md:flex-1",
+                    "group relative block min-w-[min(18rem,78vw)] shrink-0 snap-center rounded-[1.45rem] border p-3 transition duration-[380ms] ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transform-none md:absolute md:left-1/2 md:top-0 md:min-w-0 md:w-[15rem] md:snap-none md:origin-top-center md:opacity-[var(--deck-opacity)] md:[transform:translateX(calc(-50%+var(--deck-x)))_translateY(var(--deck-y))_scale(var(--deck-scale))_rotate(var(--deck-rotate))]",
                     active
-                      ? "z-20 border-[#9d7b3f]/70 bg-[#fffaf0]/92 shadow-[0_30px_70px_rgba(102,75,33,0.22)] md:-translate-y-3 md:scale-[1.05]"
-                      : "z-10 border-[#d8b76a]/28 bg-[#fbf3e4]/72 shadow-[0_14px_38px_rgba(102,75,33,0.1)] hover:-translate-y-1.5 md:translate-y-3 md:scale-[0.93] md:opacity-80 md:blur-[0.4px]",
-                    offset === -1 && "md:rotate-[-4deg]",
-                    offset === 1 && "md:rotate-[4deg]",
-                    offset <= -2 && "md:-mr-6 md:rotate-[-7deg]",
-                    offset >= 2 && "md:-ml-6 md:rotate-[7deg]",
+                      ? "border-[#9d7b3f]/70 bg-[#fffaf0]/94 shadow-[0_34px_76px_rgba(102,75,33,0.24)]"
+                      : "border-[#d8b76a]/28 bg-[#fbf3e4]/74 shadow-[0_18px_44px_rgba(102,75,33,0.12)] hover:-translate-y-1.5",
                   )}
                   data-reveal-id={`deck-${card.name}`}
                   data-showroom-reveal
@@ -753,27 +774,54 @@ export function OracleShowroomHome({
                   key={card.name}
                   onFocus={() => setActiveCard(index)}
                   onMouseEnter={() => setActiveCard(index)}
-                  style={revealStyle(index)}
+                  style={
+                    {
+                      ...revealStyle(index),
+                      "--deck-x": `${deckX}rem`,
+                      "--deck-y": `${deckY}px`,
+                      "--deck-scale": deckScale,
+                      "--deck-rotate": `${deckRotate}deg`,
+                      "--deck-opacity": deckOpacity,
+                      zIndex: deckZ,
+                    } as CSSProperties
+                  }
                 >
-                  {card.face || active ? (
-                    <CardFace
-                      keyword={card.keyword}
-                      name={card.name}
-                      numeral={card.numeral}
-                      className="rounded-[0.95rem]"
-                    />
-                  ) : (
-                    <CardBack className="rounded-[0.95rem]" />
-                  )}
-                  <div className="mt-4 flex min-h-12 items-center justify-between gap-2">
-                    <p className="font-serif text-lg leading-tight text-[#4f4235]">
-                      {card.name}
-                    </p>
-                    {active && (
-                      <span className="rounded-full bg-[#9d7b3f]/14 px-2 py-1 text-[0.5rem] font-semibold uppercase tracking-[0.16em] text-[#8d6426]">
+                  <div className="relative">
+                    {card.face || active ? (
+                      <CardFace
+                        keyword={card.keyword}
+                        name={card.name}
+                        numeral={card.numeral}
+                        className="rounded-[1rem]"
+                      />
+                    ) : (
+                      <CardBack className="rounded-[1rem]" />
+                    )}
+                    {active ? (
+                      <div className="absolute inset-x-3 bottom-3 rounded-[0.9rem] border border-[#d8b76a]/26 bg-[#fffaf0]/78 px-3 py-2 shadow-[0_8px_22px_rgba(102,75,33,0.1)] backdrop-blur">
+                        <p className="font-serif text-lg leading-tight text-[#4f4235]">
+                          {card.name}
+                        </p>
+                        <p className="mt-1 text-[0.58rem] font-semibold uppercase tracking-[0.18em] text-[#9d7b3f]">
+                          {card.keyword}
+                        </p>
+                      </div>
+                    ) : null}
+                  </div>
+                  <div className="mt-4 flex min-h-12 items-center justify-between gap-2 px-1">
+                    <div>
+                      <p className="font-serif text-lg leading-tight text-[#4f4235]">
+                        {card.name}
+                      </p>
+                      <p className="mt-1 text-[0.58rem] font-semibold uppercase tracking-[0.18em] text-[#9d7b3f]">
+                        {active ? "Inner guidance" : card.keyword}
+                      </p>
+                    </div>
+                    {active ? (
+                      <span className="rounded-full border border-[#d8b76a]/36 bg-[#fffaf0]/82 px-2 py-1 text-[0.5rem] font-semibold uppercase tracking-[0.16em] text-[#8d6426]">
                         Active
                       </span>
-                    )}
+                    ) : null}
                   </div>
                 </Link>
               );
@@ -781,7 +829,7 @@ export function OracleShowroomHome({
           </div>
         </section>
 
-        <section className="relative mx-auto -mt-[4vh] w-full max-w-6xl px-5 py-20 sm:px-6 lg:-mt-[5vh] lg:px-8">
+        <section className="relative mx-auto w-full max-w-7xl px-5 py-16 sm:px-6 lg:px-8">
           <p
             className={cx(
               revealClass("modes-kicker"),
@@ -842,7 +890,7 @@ export function OracleShowroomHome({
                     <span className="h-2.5 w-24 rounded-sm bg-[#caa96a]/45" />
                     <span className="h-2.5 w-32 rounded-sm bg-[#caa96a]/35" />
                     <span className="h-2.5 w-40 rounded-sm bg-[#caa96a]/28" />
-                    <span className="mt-2 text-2xl text-[#9d7b3f]">↑</span>
+                    <span className="mt-2 text-2xl text-[#9d7b3f]">-&gt;</span>
                   </span>
                 )}
                 <div className="relative">
@@ -863,7 +911,7 @@ export function OracleShowroomHome({
                       mode.theme === "mirror" ? "text-[#d8b76a]" : "text-[#9d7b3f]",
                     )}
                   >
-                    One upright card →
+                    One upright card -&gt;
                   </span>
                 </div>
               </Link>
@@ -871,7 +919,7 @@ export function OracleShowroomHome({
           </div>
         </section>
 
-        <section className="relative mx-auto w-full max-w-6xl px-5 py-16 sm:px-6 lg:px-8">
+        <section className="relative mx-auto w-full max-w-7xl px-5 py-14 sm:px-6 lg:px-8">
           <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
             <h2
               className={cx(
@@ -921,7 +969,7 @@ export function OracleShowroomHome({
           </div>
         </section>
 
-        <section className="relative mx-auto w-full max-w-6xl px-5 py-16 sm:px-6 lg:px-8">
+        <section className="relative mx-auto w-full max-w-7xl px-5 py-14 sm:px-6 lg:px-8">
           <div className="grid gap-4 lg:grid-cols-2">
             <div
               className={cx(
@@ -970,7 +1018,7 @@ export function OracleShowroomHome({
           </div>
         </section>
 
-        <section className="relative mx-auto w-full max-w-6xl px-5 py-16 sm:px-6 lg:px-8">
+        <section className="relative mx-auto w-full max-w-7xl px-5 py-14 sm:px-6 lg:px-8">
           <h2
             className={cx(
               revealClass("trust-title"),
@@ -1025,7 +1073,7 @@ export function OracleShowroomHome({
           </div>
         </section>
 
-        <section className="relative bg-[#21362f] px-5 py-20 text-center text-[#f4efe5] sm:px-6 lg:px-8">
+        <section className="relative bg-[#21362f] px-5 py-16 text-center text-[#f4efe5] sm:px-6 lg:px-8">
           <div
             className={cx(revealClass("final-cta"), "mx-auto max-w-4xl")}
             data-reveal-id="final-cta"
@@ -1054,12 +1102,12 @@ export function OracleShowroomHome({
         .showroom-final-primary,
         .showroom-final-secondary {
           display: inline-flex;
-          min-height: 3rem;
+          min-height: 3.15rem;
           touch-action: manipulation;
           align-items: center;
           justify-content: center;
           border-radius: 9999px;
-          padding: 0.85rem 1.25rem;
+          padding: 0.9rem 1.35rem;
           text-align: center;
           font-size: 0.75rem;
           font-weight: 700;
