@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import type { User } from "@supabase/supabase-js";
 
 import {
@@ -66,6 +67,7 @@ export function ActivationCodePanel({
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [isTopUpOpen, setIsTopUpOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   const lastCreditsRefreshAtRef = useRef(0);
   const isZh = lang === "zh";
   const copy = useMemo(
@@ -86,9 +88,21 @@ export function ActivationCodePanel({
         ? "阅读提醒和账户更新稍后会出现在这里。"
         : "Reading reminders and account updates will appear here later.",
       enterRoom: isZh ? "进入你的阅读室" : "Enter your reading room",
+      chooseSignInMethod: isZh
+        ? "选择你的登录方式"
+        : "Choose how to enter your reading account",
       signInBody: isZh
         ? "登录后可保存解读，并兑换卡组码。"
         : "Sign in to save your readings and redeem deck codes.",
+      continueWithApple: isZh ? "使用 Apple 继续" : "Continue with Apple",
+      continueWithGoogle: isZh ? "使用 Google 继续" : "Continue with Google",
+      emailMagicLink: isZh ? "邮箱 Magic Link" : "Email Magic Link",
+      socialSignInSoon: isZh
+        ? "Apple 和 Google 登录即将开放。当前请使用邮箱 Magic Link。"
+        : "Apple and Google sign-in are coming soon. Please use Email Magic Link for now.",
+      registerPrompt: isZh
+        ? "没有账户？使用邮箱登录即可创建阅读账户。"
+        : "No account yet? Sign in with email to create your Reading Account.",
       checkingAccount: isZh ? "正在检查你的阅读账户..." : "Checking your reading account...",
       email: isZh ? "邮箱" : "Email",
       sending: isZh ? "发送中..." : "Sending...",
@@ -144,6 +158,10 @@ export function ActivationCodePanel({
     }),
     [isZh],
   );
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
     if (hasLangParam) {
@@ -391,7 +409,8 @@ export function ActivationCodePanel({
   const userInitial = (user?.email ?? "A").slice(0, 1).toUpperCase();
   const accountName =
     user?.email?.split("@")[0]?.trim() || (user ? copy.account : "");
-  const isAnyPanelOpen = isMenuOpen || isTopUpOpen || isNotificationsOpen;
+  const hasDismissOverlay =
+    isTopUpOpen || isNotificationsOpen || (isMenuOpen && Boolean(user));
 
   function closePanels() {
     setIsMenuOpen(false);
@@ -423,17 +442,138 @@ export function ActivationCodePanel({
     setError(null);
   }
 
-  return (
-    <div className="relative z-[280]">
-      {isAnyPanelOpen ? (
-        <button
-          aria-label={copy.closeAccountPanel}
-          className="fixed inset-0 z-[270] cursor-default bg-transparent"
-          onClick={closePanels}
-          type="button"
+  const authModal = isMenuOpen && !user ? (
+    <section
+      className="fixed inset-0 z-[999] flex items-center justify-center overflow-y-auto bg-[#2f271e]/18 p-4 backdrop-blur-[8px] sm:p-6"
+      onClick={closePanels}
+    >
+      <div
+        className="relative max-h-[min(90vh,44rem)] w-[min(calc(100vw-2rem),27rem)] overflow-y-auto rounded-3xl border border-[#d8b76a]/45 bg-[#fffaf0]/96 p-5 text-left text-[#4f4235] shadow-[0_28px_78px_rgba(35,27,18,0.3),inset_0_1px_0_rgba(255,255,255,0.82)] backdrop-blur-md sm:p-6"
+        onClick={(event) => event.stopPropagation()}
+      >
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_14%_8%,rgba(255,255,255,0.92),transparent_32%),radial-gradient(circle_at_92%_12%,rgba(216,183,106,0.18),transparent_30%),repeating-linear-gradient(90deg,rgba(91,74,54,0.035)_0_1px,transparent_1px_18px)]"
         />
-      ) : null}
+        <div className="relative grid gap-4">
+          <div className="grid justify-items-center border-b border-[#d8b76a]/30 pb-4 text-center">
+            <div className="flex size-11 shrink-0 items-center justify-center rounded-full border border-[#caa96a]/60 bg-[#f6e1ae]/80 font-serif text-lg text-[#5b3c16] shadow-[inset_0_1px_0_rgba(255,255,255,0.72)]">
+              O
+            </div>
+            <p className="mt-3 text-[0.58rem] font-semibold uppercase tracking-[0.18em] text-[#9d7b3f]">
+              {copy.enterRoom}
+            </p>
+            <h2 className="mt-2 font-serif text-3xl leading-tight text-[#3f352b]">
+              {copy.signIn}
+            </h2>
+            <p className="mt-2 max-w-[20rem] text-sm leading-6 text-[#766955]">
+              {copy.chooseSignInMethod}
+            </p>
+          </div>
 
+          {isLoadingUser ? (
+            <p className="rounded-xl border border-[#d8b76a]/28 bg-[#fff7e8]/72 px-3 py-2 text-xs leading-5 text-[#766955]">
+              {copy.checkingAccount}
+            </p>
+          ) : (
+            <div className="grid gap-3">
+              <button
+                className="min-h-11 rounded-full border border-[#d8b76a]/40 bg-[#fffdf8] px-4 text-xs font-semibold uppercase tracking-[0.14em] text-[#3f352b] shadow-[0_10px_24px_rgba(111,84,43,0.08),inset_0_1px_0_rgba(255,255,255,0.72)] transition hover:-translate-y-0.5 hover:border-[#9d7b3f]"
+                onClick={() => {
+                  setStatus(copy.socialSignInSoon);
+                  setError(null);
+                }}
+                type="button"
+              >
+                {copy.continueWithApple}
+              </button>
+              <button
+                className="min-h-11 rounded-full border border-[#d8b76a]/40 bg-[#fffdf8] px-4 text-xs font-semibold uppercase tracking-[0.14em] text-[#3f352b] shadow-[0_10px_24px_rgba(111,84,43,0.08),inset_0_1px_0_rgba(255,255,255,0.72)] transition hover:-translate-y-0.5 hover:border-[#9d7b3f]"
+                onClick={() => {
+                  setStatus(copy.socialSignInSoon);
+                  setError(null);
+                }}
+                type="button"
+              >
+                {copy.continueWithGoogle}
+              </button>
+              <div className="relative flex items-center py-1">
+                <span className="h-px flex-1 bg-[#d8b76a]/28" />
+                <span className="px-3 text-[0.56rem] font-semibold uppercase tracking-[0.16em] text-[#9d7b3f]">
+                  {copy.emailMagicLink}
+                </span>
+                <span className="h-px flex-1 bg-[#d8b76a]/28" />
+              </div>
+              <label className="grid gap-1.5 text-[0.68rem] font-semibold uppercase tracking-[0.12em] text-[#6f5f4b]">
+                {copy.email}
+                <input
+                  autoComplete="email"
+                  className="min-h-11 rounded-full border border-[#d8b76a]/45 bg-[#fffdf8] px-4 text-sm normal-case tracking-normal text-[#3f352b] outline-none transition placeholder:text-[#b09d7f] focus:border-[#9d7b3f] focus:ring-2 focus:ring-[#d8b76a]/20"
+                  onChange={(event) => setEmail(event.target.value)}
+                  placeholder="you@example.com"
+                  type="email"
+                  value={email}
+                />
+              </label>
+              <button
+                className="min-h-11 rounded-full border border-[#caa96a]/60 bg-[linear-gradient(180deg,#f7e5b8,#d7ad62)] px-4 text-xs font-semibold uppercase tracking-[0.16em] text-[#3f2b14] shadow-[0_12px_28px_rgba(157,123,63,0.18),inset_0_1px_0_rgba(255,255,255,0.62)] transition hover:-translate-y-0.5 hover:border-[#9d7b3f] disabled:cursor-not-allowed disabled:opacity-50"
+                disabled={isSendingEmail || !email.trim()}
+                onClick={handleSendLoginEmail}
+                type="button"
+              >
+                {isSendingEmail ? copy.sending : copy.sendSignInEmail}
+              </button>
+              <p className="rounded-xl border border-[#d8b76a]/26 bg-[#fff7e8]/68 px-3 py-2 text-xs leading-5 text-[#766955]">
+                {copy.passwordlessNote}
+              </p>
+              <p className="text-center text-xs leading-5 text-[#8a765d]">
+                {copy.registerPrompt}
+              </p>
+            </div>
+          )}
+
+          <div className="grid gap-2.5 border-t border-[#d8b76a]/30 pt-3">
+            <div>
+              <p className="text-[0.56rem] font-semibold uppercase tracking-[0.18em] text-[#9d7b3f]">
+                {copy.language}
+              </p>
+              <div className="mt-1.5 inline-flex min-h-9 items-center rounded-full border border-[#d8b76a]/45 bg-[#fff7e8]/76 p-1 text-[0.6rem] font-semibold uppercase tracking-[0.14em] text-[#8f826f]">
+                {(["en", "zh"] as const).map((nextLang) => (
+                  <Link
+                    className={`flex min-h-7 touch-manipulation items-center rounded-full px-2.5 transition ${
+                      lang === nextLang
+                        ? "bg-[#31483f] text-[#fff7e8] shadow-[0_8px_18px_rgba(49,72,63,0.12)]"
+                        : "text-[#8f826f] hover:text-[#5b4a36]"
+                    }`}
+                    href={withLang("/ai-guide", {}, nextLang)}
+                    key={nextLang}
+                    onClick={() => rememberLanguage(nextLang)}
+                  >
+                    {nextLang === "en" ? "EN" : languageLabel(nextLang)}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {status ? (
+            <p className="rounded-xl border border-[#8fb58a]/30 bg-[#eef7e9] px-3 py-2 text-xs leading-5 text-[#3e6d3f]">
+              {status}
+            </p>
+          ) : null}
+          {error ? (
+            <p className="rounded-xl border border-[#d9a08f]/35 bg-[#fff0ea] px-3 py-2 text-xs leading-5 text-[#9a4b35]">
+              {error}
+            </p>
+          ) : null}
+        </div>
+      </div>
+    </section>
+  ) : null;
+
+  return (
+    <>
+      <div className="fixed right-4 top-3 z-[360] sm:right-6 sm:top-4">
       <div className="relative z-[290] flex min-w-0 items-center justify-end gap-1.5">
         {user ? (
           <>
@@ -500,6 +640,16 @@ export function ActivationCodePanel({
           </button>
         )}
       </div>
+      </div>
+
+      {hasDismissOverlay ? (
+        <button
+          aria-label={copy.closeAccountPanel}
+          className="fixed inset-0 z-[270] cursor-default bg-[#1d1710]/30 backdrop-blur-[2px]"
+          onClick={closePanels}
+          type="button"
+        />
+      ) : null}
 
       {isTopUpOpen ? (
         <section className="fixed right-4 top-[4.75rem] z-[300] w-[min(calc(100vw-2rem),19rem)] overflow-hidden rounded-2xl border border-[#d8b76a]/45 bg-[#fffaf0]/96 p-3.5 text-left text-[#4f4235] shadow-[0_18px_48px_rgba(102,75,33,0.17),inset_0_1px_0_rgba(255,255,255,0.82)] backdrop-blur-md sm:right-6">
@@ -541,95 +691,7 @@ export function ActivationCodePanel({
         </section>
       ) : null}
 
-      {isMenuOpen && !user ? (
-        <section className="fixed left-1/2 top-1/2 z-[300] max-h-[80vh] w-[min(calc(100vw-2rem),25rem)] -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-2xl border border-[#d8b76a]/45 bg-[#fffaf0]/96 p-4 text-left text-[#4f4235] shadow-[0_24px_68px_rgba(79,66,53,0.23),inset_0_1px_0_rgba(255,255,255,0.82)] backdrop-blur-md sm:left-auto sm:right-6 sm:top-[4.75rem] sm:translate-x-0 sm:translate-y-0">
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_14%_8%,rgba(255,255,255,0.92),transparent_32%),radial-gradient(circle_at_92%_12%,rgba(216,183,106,0.18),transparent_30%),repeating-linear-gradient(90deg,rgba(91,74,54,0.035)_0_1px,transparent_1px_18px)]"
-          />
-          <div className="relative grid gap-3">
-            <div className="flex items-start gap-2.5 border-b border-[#d8b76a]/30 pb-3">
-              <div className="flex size-9 shrink-0 items-center justify-center rounded-full border border-[#caa96a]/60 bg-[#f6e1ae]/80 font-serif text-base text-[#5b3c16] shadow-[inset_0_1px_0_rgba(255,255,255,0.72)]">
-                O
-              </div>
-              <div className="min-w-0">
-                <p className="text-[0.58rem] font-semibold uppercase tracking-[0.18em] text-[#9d7b3f]">
-                  {copy.enterRoom}
-                </p>
-                <p className="mt-1.5 text-xs leading-5 text-[#766955]">
-                  {copy.signInBody}
-                </p>
-              </div>
-            </div>
-
-            {isLoadingUser ? (
-              <p className="rounded-xl border border-[#d8b76a]/28 bg-[#fff7e8]/72 px-3 py-2 text-xs leading-5 text-[#766955]">
-                {copy.checkingAccount}
-              </p>
-            ) : (
-              <div className="grid gap-3">
-                <label className="grid gap-1.5 text-[0.68rem] font-semibold uppercase tracking-[0.12em] text-[#6f5f4b]">
-                  {copy.email}
-                  <input
-                    autoComplete="email"
-                    className="min-h-11 rounded-full border border-[#d8b76a]/45 bg-[#fffdf8] px-4 text-sm normal-case tracking-normal text-[#3f352b] outline-none transition placeholder:text-[#b09d7f] focus:border-[#9d7b3f] focus:ring-2 focus:ring-[#d8b76a]/20"
-                    onChange={(event) => setEmail(event.target.value)}
-                    placeholder="you@example.com"
-                    type="email"
-                    value={email}
-                  />
-                </label>
-                <button
-                  className="min-h-11 rounded-full border border-[#caa96a]/60 bg-[linear-gradient(180deg,#f7e5b8,#d7ad62)] px-4 text-xs font-semibold uppercase tracking-[0.16em] text-[#3f2b14] shadow-[0_12px_28px_rgba(157,123,63,0.18),inset_0_1px_0_rgba(255,255,255,0.62)] transition hover:-translate-y-0.5 hover:border-[#9d7b3f] disabled:cursor-not-allowed disabled:opacity-50"
-                  disabled={isSendingEmail || !email.trim()}
-                  onClick={handleSendLoginEmail}
-                  type="button"
-                >
-                  {isSendingEmail ? copy.sending : copy.sendSignInEmail}
-                </button>
-                <p className="rounded-xl border border-[#d8b76a]/26 bg-[#fff7e8]/68 px-3 py-2 text-xs leading-5 text-[#766955]">
-                  {copy.passwordlessNote}
-                </p>
-              </div>
-            )}
-
-            <div className="grid gap-2.5 border-t border-[#d8b76a]/30 pt-3">
-              <div>
-                <p className="text-[0.56rem] font-semibold uppercase tracking-[0.18em] text-[#9d7b3f]">
-                  {copy.language}
-                </p>
-                <div className="mt-1.5 inline-flex min-h-9 items-center rounded-full border border-[#d8b76a]/45 bg-[#fff7e8]/76 p-1 text-[0.6rem] font-semibold uppercase tracking-[0.14em] text-[#8f826f]">
-                  {(["en", "zh"] as const).map((nextLang) => (
-                    <Link
-                      className={`flex min-h-7 touch-manipulation items-center rounded-full px-2.5 transition ${
-                        lang === nextLang
-                          ? "bg-[#31483f] text-[#fff7e8] shadow-[0_8px_18px_rgba(49,72,63,0.12)]"
-                          : "text-[#8f826f] hover:text-[#5b4a36]"
-                      }`}
-                      href={withLang("/ai-guide", {}, nextLang)}
-                      key={nextLang}
-                      onClick={() => rememberLanguage(nextLang)}
-                    >
-                      {nextLang === "en" ? "EN" : languageLabel(nextLang)}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {status ? (
-              <p className="rounded-xl border border-[#8fb58a]/30 bg-[#eef7e9] px-3 py-2 text-xs leading-5 text-[#3e6d3f]">
-                {status}
-              </p>
-            ) : null}
-            {error ? (
-              <p className="rounded-xl border border-[#d9a08f]/35 bg-[#fff0ea] px-3 py-2 text-xs leading-5 text-[#9a4b35]">
-                {error}
-              </p>
-            ) : null}
-          </div>
-        </section>
-      ) : null}
+      {isMounted && authModal ? createPortal(authModal, document.body) : null}
 
       {isMenuOpen && user ? (
         <section className="fixed right-4 top-[4.75rem] z-[300] max-h-[80vh] w-[min(calc(100vw-2rem),22.5rem)] overflow-y-auto overflow-x-hidden rounded-2xl border border-[#d8b76a]/45 bg-[#fffaf0]/96 p-3 text-left text-[#4f4235] shadow-[0_20px_56px_rgba(102,75,33,0.19),inset_0_1px_0_rgba(255,255,255,0.82)] backdrop-blur-md sm:right-6 sm:p-3.5">
@@ -854,6 +916,6 @@ export function ActivationCodePanel({
           </div>
         </section>
       ) : null}
-    </div>
+    </>
   );
 }
