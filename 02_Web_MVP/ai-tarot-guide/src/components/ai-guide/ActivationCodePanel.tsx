@@ -400,7 +400,7 @@ export function ActivationCodePanel({
   }
 
   function openAccountMenu() {
-    setIsMenuOpen((value) => !value);
+    setIsMenuOpen(true);
     setIsTopUpOpen(false);
     setIsNotificationsOpen(false);
     setStatus(null);
@@ -408,7 +408,7 @@ export function ActivationCodePanel({
   }
 
   function openTopUpPreview() {
-    setIsTopUpOpen((value) => !value);
+    setIsTopUpOpen(true);
     setIsMenuOpen(false);
     setIsNotificationsOpen(false);
     setStatus(null);
@@ -416,7 +416,7 @@ export function ActivationCodePanel({
   }
 
   function openNotificationsPreview() {
-    setIsNotificationsOpen((value) => !value);
+    setIsNotificationsOpen(true);
     setIsMenuOpen(false);
     setIsTopUpOpen(false);
     setStatus(null);
@@ -472,7 +472,10 @@ export function ActivationCodePanel({
             <button
               aria-expanded={isMenuOpen}
               className="pointer-events-auto inline-flex min-h-8 items-center gap-1.5 rounded-full border border-[#d8b76a]/55 bg-[#fffaf0]/88 px-2 text-[0.72rem] font-semibold normal-case tracking-normal text-[#5b4a36] shadow-[0_8px_20px_rgba(111,84,43,0.1),inset_0_1px_0_rgba(255,255,255,0.72)] backdrop-blur transition hover:-translate-y-0.5 hover:border-[#caa96a] hover:bg-[#fff7e8] hover:text-[#3f352b] sm:px-2.5"
-              onClick={openAccountMenu}
+              onClick={(event) => {
+                event.stopPropagation();
+                openAccountMenu();
+              }}
               type="button"
             >
               <span className="flex size-5 items-center justify-center rounded-full border border-[#caa96a]/65 bg-[#f6e1ae] font-serif text-[0.66rem] text-[#5b3c16]">
@@ -487,7 +490,10 @@ export function ActivationCodePanel({
           <button
             aria-expanded={isMenuOpen}
             className="pointer-events-auto inline-flex min-h-9 items-center gap-2 rounded-full border border-[#d8b76a]/55 bg-[#fffaf0]/88 px-3.5 text-[0.62rem] font-semibold uppercase tracking-[0.12em] text-[#5b4a36] shadow-[0_8px_20px_rgba(111,84,43,0.1),inset_0_1px_0_rgba(255,255,255,0.72)] backdrop-blur transition hover:-translate-y-0.5 hover:border-[#caa96a] hover:bg-[#fff7e8] hover:text-[#3f352b]"
-            onClick={openAccountMenu}
+            onClick={(event) => {
+              event.stopPropagation();
+              openAccountMenu();
+            }}
             type="button"
           >
             {isLoadingUser ? copy.readingAccount : copy.signIn}
@@ -496,7 +502,7 @@ export function ActivationCodePanel({
       </div>
 
       {isTopUpOpen ? (
-        <section className="absolute right-0 top-10 z-[300] w-[min(calc(100vw-1.5rem),19rem)] overflow-hidden rounded-2xl border border-[#d8b76a]/45 bg-[#fffaf0]/96 p-3.5 text-left text-[#4f4235] shadow-[0_18px_48px_rgba(102,75,33,0.17),inset_0_1px_0_rgba(255,255,255,0.82)] backdrop-blur-md">
+        <section className="fixed right-4 top-[4.75rem] z-[300] w-[min(calc(100vw-2rem),19rem)] overflow-hidden rounded-2xl border border-[#d8b76a]/45 bg-[#fffaf0]/96 p-3.5 text-left text-[#4f4235] shadow-[0_18px_48px_rgba(102,75,33,0.17),inset_0_1px_0_rgba(255,255,255,0.82)] backdrop-blur-md sm:right-6">
           <div
             aria-hidden="true"
             className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_14%_8%,rgba(255,255,255,0.92),transparent_32%),radial-gradient(circle_at_92%_12%,rgba(216,183,106,0.18),transparent_30%)]"
@@ -516,7 +522,7 @@ export function ActivationCodePanel({
       ) : null}
 
       {isNotificationsOpen ? (
-        <section className="absolute right-0 top-10 z-[300] w-[min(calc(100vw-1.5rem),19rem)] overflow-hidden rounded-2xl border border-[#d8b76a]/45 bg-[#fffaf0]/96 p-3.5 text-left text-[#4f4235] shadow-[0_18px_48px_rgba(102,75,33,0.17),inset_0_1px_0_rgba(255,255,255,0.82)] backdrop-blur-md">
+        <section className="fixed right-4 top-[4.75rem] z-[300] w-[min(calc(100vw-2rem),19rem)] overflow-hidden rounded-2xl border border-[#d8b76a]/45 bg-[#fffaf0]/96 p-3.5 text-left text-[#4f4235] shadow-[0_18px_48px_rgba(102,75,33,0.17),inset_0_1px_0_rgba(255,255,255,0.82)] backdrop-blur-md sm:right-6">
           <div
             aria-hidden="true"
             className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_14%_8%,rgba(255,255,255,0.92),transparent_32%),radial-gradient(circle_at_92%_12%,rgba(216,183,106,0.18),transparent_30%)]"
@@ -536,7 +542,7 @@ export function ActivationCodePanel({
       ) : null}
 
       {isMenuOpen && !user ? (
-        <section className="fixed left-1/2 top-1/2 z-[300] max-h-[80vh] w-[min(calc(100vw-1.5rem),25rem)] -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-2xl border border-[#d8b76a]/45 bg-[#fffaf0]/96 p-4 text-left text-[#4f4235] shadow-[0_24px_68px_rgba(79,66,53,0.23),inset_0_1px_0_rgba(255,255,255,0.82)] backdrop-blur-md">
+        <section className="fixed left-1/2 top-1/2 z-[300] max-h-[80vh] w-[min(calc(100vw-2rem),25rem)] -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-2xl border border-[#d8b76a]/45 bg-[#fffaf0]/96 p-4 text-left text-[#4f4235] shadow-[0_24px_68px_rgba(79,66,53,0.23),inset_0_1px_0_rgba(255,255,255,0.82)] backdrop-blur-md sm:left-auto sm:right-6 sm:top-[4.75rem] sm:translate-x-0 sm:translate-y-0">
           <div
             aria-hidden="true"
             className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_14%_8%,rgba(255,255,255,0.92),transparent_32%),radial-gradient(circle_at_92%_12%,rgba(216,183,106,0.18),transparent_30%),repeating-linear-gradient(90deg,rgba(91,74,54,0.035)_0_1px,transparent_1px_18px)]"
@@ -626,7 +632,7 @@ export function ActivationCodePanel({
       ) : null}
 
       {isMenuOpen && user ? (
-        <section className="absolute right-0 top-10 z-[300] max-h-[80vh] w-[min(calc(100vw-1.5rem),22.5rem)] overflow-y-auto overflow-x-hidden rounded-2xl border border-[#d8b76a]/45 bg-[#fffaf0]/96 p-3 text-left text-[#4f4235] shadow-[0_20px_56px_rgba(102,75,33,0.19),inset_0_1px_0_rgba(255,255,255,0.82)] backdrop-blur-md sm:p-3.5">
+        <section className="fixed right-4 top-[4.75rem] z-[300] max-h-[80vh] w-[min(calc(100vw-2rem),22.5rem)] overflow-y-auto overflow-x-hidden rounded-2xl border border-[#d8b76a]/45 bg-[#fffaf0]/96 p-3 text-left text-[#4f4235] shadow-[0_20px_56px_rgba(102,75,33,0.19),inset_0_1px_0_rgba(255,255,255,0.82)] backdrop-blur-md sm:right-6 sm:p-3.5">
           <div
             aria-hidden="true"
             className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_14%_8%,rgba(255,255,255,0.92),transparent_32%),radial-gradient(circle_at_92%_12%,rgba(216,183,106,0.18),transparent_30%),repeating-linear-gradient(90deg,rgba(91,74,54,0.035)_0_1px,transparent_1px_18px)]"
