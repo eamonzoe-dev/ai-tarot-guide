@@ -161,30 +161,206 @@ export function OracleShowroomHome({
   const [activeCard, setActiveCard] = useState(0);
 
   const isZh = lang === "zh";
-  const sectionNavItems = [
-    { label: "How it works", href: "#how-it-works" },
-    { label: "Deck", href: "#deck" },
-    { label: "Reading Modes", href: "#reading-modes" },
-    { label: "Journal", href: "#journal" },
-    { label: "Physical Deck", href: "#physical-deck" },
-    { label: "FAQ", href: "#faq" },
-  ];
   const copy = useMemo(
     () => ({
-      room: isZh ? "Reading Room" : "Reading Room",
+      sectionNavItems: isZh
+        ? [
+            { label: "如何开始", href: "#how-it-works" },
+            { label: "卡组", href: "#deck" },
+            { label: "解读模式", href: "#reading-modes" },
+            { label: "解读日志", href: "#journal" },
+            { label: "实体卡组", href: "#physical-deck" },
+            { label: "说明", href: "#faq" },
+          ]
+        : [
+            { label: "How it works", href: "#how-it-works" },
+            { label: "Deck", href: "#deck" },
+            { label: "Reading Modes", href: "#reading-modes" },
+            { label: "Journal", href: "#journal" },
+            { label: "Physical Deck", href: "#physical-deck" },
+            { label: "FAQ", href: "#faq" },
+          ],
+      room: isZh ? "Ora Arcana 阅读室" : "Ora Arcana Reading Room",
+      sectionNavigationLabel: isZh ? "页面分区导航" : "Section navigation",
+      heroTitle: isZh ? ["向", "卡牌", "提问"] : ["ASK", "THE", "CARD"],
       subtitle: isZh
-        ? "A quiet reading room for modern questions."
+        ? "为现代问题准备的一间安静阅读室。"
         : "A quiet reading room for modern questions.",
       heroBody: isZh
-        ? "Move through the room, choose your path, and let one card hold the question."
+        ? "在阅读室中选择路径，让一张正位牌安放此刻的问题。"
         : "Move through the room, choose your path, and let one card hold the question.",
-      begin: isZh ? "Begin a Reading" : "Begin a Reading",
-      physical: isZh ? "Use Physical Deck" : "Use Physical Deck",
-      explore: isZh ? "Explore the Cards" : "Explore the Cards",
-      journal: isZh ? "Reading Journal" : "Reading Journal",
+      begin: isZh ? "开始解读" : "Begin a Reading",
+      physical: isZh ? "使用实体卡组" : "Use Physical Deck",
+      explore: isZh ? "浏览卡牌" : "Explore the Cards",
+      journal: isZh ? "解读日志" : "Reading Journal",
+      questionSlip: isZh ? "问题纸条" : "Question slip",
+      waitingQuestion: isZh ? "此刻等待被问出的是什么？" : "What is waiting to be asked?",
+      choosePath: isZh ? "选择你的路径" : "Choose Your Path",
+      paths: isZh
+        ? [
+            {
+              id: "online",
+              title: "线上阅读卡组",
+              body: "在线抽取一张正位牌，直接进入解读流程。",
+              href: onlineHref,
+              tone: "light" as const,
+            },
+            {
+              id: "physical",
+              title: "实体卡组",
+              body: "使用手中的牌，再把抽到的牌带入 Ora 的阅读室。",
+              href: physicalHref,
+              tone: "green" as const,
+            },
+            {
+              id: "journal",
+              title: "解读日志",
+              body: "回到保存过的问题、卡牌与反思，像翻阅一间安静档案室。",
+              href: readingsHref,
+              tone: "product" as const,
+            },
+          ]
+        : [
+            {
+              id: "online",
+              title: "ONLINE READING",
+              body: "Draw one upright card online and move directly into the reading flow.",
+              href: onlineHref,
+              tone: "light" as const,
+            },
+            {
+              id: "physical",
+              title: "PHYSICAL DECK",
+              body: "Use the cards in your hands, then bring the drawn card into Ora.",
+              href: physicalHref,
+              tone: "green" as const,
+            },
+            {
+              id: "journal",
+              title: "READING JOURNAL",
+              body: "Return to saved questions, cards, and reflections in a quiet archive.",
+              href: readingsHref,
+              tone: "product" as const,
+            },
+          ],
+      wonderingTitle: isZh ? "你正在想什么？" : "What are you wondering?",
+      chips: isZh
+        ? ["关系", "工作", "自我", "选择", "未来"]
+        : ["Love", "Work", "Self", "Decision", "Future"],
+      questions: isZh
+        ? [
+            "我还没有看清什么？",
+            "什么正在请求我的注意？",
+            "下一步该放在哪里？",
+            "什么已经可以放下？",
+            "什么仍在我的掌控之中？",
+            "我的能量最值得投向哪里？",
+            "哪个课题正在反复回来？",
+          ]
+        : questions,
+      unfoldsKicker: isZh ? "解读如何展开" : "The Reading Unfolds",
+      unfoldsTitle: isZh ? "五个安静动作，一张正位牌。" : "Five quiet movements, one upright card.",
+      unfolds: isZh
+        ? [
+            { step: "安顿", note: "抵达这里，让问题周围的杂音慢慢变轻。" },
+            { step: "提问", note: "把真正的问题放进一句清楚的话里。" },
+            { step: "抽牌", note: "为此刻抽取一张正位牌。" },
+            { step: "揭示", note: "让卡牌与它的象征逐渐显现。" },
+            { step: "回看", note: "把解读当作镜子，再带走一个诚实的下一步。" },
+          ]
+        : [
+            { step: "Settle", note: "Arrive and let the noise around the question soften." },
+            { step: "Ask", note: "Put the real question into a single clear line." },
+            { step: "Draw", note: "One upright card is drawn for this moment." },
+            { step: "Reveal", note: "The card and its symbolism come into view." },
+            { step: "Reflect", note: "Read it as a mirror, then carry one honest step." },
+          ],
+      deckKicker: isZh ? "卡组" : "The Deck",
+      deckTitle: isZh ? ["轻触浏览", "整副卡组"] : ["DRAG THROUGH", "THE DECK"],
+      deckDescription: isZh
+        ? "拖动卡组，或用按钮一步步翻看。"
+        : "Drag across the deck or step through it with the controls.",
+      deckAction: isZh ? "拖动 / 浏览" : "Drag / Explore",
+      previousCard: isZh ? "上一张" : "Prev",
+      nextCard: isZh ? "下一张" : "Next",
+      previousCardLabel: isZh ? "上一张牌" : "Previous card",
+      nextCardLabel: isZh ? "下一张牌" : "Next card",
+      innerGuidance: isZh ? "内在指引" : "Inner guidance",
+      active: isZh ? "当前" : "Active",
+      deckCards: isZh
+        ? [
+            { name: "愚者", numeral: "0", keyword: "开始", face: true },
+            { name: "星星", numeral: "XVII", keyword: "希望", face: true },
+            { name: "圣杯王牌", numeral: "A", keyword: "感受", face: false },
+            { name: "权杖二", numeral: "II", keyword: "选择", face: false },
+            { name: "隐者", numeral: "IX", keyword: "内在之光", face: true },
+            { name: "女祭司", numeral: "II", keyword: "直觉", face: false },
+          ]
+        : deckCards,
+      modesKicker: isZh ? "解读模式" : "Reading Modes",
+      modesNote: isZh ? "每一次解读，都从一张正位牌开始。" : "Each reading begins with one upright card.",
+      modes: isZh
+        ? [
+            { theme: "clarity" as const, title: "清晰解读", body: "辨认一段处境中的核心信号。", href: clarityHref },
+            { theme: "mirror" as const, title: "镜像解读", body: "看见问题正在映回你什么。", href: mirrorHref },
+            { theme: "next" as const, title: "下一步解读", body: "把注意力带向最诚实的下一步。", href: nextStepHref },
+          ]
+        : [
+            { theme: "clarity" as const, title: "CLARITY READING", body: "Name the central signal in a situation.", href: clarityHref },
+            { theme: "mirror" as const, title: "MIRROR READING", body: "See what the question reflects back to you.", href: mirrorHref },
+            { theme: "next" as const, title: "NEXT STEP READING", body: "Bring attention to the most honest next move.", href: nextStepHref },
+          ],
+      oneUprightCard: isZh ? "一张正位牌 ->" : "One upright card ->",
+      journalTitle: isZh ? ["你的", "解读", "日志"] : ["YOUR", "READING", "JOURNAL"],
+      journalNotes: isZh
+        ? [
+            {
+              title: "安静的模式",
+              card: "星星",
+              note: "当问题不再急着取胜，一个更柔和的答案浮现出来。",
+            },
+            {
+              title: "选择的线索",
+              card: "权杖二",
+              note: "下一步先请求边界，然后才请求速度。",
+            },
+            {
+              title: "镜中札记",
+              card: "隐者",
+              note: "这次解读把注意力带回那个仍然可以选择的地方。",
+            },
+            {
+              title: "释放标记",
+              card: "圣杯王牌",
+              note: "卡牌把感受命名为信息，而不是干扰。",
+            },
+          ]
+        : journalNotes,
+      openJournal: isZh ? "打开解读日志" : "Open Journal",
+      viewAll: isZh ? "查看全部" : "View All",
+      physicalDeckKicker: isZh ? "实体卡组" : "PHYSICAL DECK",
+      physicalDeckTitle: isZh ? ["为手心而作。", "为感受而作。"] : ["Made to be held.", "Made to be felt."],
+      redeemDeckKicker: isZh ? "兑换你的卡组" : "REDEEM YOUR DECK",
+      redeemDeckTitle: isZh
+        ? "解锁实体卡组的线上陪伴体验。"
+        : "Unlock your deck's companion experience.",
+      redeemDeckCode: isZh ? "兑换卡组码" : "Redeem Deck Code",
+      trustTitle: isZh ? "这是一件反思工具，不是一台预言机器。" : "A reflective tool, not a prediction machine.",
+      trustItems: isZh
+        ? ["以隐私为先", "AI 辅助象征解读", "用于反思与娱乐"]
+        : ["Private by design", "AI-guided symbolism", "For reflection and entertainment"],
+      trustBody: isZh
+        ? "Ora 支持象征性的自我反思与有结构的注意力整理。它不是医疗、法律、财务或心理建议。"
+        : "Ora supports symbolic reflection and structured attention. It is not medical, legal, financial, or psychological advice.",
+      trustLinks: isZh
+        ? { privacy: "隐私", terms: "条款", disclaimer: "免责声明", contact: "联系" }
+        : { privacy: "Privacy", terms: "Terms", disclaimer: "Disclaimer", contact: "Contact" },
+      finalTitle: isZh ? "你的问题正在等待。" : "Your question is waiting.",
     }),
-    [isZh],
+    [clarityHref, isZh, mirrorHref, nextStepHref, onlineHref, physicalHref, readingsHref],
   );
+  const sectionNavItems = copy.sectionNavItems;
+  const localizedDeckCards = copy.deckCards;
 
   useEffect(() => {
     const reduceMotion = window.matchMedia(
@@ -279,10 +455,10 @@ export function OracleShowroomHome({
     setActiveCard((current) => {
       const next = current + direction;
       if (next < 0) {
-        return deckCards.length - 1;
+        return localizedDeckCards.length - 1;
       }
 
-      if (next >= deckCards.length) {
+      if (next >= localizedDeckCards.length) {
         return 0;
       }
 
@@ -308,7 +484,7 @@ export function OracleShowroomHome({
             Ora Arcana
           </Link>
           <nav
-            aria-label="Section navigation"
+            aria-label={copy.sectionNavigationLabel}
             className="hidden items-center justify-center gap-4 text-[0.68rem] font-medium text-[#7a6b56] xl:flex xl:gap-5"
           >
             {sectionNavItems.map((item) => (
@@ -348,12 +524,14 @@ export function OracleShowroomHome({
             style={revealStyle(0)}
           >
             <p className="mb-5 text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-[#9d7b3f]">
-              Ora Arcana Reading Room
+              {copy.room}
             </p>
             <h1 className="font-serif text-[clamp(4.5rem,20vw,12.5rem)] leading-[0.74] text-[#3f352b]">
-              <span className="block">ASK</span>
-              <span className="block">THE</span>
-              <span className="block">CARD</span>
+              {copy.heroTitle.map((line) => (
+                <span className="block" key={line}>
+                  {line}
+                </span>
+              ))}
             </h1>
             <p className="mt-5 max-w-xl font-serif text-xl leading-8 text-[#5b4a36] sm:text-2xl">
               {copy.subtitle}
@@ -410,7 +588,7 @@ export function OracleShowroomHome({
                 <CardBack />
               </div>
               <div className="absolute right-[6%] top-30 w-30 rotate-[13deg] sm:right-[5%] sm:w-44">
-                <CardFace keyword="Hope" name="The Star" numeral="XVII" />
+                <CardFace keyword={copy.deckCards[1].keyword} name={copy.deckCards[1].name} numeral="XVII" />
               </div>
               {/* center hero card - thick, raised */}
               <div className="absolute left-1/2 top-8 w-48 -translate-x-1/2 sm:w-64 lg:w-72">
@@ -418,8 +596,8 @@ export function OracleShowroomHome({
                 <div className="absolute inset-0 translate-x-1 translate-y-3 rounded-[1.35rem] border border-[#caa96a]/36 bg-[#ead7a6]/30" />
                 <div className="absolute inset-0 translate-y-2 rounded-[1.35rem] bg-[#2c2016]/24 blur-[3px]" />
                 <CardFace
-                  keyword="Beginnings"
-                  name="The Fool"
+                  keyword={copy.deckCards[0].keyword}
+                  name={copy.deckCards[0].name}
                   numeral="0"
                   className="relative shadow-[0_34px_82px_rgba(102,75,33,0.3),0_0_56px_rgba(255,255,255,0.7),inset_0_0_0_10px_rgba(255,255,255,0.34)]"
                 />
@@ -433,10 +611,10 @@ export function OracleShowroomHome({
               <div className="absolute bottom-4 left-1/2 w-[min(26rem,92vw)] -translate-x-1/2 rotate-[-3deg] rounded-[1.1rem] border border-[#caa96a]/40 bg-[#fffaf0]/94 p-5 shadow-[0_24px_62px_rgba(111,84,43,0.2),inset_0_1px_0_rgba(255,255,255,0.78)]">
                 <span className="absolute -top-3 left-1/2 h-6 w-20 -translate-x-1/2 rotate-[-2deg] rounded-[2px] bg-[#e9d6a8]/70 shadow-sm" />
                 <p className="text-[0.62rem] font-semibold uppercase tracking-[0.2em] text-[#9d7b3f]">
-                  Question slip
+                  {copy.questionSlip}
                 </p>
                 <p className="mt-3 font-serif text-2xl leading-tight text-[#4f4235]">
-                  What is waiting to be asked?
+                  {copy.waitingQuestion}
                 </p>
                 <div className="mt-4 h-px bg-gradient-to-r from-[#caa96a]/0 via-[#caa96a]/44 to-[#caa96a]/0" />
               </div>
@@ -454,32 +632,10 @@ export function OracleShowroomHome({
             data-showroom-reveal
             style={revealStyle(0)}
           >
-            Choose Your Path
+            {copy.choosePath}
           </p>
           <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {[
-              {
-                id: "online",
-                title: "ONLINE READING",
-                body: "Draw one upright card online and move directly into the reading flow.",
-                href: onlineHref,
-                tone: "light" as const,
-              },
-              {
-                id: "physical",
-                title: "PHYSICAL DECK",
-                body: "Use the cards in your hands, then bring the drawn card into Ora.",
-                href: physicalHref,
-                tone: "green" as const,
-              },
-              {
-                id: "journal",
-                title: "READING JOURNAL",
-                body: "Return to saved questions, cards, and reflections in a quiet archive.",
-                href: readingsHref,
-                tone: "product" as const,
-              },
-            ].map((item, index) => (
+            {copy.paths.map((item, index) => (
               <Link
                 className={cx(
                   revealClass(`path-${item.id}`),
@@ -501,7 +657,11 @@ export function OracleShowroomHome({
                 {item.tone === "light" && (
                   <span aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-48">
                     <span className="absolute right-4 top-5 w-28 rotate-[10deg] opacity-95 sm:w-32">
-                      <CardFace keyword="Begin" name="The Fool" numeral="0" />
+                      <CardFace
+                        keyword={copy.deckCards[0].keyword}
+                        name={copy.deckCards[0].name}
+                        numeral="0"
+                      />
                     </span>
                     <span className="absolute right-24 top-10 h-px w-40 rotate-[-24deg] bg-gradient-to-r from-transparent via-[#caa96a]/52 to-transparent" />
                     <span className="absolute left-5 top-8 h-20 w-16 -rotate-[8deg] rounded-[0.45rem] border border-[#caa96a]/28 bg-[#fffaf0]/70" />
@@ -565,10 +725,10 @@ export function OracleShowroomHome({
             style={revealStyle(0)}
           >
             <h2 className="font-serif text-[clamp(2.6rem,10vw,7rem)] leading-[0.9] text-[#3f352b]">
-              What are you wondering?
+              {copy.wonderingTitle}
             </h2>
             <div className="mt-6 flex flex-wrap gap-2">
-              {["Love", "Work", "Self", "Decision", "Future"].map((chip) => (
+              {copy.chips.map((chip) => (
                 <span
                   className="rounded-full border border-[#caa96a]/36 bg-[#fffaf0]/72 px-4 py-2 text-[0.66rem] font-semibold uppercase tracking-[0.18em] text-[#8d6426]"
                   key={chip}
@@ -579,7 +739,7 @@ export function OracleShowroomHome({
             </div>
           </div>
           <div className="mt-12 grid gap-x-4 gap-y-6 sm:grid-cols-2 lg:grid-cols-4">
-            {questions.map((question, index) => {
+            {copy.questions.map((question, index) => {
               const paper = [
                 "bg-[#fffbf4]/90",
                 "bg-[#fdf6e7]/90",
@@ -655,7 +815,7 @@ export function OracleShowroomHome({
               data-showroom-reveal
               style={revealStyle(0)}
             >
-              The Reading Unfolds
+              {copy.unfoldsKicker}
             </p>
             <h2
               className={cx(
@@ -666,16 +826,10 @@ export function OracleShowroomHome({
               data-showroom-reveal
               style={revealStyle(1)}
             >
-              Five quiet movements, one upright card.
+              {copy.unfoldsTitle}
             </h2>
             <div className="mt-10 grid gap-x-6 gap-y-8 md:grid-cols-5">
-              {[
-                { step: "Settle", note: "Arrive and let the noise around the question soften." },
-                { step: "Ask", note: "Put the real question into a single clear line." },
-                { step: "Draw", note: "One upright card is drawn for this moment." },
-                { step: "Reveal", note: "The card and its symbolism come into view." },
-                { step: "Reflect", note: "Read it as a mirror, then carry one honest step." },
-              ].map(({ step, note }, index) => (
+              {copy.unfolds.map(({ step, note }, index) => (
                 <div
                   className={cx(
                     revealClass(`unfold-${step}`),
@@ -714,7 +868,7 @@ export function OracleShowroomHome({
                 data-showroom-reveal
                 style={revealStyle(0)}
               >
-                The Deck
+                {copy.deckKicker}
               </p>
               <h2
                 className={cx(
@@ -725,52 +879,55 @@ export function OracleShowroomHome({
                 data-showroom-reveal
                 style={revealStyle(1)}
               >
-                <span className="block">DRAG THROUGH</span>
-                <span className="block">THE DECK</span>
+                {copy.deckTitle.map((line) => (
+                  <span className="block" key={line}>
+                    {line}
+                  </span>
+                ))}
               </h2>
               <p className="mt-4 max-w-2xl text-sm leading-7 text-[#766955]">
-                Drag across the deck or step through it with the controls.
+                {copy.deckDescription}
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-3">
               <span className="rounded-full border border-[#d8b76a]/36 bg-[#fffaf0]/78 px-3 py-2 text-[0.62rem] font-semibold uppercase tracking-[0.18em] text-[#8d6426]">
-                Drag / Explore
+                {copy.deckAction}
               </span>
               <span className="rounded-full border border-[#caa96a]/28 bg-[#fffaf0]/70 px-3 py-2 text-[0.62rem] font-semibold uppercase tracking-[0.18em] text-[#9b8a73]">
-                {String(activeCard + 1).padStart(2, "0")} / {String(deckCards.length).padStart(2, "0")}
+                {String(activeCard + 1).padStart(2, "0")} / {String(localizedDeckCards.length).padStart(2, "0")}
               </span>
               <button
-                aria-label="Previous card"
+                aria-label={copy.previousCardLabel}
                 className="flex min-h-12 items-center justify-center rounded-full border border-[#caa96a]/45 bg-[#fffaf0]/82 px-4 text-xs font-semibold uppercase tracking-[0.16em] text-[#6f614d] shadow-[0_10px_26px_rgba(102,75,33,0.12)] transition duration-[260ms] hover:-translate-y-1 hover:border-[#9d7b3f] hover:text-[#3f352b] motion-reduce:transform-none"
                 onClick={() => setNextCard(-1)}
                 type="button"
               >
-                Prev
+                {copy.previousCard}
               </button>
               <button
-                aria-label="Next card"
+                aria-label={copy.nextCardLabel}
                 className="flex min-h-12 items-center justify-center rounded-full border border-[#9d7b3f]/55 bg-[linear-gradient(180deg,#f6e1ae,#c59748)] px-4 text-xs font-semibold uppercase tracking-[0.16em] text-[#352513] shadow-[0_12px_30px_rgba(148,105,39,0.22)] transition duration-[260ms] hover:-translate-y-1 hover:scale-[1.03] motion-reduce:transform-none"
                 onClick={() => setNextCard(1)}
                 type="button"
               >
-                Next
+                {copy.nextCard}
               </button>
             </div>
           </div>
 
           <div className="mt-10 flex snap-x snap-mandatory gap-5 overflow-x-auto px-1 pb-8 pt-4 [scrollbar-width:thin] md:relative md:h-[31rem] md:block md:overflow-hidden md:px-0">
-            {deckCards.map((card, index) => {
+            {localizedDeckCards.map((card, index) => {
               const active = activeCard === index;
               const offset = index - activeCard;
               let layeredOffset = offset;
-              const halfDeck = deckCards.length / 2;
+              const halfDeck = localizedDeckCards.length / 2;
 
               if (layeredOffset > halfDeck) {
-                layeredOffset -= deckCards.length;
+                layeredOffset -= localizedDeckCards.length;
               }
 
               if (layeredOffset < -halfDeck) {
-                layeredOffset += deckCards.length;
+                layeredOffset += localizedDeckCards.length;
               }
 
               const distance = Math.abs(layeredOffset);
@@ -838,12 +995,12 @@ export function OracleShowroomHome({
                         {card.name}
                       </p>
                       <p className="mt-1 text-[0.58rem] font-semibold uppercase tracking-[0.18em] text-[#9d7b3f]">
-                        {active ? "Inner guidance" : card.keyword}
+                        {active ? copy.innerGuidance : card.keyword}
                       </p>
                     </div>
                     {active ? (
                       <span className="rounded-full border border-[#d8b76a]/36 bg-[#fffaf0]/82 px-2 py-1 text-[0.5rem] font-semibold uppercase tracking-[0.16em] text-[#8d6426]">
-                        Active
+                        {copy.active}
                       </span>
                     ) : null}
                   </div>
@@ -866,7 +1023,7 @@ export function OracleShowroomHome({
             data-showroom-reveal
             style={revealStyle(0)}
           >
-            Reading Modes
+            {copy.modesKicker}
           </p>
           <p
             className={cx(
@@ -877,14 +1034,10 @@ export function OracleShowroomHome({
             data-showroom-reveal
             style={revealStyle(1)}
           >
-            Each reading begins with one upright card.
+            {copy.modesNote}
           </p>
           <div className="mt-10 grid gap-5 md:grid-cols-3">
-            {[
-              { theme: "clarity" as const, title: "CLARITY READING", body: "Name the central signal in a situation.", href: clarityHref },
-              { theme: "mirror" as const, title: "MIRROR READING", body: "See what the question reflects back to you.", href: mirrorHref },
-              { theme: "next" as const, title: "NEXT STEP READING", body: "Bring attention to the most honest next move.", href: nextStepHref },
-            ].map((mode, index) => (
+            {copy.modes.map((mode, index) => (
               <Link
                 className={cx(
                   revealClass(`mode-${index}`),
@@ -938,7 +1091,7 @@ export function OracleShowroomHome({
                       mode.theme === "mirror" ? "text-[#d8b76a]" : "text-[#9d7b3f]",
                     )}
                   >
-                    One upright card -&gt;
+                    {copy.oneUprightCard}
                   </span>
                 </div>
               </Link>
@@ -960,12 +1113,14 @@ export function OracleShowroomHome({
               data-showroom-reveal
               style={revealStyle(0)}
             >
-              <span className="block">YOUR</span>
-              <span className="block">READING</span>
-              <span className="block">JOURNAL</span>
+              {copy.journalTitle.map((line) => (
+                <span className="block" key={line}>
+                  {line}
+                </span>
+              ))}
             </h2>
             <div className="grid gap-4 sm:grid-cols-2">
-              {journalNotes.map((note, index) => (
+              {copy.journalNotes.map((note, index) => (
                 <article
                   className={cx(
                     revealClass(`journal-${index}`),
@@ -989,10 +1144,10 @@ export function OracleShowroomHome({
               ))}
               <div className="flex flex-col gap-3 sm:col-span-2 sm:flex-row">
                 <Link className="showroom-action-primary" href={readingsHref}>
-                  Open Journal
+                  {copy.openJournal}
                 </Link>
                 <Link className="showroom-action-secondary" href={readingsHref}>
-                  View All
+                  {copy.viewAll}
                 </Link>
               </div>
             </div>
@@ -1014,15 +1169,15 @@ export function OracleShowroomHome({
               style={revealStyle(0)}
             >
               <p className="text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-[#9d7b3f]">
-                PHYSICAL DECK
+                {copy.physicalDeckKicker}
               </p>
               <h2 className="mt-8 font-serif text-5xl leading-none text-[#3f352b]">
-                Made to be held.
+                {copy.physicalDeckTitle[0]}
                 <br />
-                Made to be felt.
+                {copy.physicalDeckTitle[1]}
               </h2>
               <Link className="showroom-action-primary mt-8" href={physicalHref}>
-                Use Physical Deck
+                {copy.physical}
               </Link>
             </div>
             <div
@@ -1035,17 +1190,17 @@ export function OracleShowroomHome({
               style={revealStyle(1)}
             >
               <p className="text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-[#d8b76a]">
-                REDEEM YOUR DECK
+                {copy.redeemDeckKicker}
               </p>
               <h2 className="mt-8 font-serif text-5xl leading-none">
-                Unlock your deck&apos;s companion experience.
+                {copy.redeemDeckTitle}
               </h2>
               <button
                 className="mt-8 inline-flex min-h-12 touch-manipulation items-center justify-center rounded-full border border-[#d8b76a]/56 bg-[#f4efe5] px-5 text-xs font-semibold uppercase tracking-[0.18em] text-[#21362f] shadow-[0_14px_34px_rgba(0,0,0,0.18)] transition duration-[260ms] hover:-translate-y-1.5 hover:scale-[1.015] motion-reduce:transform-none"
                 onClick={openAccountMenu}
                 type="button"
               >
-                Redeem Deck Code
+                {copy.redeemDeckCode}
               </button>
             </div>
           </div>
@@ -1064,14 +1219,10 @@ export function OracleShowroomHome({
             data-showroom-reveal
             style={revealStyle(0)}
           >
-            A reflective tool, not a prediction machine.
+            {copy.trustTitle}
           </h2>
           <div className="mt-8 grid gap-4 lg:grid-cols-3">
-            {[
-              "Private by design",
-              "AI-guided symbolism",
-              "For reflection and entertainment",
-            ].map((item, index) => (
+            {copy.trustItems.map((item, index) => (
               <div
                 className={cx(
                   revealClass(`trust-${index}`),
@@ -1084,27 +1235,26 @@ export function OracleShowroomHome({
               >
                 <h3 className="font-serif text-2xl text-[#4f4235]">{item}</h3>
                 <p className="mt-3 text-sm leading-7 text-[#766955]">
-                  Ora supports symbolic reflection and structured attention. It
-                  is not medical, legal, financial, or psychological advice.
+                  {copy.trustBody}
                 </p>
               </div>
             ))}
           </div>
           <div className="mt-8 flex flex-wrap gap-4 text-sm font-semibold uppercase tracking-[0.16em] text-[#7a6b56]">
             <Link className="transition hover:text-[#9d7b3f]" href={trustHrefs.privacy}>
-              Privacy
+              {copy.trustLinks.privacy}
             </Link>
             <Link className="transition hover:text-[#9d7b3f]" href={trustHrefs.terms}>
-              Terms
+              {copy.trustLinks.terms}
             </Link>
             <Link
               className="transition hover:text-[#9d7b3f]"
               href={trustHrefs.disclaimer}
             >
-              Disclaimer
+              {copy.trustLinks.disclaimer}
             </Link>
             <Link className="transition hover:text-[#9d7b3f]" href={trustHrefs.contact}>
-              Contact
+              {copy.trustLinks.contact}
             </Link>
           </div>
         </section>
@@ -1117,14 +1267,14 @@ export function OracleShowroomHome({
             style={revealStyle(0)}
           >
             <h2 className="font-serif text-[clamp(3.4rem,12vw,8rem)] leading-[0.85]">
-              Your question is waiting.
+              {copy.finalTitle}
             </h2>
             <div className="mt-8 grid gap-3 sm:flex sm:justify-center">
               <Link className="showroom-final-primary" href={onlineHref}>
-                Begin a Reading
+                {copy.begin}
               </Link>
               <Link className="showroom-final-secondary" href={physicalHref}>
-                Use Physical Deck
+                {copy.physical}
               </Link>
             </div>
           </div>

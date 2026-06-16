@@ -67,6 +67,83 @@ export function ActivationCodePanel({
   const [isTopUpOpen, setIsTopUpOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const lastCreditsRefreshAtRef = useRef(0);
+  const isZh = lang === "zh";
+  const copy = useMemo(
+    () => ({
+      closeAccountPanel: isZh ? "关闭账户面板" : "Close account panel",
+      credits: isZh ? "解读额度" : "Credits",
+      creditsCount: (value: number) => isZh ? `${value} 次解读额度` : `${value} Credits`,
+      topUp: isZh ? "补充额度" : "Top Up",
+      notifications: isZh ? "通知" : "Notifications",
+      readingAccount: isZh ? "阅读账户" : "Reading Account",
+      signIn: isZh ? "登录" : "Sign in",
+      topUpTitle: isZh ? "额度补充即将开放。" : "Credit top-up is coming soon.",
+      topUpBody: isZh
+        ? "目前可通过卡组码为阅读账户增加解读额度。"
+        : "For now, deck codes can add credits to your Reading Account.",
+      notificationsTitle: isZh ? "暂时没有通知。" : "No notifications yet.",
+      notificationsBody: isZh
+        ? "阅读提醒和账户更新稍后会出现在这里。"
+        : "Reading reminders and account updates will appear here later.",
+      enterRoom: isZh ? "进入你的阅读室" : "Enter your reading room",
+      signInBody: isZh
+        ? "登录后可保存解读，并兑换卡组码。"
+        : "Sign in to save your readings and redeem deck codes.",
+      checkingAccount: isZh ? "正在检查你的阅读账户..." : "Checking your reading account...",
+      email: isZh ? "邮箱" : "Email",
+      sending: isZh ? "发送中..." : "Sending...",
+      sendSignInEmail: isZh ? "发送登录邮件" : "Send sign-in email",
+      passwordlessNote: isZh
+        ? "无需密码。我们会发送一封安全登录邮件给你。"
+        : "No password needed. We'll send you a secure sign-in link.",
+      language: isZh ? "语言" : "Language",
+      signInEmailSent: isZh
+        ? "登录邮件已发送。请查看收件箱，进入阅读室。"
+        : "Sign-in email sent. Check your inbox to enter the Reading Room.",
+      signedOut: isZh ? "已退出登录。" : "Signed out.",
+      unableToLoadCredits: isZh
+        ? "暂时无法读取解读额度。"
+        : "Unable to load Reading Credits.",
+      codeCouldNotRedeem: isZh
+        ? "这个卡组码暂时无法兑换。"
+        : "That code could not be redeemed.",
+      codeCouldNotRedeemRetry: isZh
+        ? "这个卡组码暂时无法兑换。请检查后再试一次。"
+        : "That code could not be redeemed. Check the code and try again.",
+      redeemedButCreditsFailed: isZh
+        ? "卡组码已兑换，但解读额度暂时未能刷新。"
+        : "Deck code redeemed, but Reading Credits could not refresh.",
+      redeemedCreditsUpdated: isZh
+        ? "卡组码已兑换，解读额度已更新。"
+        : "Deck code redeemed. Credits updated.",
+      account: isZh ? "账户" : "Account",
+      creditsLoading: isZh ? "正在读取额度" : "Loading credits",
+      creditsLower: (value: number) => isZh ? `${value} 次额度` : `${value} credits`,
+      creditUseNote: isZh ? "每次 AI 解读会使用 1 次额度。" : "Each AI reading uses 1 credit.",
+      readingRoom: isZh ? "阅读室" : "Reading Room",
+      journal: isZh ? "解读日志" : "Journal",
+      redeem: isZh ? "兑换" : "Redeem",
+      membership: isZh ? "会员" : "Membership",
+      comingSoon: isZh ? "即将开放" : "Coming soon",
+      membershipPreviewSoon: isZh
+        ? "会员预览即将开放。"
+        : "Membership preview is coming soon.",
+      signOut: isZh ? "退出登录" : "Sign out",
+      signingOut: isZh ? "正在退出..." : "Signing out...",
+      deckCode: isZh ? "卡组码" : "Deck code",
+      deckCodePlaceholder: isZh ? "输入卡组码" : "Enter deck code",
+      redeemBody: isZh
+        ? "实体卡组附带的激活码可为你的账户增加解读额度。"
+        : "Physical deck activation codes add credits to your account.",
+      redeeming: isZh ? "兑换中..." : "Redeeming...",
+      cancel: isZh ? "取消" : "Cancel",
+      privacy: isZh ? "隐私" : "Privacy",
+      terms: isZh ? "条款" : "Terms",
+      disclaimer: isZh ? "免责声明" : "Disclaimer",
+      contact: isZh ? "联系" : "Contact",
+    }),
+    [isZh],
+  );
 
   useEffect(() => {
     if (hasLangParam) {
@@ -99,7 +176,7 @@ export function ActivationCodePanel({
 
       if (!response.ok) {
         throw new Error(
-          getApiErrorMessage(payload, "Unable to load Reading Credits."),
+          getApiErrorMessage(payload, copy.unableToLoadCredits),
         );
       }
 
@@ -109,7 +186,7 @@ export function ActivationCodePanel({
           : null;
 
       if (!isCredits(nextCredits)) {
-        throw new Error("Unable to load Reading Credits.");
+        throw new Error(copy.unableToLoadCredits);
       }
 
       setCredits(nextCredits);
@@ -118,12 +195,12 @@ export function ActivationCodePanel({
       setError(
         creditsError instanceof Error
           ? creditsError.message
-          : "Unable to load Reading Credits.",
+          : copy.unableToLoadCredits,
       );
     } finally {
       setIsLoadingCredits(false);
     }
-  }, []);
+  }, [copy.unableToLoadCredits]);
 
   const requestCreditsRefresh = useCallback(() => {
     if (!user) {
@@ -227,9 +304,7 @@ export function ActivationCodePanel({
     if (signInError) {
       setError(signInError.message);
     } else {
-      setStatus(
-        "Sign-in email sent. Check your inbox to enter the Reading Room.",
-      );
+      setStatus(copy.signInEmailSent);
     }
 
     setIsSendingEmail(false);
@@ -253,7 +328,7 @@ export function ActivationCodePanel({
       setIsRedeemFormOpen(false);
       setIsTopUpOpen(false);
       setIsNotificationsOpen(false);
-      setStatus("Signed out.");
+      setStatus(copy.signedOut);
     }
 
     setIsSigningOut(false);
@@ -284,7 +359,7 @@ export function ActivationCodePanel({
 
       if (!response.ok) {
         throw new Error(
-          getApiErrorMessage(payload, "That code could not be redeemed."),
+          getApiErrorMessage(payload, copy.codeCouldNotRedeem),
         );
       }
 
@@ -294,18 +369,18 @@ export function ActivationCodePanel({
           : null;
 
       if (!isCredits(nextCredits)) {
-        throw new Error("Deck code redeemed, but Reading Credits could not refresh.");
+        throw new Error(copy.redeemedButCreditsFailed);
       }
 
       setCredits(nextCredits);
       setActivationCode("");
       setIsRedeemFormOpen(false);
-      setStatus("Deck code redeemed. Credits updated.");
+      setStatus(copy.redeemedCreditsUpdated);
     } catch (redeemError) {
       setError(
         redeemError instanceof Error
           ? redeemError.message
-          : "That code could not be redeemed. Check the code and try again.",
+          : copy.codeCouldNotRedeemRetry,
       );
     } finally {
       setIsRedeeming(false);
@@ -315,7 +390,7 @@ export function ActivationCodePanel({
   const creditsRemaining = credits?.remaining_credits ?? 0;
   const userInitial = (user?.email ?? "A").slice(0, 1).toUpperCase();
   const accountName =
-    user?.email?.split("@")[0]?.trim() || (user ? "Account" : "");
+    user?.email?.split("@")[0]?.trim() || (user ? copy.account : "");
   const isAnyPanelOpen = isMenuOpen || isTopUpOpen || isNotificationsOpen;
 
   function closePanels() {
@@ -352,7 +427,7 @@ export function ActivationCodePanel({
     <div className="relative z-[280]">
       {isAnyPanelOpen ? (
         <button
-          aria-label="Close account panel"
+          aria-label={copy.closeAccountPanel}
           className="fixed inset-0 z-[270] cursor-default bg-transparent"
           onClick={closePanels}
           type="button"
@@ -363,7 +438,7 @@ export function ActivationCodePanel({
         {user ? (
           <>
             <span className="hidden min-h-9 items-center rounded-full border border-[#d8b76a]/42 bg-[#fffaf0]/82 px-2.5 text-[0.62rem] font-semibold uppercase tracking-[0.11em] text-[#5b4a36] shadow-[0_7px_18px_rgba(111,84,43,0.08),inset_0_1px_0_rgba(255,255,255,0.72)] backdrop-blur sm:inline-flex">
-              {isLoadingCredits ? "Credits" : `${creditsRemaining} Credits`}
+              {isLoadingCredits ? copy.credits : copy.creditsCount(creditsRemaining)}
             </span>
             <button
               aria-expanded={isTopUpOpen}
@@ -371,11 +446,11 @@ export function ActivationCodePanel({
               onClick={openTopUpPreview}
               type="button"
             >
-              Top Up
+              {copy.topUp}
             </button>
             <button
               aria-expanded={isNotificationsOpen}
-              aria-label="Notifications"
+              aria-label={copy.notifications}
               className="hidden size-8 items-center justify-center rounded-full border border-[#d8b76a]/42 bg-[#fffaf0]/86 text-[#6f4f20] shadow-[0_7px_18px_rgba(111,84,43,0.08),inset_0_1px_0_rgba(255,255,255,0.72)] transition hover:-translate-y-0.5 hover:border-[#caa96a] sm:inline-flex"
               onClick={openNotificationsPreview}
               type="button"
@@ -415,7 +490,7 @@ export function ActivationCodePanel({
             onClick={openAccountMenu}
             type="button"
           >
-            {isLoadingUser ? "Reading Account" : "Sign in"}
+            {isLoadingUser ? copy.readingAccount : copy.signIn}
           </button>
         )}
       </div>
@@ -428,13 +503,13 @@ export function ActivationCodePanel({
           />
           <div className="relative">
             <p className="text-[0.58rem] font-semibold uppercase tracking-[0.18em] text-[#9d7b3f]">
-              Top Up
+              {copy.topUp}
             </p>
             <h2 className="mt-2 font-serif text-xl text-[#3f352b]">
-              Credit top-up is coming soon.
+              {copy.topUpTitle}
             </h2>
             <p className="mt-2 text-xs leading-5 text-[#766955]">
-              For now, deck codes can add credits to your Reading Account.
+              {copy.topUpBody}
             </p>
           </div>
         </section>
@@ -448,13 +523,13 @@ export function ActivationCodePanel({
           />
           <div className="relative">
             <p className="text-[0.58rem] font-semibold uppercase tracking-[0.18em] text-[#9d7b3f]">
-              Notifications
+              {copy.notifications}
             </p>
             <h2 className="mt-2 font-serif text-xl text-[#3f352b]">
-              No notifications yet.
+              {copy.notificationsTitle}
             </h2>
             <p className="mt-2 text-xs leading-5 text-[#766955]">
-              Reading reminders and account updates will appear here later.
+              {copy.notificationsBody}
             </p>
           </div>
         </section>
@@ -473,22 +548,22 @@ export function ActivationCodePanel({
               </div>
               <div className="min-w-0">
                 <p className="text-[0.58rem] font-semibold uppercase tracking-[0.18em] text-[#9d7b3f]">
-                  Enter your reading room
+                  {copy.enterRoom}
                 </p>
                 <p className="mt-1.5 text-xs leading-5 text-[#766955]">
-                  Sign in to save your readings and redeem deck codes.
+                  {copy.signInBody}
                 </p>
               </div>
             </div>
 
             {isLoadingUser ? (
               <p className="rounded-xl border border-[#d8b76a]/28 bg-[#fff7e8]/72 px-3 py-2 text-xs leading-5 text-[#766955]">
-                Checking your reading account...
+                {copy.checkingAccount}
               </p>
             ) : (
               <div className="grid gap-3">
                 <label className="grid gap-1.5 text-[0.68rem] font-semibold uppercase tracking-[0.12em] text-[#6f5f4b]">
-                  Email
+                  {copy.email}
                   <input
                     autoComplete="email"
                     className="min-h-11 rounded-full border border-[#d8b76a]/45 bg-[#fffdf8] px-4 text-sm normal-case tracking-normal text-[#3f352b] outline-none transition placeholder:text-[#b09d7f] focus:border-[#9d7b3f] focus:ring-2 focus:ring-[#d8b76a]/20"
@@ -504,10 +579,10 @@ export function ActivationCodePanel({
                   onClick={handleSendLoginEmail}
                   type="button"
                 >
-                  {isSendingEmail ? "Sending..." : "Send sign-in email"}
+                  {isSendingEmail ? copy.sending : copy.sendSignInEmail}
                 </button>
                 <p className="rounded-xl border border-[#d8b76a]/26 bg-[#fff7e8]/68 px-3 py-2 text-xs leading-5 text-[#766955]">
-                  No password needed. We&apos;ll send you a secure sign-in link.
+                  {copy.passwordlessNote}
                 </p>
               </div>
             )}
@@ -515,7 +590,7 @@ export function ActivationCodePanel({
             <div className="grid gap-2.5 border-t border-[#d8b76a]/30 pt-3">
               <div>
                 <p className="text-[0.56rem] font-semibold uppercase tracking-[0.18em] text-[#9d7b3f]">
-                  Language
+                  {copy.language}
                 </p>
                 <div className="mt-1.5 inline-flex min-h-9 items-center rounded-full border border-[#d8b76a]/45 bg-[#fff7e8]/76 p-1 text-[0.6rem] font-semibold uppercase tracking-[0.14em] text-[#8f826f]">
                   {(["en", "zh"] as const).map((nextLang) => (
@@ -566,16 +641,16 @@ export function ActivationCodePanel({
                   {accountName}
                 </p>
                 <p className="truncate text-[0.68rem] leading-4 text-[#8a765d]">
-                  {user.email ?? "Reading Account"}
+                  {user.email ?? copy.readingAccount}
                 </p>
               </div>
             </div>
 
             <p className="rounded-full border border-[#d8b76a]/28 bg-[#fff7e8]/68 px-3 py-1.5 text-[0.72rem] leading-5 text-[#6f5f4b]">
               <span className="font-semibold text-[#6f4f20]">
-                {isLoadingCredits ? "Loading credits" : `${creditsRemaining} credits`}
+                {isLoadingCredits ? copy.creditsLoading : copy.creditsLower(creditsRemaining)}
               </span>{" "}
-              · Each AI reading uses 1 credit.
+              · {copy.creditUseNote}
             </p>
 
             <div className="grid grid-cols-2 gap-1.5">
@@ -588,7 +663,7 @@ export function ActivationCodePanel({
                   R
                 </span>
                 <span className="mt-1 block text-xs font-semibold text-[#3f352b]">
-                  Reading Room
+                  {copy.readingRoom}
                 </span>
               </Link>
               <Link
@@ -600,7 +675,7 @@ export function ActivationCodePanel({
                   J
                 </span>
                 <span className="mt-1 block text-xs font-semibold text-[#3f352b]">
-                  Journal
+                  {copy.journal}
                 </span>
               </Link>
               <button
@@ -616,13 +691,13 @@ export function ActivationCodePanel({
                   +
                 </span>
                 <span className="mt-1 block text-xs font-semibold text-[#3f352b]">
-                  Redeem
+                  {copy.redeem}
                 </span>
               </button>
               <button
                 className="grid min-h-[4.5rem] place-items-center rounded-xl border border-transparent bg-transparent px-2 py-2 text-center transition hover:border-[#d8b76a]/26 hover:bg-[#fff7e8]/78"
                 onClick={() => {
-                  setStatus("Membership preview is coming soon.");
+                  setStatus(copy.membershipPreviewSoon);
                   setError(null);
                 }}
                 type="button"
@@ -631,10 +706,10 @@ export function ActivationCodePanel({
                   M
                 </span>
                 <span className="mt-1 block text-xs font-semibold text-[#3f352b]">
-                  Membership
+                  {copy.membership}
                 </span>
                 <span className="mt-0.5 block text-[0.6rem] text-[#8a765d]">
-                  Coming soon
+                  {copy.comingSoon}
                 </span>
               </button>
               <button
@@ -646,7 +721,7 @@ export function ActivationCodePanel({
                   EN
                 </span>
                 <span className="mt-1 block text-xs font-semibold text-[#3f352b]">
-                  Language
+                  {copy.language}
                 </span>
                 <span className="mt-0.5 block text-[0.6rem] text-[#8a765d]">
                   EN / 中文
@@ -662,7 +737,7 @@ export function ActivationCodePanel({
                   onClick={handleSignOut}
                   type="button"
                 >
-                  {isSigningOut ? "Signing out..." : "Sign out"}
+                  {isSigningOut ? copy.signingOut : copy.signOut}
                 </button>
               </div>
             </div>
@@ -670,20 +745,20 @@ export function ActivationCodePanel({
             {isRedeemFormOpen ? (
               <div className="grid gap-2.5 rounded-xl border border-[#d8b76a]/30 bg-[#fffaf0]/72 p-3">
                     <label className="grid gap-1.5 text-[0.68rem] font-semibold uppercase tracking-[0.12em] text-[#6f5f4b]">
-                      Deck code
+                      {copy.deckCode}
                       <input
                         autoComplete="off"
                         className="min-h-10 rounded-full border border-[#d8b76a]/45 bg-[#fffdf8] px-3.5 text-sm normal-case tracking-normal text-[#3f352b] outline-none transition placeholder:text-[#b09d7f] focus:border-[#9d7b3f] focus:ring-2 focus:ring-[#d8b76a]/20"
                         onChange={(event) =>
                           setActivationCode(event.target.value)
                         }
-                        placeholder="Enter deck code"
+                        placeholder={copy.deckCodePlaceholder}
                         type="text"
                         value={activationCode}
                       />
                     </label>
                     <p className="text-xs leading-5 text-[#766955]">
-                      Physical deck activation codes add credits to your account.
+                      {copy.redeemBody}
                     </p>
 
                     <div className="grid gap-2 sm:grid-cols-2">
@@ -693,7 +768,7 @@ export function ActivationCodePanel({
                         onClick={handleRedeemCode}
                         type="button"
                       >
-                        {isRedeeming ? "Redeeming..." : "Redeem"}
+                        {isRedeeming ? copy.redeeming : copy.redeem}
                       </button>
                       <button
                         className="min-h-10 rounded-full border border-[#d8b76a]/42 bg-[#fffaf0] px-3.5 text-[0.68rem] font-semibold uppercase tracking-[0.13em] text-[#6f5f4b] transition hover:border-[#9d7b3f] hover:text-[#3f352b] disabled:cursor-not-allowed disabled:opacity-50"
@@ -701,14 +776,14 @@ export function ActivationCodePanel({
                         onClick={handleCancelRedeem}
                         type="button"
                       >
-                        Cancel
+                        {copy.cancel}
                       </button>
                     </div>
                   </div>
             ) : null}
 
             <div className="flex min-h-10 items-center justify-between gap-2.5 rounded-xl border border-[#d8b76a]/30 bg-[#fff7e8]/62 px-3 py-1.5 text-sm leading-6">
-              <span className="text-xs text-[#5b4a36]">Language</span>
+              <span className="text-xs text-[#5b4a36]">{copy.language}</span>
               <div className="inline-flex min-h-8 items-center rounded-full border border-[#d8b76a]/45 bg-[#fffaf0] p-0.5 text-[0.62rem] font-semibold uppercase tracking-[0.12em] text-[#8f826f]">
                 {(["en", "zh"] as const).map((nextLang) => (
                   <Link
@@ -734,28 +809,28 @@ export function ActivationCodePanel({
                   href={withLang("/privacy", {}, lang)}
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  Privacy
+                  {copy.privacy}
                 </Link>
                 <Link
                   className="transition hover:text-[#9d7b3f]"
                   href={withLang("/terms", {}, lang)}
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  Terms
+                  {copy.terms}
                 </Link>
                 <Link
                   className="transition hover:text-[#9d7b3f]"
                   href={withLang("/disclaimer", {}, lang)}
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  Disclaimer
+                  {copy.disclaimer}
                 </Link>
                 <Link
                   className="transition hover:text-[#9d7b3f]"
                   href={withLang("/contact", {}, lang)}
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  Contact
+                  {copy.contact}
                 </Link>
               </div>
             </div>
