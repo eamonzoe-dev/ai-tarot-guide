@@ -308,21 +308,23 @@ export function ActivationCodePanel({
     }
   }
 
+  const creditsRemaining = credits?.remaining_credits ?? 0;
+
   return (
-    <div className="relative z-30">
+    <div className="relative z-[280]">
       {isMenuOpen ? (
         <button
           aria-label="Close account menu"
-          className="fixed inset-0 z-30 cursor-default bg-transparent"
+          className="fixed inset-0 z-[270] cursor-default bg-transparent"
           onClick={() => setIsMenuOpen(false)}
           type="button"
         />
       ) : null}
 
-      <div className="relative z-40 flex items-center justify-end">
+      <div className="relative z-[290] flex items-center justify-end">
         <button
           aria-expanded={isMenuOpen}
-          className="inline-flex min-h-9 items-center gap-2 rounded-full border border-[#3d3020] bg-[#0b0907]/70 px-3 text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-[#d8c9ae] shadow-[0_8px_20px_rgba(0,0,0,0.18)] transition hover:border-[#6d5a35] hover:text-[#f6ecd8]"
+          className="pointer-events-auto inline-flex min-h-10 items-center gap-2 rounded-full border border-[#d8b76a]/55 bg-[#fffaf0]/88 px-4 text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-[#5b4a36] shadow-[0_10px_26px_rgba(111,84,43,0.12),inset_0_1px_0_rgba(255,255,255,0.72)] backdrop-blur transition hover:-translate-y-0.5 hover:border-[#caa96a] hover:bg-[#fff7e8] hover:text-[#3f352b]"
           onClick={() => {
             setIsMenuOpen((value) => !value);
             setStatus(null);
@@ -332,7 +334,7 @@ export function ActivationCodePanel({
         >
           {user ? (
             <>
-              <span className="flex size-5 items-center justify-center rounded-full border border-[#6d5a35] bg-[#120d09] text-[0.62rem] text-[#d9bd80]">
+              <span className="flex size-6 items-center justify-center rounded-full border border-[#caa96a]/65 bg-[#f6e1ae] font-serif text-[0.72rem] text-[#5b3c16]">
                 {(user.email ?? "A").slice(0, 1).toUpperCase()}
               </span>
               <span>Reading Account</span>
@@ -346,55 +348,64 @@ export function ActivationCodePanel({
       </div>
 
       {isMenuOpen ? (
-        <section className="absolute right-0 top-11 z-50 w-[min(calc(100vw-1rem),23rem)] rounded-xl border border-[#d9bd80]/24 bg-[#0b0907]/95 p-4 text-left shadow-[0_18px_48px_rgba(0,0,0,0.38)] backdrop-blur">
-          <div className="grid gap-3">
-            <div className="flex items-start gap-3 border-b border-[#2b241a] pb-3">
-              <div className="flex size-10 shrink-0 items-center justify-center rounded-full border border-[#6d5a35] bg-[#120d09] font-serif text-lg text-[#d9bd80]">
+        <section className="absolute right-0 top-12 z-[300] w-[min(calc(100vw-1.5rem),24rem)] overflow-hidden rounded-3xl border border-[#d8b76a]/45 bg-[#fffaf0]/96 p-4 text-left text-[#4f4235] shadow-[0_24px_70px_rgba(102,75,33,0.22),inset_0_1px_0_rgba(255,255,255,0.82)] backdrop-blur-md sm:p-5">
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_14%_8%,rgba(255,255,255,0.92),transparent_32%),radial-gradient(circle_at_92%_12%,rgba(216,183,106,0.18),transparent_30%),repeating-linear-gradient(90deg,rgba(91,74,54,0.035)_0_1px,transparent_1px_18px)]"
+          />
+          <div className="relative grid gap-4">
+            <div className="flex items-start gap-3 border-b border-[#d8b76a]/30 pb-4">
+              <div className="flex size-11 shrink-0 items-center justify-center rounded-full border border-[#caa96a]/60 bg-[#f6e1ae]/80 font-serif text-lg text-[#5b3c16] shadow-[inset_0_1px_0_rgba(255,255,255,0.72)]">
                 {user ? (user.email ?? "A").slice(0, 1).toUpperCase() : "O"}
               </div>
               <div className="min-w-0">
-                <p className="atelier-label text-[0.62rem] font-semibold">
-                  Reading Account
+                <p className="text-[0.62rem] font-semibold uppercase tracking-[0.22em] text-[#9d7b3f]">
+                  {user ? "Reading Account" : "Enter your reading room"}
                 </p>
                 {user ? (
-                  <div className="mt-1 grid gap-0.5">
-                    <p className="text-sm leading-6 text-[#b7aa94]">
+                  <div className="mt-2 grid gap-1">
+                    <p className="text-sm leading-6 text-[#6f5f4b]">
                       Signed in as{" "}
-                      <span className="break-all text-[#d9bd80]">
+                      <span className="break-all font-semibold text-[#4f4235]">
                         {user.email ?? "current user"}
                       </span>
                     </p>
-                    <p className="text-sm leading-6 text-[#b7aa94]">
+                    <p className="text-sm leading-6 text-[#766955]">
                       Your readings are saved when you are signed in.
-                    </p>
-                    <p className="text-sm leading-6 text-[#8f826f]">
-                      {isLoadingCredits
-                        ? "Loading Reading Credits..."
-                        : `Reading Credits: ${credits?.remaining_credits ?? 0} remaining`}
-                    </p>
-                    <p className="text-sm leading-6 text-[#8f826f]">
-                      {credits?.remaining_credits === 0
-                        ? "Each AI reading uses 1 credit. Redeem a deck code to add credits."
-                        : "Each AI reading uses 1 credit."}
                     </p>
                   </div>
                 ) : (
-                  <p className="mt-1 text-xs leading-5 text-[#b7aa94]">
-                    Sign in to save your readings, view your credits, and redeem
-                    a deck code.
+                  <p className="mt-2 text-sm leading-6 text-[#766955]">
+                    Sign in to save your readings and redeem deck codes.
                   </p>
                 )}
               </div>
             </div>
 
             {isLoadingUser ? (
-              <p className="text-xs leading-5 text-[#9f947f]">
+              <p className="rounded-2xl border border-[#d8b76a]/28 bg-[#fff7e8]/72 px-4 py-3 text-xs leading-5 text-[#766955]">
                 Checking your reading account...
               </p>
             ) : user ? (
-              <div className="grid gap-3">
+              <div className="grid gap-4">
+                <div className="rounded-2xl border border-[#d8b76a]/34 bg-[#fff7e8]/78 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.72)]">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <p className="text-[0.6rem] font-semibold uppercase tracking-[0.2em] text-[#9d7b3f]">
+                      Reading Credits
+                    </p>
+                    <span className="rounded-full border border-[#caa96a]/38 bg-[#fffaf0] px-3 py-1 text-[0.62rem] font-semibold uppercase tracking-[0.14em] text-[#6f4f20]">
+                      {isLoadingCredits ? "Loading" : `${creditsRemaining} remaining`}
+                    </span>
+                  </div>
+                  <p className="mt-3 text-sm leading-6 text-[#6f5f4b]">
+                    {creditsRemaining === 0
+                      ? "Each AI reading uses 1 credit. Redeem a deck code to add credits."
+                      : "Each AI reading uses 1 credit."}
+                  </p>
+                </div>
+
                 <button
-                  className="min-h-11 rounded-full border border-[#6d5a35]/75 bg-[#1a130b]/80 px-4 text-sm font-semibold uppercase tracking-[0.14em] text-[#f2dfb9] transition hover:border-[#d9bd80] hover:text-[#fff7e8]"
+                  className="min-h-11 rounded-full border border-[#caa96a]/60 bg-[linear-gradient(180deg,#f7e5b8,#d7ad62)] px-4 text-sm font-semibold uppercase tracking-[0.14em] text-[#3f2b14] shadow-[0_12px_28px_rgba(157,123,63,0.18),inset_0_1px_0_rgba(255,255,255,0.62)] transition hover:-translate-y-0.5 hover:border-[#9d7b3f] disabled:cursor-not-allowed disabled:opacity-55"
                   onClick={() => {
                     setStatus(null);
                     setError(null);
@@ -406,12 +417,12 @@ export function ActivationCodePanel({
                 </button>
 
                 {isRedeemFormOpen ? (
-                  <div className="grid gap-3 border-t border-[#3d3020] pt-3">
-                    <label className="grid gap-2 text-xs text-[#cfc3ad]">
+                  <div className="grid gap-3 rounded-2xl border border-[#d8b76a]/30 bg-[#fffaf0]/72 p-4">
+                    <label className="grid gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-[#6f5f4b]">
                       Deck code
                       <input
                         autoComplete="off"
-                        className="min-h-11 rounded-full border border-[#3d3020] bg-[#0d0a08]/80 px-4 text-sm text-[#f6ecd8] outline-none transition focus:border-[#d9bd80]"
+                        className="min-h-11 rounded-full border border-[#d8b76a]/45 bg-[#fffdf8] px-4 text-sm normal-case tracking-normal text-[#3f352b] outline-none transition placeholder:text-[#b09d7f] focus:border-[#9d7b3f] focus:ring-2 focus:ring-[#d8b76a]/20"
                         onChange={(event) =>
                           setActivationCode(event.target.value)
                         }
@@ -420,13 +431,13 @@ export function ActivationCodePanel({
                         value={activationCode}
                       />
                     </label>
-                    <p className="text-xs leading-5 text-[#8f826f]">
+                    <p className="text-xs leading-5 text-[#766955]">
                       Physical deck activation codes add credits to your account.
                     </p>
 
                     <div className="grid gap-2 sm:grid-cols-2">
                       <button
-                        className="ritual-action-link w-full"
+                        className="min-h-11 rounded-full border border-[#caa96a]/60 bg-[#31483f] px-4 text-xs font-semibold uppercase tracking-[0.16em] text-[#fff7e8] shadow-[0_10px_24px_rgba(49,72,63,0.16)] transition hover:-translate-y-0.5 hover:bg-[#263b34] disabled:cursor-not-allowed disabled:opacity-50"
                         disabled={isRedeeming || !activationCode.trim()}
                         onClick={handleRedeemCode}
                         type="button"
@@ -434,7 +445,7 @@ export function ActivationCodePanel({
                         {isRedeeming ? "Redeeming..." : "Redeem"}
                       </button>
                       <button
-                        className="min-h-11 rounded-full border border-[#3d3020] bg-transparent px-4 text-xs font-semibold uppercase tracking-[0.18em] text-[#b7aa94] transition hover:border-[#6d5a35] hover:text-[#efe8d9] disabled:cursor-not-allowed disabled:opacity-50"
+                        className="min-h-11 rounded-full border border-[#d8b76a]/42 bg-[#fffaf0] px-4 text-xs font-semibold uppercase tracking-[0.18em] text-[#6f5f4b] transition hover:border-[#9d7b3f] hover:text-[#3f352b] disabled:cursor-not-allowed disabled:opacity-50"
                         disabled={isRedeeming}
                         onClick={handleCancelRedeem}
                         type="button"
@@ -445,30 +456,30 @@ export function ActivationCodePanel({
                   </div>
                 ) : null}
 
-                <div className="grid border-y border-[#2b241a] text-sm leading-6">
+                <div className="grid overflow-hidden rounded-2xl border border-[#d8b76a]/30 bg-[#fff7e8]/62 text-sm leading-6">
                   <button
-                    className="flex min-h-11 items-center justify-between border-b border-[#2b241a] py-2 text-left text-[#c8bca6] transition hover:text-[#f6ecd8]"
+                    className="flex min-h-11 items-center justify-between border-b border-[#d8b76a]/24 px-4 py-2 text-left text-[#5b4a36] transition hover:bg-[#fffaf0] hover:text-[#9d7b3f]"
                     onClick={() => setIsMenuOpen(false)}
                     type="button"
                   >
                     <span>Reading Room</span>
                   </button>
                   <Link
-                    className="flex min-h-11 items-center justify-between border-b border-[#2b241a] py-2 text-[#c8bca6] transition hover:text-[#f6ecd8]"
+                    className="flex min-h-11 items-center justify-between border-b border-[#d8b76a]/24 px-4 py-2 text-[#5b4a36] transition hover:bg-[#fffaf0] hover:text-[#9d7b3f]"
                     href={withLang("/ai-guide/readings", {}, lang)}
                     onClick={() => setIsMenuOpen(false)}
                   >
                     <span>View Reading Journal</span>
                   </Link>
-                  <div className="flex min-h-11 items-center justify-between gap-3 border-b border-[#2b241a] py-2">
-                    <span className="text-[#c8bca6]">Language</span>
-                    <div className="inline-flex min-h-8 items-center rounded-full border border-[#6d5a35]/45 bg-[#080706]/80 p-0.5 text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-[#a9a59d]">
+                  <div className="flex min-h-11 items-center justify-between gap-3 px-4 py-2">
+                    <span className="text-[#5b4a36]">Language</span>
+                    <div className="inline-flex min-h-8 items-center rounded-full border border-[#d8b76a]/45 bg-[#fffaf0] p-0.5 text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-[#8f826f]">
                       {(["en", "zh"] as const).map((nextLang) => (
                         <Link
                           className={`flex min-h-7 touch-manipulation items-center rounded-full px-2.5 transition ${
                             lang === nextLang
-                              ? "bg-[#2b2114] text-[#f2dfb9]"
-                              : "text-[#9f947f] hover:text-[#efe8d9]"
+                              ? "bg-[#31483f] text-[#fff7e8]"
+                              : "text-[#8f826f] hover:text-[#5b4a36]"
                           }`}
                           href={withLang("/ai-guide", {}, nextLang)}
                           key={nextLang}
@@ -479,21 +490,15 @@ export function ActivationCodePanel({
                       ))}
                     </div>
                   </div>
-                  <div className="flex min-h-11 items-center justify-between py-2 text-[#7d7466]">
-                    <span>Settings</span>
-                    <span className="text-[0.68rem] uppercase tracking-[0.14em]">
-                      Coming soon
-                    </span>
-                  </div>
                 </div>
               </div>
             ) : (
-              <div className="grid gap-3">
-                <label className="grid gap-2 text-xs text-[#cfc3ad]">
+              <div className="grid gap-4">
+                <label className="grid gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-[#6f5f4b]">
                   Email
                   <input
                     autoComplete="email"
-                    className="min-h-11 rounded-full border border-[#3d3020] bg-[#0d0a08]/80 px-4 text-sm text-[#f6ecd8] outline-none transition focus:border-[#d9bd80]"
+                    className="min-h-11 rounded-full border border-[#d8b76a]/45 bg-[#fffdf8] px-4 text-sm normal-case tracking-normal text-[#3f352b] outline-none transition placeholder:text-[#b09d7f] focus:border-[#9d7b3f] focus:ring-2 focus:ring-[#d8b76a]/20"
                     onChange={(event) => setEmail(event.target.value)}
                     placeholder="you@example.com"
                     type="email"
@@ -501,68 +506,68 @@ export function ActivationCodePanel({
                   />
                 </label>
                 <button
-                  className="ritual-action-link w-full"
+                  className="min-h-11 rounded-full border border-[#caa96a]/60 bg-[linear-gradient(180deg,#f7e5b8,#d7ad62)] px-4 text-xs font-semibold uppercase tracking-[0.16em] text-[#3f2b14] shadow-[0_12px_28px_rgba(157,123,63,0.18),inset_0_1px_0_rgba(255,255,255,0.62)] transition hover:-translate-y-0.5 hover:border-[#9d7b3f] disabled:cursor-not-allowed disabled:opacity-50"
                   disabled={isSendingEmail || !email.trim()}
                   onClick={handleSendLoginEmail}
                   type="button"
                 >
                   {isSendingEmail ? "Sending..." : "Send sign-in email"}
                 </button>
-                <p className="text-xs leading-5 text-[#8f826f]">
-                  Your readings are saved when you are signed in.
+                <p className="rounded-2xl border border-[#d8b76a]/26 bg-[#fff7e8]/68 px-4 py-3 text-xs leading-5 text-[#766955]">
+                  No password needed. We&apos;ll send you a secure sign-in link.
                 </p>
               </div>
             )}
 
-            <div className="grid gap-3 border-t border-[#3d3020] pt-3">
+            <div className="grid gap-3 border-t border-[#d8b76a]/30 pt-4">
               {!user ? (
                 <div>
-                <p className="atelier-label text-[0.58rem] font-semibold">
-                  Language
-                </p>
-                <div className="mt-2 inline-flex min-h-10 items-center rounded-full border border-[#6d5a35]/55 bg-[#080706]/80 p-1 text-[0.62rem] font-semibold uppercase tracking-[0.18em] text-[#a9a59d]">
-                  {(["en", "zh"] as const).map((nextLang) => (
-                    <Link
-                      className={`flex min-h-8 touch-manipulation items-center rounded-full px-3 transition ${
-                        lang === nextLang
-                          ? "bg-[#2b2114] text-[#f2dfb9] shadow-[0_0_18px_rgba(214,179,109,0.12)]"
-                          : "text-[#9f947f] hover:text-[#efe8d9]"
-                      }`}
-                      href={withLang("/ai-guide", {}, nextLang)}
-                      key={nextLang}
-                      onClick={() => rememberLanguage(nextLang)}
-                    >
-                      {nextLang === "en" ? "EN" : languageLabel(nextLang)}
-                    </Link>
-                  ))}
+                  <p className="text-[0.58rem] font-semibold uppercase tracking-[0.2em] text-[#9d7b3f]">
+                    Language
+                  </p>
+                  <div className="mt-2 inline-flex min-h-10 items-center rounded-full border border-[#d8b76a]/45 bg-[#fff7e8]/76 p-1 text-[0.62rem] font-semibold uppercase tracking-[0.18em] text-[#8f826f]">
+                    {(["en", "zh"] as const).map((nextLang) => (
+                      <Link
+                        className={`flex min-h-8 touch-manipulation items-center rounded-full px-3 transition ${
+                          lang === nextLang
+                            ? "bg-[#31483f] text-[#fff7e8] shadow-[0_8px_18px_rgba(49,72,63,0.12)]"
+                            : "text-[#8f826f] hover:text-[#5b4a36]"
+                        }`}
+                        href={withLang("/ai-guide", {}, nextLang)}
+                        key={nextLang}
+                        onClick={() => rememberLanguage(nextLang)}
+                      >
+                        {nextLang === "en" ? "EN" : languageLabel(nextLang)}
+                      </Link>
+                    ))}
+                  </div>
                 </div>
-              </div>
               ) : null}
 
-              <div className="flex flex-wrap gap-x-3 gap-y-1 text-[0.68rem] uppercase tracking-[0.12em] text-[#6f6658]">
+              <div className="flex flex-wrap gap-x-3 gap-y-1 text-[0.68rem] uppercase tracking-[0.12em] text-[#8a765d]">
                 <Link
-                  className="transition hover:text-[#d8c9ae]"
+                  className="transition hover:text-[#9d7b3f]"
                   href={withLang("/privacy", {}, lang)}
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Privacy
                 </Link>
                 <Link
-                  className="transition hover:text-[#d8c9ae]"
+                  className="transition hover:text-[#9d7b3f]"
                   href={withLang("/terms", {}, lang)}
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Terms
                 </Link>
                 <Link
-                  className="transition hover:text-[#d8c9ae]"
+                  className="transition hover:text-[#9d7b3f]"
                   href={withLang("/disclaimer", {}, lang)}
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Disclaimer
                 </Link>
                 <Link
-                  className="transition hover:text-[#d8c9ae]"
+                  className="transition hover:text-[#9d7b3f]"
                   href={withLang("/contact", {}, lang)}
                   onClick={() => setIsMenuOpen(false)}
                 >
@@ -572,7 +577,7 @@ export function ActivationCodePanel({
 
               {user ? (
                 <button
-                  className="justify-self-start rounded-full py-1.5 text-sm font-semibold uppercase tracking-[0.16em] text-[#8f826f] transition hover:text-[#d8c9ae] disabled:cursor-not-allowed disabled:opacity-50"
+                  className="justify-self-start rounded-full px-1 py-1.5 text-sm font-semibold uppercase tracking-[0.16em] text-[#8a765d] transition hover:text-[#9d7b3f] disabled:cursor-not-allowed disabled:opacity-50"
                   disabled={isSigningOut}
                   onClick={handleSignOut}
                   type="button"
@@ -583,10 +588,14 @@ export function ActivationCodePanel({
             </div>
 
             {status ? (
-              <p className="text-xs leading-5 text-[#bfe3bf]">{status}</p>
+              <p className="rounded-2xl border border-[#8fb58a]/30 bg-[#eef7e9] px-4 py-3 text-xs leading-5 text-[#3e6d3f]">
+                {status}
+              </p>
             ) : null}
             {error ? (
-              <p className="text-xs leading-5 text-[#f0a99a]">{error}</p>
+              <p className="rounded-2xl border border-[#d9a08f]/35 bg-[#fff0ea] px-4 py-3 text-xs leading-5 text-[#9a4b35]">
+                {error}
+              </p>
             ) : null}
           </div>
         </section>
