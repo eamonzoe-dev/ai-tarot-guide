@@ -241,27 +241,7 @@ export default function Galaxy({
       gl.clearColor(0, 0, 0, 1);
     }
 
-    let program: Program | undefined;
-
-    function resize() {
-      const width = Math.max(container.offsetWidth, 1);
-      const height = Math.max(container.offsetHeight, 1);
-      renderer.setSize(width, height);
-
-      if (program) {
-        program.uniforms.uResolution.value = new Color(
-          gl.canvas.width,
-          gl.canvas.height,
-          gl.canvas.width / gl.canvas.height,
-        );
-      }
-    }
-
-    window.addEventListener("resize", resize, false);
-    resize();
-
-    const geometry = new Triangle(gl);
-    program = new Program(gl, {
+    const program = new Program(gl, {
       vertex: vertexShader,
       fragment: fragmentShader,
       uniforms: {
@@ -297,13 +277,29 @@ export default function Galaxy({
       },
     });
 
+    function resize() {
+      const width = Math.max(container.offsetWidth, 1);
+      const height = Math.max(container.offsetHeight, 1);
+      renderer.setSize(width, height);
+
+      program.uniforms.uResolution.value = new Color(
+        gl.canvas.width,
+        gl.canvas.height,
+        gl.canvas.width / gl.canvas.height,
+      );
+    }
+
+    window.addEventListener("resize", resize, false);
+    resize();
+
+    const geometry = new Triangle(gl);
     const mesh = new Mesh(gl, { geometry, program });
     let animationId = 0;
 
     function update(time: number) {
       animationId = requestAnimationFrame(update);
 
-      if (program && !disableAnimation) {
+      if (!disableAnimation) {
         program.uniforms.uTime.value = time * 0.001;
         program.uniforms.uStarSpeed.value = (time * 0.001 * starSpeed) / 10;
       }
@@ -315,11 +311,9 @@ export default function Galaxy({
       smoothMouseActive.current +=
         (targetMouseActive.current - smoothMouseActive.current) * 0.05;
 
-      if (program) {
-        program.uniforms.uMouse.value[0] = smoothMousePos.current.x;
-        program.uniforms.uMouse.value[1] = smoothMousePos.current.y;
-        program.uniforms.uMouseActiveFactor.value = smoothMouseActive.current;
-      }
+      program.uniforms.uMouse.value[0] = smoothMousePos.current.x;
+      program.uniforms.uMouse.value[1] = smoothMousePos.current.y;
+      program.uniforms.uMouseActiveFactor.value = smoothMouseActive.current;
 
       renderer.render({ scene: mesh });
     }

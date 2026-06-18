@@ -35,14 +35,6 @@ type AiReading = {
   closingNote?: string;
 };
 
-type UserQuota = {
-  user_id: string;
-  plan_type: string;
-  remaining_credits: number | null;
-  daily_limit: number;
-  valid_until: string | null;
-};
-
 type UserCredits = {
   remaining_credits: number;
   total_credits: number;
@@ -341,48 +333,6 @@ function normalizeOpenAiApiKey(value: string | undefined) {
   return value?.trim().replace(/^Bearer\s+/i, "") || "";
 }
 
-function getUtcDayWindow() {
-  const dayStart = new Date();
-  dayStart.setUTCHours(0, 0, 0, 0);
-
-  const nextDayStart = new Date(dayStart);
-  nextDayStart.setUTCDate(nextDayStart.getUTCDate() + 1);
-
-  return {
-    dayStartIso: dayStart.toISOString(),
-    retryAfterSeconds: Math.max(
-      Math.ceil((nextDayStart.getTime() - Date.now()) / 1000),
-      1,
-    ),
-  };
-}
-
-function normalizeQuota(value: unknown): UserQuota | null {
-  if (!isRecord(value)) {
-    return null;
-  }
-
-  if (
-    typeof value.user_id !== "string" ||
-    typeof value.plan_type !== "string" ||
-    typeof value.daily_limit !== "number"
-  ) {
-    return null;
-  }
-
-  return {
-    user_id: value.user_id,
-    plan_type: value.plan_type,
-    remaining_credits:
-      typeof value.remaining_credits === "number"
-        ? value.remaining_credits
-        : null,
-    daily_limit: value.daily_limit,
-    valid_until:
-      typeof value.valid_until === "string" ? value.valid_until : null,
-  };
-}
-
 function normalizeCredits(value: unknown): UserCredits | null {
   if (!isRecord(value)) {
     return null;
@@ -482,67 +432,6 @@ async function consumeAiReadingCredit(
   return {
     credits: normalizeConsumedCredit(firstResult),
     error: null,
-  };
-}
-
-async function getOrCreateUserQuota(
-  admin: ReturnType<typeof createSupabaseAdminClient>,
-  userId: string,
-) {
-  const quotaResult = await admin
-    .from("user_quotas")
-    .select("user_id,plan_type,remaining_credits,daily_limit,valid_until")
-    .eq("user_id", userId)
-    .maybeSingle();
-
-  if (quotaResult.error) {
-    return { quota: null, error: quotaResult.error };
-  }
-
-  const existingQuota = normalizeQuota(quotaResult.data);
-
-  if (existingQuota) {
-    return { quota: existingQuota, error: null };
-  }
-
-  const createdQuotaResult = await admin
-    .from("user_quotas")
-    .insert({
-      user_id: userId,
-      plan_type: "free",
-      daily_limit: 1,
-      remaining_credits: null,
-      valid_until: null,
-    })
-    .select("user_id,plan_type,remaining_credits,daily_limit,valid_until")
-    .single();
-
-  if (createdQuotaResult.error) {
-    return { quota: null, error: createdQuotaResult.error };
-  }
-
-  return {
-    quota: normalizeQuota(createdQuotaResult.data),
-    error: null,
-  };
-}
-
-async function getChargedUsageCountForToday(
-  admin: ReturnType<typeof createSupabaseAdminClient>,
-  userId: string,
-) {
-  const { dayStartIso, retryAfterSeconds } = getUtcDayWindow();
-  const usageResult = await admin
-    .from("usage_events")
-    .select("id", { count: "exact", head: true })
-    .eq("user_id", userId)
-    .eq("charged", true)
-    .gte("created_at", dayStartIso);
-
-  return {
-    count: usageResult.count ?? 0,
-    retryAfterSeconds,
-    error: usageResult.error,
   };
 }
 

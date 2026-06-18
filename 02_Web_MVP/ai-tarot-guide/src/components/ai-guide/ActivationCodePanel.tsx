@@ -160,7 +160,9 @@ export function ActivationCodePanel({
   );
 
   useEffect(() => {
-    setIsMounted(true);
+    queueMicrotask(() => {
+      setIsMounted(true);
+    });
   }, []);
 
   useEffect(() => {
@@ -271,7 +273,9 @@ export function ActivationCodePanel({
   }, [loadCredits, supabase]);
 
   useEffect(() => {
-    void refreshUser();
+    queueMicrotask(() => {
+      void refreshUser();
+    });
   }, [refreshUser]);
 
   useEffect(() => {

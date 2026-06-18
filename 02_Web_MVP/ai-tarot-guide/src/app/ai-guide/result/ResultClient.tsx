@@ -382,115 +382,124 @@ export function ResultClient({
   const card = selectedCard ? getTarotCardById(selectedCard) : undefined;
 
   useEffect(() => {
-    if (!card || !question || !mode || orientation !== "upright") {
-      setAiReading(null);
-      setAiReadingStatus("idle");
-      setAiReadingErrorMessage(null);
-      return;
-    }
+    let isCancelled = false;
 
-    const cacheKey = [
-      AI_READING_CACHE_PREFIX,
-      initialLang,
-      mode,
-      orientation,
-      card.id,
-      question,
-    ].join(":");
-    const cachedReading = sessionStorage.getItem(cacheKey);
-
-    if (cachedReading) {
-      try {
-        const parsedCachedReading = JSON.parse(cachedReading) as unknown;
-
-        if (!isDisplayableAiReading(parsedCachedReading)) {
-          sessionStorage.removeItem(cacheKey);
-        } else {
-          setAiReading(parsedCachedReading);
-          setAiReadingStatus("ready");
-          return;
-        }
-      } catch {
-        sessionStorage.removeItem(cacheKey);
+    queueMicrotask(() => {
+      if (isCancelled) {
+        return;
       }
-    }
 
-    const cachedFailureKey = `${cacheKey}:error`;
-    sessionStorage.removeItem(cachedFailureKey);
+      if (!card || !question || !mode || orientation !== "upright") {
+        setAiReading(null);
+        setAiReadingStatus("idle");
+        setAiReadingErrorMessage(null);
+        return;
+      }
 
-    const requestKey = `${cacheKey}:${aiRetryKey}`;
-
-    if (
-      inFlightAiReadingKeyRef.current === requestKey ||
-      activeAiReadingRequests.has(requestKey)
-    ) {
-      return;
-    }
-
-    const clientRequestId = getStableClientRequestId(cacheKey, aiRetryKey);
-    inFlightAiReadingKeyRef.current = requestKey;
-    activeAiReadingRequests.add(requestKey);
-    setAiReading(null);
-    setAiReadingStatus("loading");
-    setAiReadingErrorMessage(null);
-
-    fetch("/api/ai-reading", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        cardId: card.id,
-        question,
-        lang: initialLang,
+      const cacheKey = [
+        AI_READING_CACHE_PREFIX,
+        initialLang,
         mode,
         orientation,
-        spread: "single",
-        clientRequestId,
-      }),
-    })
-      .then(async (response) => {
-        if (!response.ok) {
-          const apiError = await readAiReadingApiError(response);
-          throw new Error(apiError.message);
-        }
+        card.id,
+        question,
+      ].join(":");
+      const cachedReading = sessionStorage.getItem(cacheKey);
 
-        return response.json() as Promise<{
-          reading?: AiReading;
-          credits?: unknown;
-        }>;
-      })
-      .then((payload) => {
-        if (!payload.reading || !isDisplayableAiReading(payload.reading)) {
-          throw new Error("AI reading response was empty.");
-        }
+      if (cachedReading) {
+        try {
+          const parsedCachedReading = JSON.parse(cachedReading) as unknown;
 
-        sessionStorage.setItem(cacheKey, JSON.stringify(payload.reading));
-        setAiReading(payload.reading);
-        setAiReadingStatus("ready");
-        window.dispatchEvent(new Event(CREDITS_UPDATED_EVENT));
-      })
-      .catch((error) => {
-        if (error instanceof DOMException && error.name === "AbortError") {
-          return;
+          if (!isDisplayableAiReading(parsedCachedReading)) {
+            sessionStorage.removeItem(cacheKey);
+          } else {
+            setAiReading(parsedCachedReading);
+            setAiReadingStatus("ready");
+            return;
+          }
+        } catch {
+          sessionStorage.removeItem(cacheKey);
         }
+      }
 
-        setAiReading(null);
-        setAiReadingErrorMessage(
-          error instanceof Error
-            ? error.message
-            : "AI reading request failed.",
-        );
-        setAiReadingStatus("error");
+      const cachedFailureKey = `${cacheKey}:error`;
+      sessionStorage.removeItem(cachedFailureKey);
+
+      const requestKey = `${cacheKey}:${aiRetryKey}`;
+
+      if (
+        inFlightAiReadingKeyRef.current === requestKey ||
+        activeAiReadingRequests.has(requestKey)
+      ) {
+        return;
+      }
+
+      const clientRequestId = getStableClientRequestId(cacheKey, aiRetryKey);
+      inFlightAiReadingKeyRef.current = requestKey;
+      activeAiReadingRequests.add(requestKey);
+      setAiReading(null);
+      setAiReadingStatus("loading");
+      setAiReadingErrorMessage(null);
+
+      fetch("/api/ai-reading", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          cardId: card.id,
+          question,
+          lang: initialLang,
+          mode,
+          orientation,
+          spread: "single",
+          clientRequestId,
+        }),
       })
-      .finally(() => {
-        if (inFlightAiReadingKeyRef.current === requestKey) {
-          inFlightAiReadingKeyRef.current = null;
-        }
-        activeAiReadingRequests.delete(requestKey);
+        .then(async (response) => {
+          if (!response.ok) {
+            const apiError = await readAiReadingApiError(response);
+            throw new Error(apiError.message);
+          }
+
+          return response.json() as Promise<{
+            reading?: AiReading;
+            credits?: unknown;
+          }>;
+        })
+        .then((payload) => {
+          if (!payload.reading || !isDisplayableAiReading(payload.reading)) {
+            throw new Error("AI reading response was empty.");
+          }
+
+          sessionStorage.setItem(cacheKey, JSON.stringify(payload.reading));
+          setAiReading(payload.reading);
+          setAiReadingStatus("ready");
+          window.dispatchEvent(new Event(CREDITS_UPDATED_EVENT));
+        })
+        .catch((error) => {
+          if (error instanceof DOMException && error.name === "AbortError") {
+            return;
+          }
+
+          setAiReading(null);
+          setAiReadingErrorMessage(
+            error instanceof Error
+              ? error.message
+              : "AI reading request failed.",
+          );
+          setAiReadingStatus("error");
+        })
+        .finally(() => {
+          if (inFlightAiReadingKeyRef.current === requestKey) {
+            inFlightAiReadingKeyRef.current = null;
+          }
+          activeAiReadingRequests.delete(requestKey);
+        });
       });
 
     return () => {
+      isCancelled = true;
       // Keep the in-flight guard active across React dev remounts.
       // The request result is idempotent server-side via clientRequestId.
     };

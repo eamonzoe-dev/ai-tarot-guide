@@ -371,7 +371,11 @@ export function OracleShowroomHome({
     );
 
     if (reduceMotion) {
-      setVisible(new Set(revealNodes.map((node) => node.dataset.revealId ?? "")));
+      queueMicrotask(() => {
+        setVisible(
+          new Set(revealNodes.map((node) => node.dataset.revealId ?? "")),
+        );
+      });
       return;
     }
 

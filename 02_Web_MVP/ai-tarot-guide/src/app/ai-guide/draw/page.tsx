@@ -1,5 +1,4 @@
 import { DrawClient } from "./DrawClient";
-import { tarotCards } from "@/data/tarotCards";
 import { normalizeLanguage } from "@/lib/ai-guide/i18n";
 
 type ReadingMode = "physical" | "online";
@@ -43,8 +42,6 @@ export default async function DrawPage({
     ritualStep: ritualStepParam,
   } = await searchParams;
   const ritualStep = normalizeRitualStep(ritualStepParam);
-  const drawnCard =
-    tarotCards[Math.floor(Math.random() * tarotCards.length)]?.id ?? "";
 
   return (
     <DrawClient
@@ -53,7 +50,6 @@ export default async function DrawPage({
       initialLang={normalizeLanguage(langParam)}
       hasLangParam={Boolean(langParam)}
       initialRitualStep={ritualStep}
-      initialDrawnCard={drawnCard}
     />
   );
 }

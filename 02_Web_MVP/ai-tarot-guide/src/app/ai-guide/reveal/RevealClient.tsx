@@ -224,7 +224,9 @@ export function RevealClient({
       nextRitual.question !== ritual.question ||
       nextRitual.card !== ritual.card
     ) {
-      setRitual(nextRitual);
+      queueMicrotask(() => {
+        setRitual(nextRitual);
+      });
       return;
     }
 

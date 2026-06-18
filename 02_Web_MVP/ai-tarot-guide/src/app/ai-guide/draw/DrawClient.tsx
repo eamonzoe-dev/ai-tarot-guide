@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 
 import { LanguageToggle } from "@/components/ai-guide/LanguageToggle";
 import { ReadingNav } from "@/components/ai-guide/ReadingNav";
+import { tarotCards } from "@/data/tarotCards";
 import { type Language, text } from "@/lib/ai-guide/i18n";
 
 const USER_QUESTION_KEY = "aiTarot:userQuestion";
@@ -19,7 +20,6 @@ type DrawClientProps = {
   initialLang: Language;
   hasLangParam: boolean;
   initialRitualStep: number;
-  initialDrawnCard: string;
 };
 
 function buildQuery(
@@ -65,6 +65,10 @@ function saveLatestRitual(
       card,
     }),
   );
+}
+
+function getRandomTarotCardId() {
+  return tarotCards[Math.floor(Math.random() * tarotCards.length)]?.id ?? "";
 }
 
 function LuminousShell({
@@ -172,7 +176,6 @@ export function DrawClient({
   initialLang,
   hasLangParam,
   initialRitualStep,
-  initialDrawnCard,
 }: DrawClientProps) {
   const router = useRouter();
   const copy = text(initialLang);
@@ -202,6 +205,7 @@ export function DrawClient({
   const [question, setQuestion] = useState<string | undefined>(
     initialQuestion || undefined,
   );
+  const [drawnCard, setDrawnCard] = useState<string | undefined>(undefined);
   const currentOnlineStep = onlineSteps[initialRitualStep];
   const onlineActionHref =
     initialRitualStep < 2
@@ -216,7 +220,7 @@ export function DrawClient({
           "online",
           question ?? initialQuestion,
           initialLang,
-          initialDrawnCard,
+          drawnCard,
         )}`;
 
   useEffect(() => {
@@ -229,8 +233,14 @@ export function DrawClient({
         initialMode,
         initialQuestion,
         initialLang,
-        initialRitualStep === 2 ? initialDrawnCard : undefined,
+        initialRitualStep === 2 ? drawnCard : undefined,
       );
+    }
+
+    if (initialRitualStep === 2 && !drawnCard) {
+      queueMicrotask(() => {
+        setDrawnCard(getRandomTarotCardId());
+      });
     }
 
     queueMicrotask(() => {
@@ -243,7 +253,7 @@ export function DrawClient({
       );
     }
   }, [
-    initialDrawnCard,
+    drawnCard,
     initialLang,
     initialMode,
     initialQuestion,
@@ -274,6 +284,27 @@ export function DrawClient({
 
   if (!question) {
     return null;
+  }
+
+  if (initialMode === "online" && initialRitualStep === 2 && !drawnCard) {
+    return (
+      <LuminousShell>
+        <section className="my-auto rounded-[2rem] border border-[#d8bd82]/45 bg-[#fffaf1]/74 p-6 text-center shadow-[0_24px_70px_rgba(116,83,36,0.10)] backdrop-blur-md">
+          <p className="text-[0.66rem] font-semibold uppercase tracking-[0.28em] text-[#a77f3c]">
+            {copy.readingRoom}
+          </p>
+          <h1 className="mt-4 font-serif text-4xl leading-tight text-[#34271b]">
+            {copy.readingCard}
+          </h1>
+          <p className="mt-4 text-sm leading-7 text-[#7b6c58]">
+            {copy.gatheringReading}
+          </p>
+          <p className="mt-6 text-sm text-[#80715d]">
+            {copy.preparingMessage}
+          </p>
+        </section>
+      </LuminousShell>
+    );
   }
 
   if (initialMode === "online") {

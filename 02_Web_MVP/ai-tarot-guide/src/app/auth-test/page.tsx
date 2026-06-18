@@ -86,7 +86,9 @@ export default function AuthTestPage() {
   }, [loadRelatedData, supabase]);
 
   useEffect(() => {
-    void refreshUser();
+    queueMicrotask(() => {
+      void refreshUser();
+    });
   }, [refreshUser]);
 
   async function handleSendLoginEmail() {

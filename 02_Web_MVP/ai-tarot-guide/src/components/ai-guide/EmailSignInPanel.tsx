@@ -52,7 +52,9 @@ export function EmailSignInPanel({
   }, [supabase]);
 
   useEffect(() => {
-    void refreshUser();
+    queueMicrotask(() => {
+      void refreshUser();
+    });
   }, [refreshUser]);
 
   async function handleSendLoginEmail() {
