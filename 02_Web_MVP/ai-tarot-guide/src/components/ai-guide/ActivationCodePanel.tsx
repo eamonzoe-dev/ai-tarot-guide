@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import type { User } from "@supabase/supabase-js";
 
@@ -69,6 +69,7 @@ export function ActivationCodePanel({
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const lastCreditsRefreshAtRef = useRef(0);
+  const authModalTitleId = useId();
   const isZh = lang === "zh";
   const copy = useMemo(
     () => ({
@@ -416,11 +417,29 @@ export function ActivationCodePanel({
   const hasDismissOverlay =
     isTopUpOpen || isNotificationsOpen || (isMenuOpen && Boolean(user));
 
-  function closePanels() {
+  const closePanels = useCallback(() => {
     setIsMenuOpen(false);
     setIsTopUpOpen(false);
     setIsNotificationsOpen(false);
-  }
+  }, []);
+
+  useEffect(() => {
+    if (!isMenuOpen && !isTopUpOpen && !isNotificationsOpen) {
+      return;
+    }
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        closePanels();
+      }
+    }
+
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [closePanels, isMenuOpen, isNotificationsOpen, isTopUpOpen]);
 
   function openAccountMenu() {
     setIsMenuOpen(true);
@@ -452,13 +471,24 @@ export function ActivationCodePanel({
       onClick={closePanels}
     >
       <div
+        aria-labelledby={authModalTitleId}
+        aria-modal="true"
         className="relative max-h-[min(90vh,44rem)] w-[min(calc(100vw-2rem),27rem)] overflow-y-auto rounded-3xl border border-[#d8b76a]/45 bg-[#fffaf0]/96 p-5 text-left text-[#4f4235] shadow-[0_28px_78px_rgba(35,27,18,0.3),inset_0_1px_0_rgba(255,255,255,0.82)] backdrop-blur-md sm:p-6"
         onClick={(event) => event.stopPropagation()}
+        role="dialog"
       >
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_14%_8%,rgba(255,255,255,0.92),transparent_32%),radial-gradient(circle_at_92%_12%,rgba(216,183,106,0.18),transparent_30%),repeating-linear-gradient(90deg,rgba(91,74,54,0.035)_0_1px,transparent_1px_18px)]"
         />
+        <button
+          aria-label={copy.closeAccountPanel}
+          className="absolute right-3 top-3 z-10 flex size-8 items-center justify-center rounded-full border border-[#d8b76a]/42 bg-[#fffaf0]/88 text-base leading-none text-[#6f5f4b] shadow-[0_8px_18px_rgba(111,84,43,0.08),inset_0_1px_0_rgba(255,255,255,0.72)] transition hover:-translate-y-0.5 hover:border-[#9d7b3f] hover:text-[#3f352b] focus:outline-none focus:ring-2 focus:ring-[#d8b76a]/30"
+          onClick={closePanels}
+          type="button"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
         <div className="relative grid gap-4">
           <div className="grid justify-items-center border-b border-[#d8b76a]/30 pb-4 text-center">
             <div className="flex size-11 shrink-0 items-center justify-center rounded-full border border-[#caa96a]/60 bg-[#f6e1ae]/80 font-serif text-lg text-[#5b3c16] shadow-[inset_0_1px_0_rgba(255,255,255,0.72)]">
@@ -467,7 +497,10 @@ export function ActivationCodePanel({
             <p className="mt-3 text-[0.58rem] font-semibold uppercase tracking-[0.18em] text-[#9d7b3f]">
               {copy.enterRoom}
             </p>
-            <h2 className="mt-2 font-serif text-3xl leading-tight text-[#3f352b]">
+            <h2
+              className="mt-2 font-serif text-3xl leading-tight text-[#3f352b]"
+              id={authModalTitleId}
+            >
               {copy.signIn}
             </h2>
             <p className="mt-2 max-w-[20rem] text-sm leading-6 text-[#766955]">
