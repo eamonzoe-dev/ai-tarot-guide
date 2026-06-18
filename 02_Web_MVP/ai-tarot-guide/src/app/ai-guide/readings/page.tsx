@@ -47,6 +47,13 @@ function getReadingSummary(reading: unknown, t: ReadingsText) {
   return summary.length > 180 ? `${summary.slice(0, 180)}...` : summary;
 }
 
+function isFallbackReading(reading: unknown) {
+  return (
+    isRecord(reading) &&
+    (reading.fallback === true || reading.readingSource === "system_fallback")
+  );
+}
+
 function formatReadableValue(value: string) {
   return value
     .split(/[-_\s]+/)
@@ -257,56 +264,70 @@ export default async function MyReadingsPage({
               <p className="text-center text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-[#9d7b3f]">
                 {t.readingsLatest}
               </p>
-              {readings.map((reading) => (
-                <article
-                  className="relative overflow-hidden rounded-[1.6rem] border border-[#d8bd82]/42 bg-[linear-gradient(180deg,rgba(255,253,247,0.94),rgba(250,244,233,0.88))] p-4 shadow-[0_18px_52px_rgba(116,83,36,0.10),inset_0_1px_0_rgba(255,255,255,0.74)] backdrop-blur-md sm:p-5"
-                  key={reading.id}
-                >
-                  <div className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-[#d2b06d]/56 to-transparent" />
-                  <div className="flex flex-col gap-3 border-b border-[#d8bd82]/32 pb-4 sm:flex-row sm:items-start sm:justify-between">
-                    <div>
-                      <p className="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-[#9d7b3f]">
-                        {formatDate(reading.created_at, lang)}
-                      </p>
-                      <h2 className="mt-2 font-serif text-2xl leading-tight text-[#4f4235]">
-                        {reading.card_title ||
-                          reading.card_id ||
-                          t.readingsSavedCard}
-                      </h2>
-                    </div>
-                    <div className="flex flex-wrap gap-2 sm:justify-end">
-                      <span className="inline-flex rounded-full border border-[#d8bd82]/46 bg-[#fffaf1]/76 px-3 py-1 text-[0.62rem] font-semibold uppercase tracking-[0.14em] text-[#8d6426]">
-                        {getModeLabel(reading.mode, t)}
-                      </span>
-                      <span className="inline-flex rounded-full border border-[#d8bd82]/38 bg-white/48 px-3 py-1 text-[0.62rem] font-semibold uppercase tracking-[0.14em] text-[#7b6c58]">
-                        {getSpreadLabel(reading.spread, t)}
-                      </span>
-                      <span className="inline-flex rounded-full border border-[#d8bd82]/38 bg-white/48 px-3 py-1 text-[0.62rem] font-semibold uppercase tracking-[0.14em] text-[#7b6c58]">
-                        {getOrientationLabel(reading.orientation, t)}
-                      </span>
-                    </div>
-                  </div>
+              {readings.map((reading) => {
+                const isFallback = isFallbackReading(reading.reading_json);
 
-                  <div className="mt-4 grid gap-4">
-                    <section className="rounded-[1.1rem] border border-[#d8bd82]/28 bg-white/42 p-4">
-                      <h3 className="text-[0.62rem] font-semibold uppercase tracking-[0.22em] text-[#9d7b3f]">
-                        {t.readingsQuestionLabel}
-                      </h3>
-                      <p className="mt-2 text-sm leading-7 text-[#4f4334]">
-                        {reading.question || t.readingsNoQuestion}
-                      </p>
-                    </section>
-                    <section className="rounded-[1.1rem] border border-[#d8bd82]/28 bg-[#fffaf1]/58 p-4">
-                      <h3 className="text-[0.62rem] font-semibold uppercase tracking-[0.22em] text-[#9d7b3f]">
-                        {t.readingsInterpretationLabel}
-                      </h3>
-                      <p className="mt-2 text-sm leading-7 text-[#6f624f]">
-                        {getReadingSummary(reading.reading_json, t)}
-                      </p>
-                    </section>
-                  </div>
-                </article>
-              ))}
+                return (
+                  <article
+                    className="relative overflow-hidden rounded-[1.6rem] border border-[#d8bd82]/42 bg-[linear-gradient(180deg,rgba(255,253,247,0.94),rgba(250,244,233,0.88))] p-4 shadow-[0_18px_52px_rgba(116,83,36,0.10),inset_0_1px_0_rgba(255,255,255,0.74)] backdrop-blur-md sm:p-5"
+                    key={reading.id}
+                  >
+                    <div className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-[#d2b06d]/56 to-transparent" />
+                    <div className="flex flex-col gap-3 border-b border-[#d8bd82]/32 pb-4 sm:flex-row sm:items-start sm:justify-between">
+                      <div>
+                        <p className="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-[#9d7b3f]">
+                          {formatDate(reading.created_at, lang)}
+                        </p>
+                        <h2 className="mt-2 font-serif text-2xl leading-tight text-[#4f4235]">
+                          {reading.card_title ||
+                            reading.card_id ||
+                            t.readingsSavedCard}
+                        </h2>
+                      </div>
+                      <div className="flex flex-wrap gap-2 sm:justify-end">
+                        {isFallback ? (
+                          <span className="inline-flex rounded-full border border-[#c48a73]/36 bg-[#fff5ed]/72 px-3 py-1 text-[0.62rem] font-semibold uppercase tracking-[0.14em] text-[#8a4634]">
+                            {t.readingsFallbackBadge}
+                          </span>
+                        ) : null}
+                        <span className="inline-flex rounded-full border border-[#d8bd82]/46 bg-[#fffaf1]/76 px-3 py-1 text-[0.62rem] font-semibold uppercase tracking-[0.14em] text-[#8d6426]">
+                          {getModeLabel(reading.mode, t)}
+                        </span>
+                        <span className="inline-flex rounded-full border border-[#d8bd82]/38 bg-white/48 px-3 py-1 text-[0.62rem] font-semibold uppercase tracking-[0.14em] text-[#7b6c58]">
+                          {getSpreadLabel(reading.spread, t)}
+                        </span>
+                        <span className="inline-flex rounded-full border border-[#d8bd82]/38 bg-white/48 px-3 py-1 text-[0.62rem] font-semibold uppercase tracking-[0.14em] text-[#7b6c58]">
+                          {getOrientationLabel(reading.orientation, t)}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="mt-4 grid gap-4">
+                      {isFallback ? (
+                        <p className="rounded-[1.1rem] border border-[#c48a73]/28 bg-[#fff5ed]/58 px-4 py-3 text-xs leading-5 text-[#7b5f52]">
+                          {t.readingsFallbackNote}
+                        </p>
+                      ) : null}
+                      <section className="rounded-[1.1rem] border border-[#d8bd82]/28 bg-white/42 p-4">
+                        <h3 className="text-[0.62rem] font-semibold uppercase tracking-[0.22em] text-[#9d7b3f]">
+                          {t.readingsQuestionLabel}
+                        </h3>
+                        <p className="mt-2 text-sm leading-7 text-[#4f4334]">
+                          {reading.question || t.readingsNoQuestion}
+                        </p>
+                      </section>
+                      <section className="rounded-[1.1rem] border border-[#d8bd82]/28 bg-[#fffaf1]/58 p-4">
+                        <h3 className="text-[0.62rem] font-semibold uppercase tracking-[0.22em] text-[#9d7b3f]">
+                          {t.readingsInterpretationLabel}
+                        </h3>
+                        <p className="mt-2 text-sm leading-7 text-[#6f624f]">
+                          {getReadingSummary(reading.reading_json, t)}
+                        </p>
+                      </section>
+                    </div>
+                  </article>
+                );
+              })}
             </div>
           )}
         </section>

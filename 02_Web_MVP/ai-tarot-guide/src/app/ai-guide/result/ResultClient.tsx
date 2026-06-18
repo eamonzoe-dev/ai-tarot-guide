@@ -70,6 +70,9 @@ type AiReading = {
   reflectionQuestion?: string;
   closingNote?: string;
   cardMeaning?: string;
+  fallback?: boolean;
+  readingSource?: "system_fallback";
+  fallbackReason?: "upstream_failure";
 };
 
 type AiReadingStatus = "idle" | "loading" | "ready" | "error";
@@ -294,6 +297,12 @@ function isDisplayableAiReading(value: unknown): value is AiReading {
   );
 }
 
+function isFallbackAiReading(reading: AiReading | null | undefined) {
+  return (
+    reading?.fallback === true || reading?.readingSource === "system_fallback"
+  );
+}
+
 function buildFallbackFullReading(
   aiDisplay: ReturnType<typeof normalizeAiReadingForDisplay>,
 ) {
@@ -465,6 +474,7 @@ export function ResultClient({
           return response.json() as Promise<{
             reading?: AiReading;
             credits?: unknown;
+            fallback?: boolean;
           }>;
         })
         .then((payload) => {
@@ -472,8 +482,19 @@ export function ResultClient({
             throw new Error("AI reading response was empty.");
           }
 
-          sessionStorage.setItem(cacheKey, JSON.stringify(payload.reading));
-          setAiReading(payload.reading);
+          const nextReading =
+            payload.fallback || isFallbackAiReading(payload.reading)
+              ? {
+                  ...payload.reading,
+                  fallback: true,
+                  readingSource: "system_fallback" as const,
+                  fallbackReason:
+                    payload.reading.fallbackReason || "upstream_failure",
+                }
+              : payload.reading;
+
+          sessionStorage.setItem(cacheKey, JSON.stringify(nextReading));
+          setAiReading(nextReading);
           setAiReadingStatus("ready");
           window.dispatchEvent(new Event(CREDITS_UPDATED_EVENT));
         })
@@ -693,6 +714,7 @@ export function ResultClient({
   const aiDisplay = aiReading
     ? normalizeAiReadingForDisplay(aiReading)
     : undefined;
+  const isFallbackDisplay = isFallbackAiReading(aiReading);
   const fullReadingText = aiDisplay
     ? firstText(
         aiDisplay.fullReading,
@@ -884,6 +906,15 @@ export function ResultClient({
             <h2 className="mt-3 font-serif text-3xl leading-tight text-[#34271b] sm:text-4xl">
               {copy.aiReadingTitle}
             </h2>
+
+            {isFallbackDisplay ? (
+              <div className="mt-5 rounded-[1.35rem] border border-[#d8bd82]/42 bg-[#fffaf1]/76 p-4 text-sm leading-6 text-[#6f624f]">
+                <p className="text-[0.64rem] font-semibold uppercase tracking-[0.2em] text-[#9d7b3f]">
+                  {copy.aiFallbackNoticeTitle}
+                </p>
+                <p className="mt-2">{copy.aiFallbackNoticeBody}</p>
+              </div>
+            ) : null}
 
             {aiDisplay.summary ? (
               <p className="mt-6 border-l border-[#c89d4f]/55 bg-[#fffaf1]/72 py-2 pl-4 font-serif text-[1.15rem] leading-8 text-[#4a3827] sm:text-[1.35rem] sm:leading-9">

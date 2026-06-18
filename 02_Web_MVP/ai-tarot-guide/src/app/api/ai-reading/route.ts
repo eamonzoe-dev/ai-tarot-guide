@@ -33,6 +33,9 @@ type AiReading = {
   cardMessage?: string;
   cardMeaning?: string;
   closingNote?: string;
+  fallback?: boolean;
+  readingSource?: "system_fallback";
+  fallbackReason?: "upstream_failure";
 };
 
 type UserCredits = {
@@ -178,6 +181,22 @@ function normalizeAiReading(reading: AiReading): AiReading {
     cardMeaning: reading.cardMeaning || reading.cardMessage,
     closingNote: reading.closingNote,
   };
+}
+
+function withFallbackMetadata(reading: AiReading): AiReading {
+  return {
+    ...reading,
+    fallback: true,
+    readingSource: "system_fallback",
+    fallbackReason: "upstream_failure",
+  };
+}
+
+function isFallbackReading(value: unknown) {
+  return (
+    isRecord(value) &&
+    (value.fallback === true || value.readingSource === "system_fallback")
+  );
 }
 
 function buildFallbackReading({
@@ -492,6 +511,44 @@ async function recordReadingLog({
     lang,
     reading_json: reading,
     credits_event_id: creditsEventId,
+  });
+}
+
+async function recordFallbackReadingLog({
+  admin,
+  userId,
+  clientRequestId,
+  question,
+  cardId,
+  cardTitle,
+  mode,
+  orientation,
+  lang,
+  reading,
+}: {
+  admin: ReturnType<typeof createSupabaseAdminClient>;
+  userId: string;
+  clientRequestId: string;
+  question: string;
+  cardId: string;
+  cardTitle: string;
+  mode: "physical" | "online";
+  orientation: "upright";
+  lang: Language;
+  reading: AiReading;
+}) {
+  return admin.from("reading_logs").insert({
+    user_id: userId,
+    question,
+    card_id: cardId,
+    card_title: cardTitle,
+    mode,
+    spread: "single",
+    orientation,
+    lang,
+    reading_json: reading,
+    credits_event_id: null,
+    client_request_id: clientRequestId,
   });
 }
 
@@ -855,6 +912,7 @@ export async function POST(request: Request) {
       return NextResponse.json({
         reading: existingReadingResult.data.reading_json as AiReading,
         credits: existingCreditsResult.credits,
+        fallback: isFallbackReading(existingReadingResult.data.reading_json),
       });
     }
   }
@@ -1022,6 +1080,7 @@ export async function POST(request: Request) {
         return NextResponse.json({
           reading: duplicateReadingResult.data.reading_json as AiReading,
           credits: existingCreditsResult.credits,
+          fallback: isFallbackReading(duplicateReadingResult.data.reading_json),
         });
       }
 
@@ -1201,6 +1260,73 @@ export async function POST(request: Request) {
         ? "OpenAI-compatible request timed out."
         : "OpenAI-compatible request failed.",
     });
+    const fallbackReading = withFallbackMetadata(buildFallbackReading({ card, lang }));
+
+    if (clientRequestId) {
+      const existingFallbackResult = await getExistingReadingLog(
+        admin,
+        user.id,
+        clientRequestId,
+      );
+
+      if (existingFallbackResult.error) {
+        console.error("AI fallback reading log lookup failed:", {
+          cardId,
+          lang,
+          mode,
+          model,
+          questionLength: question.length,
+          hasCustomBaseURL: Boolean(customBaseURL),
+          error: formatSupabaseErrorForLog(existingFallbackResult.error),
+        });
+      } else if (existingFallbackResult.data?.reading_json) {
+        return NextResponse.json({
+          reading: existingFallbackResult.data.reading_json as AiReading,
+          credits,
+          fallback: isFallbackReading(existingFallbackResult.data.reading_json),
+        });
+      }
+
+      const fallbackLogResult = await recordFallbackReadingLog({
+        admin,
+        userId: user.id,
+        clientRequestId,
+        question,
+        cardId,
+        cardTitle: cardData.title,
+        mode,
+        orientation,
+        lang,
+        reading: fallbackReading,
+      });
+
+      if (fallbackLogResult.error) {
+        const duplicateFallbackResult = await getExistingReadingLog(
+          admin,
+          user.id,
+          clientRequestId,
+        );
+
+        if (duplicateFallbackResult.data?.reading_json) {
+          return NextResponse.json({
+            reading: duplicateFallbackResult.data.reading_json as AiReading,
+            credits,
+            fallback: isFallbackReading(duplicateFallbackResult.data.reading_json),
+          });
+        }
+
+        console.error("AI fallback reading log record failed:", {
+          cardId,
+          lang,
+          mode,
+          model,
+          questionLength: question.length,
+          hasCustomBaseURL: Boolean(customBaseURL),
+          error: formatSupabaseErrorForLog(fallbackLogResult.error),
+        });
+      }
+    }
+
     const fallbackUsageResult = await insertUsageEvent(admin, {
       ...usageEventBase,
       ai_success: false,
@@ -1221,7 +1347,8 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({
-      reading: buildFallbackReading({ card, lang }),
+      reading: fallbackReading,
+      credits,
       fallback: true,
     });
   }
