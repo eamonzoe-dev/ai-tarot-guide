@@ -18,57 +18,54 @@ Before writing Next.js code:
 
 # AGENTS.md
 
-## Project Identity
+- Status: Active
+- Last updated: 2026-06-20
+- Owner: eamonzoe
+- Source priority: Stable workflow rules only. For current facts, follow `00_START_HERE.md` and the docs source priority.
 
-This project is Ora Arcana / AI Tarot Guide, a Next.js MVP for an AI tarot reading product.
+## Purpose
 
-Current stage:
+This file gives AI agents stable workflow rules for Ora Arcana / AI Tarot Guide.
 
-* Pre-launch MVP stabilization
-
-Tech stack:
-
-* Next.js
-* TypeScript
-* Tailwind CSS
-* localStorage
-* Supabase auth, credits, activation codes, and reading logs
-* Vercel deployment
-
-Main route:
-
-* `/ai-guide`
-
-Production URL:
-
-* `https://oraarcana.com/ai-guide`
-
-GitHub repository:
-
-* `https://github.com/eamonzoe-dev/ai-tarot-guide.git`
+Do not use this file for fast-changing project state, task priority, environment details, launch status, or service configuration. Those belong in the GitHub docs listed in `00_START_HERE.md`.
 
 ## Required Reading
 
-Before significant work, Codex must read:
+Before significant work, read:
 
-1. `AGENTS.md`
-2. `docs/CODEX_PROJECT_CONTEXT.md`
+1. `00_START_HERE.md`
+2. `docs/NEXT_TASK.md`
+3. `docs/PROJECT_STATUS.md`
+4. `docs/DECISIONS.md`
+5. Relevant local files for the task
 
-Before deciding task priority, Codex must also read:
-
-1. `docs/ROADMAP.md`
-
-Before any launch, SEO, indexing, robots, sitemap, metadata, or site-lock work, Codex must also read:
+Before launch, SEO, indexing, robots, sitemap, metadata, or site-lock work, also read:
 
 1. `docs/SEO_AND_LAUNCH_CHECKLIST.md`
+
+## Source Of Truth
+
+GitHub docs are the source of truth.
+
+Feishu, Notion, spreadsheets, chat notes, screenshots, and external planning tools are optional reading layers only. If they disagree with GitHub docs, use GitHub docs and record the mismatch in `docs/OPERATIONS_LOG.md` or `docs/DECISIONS.md`.
+
+Use this source priority for current project truth:
+
+1. `docs/NEXT_TASK.md`
+2. `docs/PROJECT_STATUS.md`
+3. `docs/DECISIONS.md`
+4. `docs/EXTERNAL_SERVICES.md`
+5. `docs/ENVIRONMENT.md`
+6. `docs/CHANGELOG.md`
+7. `docs/archive/`
+
+`docs/archive/` must never be treated as current truth.
 
 ## User Context
 
 The user is not a professional programmer.
 
-Explain important changes clearly and avoid unnecessary technical jargon.
-
-The user is visually and product oriented. Preserve UI style and explain visible changes.
+Explain important changes clearly and avoid unnecessary technical jargon. The user is visually and product oriented, so preserve UI style and explain visible changes when app UI changes are requested.
 
 ## Core Product Rules
 
@@ -149,6 +146,8 @@ For implementation tasks:
 * Avoid broad refactors.
 * Only modify files required for the task.
 * Do not change app code when the task is documentation-only.
+* Update AI Project OS docs when the work changes current status, decisions, services, environment variable names, or operational history.
+* Run `node scripts/check-ai-docs.mjs` after editing AI Project OS docs.
 
 For complex features or refactors:
 
@@ -179,7 +178,11 @@ If build fails:
 * Fix it if the cause is clear and within scope.
 * Do not hide the failure.
 
-Documentation-only changes do not require a build unless they affect generated content or tooling.
+Documentation-only changes do not require a build unless they affect generated content or tooling. AI Project OS documentation changes should at least run:
+
+```bash
+node scripts/check-ai-docs.mjs
+```
 
 ## Output Format
 
@@ -206,5 +209,4 @@ Do not:
 * Add Stripe payments
 * Add real Google or Apple login
 * Add oracle-card-specific reading rules
-* Push to GitHub without user approval
 * Deploy to Vercel without user approval
