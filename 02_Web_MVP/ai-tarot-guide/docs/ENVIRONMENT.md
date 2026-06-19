@@ -13,37 +13,45 @@ Do not record secret values, API key values, bearer tokens, passwords, or copied
 
 ## App Runtime Variables
 
-| Variable | Purpose | Exposure |
-| --- | --- | --- |
-| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL used by client and server Supabase helpers. | Public |
-| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Supabase publishable key used by client and server Supabase helpers. | Public |
-| `SUPABASE_SECRET_KEY` | Server-only Supabase privileged key for admin operations. | Secret |
-| `AI_READING_OPENAI_API_KEY` | Preferred server-only API key for AI reading generation. | Secret |
-| `AI_READING_OPENAI_BASE_URL` | Preferred OpenAI-compatible base URL for AI reading generation. | Server config |
-| `AI_READING_OPENAI_MODEL` | Preferred model name for AI reading generation. | Server config |
-| `AI_READING_RATE_LIMIT_PER_HOUR` | Optional hourly rate limit for AI reading requests. | Server config |
-| `OPENAI_API_KEY` | Generic fallback server-only API key for AI reading generation. | Secret |
-| `OPENAI_BASE_URL` | Generic fallback OpenAI-compatible base URL. | Server config |
-| `OPENAI_MODEL` | Generic fallback model name. | Server config |
-| `SITE_LOCK_ENABLED` | Enables or disables site lock behavior. | Server config |
-| `SITE_LOCK_USERNAME` | Site lock username. | Secret |
-| `SITE_LOCK_PASSWORD` | Site lock password. | Secret |
+| Variable | Platform / location | Purpose | Secret | Value recorded | Verification status |
+| --- | --- | --- | --- | --- | --- |
+| `NEXT_PUBLIC_SUPABASE_URL` | Vercel env, local `.env*` | Supabase project URL used by client and server Supabase helpers. | No | No | Name verified in source; deployed value requires manual verification. |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Vercel env, local `.env*` | Supabase publishable key used by client and server Supabase helpers. | No | No | Name verified in source; deployed value requires manual verification. |
+| `SUPABASE_SECRET_KEY` | Vercel server env, local `.env*` | Server-only Supabase privileged key for admin operations. | Yes | No | Name verified in source; deployed value requires manual verification. |
+| `AI_READING_OPENAI_API_KEY` | Vercel server env, local `.env*` | Preferred server-only API key for AI reading generation. | Yes | No | Name verified in source; deployed value requires manual verification. |
+| `AI_READING_OPENAI_BASE_URL` | Vercel server env, local `.env*` | Preferred OpenAI-compatible base URL for AI reading generation. | No | No | Name verified in source; deployed value requires manual verification if used. |
+| `AI_READING_OPENAI_MODEL` | Vercel server env, local `.env*` | Preferred model name for AI reading generation. | No | No | Name verified in source; deployed value requires manual verification if used. |
+| `AI_READING_RATE_LIMIT_PER_HOUR` | Vercel server env, local `.env*` | Optional hourly rate limit for AI reading requests. | No | No | Name verified in source; deployed value requires manual verification if used. |
+| `OPENAI_API_KEY` | Vercel server env, local `.env*` | Generic fallback server-only API key for AI reading generation. | Yes | No | Name verified in source; deployed value requires manual verification if used. |
+| `OPENAI_BASE_URL` | Vercel server env, local `.env*` | Generic fallback OpenAI-compatible base URL. | No | No | Name verified in source; deployed value requires manual verification if used. |
+| `OPENAI_MODEL` | Vercel server env, local `.env*` | Generic fallback model name. | No | No | Name verified in source; deployed value requires manual verification if used. |
+| `SITE_LOCK_ENABLED` | Vercel server env, local `.env*` | Enables or disables site lock behavior in `src/proxy.ts`. | No | No | Name verified in source; deployed value requires manual verification. |
+| `SITE_LOCK_USERNAME` | Vercel server env, local `.env*` | Site lock username. | Yes | No | Name verified in source; deployed value requires manual verification if site lock is enabled. |
+| `SITE_LOCK_PASSWORD` | Vercel server env, local `.env*` | Site lock password. | Yes | No | Name verified in source; deployed value requires manual verification if site lock is enabled. |
 
 ## Feishu Script Variables
 
 These are used by optional Feishu scripts. Feishu is not the project source of truth.
 
-| Variable | Purpose | Exposure |
-| --- | --- | --- |
-| `FEISHU_APP_ID` | Feishu app identifier for API access. | Secret or restricted config |
-| `FEISHU_APP_SECRET` | Feishu app secret for API access. | Secret |
-| `FEISHU_APP_TOKEN` | Feishu Bitable app token. | Restricted config |
-| `FEISHU_BASE_ID` | Alternate Feishu Bitable app/base identifier. | Restricted config |
-| `FEISHU_TABLE_ID` | Feishu table used by the general log script. | Restricted config |
-| `FEISHU_PROJECT_LOG_TABLE_ID` | Feishu table used by the project log script. | Restricted config |
-| `FEISHU_PROJECT_LOG_DRY_RUN` | Dry-run toggle for project log writes. | Local config |
-| `FEISHU_PROJECT_BOARD_TABLE_ID` | Feishu table used by the project board script. | Restricted config |
+| Variable | Platform / location | Purpose | Secret | Value recorded | Verification status |
+| --- | --- | --- | --- | --- | --- |
+| `FEISHU_APP_ID` | Local env or GitHub Secrets if automated | Feishu app identifier for API access. | Yes | No | Name verified in scripts; current use requires manual verification. |
+| `FEISHU_APP_SECRET` | Local env or GitHub Secrets if automated | Feishu app secret for API access. | Yes | No | Name verified in scripts; current use requires manual verification. |
+| `FEISHU_APP_TOKEN` | Local env or GitHub Secrets if automated | Feishu Bitable app token. | Yes | No | Name verified in scripts; current use requires manual verification. |
+| `FEISHU_BASE_ID` | Local env or GitHub Secrets if automated | Alternate Feishu Bitable app/base identifier. | Yes | No | Name verified in scripts; current use requires manual verification. |
+| `FEISHU_TABLE_ID` | Local env or GitHub Secrets if automated | Feishu table used by the general log script. | Yes | No | Name verified in scripts; current use requires manual verification. |
+| `FEISHU_PROJECT_LOG_TABLE_ID` | Local env or GitHub Secrets if automated | Feishu table used by the project log script. | Yes | No | Name verified in scripts; current use requires manual verification. |
+| `FEISHU_PROJECT_LOG_DRY_RUN` | Local env or GitHub Secrets if automated | Dry-run toggle for project log writes. | No | No | Name verified in scripts; current use requires manual verification. |
+| `FEISHU_PROJECT_BOARD_TABLE_ID` | Local env or GitHub Secrets if automated | Feishu table used by the project board script. | Yes | No | Name verified in scripts; current use requires manual verification. |
+
+## Email Provider Variables
+
+No Resend-specific runtime environment variable is currently referenced by app source or scripts.
+
+If Supabase Auth is later moved to custom SMTP or Resend, record the variable names and purposes here before using them in deployment. Do not record provider key values.
 
 ## Local Files
 
 Local `.env` files may exist for development, but their contents must not be copied into docs, logs, commits, or handoffs.
+
+Local verification on 2026-06-20 confirmed `.env*` files are ignored by git. Their contents were not opened or copied.

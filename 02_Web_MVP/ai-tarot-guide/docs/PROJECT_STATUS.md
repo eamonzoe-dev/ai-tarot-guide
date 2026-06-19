@@ -123,6 +123,30 @@ Launch-sensitive areas:
 * Mobile Safari and mobile Chrome
 * Launch visibility, SEO, noindex, and site lock
 
+## External Service Verification Snapshot
+
+Current verification result: PARTIAL.
+
+Verified from repo/docs on 2026-06-20:
+
+* Vercel is the hosting target.
+* Known production route is `https://oraarcana.com/ai-guide`.
+* Known Vercel route is `https://ai-tarot-guide.vercel.app/ai-guide`.
+* `next.config.ts` and `src/proxy.ts` currently apply `X-Robots-Tag: noindex, nofollow`.
+* `src/proxy.ts` contains optional Basic Auth site-lock behavior controlled by environment variables.
+* Supabase Auth, credits, activation codes, usage events, and reading logs are current product dependencies.
+* Supabase SQL files document the expected app tables, RLS enablement, user read policies, and core RPC functions.
+* No `.github/workflows` files were present during verification.
+* Local `.env*` files are ignored by git.
+
+Manual verification still required:
+
+* Vercel production deployment state, domain settings, `www` redirect behavior, Vercel Protection, and environment variable presence.
+* Supabase production Auth redirect URLs, email delivery, applied schema/RPCs, and active RLS policies.
+* Whether production Supabase email uses default email or a provider such as Resend.
+* DNS, HTTPS, canonical domain, Search Console, sitemap, robots, and indexing state.
+* GitHub Secrets presence if Feishu or deployment automation is expected.
+
 ## Non-Goals During Stabilization
 
 Do not pull these into the launch freeze unless the user explicitly changes priority:

@@ -9,8 +9,13 @@
 
 ### Tested
 
+* Completed `P0-EXTERNAL-SERVICES-VERIFY` and archived the external service verification report in `docs/archive/qa/`.
 * Completed `P0-AI-HANDOFF-TEST-V2` and archived the handoff evaluation in `docs/archive/qa/`.
 * Ran `P0-AI-HANDOFF-TEST` and archived the handoff report in `docs/archive/qa/`.
+
+### Updated
+
+* Updated external service, environment, project status, and operations docs with repo-verified service state and remaining manual verification items.
 
 ### Added
 
