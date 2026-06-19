@@ -7,6 +7,10 @@
 
 ## 2026-06-20
 
+### Tested
+
+* Ran `P0-AI-HANDOFF-TEST` and archived the handoff report in `docs/archive/qa/`.
+
 ### Added
 
 * Established AI Project OS Standard documentation.
