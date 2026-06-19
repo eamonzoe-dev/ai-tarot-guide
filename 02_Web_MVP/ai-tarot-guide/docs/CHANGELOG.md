@@ -9,6 +9,7 @@
 
 ### Tested
 
+* Completed `P0-AI-HANDOFF-TEST-V2` and archived the handoff evaluation in `docs/archive/qa/`.
 * Ran `P0-AI-HANDOFF-TEST` and archived the handoff report in `docs/archive/qa/`.
 
 ### Added
