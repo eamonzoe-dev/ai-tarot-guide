@@ -36,9 +36,10 @@ Read these files in order:
 1. `AGENTS.md`
 2. `docs/NEXT_TASK.md`
 3. `docs/PROJECT_STATUS.md`
-4. `docs/DECISIONS.md`
-5. `docs/EXTERNAL_SERVICES.md`
-6. `docs/ENVIRONMENT.md`
+4. `docs/CORE_BEHAVIOR_SPEC.md`
+5. `docs/DECISIONS.md`
+6. `docs/EXTERNAL_SERVICES.md`
+7. `docs/ENVIRONMENT.md`
 
 Then inspect the relevant code or docs for the task.
 
@@ -72,6 +73,7 @@ When work changes the project state, update the relevant docs:
 
 * Next action: `docs/NEXT_TASK.md`
 * Current facts: `docs/PROJECT_STATUS.md`
+* Core product behavior: `docs/CORE_BEHAVIOR_SPEC.md`
 * Product or technical decisions: `docs/DECISIONS.md`
 * External tools and service ownership: `docs/EXTERNAL_SERVICES.md`
 * Environment variable names and purposes: `docs/ENVIRONMENT.md`

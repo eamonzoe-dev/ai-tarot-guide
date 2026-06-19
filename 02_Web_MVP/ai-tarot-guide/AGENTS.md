@@ -39,6 +39,10 @@ Before significant work, read:
 4. `docs/DECISIONS.md`
 5. Relevant local files for the task
 
+Before touching route flow, auth, credits, deck code redemption, Reading Journal, AI-reading behavior, language handling, or tarot card behavior, also read:
+
+1. `docs/CORE_BEHAVIOR_SPEC.md`
+
 Before launch, SEO, indexing, robots, sitemap, metadata, or site-lock work, also read:
 
 1. `docs/SEO_AND_LAUNCH_CHECKLIST.md`

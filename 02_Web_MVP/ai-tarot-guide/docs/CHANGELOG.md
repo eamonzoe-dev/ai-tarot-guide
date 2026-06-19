@@ -14,6 +14,7 @@
 
 ### Added
 
+* Added `docs/CORE_BEHAVIOR_SPEC.md` to define current core product flows, constraints, auth, credits, redeem, journal, AI-reading, and verification expectations.
 * Established AI Project OS Standard documentation.
 * Added `00_START_HERE.md` as the AI entry point.
 * Added current-state docs for project status, next task, decisions, external services, environment variable names, and operations.
