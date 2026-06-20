@@ -9,6 +9,7 @@
 
 ### Tested
 
+* Completed `P1-LANG-URL-PRIORITY-QA` and archived the language URL-priority verification report in `docs/archive/qa/`.
 * Synced manual production verification for Vercel, Supabase Auth/Email/Resend, and DB/RPC/RLS.
 * Completed `P0-EXTERNAL-SERVICES-VERIFY` and archived the external service verification report in `docs/archive/qa/`.
 * Completed `P0-AI-HANDOFF-TEST-V2` and archived the handoff evaluation in `docs/archive/qa/`.

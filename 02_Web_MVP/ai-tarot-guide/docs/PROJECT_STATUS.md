@@ -148,7 +148,7 @@ User-confirmed manual production verification on 2026-06-20:
 
 Remaining manual verification:
 
-* Existing-browser language localStorage versus URL-priority behavior needs focused verification.
+* Existing-browser language localStorage versus URL-priority behavior passed current source inspection in `docs/archive/qa/P1-LANG-URL-PRIORITY-QA.md`; the earlier normal-browser production observation remains unresolved until a manual production retest on the latest deployment.
 * Supabase redirect URL strictness is PARTIAL because wildcard redirects are broad; consider tightening before public launch.
 * Full internal RPC body behavior was not fully inspected.
 * DNS/Search Console/robots/sitemap/indexing state still needs launch-stage verification.
