@@ -36,6 +36,7 @@ type ResultClientProps = {
   initialMode: "physical" | "online" | "";
   initialSpread: string;
   initialCard: string;
+  initialCards: string;
   initialOrientation: string;
   initialQuestion: string;
   initialLang: Language;
@@ -49,12 +50,33 @@ function cleanParagraph(paragraph: string) {
   return paragraph.replace(READING_LABEL_PATTERN, "").trim();
 }
 
+function buildThreeCardFallbackParagraph({
+  cardTitle,
+  keywords,
+  lang,
+  position,
+}: {
+  cardTitle: string;
+  keywords: string[];
+  lang: Language;
+  position: string;
+}) {
+  const keywordText = keywords.slice(0, 4).join(lang === "zh" ? "、" : ", ");
+
+  if (lang === "zh") {
+    return `在${position}的位置上，${cardTitle}把注意力带向${keywordText}。先把这些线索当作这一部分牌阵的象征提示，再回到你的问题里看它照亮了什么。`;
+  }
+
+  return `In the ${position.toLowerCase()} position, ${cardTitle} points to ${keywordText}. Let those themes shape how you read this part of the spread.`;
+}
+
 type StoredRitual = {
   mode?: "physical" | "online";
   spread?: string;
   orientation?: string;
   question?: string;
   card?: string;
+  cards?: string;
   lang?: Language;
 };
 
@@ -358,6 +380,7 @@ export function ResultClient({
   initialMode,
   initialSpread,
   initialCard,
+  initialCards,
   initialOrientation,
   initialQuestion,
   initialLang,
@@ -377,6 +400,9 @@ export function ResultClient({
   const [selectedCard, setSelectedCard] = useState<string | null | undefined>(
     initialCard || undefined,
   );
+  const [selectedCards, setSelectedCards] = useState<string | null | undefined>(
+    initialCards || undefined,
+  );
   const [question, setQuestion] = useState<string | null | undefined>(
     initialQuestion || undefined,
   );
@@ -389,6 +415,12 @@ export function ResultClient({
   const [aiRetryKey, setAiRetryKey] = useState(0);
   const inFlightAiReadingKeyRef = useRef<string | null>(null);
   const card = selectedCard ? getTarotCardById(selectedCard) : undefined;
+  const threeCardItems = (selectedCards ?? "")
+    .split(",")
+    .map((cardId) => getTarotCardById(cardId.trim()))
+    .filter((tarotCard): tarotCard is NonNullable<typeof tarotCard> =>
+      Boolean(tarotCard),
+    );
 
   useEffect(() => {
     let isCancelled = false;
@@ -398,7 +430,13 @@ export function ResultClient({
         return;
       }
 
-      if (!card || !question || !mode || orientation !== "upright") {
+      if (
+        spread === "three-card" ||
+        !card ||
+        !question ||
+        !mode ||
+        orientation !== "upright"
+      ) {
         setAiReading(null);
         setAiReadingStatus("idle");
         setAiReadingErrorMessage(null);
@@ -524,7 +562,7 @@ export function ResultClient({
       // Keep the in-flight guard active across React dev remounts.
       // The request result is idempotent server-side via clientRequestId.
     };
-  }, [card, question, mode, orientation, initialLang, aiRetryKey]);
+  }, [card, question, mode, orientation, initialLang, aiRetryKey, spread]);
 
   useEffect(() => {
     const storedRitual = readStoredRitual();
@@ -540,7 +578,11 @@ export function ResultClient({
       (storedMode === "online" ? "online" : "physical");
     const resolvedSpread =
       initialSpread || storedRitual.spread || storedSpread || "single";
-    const resolvedCard = initialCard || storedRitual.card || storedSelectedCard;
+    const resolvedCard =
+      resolvedSpread === "three-card"
+        ? ""
+        : initialCard || storedRitual.card || storedSelectedCard;
+    const resolvedCards = initialCards || storedRitual.cards || "";
     const resolvedOrientation =
       initialOrientation ||
       storedRitual.orientation ||
@@ -586,6 +628,7 @@ export function ResultClient({
           orientation: resolvedOrientation,
           question: resolvedQuestion,
           card: resolvedCard,
+          cards: resolvedCards,
           lang: resolvedLang,
         }),
       );
@@ -595,16 +638,17 @@ export function ResultClient({
       setMode(resolvedMode);
       setSpread(resolvedSpread);
       setSelectedCard(resolvedCard);
+      setSelectedCards(resolvedCards);
       setOrientation(resolvedOrientation);
       setQuestion(resolvedQuestion);
     });
 
-    if (!resolvedCard) {
+    if (!resolvedCard && !(resolvedSpread === "three-card" && resolvedCards)) {
       router.replace(
         resolvedMode === "online"
           ? `/ai-guide/draw?mode=online${
               resolvedQuestion
-                ? `&spread=single&orientation=upright&question=${encodeURIComponent(
+                ? `&spread=${resolvedSpread}&orientation=upright&question=${encodeURIComponent(
                     resolvedQuestion,
                   )}`
                 : ""
@@ -620,6 +664,7 @@ export function ResultClient({
     initialMode,
     initialSpread,
     initialCard,
+    initialCards,
     initialOrientation,
     initialQuestion,
     initialLang,
@@ -631,6 +676,7 @@ export function ResultClient({
     mode === undefined ||
     spread === undefined ||
     selectedCard === undefined ||
+    selectedCards === undefined ||
     orientation === undefined ||
     question === undefined
   ) {
@@ -653,6 +699,195 @@ export function ResultClient({
             {copy.preparingMessage}
           </p>
         </LuminousPanel>
+      </LuminousShell>
+    );
+  }
+
+  if (spread === "three-card") {
+    const questionText = question || copy.noQuestion;
+    const homeHref = withLang("/ai-guide", {}, initialLang);
+    const positions = [
+      copy.threeCardSituation,
+      copy.threeCardChallenge,
+      copy.threeCardGuidance,
+    ];
+
+    if (threeCardItems.length !== 3) {
+      return (
+        <LuminousShell>
+          <LuminousPanel className="my-auto px-6 py-8 text-center">
+            <p className="text-[0.66rem] font-semibold uppercase tracking-[0.28em] text-[#a77f3c]">
+              {copy.readingDossier}
+            </p>
+            <h1 className="mt-4 font-serif text-4xl leading-tight text-[#34271b]">
+              {copy.invalidReadingTitle}
+            </h1>
+            <p className="mt-4 text-sm leading-7 text-[#7b6c58]">
+              {copy.invalidReadingDescription}
+            </p>
+            <LuminousActionLink className="mt-6" href={homeHref}>
+              {copy.returnToReadingRoom}
+            </LuminousActionLink>
+          </LuminousPanel>
+        </LuminousShell>
+      );
+    }
+
+    return (
+      <LuminousShell>
+        <header className="flex items-center justify-between gap-4 text-[0.66rem] font-semibold uppercase tracking-[0.28em] text-[#a77f3c]">
+          <span>{copy.readingDossier}</span>
+          <span className="text-right">{copy.threeCardSpread}</span>
+        </header>
+
+        <div className="rounded-[2rem] border border-[#d7bd82]/40 bg-white/42 px-4 py-3 shadow-[0_18px_60px_rgba(123,93,45,0.08)] backdrop-blur-md">
+          <ReadingNav lang={initialLang} />
+          <div className="mt-3 flex justify-end">
+            <LanguageToggle
+              lang={initialLang}
+              pathname="/ai-guide/result"
+              params={{
+                mode,
+                spread,
+                orientation,
+                question: question ?? undefined,
+                cards: selectedCards ?? undefined,
+              }}
+              hasLangParam={hasLangParam}
+            />
+          </div>
+        </div>
+
+        <LuminousPanel className="p-5 sm:p-6">
+          <p className="text-[0.62rem] font-semibold uppercase tracking-[0.26em] text-[#a77f3c]">
+            {copy.yourQuestion}
+          </p>
+          <p className="mt-3 text-sm leading-7 text-[#4f4334] sm:text-base">
+            {questionText}
+          </p>
+        </LuminousPanel>
+
+        <LuminousPanel className="p-5 sm:p-6">
+          <h1 className="font-serif text-3xl leading-tight text-[#34271b] sm:text-4xl">
+            {copy.yourThreeCards}
+          </h1>
+          <div className="mt-6 grid gap-4 sm:grid-cols-3">
+            {threeCardItems.map((threeCard, index) => {
+              const cardTitle = getTarotCardTitle(threeCard, initialLang);
+
+              return (
+                <article
+                  className="rounded-[1.45rem] border border-[#d8bd82]/42 bg-[#fffaf0]/72 p-4 shadow-[0_16px_40px_rgba(116,83,36,0.09)]"
+                  key={`${positions[index]}-${threeCard.id}`}
+                >
+                  <p className="text-[0.62rem] font-semibold uppercase tracking-[0.2em] text-[#a77f3c]">
+                    {index + 1}. {positions[index]}
+                  </p>
+                  <div className="mt-4 flex items-center gap-3">
+                    <div className="w-14 shrink-0">
+                      {threeCard.image ? (
+                        <Image
+                          src={threeCard.image}
+                          alt={`${cardTitle} tarot card`}
+                          width={120}
+                          height={213}
+                          className="block h-auto w-full rounded-[0.55rem] border border-[#d8bd82]/50 object-cover shadow-[0_12px_26px_rgba(116,83,36,0.14)]"
+                        />
+                      ) : (
+                        <div className="aspect-[9/16] rounded-[0.55rem] border border-[#d8bd82]/50 bg-[#fffaf0]/86" />
+                      )}
+                    </div>
+                    <div>
+                      <h2 className="font-serif text-xl leading-tight text-[#34271b]">
+                        {cardTitle}
+                      </h2>
+                      <p className="mt-1 text-xs leading-5 text-[#8b765a]">
+                        {getTarotCardLabel(threeCard, initialLang)}
+                      </p>
+                    </div>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        </LuminousPanel>
+
+        <article className="rounded-[2.2rem] border border-[#cfad6d]/52 bg-[linear-gradient(180deg,rgba(255,253,247,0.96),rgba(250,244,233,0.92))] px-5 py-7 shadow-[0_30px_86px_rgba(111,78,31,0.13),inset_0_1px_0_rgba(255,255,255,0.76)] backdrop-blur-md sm:px-8 sm:py-9">
+          <p className="text-[0.68rem] font-semibold uppercase tracking-[0.28em] text-[#a77f3c]">
+            {copy.cardByCardMeaning}
+          </p>
+          <div className="mt-6 space-y-6">
+          {threeCardItems.map((threeCard, index) => (
+              <section
+                className="border-t border-[#d8bd82]/38 pt-5"
+                key={`meaning-${threeCard.id}`}
+              >
+                <h2 className="font-serif text-2xl leading-tight text-[#34271b]">
+                  {positions[index]}: {getTarotCardTitle(threeCard, initialLang)}
+                </h2>
+                <p className="mt-3 text-sm leading-7 text-[#4f4334] sm:text-base">
+                  {initialLang === "zh"
+                    ? buildThreeCardFallbackParagraph({
+                        cardTitle: getTarotCardTitle(threeCard, initialLang),
+                        keywords: getTarotCardKeywords(threeCard, initialLang),
+                        lang: initialLang,
+                        position: positions[index],
+                      })
+                    : buildThreeCardFallbackParagraph({
+                        cardTitle: getTarotCardTitle(threeCard, initialLang),
+                        keywords: getTarotCardKeywords(threeCard, initialLang),
+                        lang: initialLang,
+                        position: positions[index],
+                      })}
+                </p>
+              </section>
+            ))}
+          </div>
+
+          <div className="mt-8 grid gap-4 md:grid-cols-2">
+            <section className="rounded-[1.45rem] border border-[#d8bd82]/42 bg-[#fffaf1]/76 p-4">
+              <h2 className="text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-[#a77f3c]">
+                {copy.overallMessage}
+              </h2>
+              <p className="mt-3 text-sm leading-7 text-[#4f4334]">
+                {copy.threeCardOverallFallback}
+              </p>
+            </section>
+            <section className="rounded-[1.45rem] border border-[#d8bd82]/42 bg-[#fffaf1]/76 p-4">
+              <h2 className="text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-[#a77f3c]">
+                {copy.practicalGuidance}
+              </h2>
+              <p className="mt-3 text-sm leading-7 text-[#4f4334]">
+                {copy.threeCardPracticalFallback}
+              </p>
+            </section>
+          </div>
+        </article>
+
+        <div className="grid gap-3 sm:grid-cols-2">
+          <button
+            className="flex min-h-12 touch-manipulation select-none items-center justify-center rounded-full border border-[#c89d4f]/42 bg-white/50 px-5 text-center text-xs font-semibold uppercase tracking-[0.2em] text-[#6f552b] opacity-70 shadow-[0_14px_32px_rgba(148,105,39,0.10)]"
+            disabled
+            type="button"
+          >
+            {copy.saveToJournal}
+          </button>
+          <LuminousActionLink href={homeHref} variant="ghost">
+            {copy.startAnotherReading}
+          </LuminousActionLink>
+        </div>
+
+        <section className="rounded-[1.75rem] border border-[#d8bd82]/32 bg-white/34 p-5 backdrop-blur-md">
+          <h2 className="text-xs font-semibold uppercase tracking-[0.26em] text-[#a77f3c]">
+            {copy.closingNote}
+          </h2>
+          <p className="mt-3 text-sm leading-6 text-[#6f624f]">
+            {copy.closingReflection}
+          </p>
+          <p className="mt-4 text-xs leading-5 text-[#8b7a61]">
+            {copy.disclaimer}
+          </p>
+        </section>
       </LuminousShell>
     );
   }
@@ -682,6 +917,7 @@ export function ResultClient({
                   orientation,
                   question: question ?? undefined,
                   card: selectedCard ?? undefined,
+                  cards: selectedCards ?? undefined,
                 }}
                 hasLangParam={hasLangParam}
               />
@@ -788,6 +1024,7 @@ export function ResultClient({
               orientation,
               question: question ?? undefined,
               card: selectedCard ?? undefined,
+              cards: selectedCards ?? undefined,
             }}
             hasLangParam={hasLangParam}
           />

@@ -10,7 +10,7 @@ const USER_QUESTION_KEY = "aiTarot:userQuestion";
 
 type AskFormProps = {
   mode: "physical" | "online";
-  spread: "single";
+  spread: "single" | "three-card";
   orientation: "upright";
   lang: Language;
   hasLangParam: boolean;

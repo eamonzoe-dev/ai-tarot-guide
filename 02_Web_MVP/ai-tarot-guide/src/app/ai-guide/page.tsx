@@ -21,23 +21,13 @@ export default async function AiGuidePage({
     { mode: "online", spread: "single", orientation: "upright" },
     lang,
   );
+  const threeCardHref = withLang(
+    "/ai-guide/prepare",
+    { mode: "online", spread: "three-card", orientation: "upright" },
+    lang,
+  );
   const readingsHref = withLang("/ai-guide/readings", {}, lang);
   const askOnlineHref = withLang("/ai-guide/ask", { mode: "online" }, lang);
-  const clarityHref = withLang(
-    "/ai-guide/ask",
-    { mode: "online", intent: "clarity" },
-    lang,
-  );
-  const mirrorHref = withLang(
-    "/ai-guide/ask",
-    { mode: "online", intent: "mirror" },
-    lang,
-  );
-  const nextStepHref = withLang(
-    "/ai-guide/ask",
-    { mode: "online", intent: "next-step" },
-    lang,
-  );
 
   return (
     <OracleShowroomHome
@@ -46,11 +36,9 @@ export default async function AiGuidePage({
       homeHref={homeHref}
       physicalHref={physicalHref}
       onlineHref={onlineHref}
+      threeCardHref={threeCardHref}
       readingsHref={readingsHref}
       askOnlineHref={askOnlineHref}
-      clarityHref={clarityHref}
-      mirrorHref={mirrorHref}
-      nextStepHref={nextStepHref}
       trustHrefs={{
         privacy: withLang("/privacy", {}, lang),
         terms: withLang("/terms", {}, lang),

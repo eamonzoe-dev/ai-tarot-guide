@@ -4,7 +4,7 @@ import { normalizeLanguage, text } from "@/lib/ai-guide/i18n";
 import { PrepareRitualStepClient } from "./PrepareRitualStepClient";
 
 type ReadingMode = "physical" | "online";
-type Spread = "single";
+type Spread = "single" | "three-card";
 type Orientation = "upright";
 type RitualStep = "breath" | "settle" | "ready";
 
@@ -45,7 +45,7 @@ export default async function PreparePage({
   const copy = text(lang);
   const spreadValue = normalizeValue(spreadParam);
   const orientationValue = normalizeValue(orientationParam);
-  const spread: Spread = spreadValue === "single" ? "single" : "single";
+  const spread: Spread = spreadValue === "three-card" ? "three-card" : "single";
   const orientation: Orientation =
     orientationValue === "upright" ? "upright" : "upright";
   const step = normalizeStep(stepParam);

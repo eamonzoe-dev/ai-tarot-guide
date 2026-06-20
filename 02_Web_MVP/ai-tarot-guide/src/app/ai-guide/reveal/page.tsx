@@ -13,11 +13,12 @@ export default async function RevealPage({
     question?: string | string[];
     spread?: string | string[];
     card?: string | string[];
+    cards?: string | string[];
     orientation?: string | string[];
     lang?: string | string[];
   }>;
 }) {
-  const { mode, question, spread, card, orientation, lang } =
+  const { mode, question, spread, card, cards, orientation, lang } =
     await searchParams;
 
   return (
@@ -26,6 +27,7 @@ export default async function RevealPage({
       initialQuestion={normalizeValue(question)}
       initialSpread={normalizeValue(spread)}
       initialCard={normalizeValue(card)}
+      initialCards={normalizeValue(cards)}
       initialOrientation={normalizeValue(orientation)}
       initialLang={normalizeLanguage(lang)}
       hasLangParam={Boolean(lang)}

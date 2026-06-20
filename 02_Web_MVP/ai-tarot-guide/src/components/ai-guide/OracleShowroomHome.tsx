@@ -12,11 +12,9 @@ type OracleShowroomHomeProps = {
   homeHref: string;
   physicalHref: string;
   onlineHref: string;
+  threeCardHref: string;
   readingsHref: string;
   askOnlineHref: string;
-  clarityHref: string;
-  mirrorHref: string;
-  nextStepHref: string;
   trustHrefs: {
     privacy: string;
     terms: string;
@@ -148,11 +146,9 @@ export function OracleShowroomHome({
   homeHref,
   physicalHref,
   onlineHref,
+  threeCardHref,
   readingsHref,
   askOnlineHref,
-  clarityHref,
-  mirrorHref,
-  nextStepHref,
   trustHrefs,
 }: OracleShowroomHomeProps) {
   const [visible, setVisible] = useState<Set<string>>(() => new Set());
@@ -195,52 +191,74 @@ export function OracleShowroomHome({
       journal: isZh ? "解读日志" : "Reading Journal",
       questionSlip: isZh ? "问题纸条" : "Question slip",
       waitingQuestion: isZh ? "此刻等待被问出的是什么？" : "What is waiting to be asked?",
-      choosePath: isZh ? "选择你的路径" : "Choose Your Path",
+      choosePath: isZh ? "选择你的解读" : "Choose Your Reading",
       paths: isZh
         ? [
             {
-              id: "online",
-              title: "线上阅读卡组",
-              body: "在线抽取一张正位牌，直接进入解读流程。",
+              id: "single",
+              title: "单牌解读",
+              body: "一个清晰问题的快速提示。",
               href: onlineHref,
               tone: "light" as const,
+              disabled: false,
             },
             {
-              id: "physical",
-              title: "实体卡组",
-              body: "使用手中的牌，再把抽到的牌带入 Ora 的阅读室。",
-              href: physicalHref,
+              id: "three-card",
+              title: "三牌阵",
+              body: "围绕处境、挑战与指引展开更深入的解读。",
+              href: threeCardHref,
               tone: "green" as const,
+              disabled: false,
             },
             {
-              id: "journal",
-              title: "解读日志",
-              body: "回到保存过的问题、卡牌与反思，像翻阅一间安静档案室。",
-              href: readingsHref,
+              id: "relationship",
+              title: "关系解读",
+              body: "即将开放",
+              href: "",
               tone: "product" as const,
+              disabled: true,
+            },
+            {
+              id: "career",
+              title: "事业解读",
+              body: "即将开放",
+              href: "",
+              tone: "product" as const,
+              disabled: true,
             },
           ]
         : [
             {
-              id: "online",
-              title: "ONLINE READING",
-              body: "Draw one upright card online and move directly into the reading flow.",
+              id: "single",
+              title: "Single Card Reading",
+              body: "A quick message for one clear question.",
               href: onlineHref,
               tone: "light" as const,
+              disabled: false,
             },
             {
-              id: "physical",
-              title: "PHYSICAL DECK",
-              body: "Use the cards in your hands, then bring the drawn card into Ora.",
-              href: physicalHref,
+              id: "three-card",
+              title: "Three Card Spread",
+              body: "A deeper reading for situation, challenge, and guidance.",
+              href: threeCardHref,
               tone: "green" as const,
+              disabled: false,
             },
             {
-              id: "journal",
-              title: "READING JOURNAL",
-              body: "Return to saved questions, cards, and reflections in a quiet archive.",
-              href: readingsHref,
+              id: "relationship",
+              title: "Relationship Reading",
+              body: "Coming Soon",
+              href: "",
               tone: "product" as const,
+              disabled: true,
+            },
+            {
+              id: "career",
+              title: "Career Reading",
+              body: "Coming Soon",
+              href: "",
+              tone: "product" as const,
+              disabled: true,
             },
           ],
       wonderingTitle: isZh ? "你正在想什么？" : "What are you wondering?",
@@ -298,19 +316,94 @@ export function OracleShowroomHome({
           ]
         : deckCards,
       modesKicker: isZh ? "解读模式" : "Reading Modes",
-      modesNote: isZh ? "每一次解读，都从一张正位牌开始。" : "Each reading begins with one upright card.",
+      modesNote: isZh ? "选择最适合你问题的解读。" : "Choose the reading that fits your question.",
       modes: isZh
         ? [
-            { theme: "clarity" as const, title: "清晰解读", body: "辨认一段处境中的核心信号。", href: clarityHref },
-            { theme: "mirror" as const, title: "镜像解读", body: "看见问题正在映回你什么。", href: mirrorHref },
-            { theme: "next" as const, title: "下一步解读", body: "把注意力带向最诚实的下一步。", href: nextStepHref },
+            {
+              theme: "clarity" as const,
+              title: "单牌解读",
+              body: "一个清晰问题的快速提示。",
+              cards: "1 张牌",
+              status: "可用",
+              cta: "开始单牌解读",
+              href: onlineHref,
+              disabled: false,
+            },
+            {
+              theme: "mirror" as const,
+              title: "三牌阵",
+              body: "围绕处境、挑战与指引展开更深入的解读。",
+              cards: "3 张牌",
+              status: "可用",
+              cta: "开始三牌解读",
+              href: threeCardHref,
+              disabled: false,
+            },
+            {
+              theme: "next" as const,
+              title: "关系解读",
+              body: "用于爱、连接与情感清晰度。",
+              cards: "3 张牌",
+              status: "即将开放",
+              cta: "即将开放",
+              href: "",
+              disabled: true,
+            },
+            {
+              theme: "product" as const,
+              title: "事业解读",
+              body: "用于工作、方向与下一次机会。",
+              cards: "3 张牌",
+              status: "即将开放",
+              cta: "即将开放",
+              href: "",
+              disabled: true,
+            },
           ]
         : [
-            { theme: "clarity" as const, title: "CLARITY READING", body: "Name the central signal in a situation.", href: clarityHref },
-            { theme: "mirror" as const, title: "MIRROR READING", body: "See what the question reflects back to you.", href: mirrorHref },
-            { theme: "next" as const, title: "NEXT STEP READING", body: "Bring attention to the most honest next move.", href: nextStepHref },
+            {
+              theme: "clarity" as const,
+              title: "Single Card Reading",
+              body: "A quick message for one clear question.",
+              cards: "1 card",
+              status: "Available",
+              cta: "Start Single Card",
+              href: onlineHref,
+              disabled: false,
+            },
+            {
+              theme: "mirror" as const,
+              title: "Three Card Spread",
+              body: "A deeper reading for situation, challenge, and guidance.",
+              cards: "3 cards",
+              status: "Available",
+              cta: "Start Three Card",
+              href: threeCardHref,
+              disabled: false,
+            },
+            {
+              theme: "next" as const,
+              title: "Relationship Reading",
+              body: "For love, connection, and emotional clarity.",
+              cards: "3 cards",
+              status: "Coming Soon",
+              cta: "Coming Soon",
+              href: "",
+              disabled: true,
+            },
+            {
+              theme: "product" as const,
+              title: "Career Reading",
+              body: "For work, direction, and next opportunities.",
+              cards: "3 cards",
+              status: "Coming Soon",
+              cta: "Coming Soon",
+              href: "",
+              disabled: true,
+            },
           ],
-      oneUprightCard: isZh ? "一张正位牌 ->" : "One upright card ->",
+      cardsLabel: isZh ? "牌数" : "Cards",
+      statusLabel: isZh ? "状态" : "Status",
       journalTitle: isZh ? ["你的", "解读", "日志"] : ["YOUR", "READING", "JOURNAL"],
       journalNotes: isZh
         ? [
@@ -357,7 +450,7 @@ export function OracleShowroomHome({
         : { privacy: "Privacy", terms: "Terms", disclaimer: "Disclaimer", contact: "Contact" },
       finalTitle: isZh ? "你的问题正在等待。" : "Your question is waiting.",
     }),
-    [clarityHref, isZh, mirrorHref, nextStepHref, onlineHref, physicalHref, readingsHref],
+    [isZh, onlineHref, threeCardHref],
   );
   const sectionNavItems = copy.sectionNavItems;
   const localizedDeckCards = copy.deckCards;
@@ -638,25 +731,23 @@ export function OracleShowroomHome({
           >
             {copy.choosePath}
           </p>
-          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {copy.paths.map((item, index) => (
-              <Link
-                className={cx(
-                  revealClass(`path-${item.id}`),
-                  "group relative flex min-h-[24rem] flex-col justify-between overflow-hidden rounded-[1.8rem] border p-6 shadow-[0_22px_58px_rgba(102,75,33,0.14)] transition duration-[260ms] hover:-translate-y-1.5 hover:scale-[1.015] motion-reduce:transform-none sm:p-7",
-                  item.tone === "green" &&
-                    "border-[#31483f]/30 bg-[linear-gradient(155deg,#29443b,#172a23)] text-[#f4efe5] hover:shadow-[0_30px_72px_rgba(33,54,47,0.3)]",
-                  item.tone === "light" &&
-                    "border-[#d8b76a]/36 bg-[radial-gradient(circle_at_82%_12%,rgba(255,255,255,0.9),transparent_30%),linear-gradient(170deg,#fffaf0,#f1e4cb)] text-[#3f352b] hover:border-[#b9934f]/62",
-                  item.tone === "product" &&
-                    "border-[#d8b76a]/30 bg-[linear-gradient(170deg,#fbf3e4,#ead8ba)] text-[#3f352b] hover:border-[#b9934f]/55",
-                )}
-                data-reveal-id={`path-${item.id}`}
-                data-showroom-reveal
-                href={item.href}
-                key={item.id}
-                style={revealStyle(index)}
-              >
+          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {copy.paths.map((item, index) => {
+              const className = cx(
+                revealClass(`path-${item.id}`),
+                "group relative flex min-h-[24rem] flex-col justify-between overflow-hidden rounded-[1.8rem] border p-6 shadow-[0_22px_58px_rgba(102,75,33,0.14)] transition duration-[260ms] motion-reduce:transform-none sm:p-7",
+                item.disabled
+                  ? "cursor-not-allowed opacity-68"
+                  : "hover:-translate-y-1.5 hover:scale-[1.015]",
+                item.tone === "green" &&
+                  "border-[#31483f]/30 bg-[linear-gradient(155deg,#29443b,#172a23)] text-[#f4efe5] hover:shadow-[0_30px_72px_rgba(33,54,47,0.3)]",
+                item.tone === "light" &&
+                  "border-[#d8b76a]/36 bg-[radial-gradient(circle_at_82%_12%,rgba(255,255,255,0.9),transparent_30%),linear-gradient(170deg,#fffaf0,#f1e4cb)] text-[#3f352b] hover:border-[#b9934f]/62",
+                item.tone === "product" &&
+                  "border-[#d8b76a]/30 bg-[linear-gradient(170deg,#fbf3e4,#ead8ba)] text-[#3f352b] hover:border-[#b9934f]/55",
+              );
+              const content = (
+                <>
                 {/* object visual layer per tone */}
                 {item.tone === "light" && (
                   <span aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-48">
@@ -716,8 +807,36 @@ export function OracleShowroomHome({
                     {item.body}
                   </p>
                 </div>
+                </>
+              );
+
+              return item.disabled ? (
+              <div
+                className={cx(
+                  className,
+                  "hover:translate-y-0 hover:scale-100",
+                )}
+                data-reveal-id={`path-${item.id}`}
+                data-showroom-reveal
+                key={item.id}
+                style={revealStyle(index)}
+                aria-disabled="true"
+              >
+                {content}
+              </div>
+              ) : (
+              <Link
+                className={className}
+                data-reveal-id={`path-${item.id}`}
+                data-showroom-reveal
+                href={item.href}
+                key={item.id}
+                style={revealStyle(index)}
+              >
+                {content}
               </Link>
-            ))}
+              );
+            })}
           </div>
         </section>
 
@@ -1040,66 +1159,111 @@ export function OracleShowroomHome({
           >
             {copy.modesNote}
           </p>
-          <div className="mt-10 grid gap-5 md:grid-cols-3">
-            {copy.modes.map((mode, index) => (
-              <Link
-                className={cx(
-                  revealClass(`mode-${index}`),
-                  "group relative flex min-h-[27rem] flex-col justify-end overflow-hidden rounded-[1.5rem] border p-7 shadow-[0_22px_60px_rgba(102,75,33,0.16)] transition duration-[260ms] hover:-translate-y-1.5 hover:scale-[1.015] motion-reduce:transform-none",
-                  mode.theme === "clarity" && "border-[#d8b76a]/40 bg-[linear-gradient(180deg,#fff7e6,#f0deb4)] text-[#3f352b] md:translate-y-4",
-                  mode.theme === "mirror" && "border-[#31483f]/40 bg-[linear-gradient(180deg,#2b3f38,#1b2a24)] text-[#f4efe5]",
-                  mode.theme === "next" && "border-[#caa96a]/40 bg-[linear-gradient(180deg,#fbf3e4,#e7d6b6)] text-[#3f352b] md:translate-y-4",
-                )}
-                data-reveal-id={`mode-${index}`}
-                data-showroom-reveal
-                href={mode.href}
-                key={mode.title}
-                style={revealStyle(index)}
-              >
-                {/* themed visual */}
-                {mode.theme === "clarity" && (
-                  <span aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-2/3">
-                    <span className="absolute left-1/2 top-8 h-40 w-28 -translate-x-1/2 rounded-t-full border border-[#caa96a]/55 bg-[radial-gradient(circle_at_50%_30%,rgba(255,247,224,0.95),rgba(216,183,106,0.25))] shadow-[0_0_50px_rgba(216,183,106,0.45)]" />
-                    <span className="absolute left-1/2 top-2 h-px w-44 -translate-x-1/2 bg-gradient-to-r from-transparent via-[#caa96a]/70 to-transparent" />
-                  </span>
-                )}
-                {mode.theme === "mirror" && (
-                  <span aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-2/3">
-                    <span className="absolute left-1/2 top-8 h-44 w-32 -translate-x-1/2 rounded-[999px] border border-[#d8b76a]/55 bg-[linear-gradient(160deg,rgba(216,183,106,0.34),rgba(20,32,27,0.5)_55%,rgba(216,183,106,0.18))] shadow-[inset_0_0_30px_rgba(0,0,0,0.5),0_0_40px_rgba(216,183,106,0.22)]" />
-                    <span className="absolute left-1/2 top-[5.5rem] h-28 w-1 -translate-x-1/2 -rotate-[18deg] bg-gradient-to-b from-[#f4efe5]/70 to-transparent" />
-                  </span>
-                )}
-                {mode.theme === "next" && (
-                  <span aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-10 flex flex-col items-center gap-1.5">
-                    <span className="h-2.5 w-24 rounded-sm bg-[#caa96a]/45" />
-                    <span className="h-2.5 w-32 rounded-sm bg-[#caa96a]/35" />
-                    <span className="h-2.5 w-40 rounded-sm bg-[#caa96a]/28" />
-                    <span className="mt-2 text-2xl text-[#9d7b3f]">-&gt;</span>
-                  </span>
-                )}
-                <div className="relative">
-                  <h2 className="font-serif text-3xl leading-none sm:text-4xl">
-                    {mode.title}
-                  </h2>
-                  <p
-                    className={cx(
-                      "mt-4 text-sm leading-7",
-                      mode.theme === "mirror" ? "text-[#cdbfa6]" : "text-[#766955]",
-                    )}
+          <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+            {copy.modes.map((mode, index) => {
+              const isDark = mode.theme === "mirror";
+              const cardClassName = cx(
+                revealClass(`mode-${index}`),
+                "group relative flex min-h-[27rem] flex-col justify-end overflow-hidden rounded-[1.5rem] border p-7 shadow-[0_22px_60px_rgba(102,75,33,0.16)] transition duration-[260ms] motion-reduce:transform-none",
+                !mode.disabled && "hover:-translate-y-1.5 hover:scale-[1.015]",
+                mode.disabled && "cursor-not-allowed opacity-70 saturate-[0.82]",
+                mode.theme === "clarity" && "border-[#d8b76a]/40 bg-[linear-gradient(180deg,#fff7e6,#f0deb4)] text-[#3f352b] xl:translate-y-4",
+                mode.theme === "mirror" && "border-[#31483f]/40 bg-[linear-gradient(180deg,#2b3f38,#1b2a24)] text-[#f4efe5]",
+                mode.theme === "next" && "border-[#caa96a]/40 bg-[linear-gradient(180deg,#fbf3e4,#e7d6b6)] text-[#3f352b] xl:translate-y-4",
+                mode.theme === "product" && "border-[#d8b76a]/32 bg-[linear-gradient(180deg,#fffaf0,#eadfc9)] text-[#3f352b]",
+              );
+              const cardContent = (
+                <>
+                  {mode.theme === "clarity" && (
+                    <span aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-2/3">
+                      <span className="absolute left-1/2 top-8 h-40 w-28 -translate-x-1/2 rounded-t-full border border-[#caa96a]/55 bg-[radial-gradient(circle_at_50%_30%,rgba(255,247,224,0.95),rgba(216,183,106,0.25))] shadow-[0_0_50px_rgba(216,183,106,0.45)]" />
+                      <span className="absolute left-1/2 top-2 h-px w-44 -translate-x-1/2 bg-gradient-to-r from-transparent via-[#caa96a]/70 to-transparent" />
+                    </span>
+                  )}
+                  {mode.theme === "mirror" && (
+                    <span aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-2/3">
+                      <span className="absolute left-1/2 top-8 h-44 w-32 -translate-x-1/2 rounded-[999px] border border-[#d8b76a]/55 bg-[linear-gradient(160deg,rgba(216,183,106,0.34),rgba(20,32,27,0.5)_55%,rgba(216,183,106,0.18))] shadow-[inset_0_0_30px_rgba(0,0,0,0.5),0_0_40px_rgba(216,183,106,0.22)]" />
+                      <span className="absolute left-1/2 top-[5.5rem] h-28 w-1 -translate-x-1/2 -rotate-[18deg] bg-gradient-to-b from-[#f4efe5]/70 to-transparent" />
+                    </span>
+                  )}
+                  {mode.theme === "next" && (
+                    <span aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-10 flex flex-col items-center gap-1.5">
+                      <span className="h-2.5 w-24 rounded-sm bg-[#caa96a]/45" />
+                      <span className="h-2.5 w-32 rounded-sm bg-[#caa96a]/35" />
+                      <span className="h-2.5 w-40 rounded-sm bg-[#caa96a]/28" />
+                      <span className="mt-2 text-2xl text-[#9d7b3f]">-&gt;</span>
+                    </span>
+                  )}
+                  {mode.theme === "product" && (
+                    <span aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-8 flex items-center justify-center">
+                      <span className="relative h-36 w-28 rounded-[0.75rem] border border-[#caa96a]/42 bg-[#fff7e6]/72 shadow-[0_20px_44px_rgba(102,75,33,0.14)]">
+                        <span className="absolute inset-4 rounded-full border border-[#d8b76a]/28" />
+                        <span className="absolute left-1/2 top-1/2 h-px w-16 -translate-x-1/2 bg-gradient-to-r from-transparent via-[#9d7b3f]/54 to-transparent" />
+                      </span>
+                    </span>
+                  )}
+                  <div className="relative">
+                    <div
+                      className={cx(
+                        "mb-5 flex flex-wrap items-center gap-2 text-[0.62rem] font-semibold uppercase tracking-[0.18em]",
+                        isDark ? "text-[#d8b76a]" : "text-[#9d7b3f]",
+                      )}
+                    >
+                      <span>{copy.cardsLabel}: {mode.cards}</span>
+                      <span aria-hidden="true" className={cx("h-1 w-1 rounded-full", isDark ? "bg-[#d8b76a]" : "bg-[#9d7b3f]")} />
+                      <span>{copy.statusLabel}: {mode.status}</span>
+                    </div>
+                    <h2 className="font-serif text-3xl leading-none sm:text-4xl">
+                      {mode.title}
+                    </h2>
+                    <p
+                      className={cx(
+                        "mt-4 text-sm leading-7",
+                        isDark ? "text-[#cdbfa6]" : "text-[#766955]",
+                      )}
+                    >
+                      {mode.body}
+                    </p>
+                    <span
+                      className={cx(
+                        "mt-5 inline-block text-[0.62rem] font-semibold uppercase tracking-[0.2em]",
+                        isDark ? "text-[#d8b76a]" : "text-[#9d7b3f]",
+                      )}
+                    >
+                      {mode.cta}{mode.disabled ? "" : " ->"}
+                    </span>
+                  </div>
+                </>
+              );
+
+              if (mode.disabled) {
+                return (
+                  <article
+                    aria-disabled="true"
+                    className={cardClassName}
+                    data-reveal-id={`mode-${index}`}
+                    data-showroom-reveal
+                    key={mode.title}
+                    style={revealStyle(index)}
                   >
-                    {mode.body}
-                  </p>
-                  <span
-                    className={cx(
-                      "mt-5 inline-block text-[0.62rem] font-semibold uppercase tracking-[0.2em]",
-                      mode.theme === "mirror" ? "text-[#d8b76a]" : "text-[#9d7b3f]",
-                    )}
-                  >
-                    {copy.oneUprightCard}
-                  </span>
-                </div>
-              </Link>
-            ))}
+                    {cardContent}
+                  </article>
+                );
+              }
+
+              return (
+                <Link
+                  className={cardClassName}
+                  data-reveal-id={`mode-${index}`}
+                  data-showroom-reveal
+                  href={mode.href}
+                  key={mode.title}
+                  style={revealStyle(index)}
+                >
+                  {cardContent}
+                </Link>
+              );
+            })}
           </div>
         </section>
 

@@ -29,6 +29,7 @@ type RevealClientProps = {
   initialQuestion: string;
   initialSpread: string;
   initialCard: string;
+  initialCards: string;
   initialOrientation: string;
   initialLang: Language;
   hasLangParam: boolean;
@@ -36,10 +37,11 @@ type RevealClientProps = {
 
 type RitualState = {
   mode: ReadingMode;
-  spread: "single";
+  spread: "single" | "three-card";
   orientation: "upright";
   question: string;
   card: string;
+  cards: string;
   lang: Language;
 };
 
@@ -67,9 +69,16 @@ function buildResultHref(ritual: RitualState) {
     spread: ritual.spread,
     orientation: ritual.orientation,
     question: ritual.question,
-    card: ritual.card,
     lang: ritual.lang,
   });
+
+  if (ritual.spread === "single" && ritual.card) {
+    params.set("card", ritual.card);
+  }
+
+  if (ritual.spread === "three-card" && ritual.cards) {
+    params.set("cards", ritual.cards);
+  }
 
   return `/ai-guide/result?${params.toString()}`;
 }
@@ -79,6 +88,7 @@ function resolveInitialRitual({
   initialQuestion,
   initialSpread,
   initialCard,
+  initialCards,
   initialOrientation,
   initialLang,
 }: Omit<RevealClientProps, "hasLangParam">): RitualState {
@@ -88,10 +98,11 @@ function resolveInitialRitual({
 
   return {
     mode,
-    spread: initialSpread === "single" ? "single" : "single",
+    spread: initialSpread === "three-card" ? "three-card" : "single",
     orientation: initialOrientation === "upright" ? "upright" : "upright",
     question: initialQuestion,
     card: initialCard,
+    cards: initialCards,
     lang: initialLang,
   };
 }
@@ -185,6 +196,7 @@ export function RevealClient({
   initialQuestion,
   initialSpread,
   initialCard,
+  initialCards,
   initialOrientation,
   initialLang,
   hasLangParam,
@@ -197,6 +209,7 @@ export function RevealClient({
       initialQuestion,
       initialSpread,
       initialCard,
+      initialCards,
       initialOrientation,
       initialLang,
     }),
@@ -217,12 +230,14 @@ export function RevealClient({
           : ritual.mode,
       question: ritual.question || stored.question || storedQuestion,
       card: ritual.card || stored.card || storedCard,
+      cards: ritual.cards || stored.cards || "",
     };
 
     if (
       nextRitual.mode !== ritual.mode ||
       nextRitual.question !== ritual.question ||
-      nextRitual.card !== ritual.card
+      nextRitual.card !== ritual.card ||
+      nextRitual.cards !== ritual.cards
     ) {
       queueMicrotask(() => {
         setRitual(nextRitual);
@@ -230,9 +245,9 @@ export function RevealClient({
       return;
     }
 
-    if (!ritual.question && !ritual.card) {
+    if (!ritual.question && !ritual.card && !ritual.cards) {
       router.replace(
-        `/ai-guide/ask?mode=${ritual.mode}&spread=single&orientation=upright&lang=${ritual.lang}`,
+        `/ai-guide/ask?mode=${ritual.mode}&spread=${ritual.spread}&orientation=upright&lang=${ritual.lang}`,
       );
       return;
     }
@@ -250,8 +265,19 @@ export function RevealClient({
   }, [initialMode, ritual, router]);
 
   const card = ritual.card ? getTarotCardById(ritual.card) : undefined;
+  const threeCardItems = ritual.cards
+    .split(",")
+    .map((cardId) => getTarotCardById(cardId.trim()))
+    .filter((tarotCard): tarotCard is NonNullable<typeof tarotCard> =>
+      Boolean(tarotCard),
+    );
+  const threeCardPositions = [
+    copy.threeCardSituation,
+    copy.threeCardChallenge,
+    copy.threeCardGuidance,
+  ];
 
-  if (ritual.mode === "physical") {
+  if (ritual.mode === "physical" && ritual.spread === "single") {
     function handleSelect(cardId: string) {
       const nextRitual: RitualState = {
         ...ritual,
@@ -278,6 +304,7 @@ export function RevealClient({
             orientation: ritual.orientation,
             question: ritual.question,
             card: ritual.card,
+            cards: ritual.cards,
           }}
           hasLangParam={hasLangParam}
         />
@@ -327,6 +354,81 @@ export function RevealClient({
     );
   }
 
+  if (ritual.spread === "three-card" && threeCardItems.length === 3) {
+    return (
+      <LuminousShell>
+        <LuminousNav
+          lang={initialLang}
+          pathname="/ai-guide/reveal"
+          params={{
+            mode: ritual.mode,
+            spread: ritual.spread,
+            orientation: ritual.orientation,
+            question: ritual.question,
+            cards: ritual.cards,
+          }}
+          hasLangParam={hasLangParam}
+        />
+
+        <header className="space-y-4 text-center">
+          <div className="mx-auto flex items-center justify-center gap-3 text-[#a77f3c]">
+            <span className="h-px w-10 bg-[#d2b06d]/55" />
+            <span className="text-[0.66rem] font-semibold uppercase tracking-[0.28em]">
+              {copy.threeCardSpread}
+            </span>
+            <span className="h-px w-10 bg-[#d2b06d]/55" />
+          </div>
+          <h1 className="font-serif text-[2.6rem] leading-tight text-[#34271b] sm:text-[3.25rem]">
+            {copy.threeCardsAreDrawn}
+          </h1>
+          <p className="mx-auto max-w-[31rem] text-sm leading-7 text-[#7b6c58]">
+            {copy.threeCardsAreDrawnDescription}
+          </p>
+        </header>
+
+        <section className="relative overflow-hidden rounded-[2.25rem] border border-[#cfad6d]/50 bg-[#fffdf7]/82 p-5 shadow-[0_28px_80px_rgba(111,78,31,0.12),inset_0_1px_0_rgba(255,255,255,0.75)] backdrop-blur-md sm:p-6">
+          <div className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-[#d2b06d]/60 to-transparent" />
+          <div className="grid gap-4 sm:grid-cols-3">
+            {threeCardItems.map((threeCard, index) => (
+              <article
+                className="rounded-[1.45rem] border border-[#d8bd82]/42 bg-[#fffaf0]/72 p-4 text-center shadow-[0_16px_40px_rgba(116,83,36,0.09)]"
+                key={`${threeCard.id}-${threeCardPositions[index]}`}
+              >
+                <p className="text-[0.62rem] font-semibold uppercase tracking-[0.2em] text-[#a77f3c]">
+                  {threeCardPositions[index]}
+                </p>
+                <div className="mx-auto mt-4 w-20">
+                  {threeCard.image ? (
+                    <Image
+                      src={threeCard.image}
+                      alt={`${getTarotCardTitle(threeCard, initialLang)} tarot card`}
+                      width={160}
+                      height={284}
+                      className="block h-auto w-full rounded-[0.7rem] border border-[#d8bd82]/50 object-cover shadow-[0_16px_32px_rgba(116,83,36,0.16)]"
+                    />
+                  ) : (
+                    <div className="flex aspect-[9/16] w-full items-center justify-center rounded-[0.7rem] border border-[#d8bd82]/50 bg-[#fffaf0]/86 p-1 shadow-[0_16px_32px_rgba(116,83,36,0.14)]">
+                      <span className="font-serif text-[0.68rem] leading-tight text-[#3f3021]">
+                        {getTarotCardTitle(threeCard, initialLang)}
+                      </span>
+                    </div>
+                  )}
+                </div>
+                <h2 className="mt-4 font-serif text-xl leading-tight text-[#34271b]">
+                  {getTarotCardTitle(threeCard, initialLang)}
+                </h2>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <LuminousAction href={buildResultHref(ritual)}>
+          {copy.openReading}
+        </LuminousAction>
+      </LuminousShell>
+    );
+  }
+
   if (!ritual.card || !card) {
     const title = ritual.card ? copy.invalidReadingTitle : copy.noCardDrawn;
     const description = ritual.card
@@ -344,6 +446,7 @@ export function RevealClient({
             orientation: ritual.orientation,
             question: ritual.question,
             card: ritual.card,
+            cards: ritual.cards,
           }}
           hasLangParam={hasLangParam}
         />
@@ -360,7 +463,7 @@ export function RevealClient({
           </p>
           <div className="mt-6 space-y-3">
             <LuminousAction
-              href={`/ai-guide/draw?mode=online&spread=single&orientation=upright&question=${encodeURIComponent(
+              href={`/ai-guide/draw?mode=online&spread=${ritual.spread}&orientation=upright&question=${encodeURIComponent(
                 ritual.question,
               )}&lang=${initialLang}`}
             >
@@ -386,6 +489,7 @@ export function RevealClient({
           orientation: ritual.orientation,
           question: ritual.question,
           card: ritual.card,
+          cards: ritual.cards,
         }}
         hasLangParam={hasLangParam}
       />

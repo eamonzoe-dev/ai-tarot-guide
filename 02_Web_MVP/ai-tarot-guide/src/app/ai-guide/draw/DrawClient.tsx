@@ -13,10 +13,12 @@ const USER_QUESTION_KEY = "aiTarot:userQuestion";
 const LATEST_RITUAL_KEY = "aiTarot:latestRitual";
 
 type ReadingMode = "physical" | "online";
+type Spread = "single" | "three-card";
 
 type DrawClientProps = {
   initialMode: ReadingMode;
   initialQuestion: string;
+  initialSpread: Spread;
   initialLang: Language;
   hasLangParam: boolean;
   initialRitualStep: number;
@@ -24,14 +26,16 @@ type DrawClientProps = {
 
 function buildQuery(
   mode: ReadingMode,
+  spread: Spread,
   question: string,
   lang: Language,
   card?: string,
+  cards?: string,
   ritualStep?: number,
 ) {
   const params = new URLSearchParams({
     mode,
-    spread: "single",
+    spread,
     orientation: "upright",
     question,
     lang,
@@ -39,6 +43,10 @@ function buildQuery(
 
   if (card) {
     params.set("card", card);
+  }
+
+  if (cards) {
+    params.set("cards", cards);
   }
 
   if (ritualStep) {
@@ -50,25 +58,44 @@ function buildQuery(
 
 function saveLatestRitual(
   mode: ReadingMode,
+  spread: Spread,
   question: string,
   lang: Language,
   card?: string,
+  cards?: string,
 ) {
   localStorage.setItem(
     LATEST_RITUAL_KEY,
     JSON.stringify({
       mode,
-      spread: "single",
+      spread,
       orientation: "upright",
       question,
       lang,
       card,
+      cards,
     }),
   );
 }
 
 function getRandomTarotCardId() {
   return tarotCards[Math.floor(Math.random() * tarotCards.length)]?.id ?? "";
+}
+
+function getRandomTarotCardIds(count: number) {
+  const deck = [...tarotCards];
+  const drawn: string[] = [];
+
+  while (drawn.length < count && deck.length > 0) {
+    const index = Math.floor(Math.random() * deck.length);
+    const [card] = deck.splice(index, 1);
+
+    if (card) {
+      drawn.push(card.id);
+    }
+  }
+
+  return drawn;
 }
 
 function LuminousShell({
@@ -173,6 +200,7 @@ function LuminousCardBack({
 export function DrawClient({
   initialMode,
   initialQuestion,
+  initialSpread,
   initialLang,
   hasLangParam,
   initialRitualStep,
@@ -206,21 +234,27 @@ export function DrawClient({
     initialQuestion || undefined,
   );
   const [drawnCard, setDrawnCard] = useState<string | undefined>(undefined);
+  const [drawnCards, setDrawnCards] = useState<string | undefined>(undefined);
   const currentOnlineStep = onlineSteps[initialRitualStep];
+  const selectedCards = drawnCards || (drawnCard ? drawnCard : undefined);
   const onlineActionHref =
     initialRitualStep < 2
       ? `/ai-guide/draw?${buildQuery(
           "online",
+          initialSpread,
           question ?? initialQuestion,
           initialLang,
+          undefined,
           undefined,
           initialRitualStep + 1,
         )}`
       : `/ai-guide/reveal?${buildQuery(
           "online",
+          initialSpread,
           question ?? initialQuestion,
           initialLang,
-          drawnCard,
+          initialSpread === "single" ? drawnCard : undefined,
+          initialSpread === "three-card" ? drawnCards : undefined,
         )}`;
 
   useEffect(() => {
@@ -231,15 +265,27 @@ export function DrawClient({
       localStorage.setItem(USER_QUESTION_KEY, initialQuestion);
       saveLatestRitual(
         initialMode,
+        initialSpread,
         initialQuestion,
         initialLang,
-        initialRitualStep === 2 ? drawnCard : undefined,
+        initialSpread === "single" && initialRitualStep === 2
+          ? drawnCard
+          : undefined,
+        initialSpread === "three-card" && initialRitualStep === 2
+          ? drawnCards
+          : undefined,
       );
     }
 
-    if (initialRitualStep === 2 && !drawnCard) {
+    if (initialRitualStep === 2 && initialSpread === "single" && !drawnCard) {
       queueMicrotask(() => {
         setDrawnCard(getRandomTarotCardId());
+      });
+    }
+
+    if (initialRitualStep === 2 && initialSpread === "three-card" && !drawnCards) {
+      queueMicrotask(() => {
+        setDrawnCards(getRandomTarotCardIds(3).join(","));
       });
     }
 
@@ -249,14 +295,16 @@ export function DrawClient({
 
     if (!resolvedQuestion) {
       router.replace(
-        `/ai-guide/ask?mode=${initialMode}&spread=single&orientation=upright&lang=${initialLang}`,
+        `/ai-guide/ask?mode=${initialMode}&spread=${initialSpread}&orientation=upright&lang=${initialLang}`,
       );
     }
   }, [
     drawnCard,
+    drawnCards,
     initialLang,
     initialMode,
     initialQuestion,
+    initialSpread,
     initialRitualStep,
     router,
   ]);
@@ -286,7 +334,7 @@ export function DrawClient({
     return null;
   }
 
-  if (initialMode === "online" && initialRitualStep === 2 && !drawnCard) {
+  if (initialMode === "online" && initialRitualStep === 2 && !selectedCards) {
     return (
       <LuminousShell>
         <section className="my-auto rounded-[2rem] border border-[#d8bd82]/45 bg-[#fffaf1]/74 p-6 text-center shadow-[0_24px_70px_rgba(116,83,36,0.10)] backdrop-blur-md">
@@ -315,7 +363,7 @@ export function DrawClient({
           pathname="/ai-guide/draw"
           params={{
             mode: initialMode,
-            spread: "single",
+            spread: initialSpread,
             orientation: "upright",
             question,
             ritualStep: String(initialRitualStep),
@@ -416,7 +464,7 @@ export function DrawClient({
         pathname="/ai-guide/draw"
         params={{
           mode: initialMode,
-          spread: "single",
+          spread: initialSpread,
           orientation: "upright",
           question,
         }}
@@ -476,6 +524,7 @@ export function DrawClient({
       <LuminousAction
         href={`/ai-guide/reveal?${buildQuery(
           "physical",
+          initialSpread,
           question,
           initialLang,
         )}`}

@@ -2,6 +2,7 @@ import { DrawClient } from "./DrawClient";
 import { normalizeLanguage } from "@/lib/ai-guide/i18n";
 
 type ReadingMode = "physical" | "online";
+type Spread = "single" | "three-card";
 
 function normalizeMode(mode: string | string[] | undefined): ReadingMode {
   const value = Array.isArray(mode) ? mode[0] : mode;
@@ -38,15 +39,19 @@ export default async function DrawPage({
   const {
     mode: modeParam,
     question: questionParam,
+    spread: spreadParam,
     lang: langParam,
     ritualStep: ritualStepParam,
   } = await searchParams;
+  const spreadValue = normalizeValue(spreadParam);
+  const spread: Spread = spreadValue === "three-card" ? "three-card" : "single";
   const ritualStep = normalizeRitualStep(ritualStepParam);
 
   return (
     <DrawClient
       initialMode={normalizeMode(modeParam)}
       initialQuestion={normalizeValue(questionParam)}
+      initialSpread={spread}
       initialLang={normalizeLanguage(langParam)}
       hasLangParam={Boolean(langParam)}
       initialRitualStep={ritualStep}

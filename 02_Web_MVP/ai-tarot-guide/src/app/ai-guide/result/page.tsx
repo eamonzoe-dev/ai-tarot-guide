@@ -17,12 +17,13 @@ export default async function ResultPage({
     mode?: string | string[];
     spread?: string | string[];
     card?: string | string[];
+    cards?: string | string[];
     orientation?: string | string[];
     question?: string | string[];
     lang?: string | string[];
   }>;
 }) {
-  const { mode, spread, card, orientation, question, lang } =
+  const { mode, spread, card, cards, orientation, question, lang } =
     await searchParams;
 
   return (
@@ -30,6 +31,7 @@ export default async function ResultPage({
       initialMode={normalizeMode(mode)}
       initialSpread={normalizeValue(spread)}
       initialCard={normalizeValue(card)}
+      initialCards={normalizeValue(cards)}
       initialOrientation={normalizeValue(orientation)}
       initialQuestion={normalizeValue(question)}
       initialLang={normalizeLanguage(lang)}
