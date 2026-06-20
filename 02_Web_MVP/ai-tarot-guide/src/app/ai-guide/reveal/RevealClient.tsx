@@ -6,7 +6,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 
 import { CardChoice } from "@/components/ai-guide/CardChoice";
-import { LanguageToggle } from "@/components/ai-guide/LanguageToggle";
+import { ActivationCodePanel } from "@/components/ai-guide/ActivationCodePanel";
 import { ReadingNav } from "@/components/ai-guide/ReadingNav";
 import {
   getTarotCardById,
@@ -107,7 +107,15 @@ function resolveInitialRitual({
   };
 }
 
-function LuminousShell({ children }: { children: ReactNode }) {
+function LuminousShell({
+  children,
+  lang,
+  hasLangParam,
+}: {
+  children: ReactNode;
+  lang: Language;
+  hasLangParam: boolean;
+}) {
   return (
     <main className="relative min-h-svh overflow-hidden bg-[#f6f0e5] px-0 py-0 text-[#34271b] sm:px-6 sm:py-6 lg:px-8">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.98),rgba(246,240,229,0.9)_42%,rgba(226,213,188,0.5)_100%)]" />
@@ -116,6 +124,7 @@ function LuminousShell({ children }: { children: ReactNode }) {
       <div className="pointer-events-none absolute left-1/2 top-44 h-[13rem] w-[13rem] -translate-x-1/2 rounded-full border border-[#ead7aa]/34 opacity-80" />
       <div className="pointer-events-none absolute -left-16 bottom-10 h-64 w-64 rounded-full bg-[#d7bd82]/12 blur-3xl" />
       <div className="pointer-events-none absolute -right-20 top-40 h-72 w-72 rounded-full bg-white/45 blur-3xl" />
+      <ActivationCodePanel lang={lang} hasLangParam={hasLangParam} />
 
       <div className="relative z-10 mx-auto flex min-h-svh w-full max-w-[720px] flex-col gap-6 px-5 py-7 sm:min-h-0 sm:px-6 sm:py-9">
         {children}
@@ -126,26 +135,12 @@ function LuminousShell({ children }: { children: ReactNode }) {
 
 function LuminousNav({
   lang,
-  pathname,
-  params,
-  hasLangParam,
 }: {
   lang: Language;
-  pathname: string;
-  params: Record<string, string>;
-  hasLangParam: boolean;
 }) {
   return (
     <div className="rounded-[2rem] border border-[#d7bd82]/40 bg-white/42 px-4 py-3 shadow-[0_18px_60px_rgba(123,93,45,0.08)] backdrop-blur-md">
       <ReadingNav lang={lang} />
-      <div className="mt-3 flex justify-end">
-        <LanguageToggle
-          lang={lang}
-          pathname={pathname}
-          params={params}
-          hasLangParam={hasLangParam}
-        />
-      </div>
     </div>
   );
 }
@@ -294,20 +289,8 @@ export function RevealClient({
     }
 
     return (
-      <LuminousShell>
-        <LuminousNav
-          lang={initialLang}
-          pathname="/ai-guide/reveal"
-          params={{
-            mode: ritual.mode,
-            spread: ritual.spread,
-            orientation: ritual.orientation,
-            question: ritual.question,
-            card: ritual.card,
-            cards: ritual.cards,
-          }}
-          hasLangParam={hasLangParam}
-        />
+      <LuminousShell lang={initialLang} hasLangParam={hasLangParam}>
+        <LuminousNav lang={initialLang} />
 
         <header className="space-y-4 text-center">
           <div className="mx-auto flex items-center justify-center gap-3 text-[#a77f3c]">
@@ -356,19 +339,8 @@ export function RevealClient({
 
   if (ritual.spread === "three-card" && threeCardItems.length === 3) {
     return (
-      <LuminousShell>
-        <LuminousNav
-          lang={initialLang}
-          pathname="/ai-guide/reveal"
-          params={{
-            mode: ritual.mode,
-            spread: ritual.spread,
-            orientation: ritual.orientation,
-            question: ritual.question,
-            cards: ritual.cards,
-          }}
-          hasLangParam={hasLangParam}
-        />
+      <LuminousShell lang={initialLang} hasLangParam={hasLangParam}>
+        <LuminousNav lang={initialLang} />
 
         <header className="space-y-4 text-center">
           <div className="mx-auto flex items-center justify-center gap-3 text-[#a77f3c]">
@@ -436,20 +408,8 @@ export function RevealClient({
       : copy.noCardDrawnDescription;
 
     return (
-      <LuminousShell>
-        <LuminousNav
-          lang={initialLang}
-          pathname="/ai-guide/reveal"
-          params={{
-            mode: ritual.mode,
-            spread: ritual.spread,
-            orientation: ritual.orientation,
-            question: ritual.question,
-            card: ritual.card,
-            cards: ritual.cards,
-          }}
-          hasLangParam={hasLangParam}
-        />
+      <LuminousShell lang={initialLang} hasLangParam={hasLangParam}>
+        <LuminousNav lang={initialLang} />
 
         <section className="my-auto rounded-[2rem] border border-[#d8bd82]/45 bg-[#fffaf1]/74 p-6 text-center shadow-[0_24px_70px_rgba(116,83,36,0.10)] backdrop-blur-md">
           <p className="text-[0.66rem] font-semibold uppercase tracking-[0.28em] text-[#a77f3c]">
@@ -479,20 +439,8 @@ export function RevealClient({
   }
 
   return (
-    <LuminousShell>
-      <LuminousNav
-        lang={initialLang}
-        pathname="/ai-guide/reveal"
-        params={{
-          mode: ritual.mode,
-          spread: ritual.spread,
-          orientation: ritual.orientation,
-          question: ritual.question,
-          card: ritual.card,
-          cards: ritual.cards,
-        }}
-        hasLangParam={hasLangParam}
-      />
+    <LuminousShell lang={initialLang} hasLangParam={hasLangParam}>
+      <LuminousNav lang={initialLang} />
 
       <header className="space-y-4 text-center">
         <div className="mx-auto flex items-center justify-center gap-3 text-[#a77f3c]">

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
-import { LanguageToggle } from "@/components/ai-guide/LanguageToggle";
+import { ActivationCodePanel } from "@/components/ai-guide/ActivationCodePanel";
 import { ReadingNav } from "@/components/ai-guide/ReadingNav";
 import { tarotCards } from "@/data/tarotCards";
 import { type Language, text } from "@/lib/ai-guide/i18n";
@@ -100,8 +100,12 @@ function getRandomTarotCardIds(count: number) {
 
 function LuminousShell({
   children,
+  lang,
+  hasLangParam,
 }: {
   children: React.ReactNode;
+  lang: Language;
+  hasLangParam: boolean;
 }) {
   return (
     <main className="relative min-h-svh overflow-hidden bg-[#f6f0e5] px-0 py-0 text-[#34271b] sm:px-6 sm:py-6 lg:px-8">
@@ -111,6 +115,7 @@ function LuminousShell({
       <div className="pointer-events-none absolute left-1/2 top-44 h-[13rem] w-[13rem] -translate-x-1/2 rounded-full border border-[#ead7aa]/34 opacity-80" />
       <div className="pointer-events-none absolute -left-16 bottom-10 h-64 w-64 rounded-full bg-[#d7bd82]/12 blur-3xl" />
       <div className="pointer-events-none absolute -right-20 top-40 h-72 w-72 rounded-full bg-white/45 blur-3xl" />
+      <ActivationCodePanel lang={lang} hasLangParam={hasLangParam} />
 
       <div className="relative z-10 mx-auto flex min-h-svh w-full max-w-[720px] flex-col gap-6 px-5 py-7 sm:min-h-0 sm:px-6 sm:py-9">
         {children}
@@ -121,26 +126,12 @@ function LuminousShell({
 
 function LuminousNav({
   lang,
-  pathname,
-  params,
-  hasLangParam,
 }: {
   lang: Language;
-  pathname: string;
-  params: Record<string, string>;
-  hasLangParam: boolean;
 }) {
   return (
     <div className="rounded-[2rem] border border-[#d7bd82]/40 bg-white/42 px-4 py-3 shadow-[0_18px_60px_rgba(123,93,45,0.08)] backdrop-blur-md">
       <ReadingNav lang={lang} />
-      <div className="mt-3 flex justify-end">
-        <LanguageToggle
-          lang={lang}
-          pathname={pathname}
-          params={params}
-          hasLangParam={hasLangParam}
-        />
-      </div>
     </div>
   );
 }
@@ -311,7 +302,7 @@ export function DrawClient({
 
   if (question === undefined) {
     return (
-      <LuminousShell>
+      <LuminousShell lang={initialLang} hasLangParam={hasLangParam}>
         <section className="my-auto rounded-[2rem] border border-[#d8bd82]/45 bg-[#fffaf1]/74 p-6 text-center shadow-[0_24px_70px_rgba(116,83,36,0.10)] backdrop-blur-md">
           <p className="text-[0.66rem] font-semibold uppercase tracking-[0.28em] text-[#a77f3c]">
             {copy.readingRoom}
@@ -336,7 +327,7 @@ export function DrawClient({
 
   if (initialMode === "online" && initialRitualStep === 2 && !selectedCards) {
     return (
-      <LuminousShell>
+      <LuminousShell lang={initialLang} hasLangParam={hasLangParam}>
         <section className="my-auto rounded-[2rem] border border-[#d8bd82]/45 bg-[#fffaf1]/74 p-6 text-center shadow-[0_24px_70px_rgba(116,83,36,0.10)] backdrop-blur-md">
           <p className="text-[0.66rem] font-semibold uppercase tracking-[0.28em] text-[#a77f3c]">
             {copy.readingRoom}
@@ -357,19 +348,8 @@ export function DrawClient({
 
   if (initialMode === "online") {
     return (
-      <LuminousShell>
-        <LuminousNav
-          lang={initialLang}
-          pathname="/ai-guide/draw"
-          params={{
-            mode: initialMode,
-            spread: initialSpread,
-            orientation: "upright",
-            question,
-            ritualStep: String(initialRitualStep),
-          }}
-          hasLangParam={hasLangParam}
-        />
+      <LuminousShell lang={initialLang} hasLangParam={hasLangParam}>
+        <LuminousNav lang={initialLang} />
 
         <header className="space-y-4 text-center">
           <div className="mx-auto flex items-center justify-center gap-3 text-[#a77f3c]">
@@ -458,18 +438,8 @@ export function DrawClient({
   }
 
   return (
-    <LuminousShell>
-      <LuminousNav
-        lang={initialLang}
-        pathname="/ai-guide/draw"
-        params={{
-          mode: initialMode,
-          spread: initialSpread,
-          orientation: "upright",
-          question,
-        }}
-        hasLangParam={hasLangParam}
-      />
+    <LuminousShell lang={initialLang} hasLangParam={hasLangParam}>
+      <LuminousNav lang={initialLang} />
 
       <header className="space-y-4 text-center">
         <div className="mx-auto flex items-center justify-center gap-3 text-[#a77f3c]">

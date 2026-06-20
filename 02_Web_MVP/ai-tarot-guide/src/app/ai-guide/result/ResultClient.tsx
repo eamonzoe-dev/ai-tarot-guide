@@ -2,11 +2,11 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 
+import { ActivationCodePanel } from "@/components/ai-guide/ActivationCodePanel";
 import { EmailSignInPanel } from "@/components/ai-guide/EmailSignInPanel";
-import { LanguageToggle } from "@/components/ai-guide/LanguageToggle";
 import { ReadingNav } from "@/components/ai-guide/ReadingNav";
 import {
   getTarotCardById,
@@ -86,12 +86,22 @@ type AiReading = {
   directAnswer?: string;
   cardMessage?: string;
   situationReading?: string;
+  challengeReading?: string;
+  guidanceReading?: string;
+  cardRelationship?: string;
   hiddenTension?: string;
   advice?: string;
   nextStep?: string;
   reflectionQuestion?: string;
   closingNote?: string;
   cardMeaning?: string;
+  readingLang?: Language;
+  spread?: "single" | "three-card";
+  cards?: Array<{
+    position: "situation" | "challenge" | "guidance";
+    cardId: string;
+    title: string;
+  }>;
   fallback?: boolean;
   readingSource?: "system_fallback";
   fallbackReason?: "upstream_failure";
@@ -183,6 +193,9 @@ function normalizeAiReadingForDisplay(reading: AiReading) {
     directAnswer: firstText(reading.directAnswer, reading.summary),
     cardMessage,
     situationReading: firstText(reading.situationReading),
+    challengeReading: firstText(reading.challengeReading),
+    guidanceReading: firstText(reading.guidanceReading),
+    cardRelationship: firstText(reading.cardRelationship),
     hiddenTension: firstText(reading.hiddenTension, reading.situationReading),
     advice: firstText(reading.advice),
     nextStep: firstText(reading.nextStep, reading.advice),
@@ -191,7 +204,13 @@ function normalizeAiReadingForDisplay(reading: AiReading) {
   };
 }
 
-function LuminousShell({ children }: { children: ReactNode }) {
+function LuminousShell({
+  children,
+  lang,
+}: {
+  children: ReactNode;
+  lang: Language;
+}) {
   return (
     <main className="relative min-h-svh overflow-hidden bg-[#f6f0e5] px-0 py-0 text-[#352a1f] sm:px-6 sm:py-6 lg:px-8">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.98),rgba(246,240,229,0.9)_42%,rgba(226,213,188,0.48)_100%)]" />
@@ -203,6 +222,7 @@ function LuminousShell({ children }: { children: ReactNode }) {
       <div className="pointer-events-none absolute right-6 top-40 h-24 w-px bg-gradient-to-b from-transparent via-[#c9a86a]/28 to-transparent sm:right-14" />
       <div className="pointer-events-none absolute -left-16 bottom-10 h-64 w-64 rounded-full bg-[#d7bd82]/10 blur-3xl" />
       <div className="pointer-events-none absolute -right-20 top-40 h-72 w-72 rounded-full bg-white/42 blur-3xl" />
+      <ActivationCodePanel lang={lang} />
 
       <div className="relative z-10 mx-auto flex min-h-svh w-full max-w-[900px] flex-col gap-5 px-5 py-7 sm:min-h-0 sm:px-6 sm:py-9">
         {children}
@@ -313,6 +333,13 @@ function isDisplayableAiReading(value: unknown): value is AiReading {
   return Boolean(
     display.fullReading ||
       (display.summary &&
+        display.situationReading &&
+        display.challengeReading &&
+        display.guidanceReading &&
+        display.cardRelationship &&
+        display.advice &&
+        display.nextStep) ||
+      (display.summary &&
         display.directAnswer &&
         display.situationReading &&
         display.advice),
@@ -376,6 +403,31 @@ function getStableClientRequestId(cacheKey: string, retryKey: number) {
   return nextRequestId;
 }
 
+function buildAiReadingCacheKey({
+  mode,
+  orientation,
+  spread,
+  cardId,
+  cardIds,
+  question,
+}: {
+  mode: "physical" | "online";
+  orientation: string;
+  spread: "single" | "three-card";
+  cardId?: string;
+  cardIds?: string;
+  question: string;
+}) {
+  return [
+    AI_READING_CACHE_PREFIX,
+    spread,
+    mode,
+    orientation,
+    spread === "three-card" ? cardIds : cardId,
+    question,
+  ].join(":");
+}
+
 export function ResultClient({
   initialMode,
   initialSpread,
@@ -415,12 +467,16 @@ export function ResultClient({
   const [aiRetryKey, setAiRetryKey] = useState(0);
   const inFlightAiReadingKeyRef = useRef<string | null>(null);
   const card = selectedCard ? getTarotCardById(selectedCard) : undefined;
-  const threeCardItems = (selectedCards ?? "")
-    .split(",")
-    .map((cardId) => getTarotCardById(cardId.trim()))
-    .filter((tarotCard): tarotCard is NonNullable<typeof tarotCard> =>
-      Boolean(tarotCard),
-    );
+  const threeCardItems = useMemo(
+    () =>
+      (selectedCards ?? "")
+        .split(",")
+        .map((cardId) => getTarotCardById(cardId.trim()))
+        .filter((tarotCard): tarotCard is NonNullable<typeof tarotCard> =>
+          Boolean(tarotCard),
+        ),
+    [selectedCards],
+  );
 
   useEffect(() => {
     let isCancelled = false;
@@ -431,8 +487,8 @@ export function ResultClient({
       }
 
       if (
-        spread === "three-card" ||
-        !card ||
+        (spread === "single" && !card) ||
+        (spread === "three-card" && threeCardItems.length !== 3) ||
         !question ||
         !mode ||
         orientation !== "upright"
@@ -443,14 +499,16 @@ export function ResultClient({
         return;
       }
 
-      const cacheKey = [
-        AI_READING_CACHE_PREFIX,
-        initialLang,
+      const normalizedSpread = spread === "three-card" ? "three-card" : "single";
+      const threeCardIds = threeCardItems.map((item) => item.id).join(",");
+      const cacheKey = buildAiReadingCacheKey({
         mode,
         orientation,
-        card.id,
+        spread: normalizedSpread,
+        cardId: card?.id,
+        cardIds: threeCardIds,
         question,
-      ].join(":");
+      });
       const cachedReading = sessionStorage.getItem(cacheKey);
 
       if (cachedReading) {
@@ -494,12 +552,21 @@ export function ResultClient({
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          cardId: card.id,
+          ...(normalizedSpread === "single"
+            ? { cardId: card?.id }
+            : {
+                cards: threeCardItems.map((item, index) => ({
+                  position: (["situation", "challenge", "guidance"] as const)[
+                    index
+                  ],
+                  cardId: item.id,
+                })),
+              }),
           question,
           lang: initialLang,
           mode,
           orientation,
-          spread: "single",
+          spread: normalizedSpread,
           clientRequestId,
         }),
       })
@@ -524,12 +591,16 @@ export function ResultClient({
             payload.fallback || isFallbackAiReading(payload.reading)
               ? {
                   ...payload.reading,
+                  readingLang: payload.reading.readingLang || initialLang,
                   fallback: true,
                   readingSource: "system_fallback" as const,
                   fallbackReason:
                     payload.reading.fallbackReason || "upstream_failure",
                 }
-              : payload.reading;
+              : {
+                  ...payload.reading,
+                  readingLang: payload.reading.readingLang || initialLang,
+                };
 
           sessionStorage.setItem(cacheKey, JSON.stringify(nextReading));
           setAiReading(nextReading);
@@ -562,7 +633,17 @@ export function ResultClient({
       // Keep the in-flight guard active across React dev remounts.
       // The request result is idempotent server-side via clientRequestId.
     };
-  }, [card, question, mode, orientation, initialLang, aiRetryKey, spread]);
+  }, [
+    card,
+    question,
+    mode,
+    orientation,
+    initialLang,
+    aiRetryKey,
+    spread,
+    selectedCards,
+    threeCardItems,
+  ]);
 
   useEffect(() => {
     const storedRitual = readStoredRitual();
@@ -681,7 +762,7 @@ export function ResultClient({
     question === undefined
   ) {
     return (
-      <LuminousShell>
+      <LuminousShell lang={initialLang}>
         <LuminousPanel className="my-auto px-6 py-8 text-center">
           <p className="text-[0.66rem] font-semibold uppercase tracking-[0.28em] text-[#a77f3c]">
             {copy.readingDossier}
@@ -711,10 +792,16 @@ export function ResultClient({
       copy.threeCardChallenge,
       copy.threeCardGuidance,
     ];
+    const aiDisplay = aiReading
+      ? normalizeAiReadingForDisplay(aiReading)
+      : undefined;
+    const isFallbackDisplay = isFallbackAiReading(aiReading);
+    const shouldShowLocalFallback =
+      aiReadingStatus !== "ready" || !aiDisplay || isFallbackDisplay;
 
     if (threeCardItems.length !== 3) {
       return (
-        <LuminousShell>
+        <LuminousShell lang={initialLang}>
           <LuminousPanel className="my-auto px-6 py-8 text-center">
             <p className="text-[0.66rem] font-semibold uppercase tracking-[0.28em] text-[#a77f3c]">
               {copy.readingDossier}
@@ -734,7 +821,7 @@ export function ResultClient({
     }
 
     return (
-      <LuminousShell>
+      <LuminousShell lang={initialLang}>
         <header className="flex items-center justify-between gap-4 text-[0.66rem] font-semibold uppercase tracking-[0.28em] text-[#a77f3c]">
           <span>{copy.readingDossier}</span>
           <span className="text-right">{copy.threeCardSpread}</span>
@@ -742,20 +829,6 @@ export function ResultClient({
 
         <div className="rounded-[2rem] border border-[#d7bd82]/40 bg-white/42 px-4 py-3 shadow-[0_18px_60px_rgba(123,93,45,0.08)] backdrop-blur-md">
           <ReadingNav lang={initialLang} />
-          <div className="mt-3 flex justify-end">
-            <LanguageToggle
-              lang={initialLang}
-              pathname="/ai-guide/result"
-              params={{
-                mode,
-                spread,
-                orientation,
-                question: question ?? undefined,
-                cards: selectedCards ?? undefined,
-              }}
-              hasLangParam={hasLangParam}
-            />
-          </div>
         </div>
 
         <LuminousPanel className="p-5 sm:p-6">
@@ -812,6 +885,141 @@ export function ResultClient({
           </div>
         </LuminousPanel>
 
+        {aiReadingStatus === "loading" ? (
+          <LuminousThinkingState
+            subtitle={copy.aiReadingLoading}
+            title={copy.aiReadingTitle}
+          />
+        ) : null}
+
+        {aiReadingStatus === "error" ? (
+          <div className="rounded-[1.75rem] border border-[#c48a73]/42 bg-[#fff5ed]/82 p-5 shadow-[0_20px_54px_rgba(137,83,54,0.10)] backdrop-blur-md sm:p-6">
+            <p className="text-sm leading-7 text-[#8a4634]">
+              {aiReadingErrorMessage || copy.aiReadingUnavailable}
+            </p>
+            {aiReadingErrorMessage ===
+            "Please sign in to generate your AI reading." ? (
+              <div className="mt-4">
+                <EmailSignInPanel reason="Sign in to generate your AI reading." />
+              </div>
+            ) : null}
+            <button
+              className="mt-4 min-h-12 w-full touch-manipulation select-none rounded-full border border-[#c89d4f]/70 bg-[linear-gradient(180deg,rgba(246,225,174,0.98),rgba(197,151,72,0.98))] px-5 text-xs font-semibold uppercase tracking-[0.2em] text-[#3a2a18] shadow-[0_18px_38px_rgba(148,105,39,0.20),inset_0_1px_0_rgba(255,255,255,0.58)] transition hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-[#c89d4f]/45 focus:ring-offset-2 focus:ring-offset-[#f6f0e5] sm:w-auto"
+              type="button"
+              onClick={() => {
+                if (question && mode) {
+                  const retryCacheKey = buildAiReadingCacheKey({
+                    mode,
+                    orientation,
+                    spread: "three-card",
+                    cardIds: threeCardItems.map((item) => item.id).join(","),
+                    question,
+                  });
+                  sessionStorage.removeItem(retryCacheKey);
+                  sessionStorage.removeItem(`${retryCacheKey}:error`);
+                }
+
+                setAiRetryKey((value) => value + 1);
+              }}
+            >
+              {copy.aiRetryReading}
+            </button>
+          </div>
+        ) : null}
+
+        {isFallbackDisplay ? (
+          <div className="rounded-[1.35rem] border border-[#d8bd82]/42 bg-[#fffaf1]/76 p-4 text-sm leading-6 text-[#6f624f]">
+            <p className="text-[0.64rem] font-semibold uppercase tracking-[0.2em] text-[#9d7b3f]">
+              {copy.aiFallbackNoticeTitle}
+            </p>
+            <p className="mt-2">{copy.aiFallbackNoticeBody}</p>
+          </div>
+        ) : null}
+
+        {aiReadingStatus === "ready" && aiDisplay && !isFallbackDisplay ? (
+          <article className="rounded-[2.2rem] border border-[#cfad6d]/52 bg-[linear-gradient(180deg,rgba(255,253,247,0.96),rgba(250,244,233,0.92))] px-5 py-7 shadow-[0_30px_86px_rgba(111,78,31,0.13),inset_0_1px_0_rgba(255,255,255,0.76)] backdrop-blur-md sm:px-8 sm:py-9">
+            <p className="text-[0.68rem] font-semibold uppercase tracking-[0.28em] text-[#a77f3c]">
+              {copy.aiPersonalizedReading}
+            </p>
+            <h2 className="mt-3 font-serif text-3xl leading-tight text-[#34271b] sm:text-4xl">
+              {copy.aiReadingTitle}
+            </h2>
+
+            {aiDisplay.summary ? (
+              <section className="mt-6 border-l border-[#c89d4f]/55 bg-[#fffaf1]/72 py-2 pl-4">
+                <h3 className="text-[0.64rem] font-semibold uppercase tracking-[0.22em] text-[#a77f3c]">
+                  {copy.overallMessage}
+                </h3>
+                <p className="mt-2 font-serif text-[1.15rem] leading-8 text-[#4a3827] sm:text-[1.35rem] sm:leading-9">
+                  {aiDisplay.summary}
+                </p>
+              </section>
+            ) : null}
+
+            <div className="mt-7 grid gap-4 md:grid-cols-3">
+              {[
+                {
+                  title: copy.threeCardSituation,
+                  body: aiDisplay.situationReading,
+                },
+                {
+                  title: copy.threeCardChallenge,
+                  body: aiDisplay.challengeReading,
+                },
+                {
+                  title: copy.threeCardGuidance,
+                  body: aiDisplay.guidanceReading,
+                },
+              ].map((item) =>
+                item.body ? (
+                  <section
+                    className="rounded-[1.45rem] border border-[#d8bd82]/42 bg-[#fffaf1]/76 p-4"
+                    key={item.title}
+                  >
+                    <h3 className="text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-[#a77f3c]">
+                      {item.title}
+                    </h3>
+                    <p className="mt-3 text-sm leading-7 text-[#4f4334]">
+                      {item.body}
+                    </p>
+                  </section>
+                ) : null,
+              )}
+            </div>
+
+            <div className="mt-7 space-y-5">
+              {[
+                {
+                  title: copy.howCardsConnect,
+                  body: aiDisplay.cardRelationship,
+                },
+                { title: copy.practicalGuidance, body: aiDisplay.advice },
+                { title: copy.aiNextStep, body: aiDisplay.nextStep },
+                {
+                  title: copy.aiReflectionQuestion,
+                  body: aiDisplay.reflectionQuestion,
+                },
+                { title: copy.closingNote, body: aiDisplay.closingNote },
+              ].map((item) =>
+                item.body ? (
+                  <section
+                    className="border-t border-[#d8bd82]/38 pt-5"
+                    key={item.title}
+                  >
+                    <h3 className="text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-[#a77f3c]">
+                      {item.title}
+                    </h3>
+                    <p className="mt-3 text-sm leading-7 text-[#4f4334] sm:text-base">
+                      {item.body}
+                    </p>
+                  </section>
+                ) : null,
+              )}
+            </div>
+          </article>
+        ) : null}
+
+        {shouldShowLocalFallback ? (
         <article className="rounded-[2.2rem] border border-[#cfad6d]/52 bg-[linear-gradient(180deg,rgba(255,253,247,0.96),rgba(250,244,233,0.92))] px-5 py-7 shadow-[0_30px_86px_rgba(111,78,31,0.13),inset_0_1px_0_rgba(255,255,255,0.76)] backdrop-blur-md sm:px-8 sm:py-9">
           <p className="text-[0.68rem] font-semibold uppercase tracking-[0.28em] text-[#a77f3c]">
             {copy.cardByCardMeaning}
@@ -863,6 +1071,7 @@ export function ResultClient({
             </section>
           </div>
         </article>
+        ) : null}
 
         <div className="grid gap-3 sm:grid-cols-2">
           <button
@@ -894,7 +1103,7 @@ export function ResultClient({
 
   if (!card) {
     return (
-      <LuminousShell>
+      <LuminousShell lang={initialLang}>
         <LuminousPanel className="my-auto px-6 py-8 text-center">
           <p className="text-[0.66rem] font-semibold uppercase tracking-[0.28em] text-[#a77f3c]">
             {copy.readingDossier}
@@ -907,21 +1116,6 @@ export function ResultClient({
           </p>
           <div className="mt-6 rounded-[1.5rem] border border-[#d8bd82]/38 bg-white/46 px-4 py-3">
             <ReadingNav lang={initialLang} />
-            <div className="mt-3 flex justify-end">
-              <LanguageToggle
-                lang={initialLang}
-                pathname="/ai-guide/result"
-                params={{
-                  mode,
-                  spread,
-                  orientation,
-                  question: question ?? undefined,
-                  card: selectedCard ?? undefined,
-                  cards: selectedCards ?? undefined,
-                }}
-                hasLangParam={hasLangParam}
-              />
-            </div>
           </div>
           <LuminousActionLink
             className="mt-6"
@@ -1004,7 +1198,7 @@ export function ResultClient({
           },
         ];
   return (
-    <LuminousShell>
+    <LuminousShell lang={initialLang}>
       <header className="flex items-center justify-between gap-4 text-[0.66rem] font-semibold uppercase tracking-[0.28em] text-[#a77f3c]">
         <span>{copy.readingDossier}</span>
         <span className="text-right">
@@ -1014,21 +1208,6 @@ export function ResultClient({
 
       <div className="rounded-[2rem] border border-[#d7bd82]/40 bg-white/42 px-4 py-3 shadow-[0_18px_60px_rgba(123,93,45,0.08)] backdrop-blur-md">
         <ReadingNav lang={initialLang} />
-        <div className="mt-3 flex justify-end">
-          <LanguageToggle
-            lang={initialLang}
-            pathname="/ai-guide/result"
-            params={{
-              mode,
-              spread,
-              orientation,
-              question: question ?? undefined,
-              card: selectedCard ?? undefined,
-              cards: selectedCards ?? undefined,
-            }}
-            hasLangParam={hasLangParam}
-          />
-        </div>
       </div>
 
       <LuminousPanel className="p-5 sm:p-6">
@@ -1116,7 +1295,7 @@ export function ResultClient({
                 if (card && question && mode) {
                   const retryCacheKey = [
                     AI_READING_CACHE_PREFIX,
-                    initialLang,
+                    "single",
                     mode,
                     orientation,
                     card.id,

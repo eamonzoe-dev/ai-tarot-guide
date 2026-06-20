@@ -140,6 +140,7 @@ export const dictionary = {
     yourThreeCards: "Your Three Cards",
     cardByCardMeaning: "Card-by-card meaning",
     overallMessage: "Overall Message",
+    howCardsConnect: "How the cards connect",
     practicalGuidance: "Practical Guidance",
     threeCardOverallFallback:
       "This spread is a symbolic map of the question: first name the situation, then notice the challenge, then carry the guidance into one grounded choice.",
@@ -345,6 +346,7 @@ export const dictionary = {
     yourThreeCards: "你的三张牌",
     cardByCardMeaning: "逐张牌义",
     overallMessage: "整体信息",
+    howCardsConnect: "牌与牌之间的连接",
     practicalGuidance: "实际指引",
     threeCardOverallFallback:
       "这组三牌阵是一张关于问题的象征地图：先看清处境，再辨认挑战，最后把指引带入一个踏实的选择。",

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-import { LanguageToggle } from "@/components/ai-guide/LanguageToggle";
+import { ActivationCodePanel } from "@/components/ai-guide/ActivationCodePanel";
 import { ReadingNav } from "@/components/ai-guide/ReadingNav";
 import { type Language, text } from "@/lib/ai-guide/i18n";
 
@@ -46,18 +46,11 @@ export function AskForm({
 
       <div className="pointer-events-none absolute left-6 top-28 h-24 w-px bg-gradient-to-b from-transparent via-[#c9a86a]/30 to-transparent sm:left-14" />
       <div className="pointer-events-none absolute right-6 top-40 h-24 w-px bg-gradient-to-b from-transparent via-[#c9a86a]/30 to-transparent sm:right-14" />
+      <ActivationCodePanel lang={lang} hasLangParam={hasLangParam} />
 
       <div className="relative z-10 mx-auto flex min-h-svh w-full max-w-[620px] flex-col gap-6 px-5 py-7 sm:min-h-0 sm:px-6 sm:py-9">
         <div className="rounded-[2rem] border border-[#d7bd82]/40 bg-white/42 px-4 py-3 shadow-[0_18px_60px_rgba(123,93,45,0.08)] backdrop-blur-md">
           <ReadingNav lang={lang} />
-          <div className="mt-3 flex justify-end">
-            <LanguageToggle
-              lang={lang}
-              pathname="/ai-guide/ask"
-              params={{ mode, spread, orientation }}
-              hasLangParam={hasLangParam}
-            />
-          </div>
         </div>
 
         <header className="space-y-4 pt-2 text-center">
