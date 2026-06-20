@@ -17,6 +17,7 @@
 
 ### Updated
 
+* Added Git workflow policy: Codex creates local commits by default; user performs final push unless explicitly approved.
 * Added the AI Project OS context budget policy to keep future agents on Core Context plus task-relevant docs only.
 * Updated `docs/CORE_BEHAVIOR_SPEC.md` verification notes after manual production checks.
 * Updated external service, environment, project status, and operations docs with repo-verified service state and remaining manual verification items.

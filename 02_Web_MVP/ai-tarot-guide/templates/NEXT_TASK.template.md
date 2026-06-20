@@ -70,3 +70,12 @@ Read broader docs, but still avoid bulk-reading unrelated archive files.
 
 * Completion condition
 * Completion condition
+
+## Git Closeout
+
+Default:
+
+* Run checks.
+* Create a local commit.
+* Do not push unless explicitly approved.
+* Ask user to run `git push` after reporting the commit hash.

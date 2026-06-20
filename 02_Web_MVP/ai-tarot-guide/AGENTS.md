@@ -236,6 +236,41 @@ Use an ExecPlan for:
 * Cross-route changes
 * Auth, credits, redeem, or AI-reading logic changes
 
+## Git Workflow Policy
+
+Default behavior:
+
+* Codex may run `git status`.
+* Codex may stage only the intended changed files.
+* Codex may create a local commit after checks pass.
+* Codex should report the commit hash.
+* Codex must not push to `origin/main` by default.
+
+Push rule:
+
+* The user performs the final `git push`.
+* Codex may push only if the user explicitly says:
+  * `Approved: push to origin main`
+  * or gives equivalent explicit approval.
+
+If push fails:
+
+* Do not repeatedly troubleshoot push, network, or sandbox issues.
+* Stop and tell the user to run:
+
+```bash
+git push
+```
+
+Recommended closeout format:
+
+1. Changed files
+2. Check result
+3. Build result
+4. Commit hash
+5. Push status: `not pushed; user should run git push`
+6. Final git status
+
 ## Verification
 
 After code changes, always run the relevant build or test command.
