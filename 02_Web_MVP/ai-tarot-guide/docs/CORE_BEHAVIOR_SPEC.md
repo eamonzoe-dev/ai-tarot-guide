@@ -418,8 +418,10 @@ Logged-out user attempting AI reading:
 
 Verification needed:
 
-* Real Magic Link email delivery depends on Supabase Auth email configuration and must be tested externally.
-* `/auth/confirm` appears to default to `/auth-test`; confirm whether it is still part of production user auth or only a test/support path.
+* Production Magic Link email delivery was manually verified on 2026-06-20 with Resend custom SMTP and a working production session return to `oraarcana.com`.
+* Supabase production redirect URLs include both `/auth/callback` and `/auth/confirm`.
+* Redirect URL strictness remains PARTIAL because broad wildcard redirects are currently configured.
+* Confirm the exact `/auth/callback` versus `/auth/confirm` path behavior if route-specific auth changes are planned.
 
 ## 9. Credits Behavior
 
@@ -456,7 +458,8 @@ User credit display refresh:
 
 Verification needed:
 
-* The exact database RPC behavior for `finalize_ai_reading_result`, `consume_ai_reading_credit`, and `redeem_activation_code` requires Supabase verification.
+* `consume_ai_reading_credit` existence, signature, return structure, and `SECURITY DEFINER` mode were manually verified by metadata-only Supabase checks on 2026-06-20.
+* Full internal RPC behavior for `consume_ai_reading_credit`, `finalize_ai_reading_result`, and `redeem_activation_code` remains deeper verification.
 * Manual QA should confirm no double-charge on reload, back/forward navigation, retry, and React dev remount scenarios.
 
 ## 10. Redeem Deck Code Behavior
@@ -539,7 +542,8 @@ Empty state behavior:
 Verification needed:
 
 * Manual QA should confirm journal entries appear after successful AI reading and fallback AI failure paths.
-* Supabase RLS/policy behavior requires external verification.
+* Supabase table existence, RLS enablement, and self-read policies were manually verified by metadata-only checks on 2026-06-20.
+* Journal behavior still needs end-to-end product QA.
 
 ## 12. AI Reading Behavior
 
@@ -665,10 +669,18 @@ Docs/source can verify:
 
 Requires manual verification:
 
-* Production Supabase Auth settings.
-* Email deliverability.
-* Redirect URLs.
-* Session behavior across browsers.
+* Redirect URL strictness before public launch.
+* Route-specific callback/confirm behavior if auth routes change.
+* Session behavior across additional browsers.
+
+Manual production verification on 2026-06-20 confirmed:
+
+* Supabase production Site URL is `https://oraarcana.com`.
+* Production, local, and legacy Vercel redirect URLs are configured.
+* Email provider and Confirm email are enabled.
+* Magic Link / OTP template is Ora Arcana branded.
+* Resend custom SMTP is enabled.
+* Production Magic Link email was received and returned to a working `oraarcana.com` session.
 
 ### Supabase DB / Credits / Reading Logs / Activation Codes
 
@@ -688,11 +700,17 @@ Docs/source can verify:
 
 Requires manual verification:
 
-* Table schema.
-* RPC definitions.
-* RLS/security policies.
+* Full internal RPC behavior.
 * Exact credit amounts per activation code.
 * Idempotency guarantees inside database functions.
+
+Manual production verification on 2026-06-20 confirmed:
+
+* Expected tables exist.
+* RLS is enabled on expected tables.
+* User self-read policies exist.
+* `activation_codes` and `usage_events` have no public policies.
+* `consume_ai_reading_credit` RPC exists with verified input/return structure.
 
 ### Vercel Deployment
 
@@ -709,25 +727,38 @@ Docs/source can verify:
 
 Requires manual verification:
 
-* Current deployment status.
-* Production environment variables.
-* Vercel Protection.
-* Robots headers and site lock before indexing.
+* Existing-browser language localStorage versus URL-priority behavior.
+* Robots, sitemap, Search Console, and noindex decisions before public indexing.
+
+Manual production verification on 2026-06-20 confirmed:
+
+* Latest production deployment is Ready from `main`, commit `276ad4a`.
+* `oraarcana.com` is the valid production domain.
+* `www.oraarcana.com` redirects to `oraarcana.com` with a 308 redirect.
+* Required Vercel environment variable names are present, with values hidden and not recorded.
+* Site Lock / Basic Auth is enabled and production access works after authentication.
 
 ### Resend Email
 
 Product behavior depending on it:
 
-* Verification needed.
+* Supabase Auth production email delivery.
 
 Docs/source can verify:
 
-* Current AI Project OS service docs and inspected runtime source do not list Resend as an active dependency.
+* Current app runtime source does not reference Resend directly.
+* Resend is configured in the Supabase dashboard as custom SMTP.
 
 Requires manual verification:
 
-* Whether production Supabase email uses Supabase default email or a custom SMTP/provider.
-* Whether Resend is planned or configured outside current docs.
+* Provider dashboard limits and operational status before public launch.
+
+Manual production verification on 2026-06-20 confirmed:
+
+* Supabase Custom SMTP is enabled.
+* SMTP host is `smtp.resend.com`.
+* Sender is `Ora Arcana <no-reply@oraarcana.com>`.
+* Production Magic Link email delivery worked.
 
 ### Feishu Project Log
 
@@ -774,11 +805,14 @@ Docs/source can verify:
 
 Requires manual verification:
 
-* Canonical domain.
-* DNS records.
-* HTTPS.
 * Search Console state.
 * robots/noindex/sitemap behavior before launch.
+
+Manual production verification on 2026-06-20 confirmed:
+
+* `oraarcana.com` has valid Vercel configuration.
+* `www.oraarcana.com` redirects to the apex domain.
+* HTTPS production access worked with no visible certificate warning.
 
 ## 15. Do-Not-Break Checklist
 
@@ -842,15 +876,12 @@ Manual QA checklist for future behavior work:
 
 These could not be fully confirmed from docs/source inspection alone:
 
-* Production Supabase Auth email deliverability.
-* Whether `/auth/confirm` is production-relevant or only a support/test path.
-* Exact Supabase schema, RLS policies, and RPC internals.
+* Existing-browser language localStorage versus URL-priority behavior.
+* Supabase redirect URL strictness before public launch.
+* Full internal RPC behavior for credit and redeem functions.
 * Exact credit amount per activation code.
 * Exact claimed/unclaimed/expiry implementation for activation codes.
-* Whether Resend or another custom email provider is configured outside current AI Project OS docs.
 * Whether GitHub Actions or GitHub Secrets are used outside current AI Project OS docs.
-* Current Vercel production deployment state.
-* Canonical domain and DNS state.
 * Google Search Console, robots, sitemap, noindex, and site-lock state.
 * Manual browser behavior for mobile Safari and mobile Chrome.
 

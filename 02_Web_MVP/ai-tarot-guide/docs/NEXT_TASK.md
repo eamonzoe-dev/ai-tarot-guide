@@ -7,26 +7,27 @@
 
 ## Current Task
 
-`P0-17B-0` Interaction & Function Freeze Audit
+`P0-17B-0A` Language URL-Priority Verification
 
 ## Goal
 
-Screen launch-critical interaction and function areas before entering full `P0-17B` Launch QA.
+Verify whether `lang=en|zh` URL parameters reliably override existing browser language persistence across the production reading flow.
 
-The audit should decide what must be frozen, fixed, or deferred before full launch QA begins.
+This focused check follows the 2026-06-20 manual production verification, where fresh incognito access to `/ai-guide?lang=en` displayed English correctly, but an existing browser previously showed Chinese UI on `/ai-guide?lang=en`.
 
 ## Scope
 
-Review these areas:
+Review these areas in normal and incognito/private browser sessions:
 
-* Account modal
-* Email sign-in
-* Reading flow
-* AI reading and credits
-* Redeem Deck Code
-* Reading Journal
-* Mobile
-* Launch visibility, SEO, noindex, and site lock
+* `/ai-guide?lang=en`
+* `/ai-guide?lang=zh`
+* `/ai-guide/prepare?lang=en`
+* `/ai-guide/ask?lang=en`
+* `/ai-guide/draw?lang=en`
+* `/ai-guide/reveal?lang=en`
+* `/ai-guide/result?lang=en`
+* Account/auth prompts if reached during the check
+* Reading Journal language if reached during the check
 
 ## Output Expected
 
@@ -36,18 +37,27 @@ Report findings as:
 * `P1`: Should fix soon
 * `P2`: Defer
 
-Include file and route references where possible.
+Include:
+
+* Browser/session type
+* URL tested
+* Expected language
+* Actual language
+* Whether localStorage or prior browser state appears to override the URL
+* File and route references if code inspection is needed
 
 ## Constraints
 
-* This is an audit task unless the user explicitly asks for fixes.
-* Do not edit files during the audit unless explicitly requested.
-* Do not enter full Launch QA until this audit has screened priorities.
-* Before SEO, indexing, robots, sitemap, metadata, or site-lock work, read `docs/SEO_AND_LAUNCH_CHECKLIST.md`.
+* This is a verification task unless the user explicitly asks for fixes.
+* Do not edit files during the verification unless explicitly requested.
+* Do not change routing, auth, credits, or reading behavior during the check.
+* Preserve the hard rule that URL language takes priority and localStorage is fallback only when the URL does not provide language.
+* Do not enter full Launch QA until this focused language behavior is understood.
 
 ## Done Means
 
-* P0 launch blockers are identified.
-* P1 and P2 follow-ups are separated.
-* Any decision to fix, defer, or accept risk is recorded in `docs/DECISIONS.md`.
+* Fresh incognito `lang=en` and `lang=zh` behavior is confirmed.
+* Existing-browser behavior after prior language use is confirmed.
+* Any URL-priority violation is classified as P0/P1/P2.
+* If a fix is needed, the exact affected route/client files are identified before editing.
 * If the next action changes, this file is updated.

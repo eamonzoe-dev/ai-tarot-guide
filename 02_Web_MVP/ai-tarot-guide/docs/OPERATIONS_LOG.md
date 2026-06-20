@@ -13,6 +13,14 @@ Do not record API key values, bearer tokens, passwords, secret values, or copied
 
 ## Log
 
+### 2026-06-20: Manual Production Verification Synced
+
+- Type: Manual production verification documentation
+- Actor: User, documented by Codex
+- Summary: Synced user-confirmed Vercel and Supabase production dashboard checks, production Site Lock access checks, Resend custom SMTP confirmation, production Magic Link login test, and metadata-only Supabase DB/RPC/RLS checks into AI Project OS docs.
+- Outcome: PARTIAL / strong production-readiness progress. Protected production hosting, domain, auth email, Resend delivery, Magic Link session flow, core DB table existence, RLS, self-read policies, protected server-only tables, and `consume_ai_reading_credit` RPC structure are verified. Launch-stage indexing/DNS/Search Console checks, GitHub Secrets, Feishu automation, activation code operations, existing-browser language URL priority, and deeper RPC internals remain open.
+- Secret handling: No secret values, API keys, SMTP passwords, Magic Link URLs, auth tokens, real activation codes, private user emails, user data, or table rows were recorded.
+
 ### 2026-06-20: External Service Documentation Verification
 
 - Type: Documentation and verification

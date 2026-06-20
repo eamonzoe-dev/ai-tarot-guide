@@ -125,27 +125,38 @@ Launch-sensitive areas:
 
 ## External Service Verification Snapshot
 
-Current verification result: PARTIAL.
+Current verification result: PARTIAL / strong production-readiness progress.
 
-Verified from repo/docs on 2026-06-20:
+User-confirmed manual production verification on 2026-06-20:
 
-* Vercel is the hosting target.
-* Known production route is `https://oraarcana.com/ai-guide`.
-* Known Vercel route is `https://ai-tarot-guide.vercel.app/ai-guide`.
-* `next.config.ts` and `src/proxy.ts` currently apply `X-Robots-Tag: noindex, nofollow`.
-* `src/proxy.ts` contains optional Basic Auth site-lock behavior controlled by environment variables.
-* Supabase Auth, credits, activation codes, usage events, and reading logs are current product dependencies.
-* Supabase SQL files document the expected app tables, RLS enablement, user read policies, and core RPC functions.
-* No `.github/workflows` files were present during verification.
-* Local `.env*` files are ignored by git.
+* Vercel production deployment is Ready from `main`, commit `276ad4a`.
+* `oraarcana.com` is a valid Vercel production domain.
+* `www.oraarcana.com` is valid and redirects to `oraarcana.com` with a 308 redirect.
+* `ai-tarot-guide.vercel.app` remains valid as a production/legacy-supporting route.
+* Required Vercel environment variable names are present; values were hidden and were not recorded.
+* Site Lock / Basic Auth is currently enabled, and production pages load after authentication.
+* Fresh incognito access to `/ai-guide?lang=en` renders English UI.
+* Supabase production Site URL is configured as `https://oraarcana.com`.
+* Production, local development, and legacy Vercel auth redirect URLs are configured.
+* Supabase Email provider and Confirm email are enabled.
+* Third-party providers such as Apple and visible external providers are disabled for V1.
+* Magic Link / OTP email template is Ora Arcana branded.
+* Supabase Custom SMTP is enabled through Resend using the Ora Arcana sender identity.
+* A real production Magic Link email was received, returned to `oraarcana.com`, and created a working session.
+* Expected Supabase tables exist, RLS is enabled, user self-read policies exist, and server-only tables are protected from direct public access.
+* `consume_ai_reading_credit` RPC exists with verified input/return structure.
 
-Manual verification still required:
+Remaining manual verification:
 
-* Vercel production deployment state, domain settings, `www` redirect behavior, Vercel Protection, and environment variable presence.
-* Supabase production Auth redirect URLs, email delivery, applied schema/RPCs, and active RLS policies.
-* Whether production Supabase email uses default email or a provider such as Resend.
-* DNS, HTTPS, canonical domain, Search Console, sitemap, robots, and indexing state.
-* GitHub Secrets presence if Feishu or deployment automation is expected.
+* Existing-browser language localStorage versus URL-priority behavior needs focused verification.
+* Supabase redirect URL strictness is PARTIAL because wildcard redirects are broad; consider tightening before public launch.
+* Full internal RPC body behavior was not fully inspected.
+* DNS/Search Console/robots/sitemap/indexing state still needs launch-stage verification.
+* GitHub Secrets state still needs manual verification if workflows require them.
+* Feishu automation write status still needs verification if expected.
+* Activation code operational policy and batch status may need separate verification before sales/public launch.
+
+Do not treat this as final public-launch readiness. The protected production stack is substantially verified, but launch-indexing and several operational checks remain open.
 
 ## Non-Goals During Stabilization
 

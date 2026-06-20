@@ -25,7 +25,7 @@ Do not record API keys, tokens, passwords, secret values, or bearer tokens.
 
 ### Vercel
 
-- Status: Active
+- Status: Active / production manually verified 2026-06-20
 - Purpose: Hosting and deployment for the Next.js MVP
 - Known production route: `https://oraarcana.com/ai-guide`
 - Known Vercel route: `https://ai-tarot-guide.vercel.app/ai-guide`
@@ -35,16 +35,23 @@ Do not record API keys, tokens, passwords, secret values, or bearer tokens.
   - `src/proxy.ts` contains optional Basic Auth site-lock behavior controlled by `SITE_LOCK_ENABLED`, `SITE_LOCK_USERNAME`, and `SITE_LOCK_PASSWORD`.
   - `.vercel` is ignored by git.
 - CLI verification: Manual verification required. Vercel CLI was not available in the local environment during the 2026-06-20 verification pass.
-- Manual verification required:
-  - Latest production deployment is Ready.
-  - Canonical production domain and `www` redirect behavior.
-  - Vercel Protection / site-lock state.
-  - Production and Preview environment variable names exist where required.
+- User-confirmed manual verification on 2026-06-20:
+  - Project is `ai-tarot-guide`.
+  - `oraarcana.com` has Valid Configuration and is the production domain.
+  - `www.oraarcana.com` has Valid Configuration and redirects to `oraarcana.com` with a 308 redirect.
+  - `ai-tarot-guide.vercel.app` has Valid Configuration and remains a production/legacy-supporting route.
+  - Latest visible production deployment is Ready from `main`, commit `276ad4a`.
+  - Vercel environment variable names required by the app are present. Values were hidden and were not recorded.
+  - Site Lock / Basic Auth is enabled and production access works after authentication.
+  - Fresh incognito access to `https://oraarcana.com/ai-guide?lang=en` renders English UI after authentication.
+- Remaining manual verification:
+  - Existing-browser language localStorage versus URL-priority behavior needs focused verification.
+  - Launch-stage robots, sitemap, Search Console, and noindex decisions remain pending.
 - Notes: Launch visibility, Vercel Protection, robots headers, and site lock must be checked before opening indexing.
 
 ### Supabase
 
-- Status: Active
+- Status: Active / production manually verified 2026-06-20
 - Purpose: Auth, credits, activation codes, and reading logs
 - Auth role:
   - Email-first Supabase Auth is documented for V1.
@@ -66,12 +73,25 @@ Do not record API keys, tokens, passwords, secret values, or bearer tokens.
   - User-facing select policies are documented for own profile, quota, credits, credit events, and reading logs.
   - Activation code and usage event writes are intended for server-side/service-role routes.
 - CLI verification: Manual verification required. Supabase CLI was not available in the local environment during the 2026-06-20 verification pass.
-- Manual verification required:
-  - Production Auth redirect URLs.
-  - Email Magic Link / OTP behavior.
-  - Applied production schema and RPC definitions.
-  - Active production RLS policies.
-  - No real activation codes are exposed in docs or logs.
+- User-confirmed manual verification on 2026-06-20:
+  - Production project appears to be `ai-tarot-guide-prod`.
+  - Site URL is `https://oraarcana.com`.
+  - Production redirect URLs include `https://oraarcana.com/auth/callback`, `https://oraarcana.com/auth/confirm`, `https://oraarcana.com/**`, and `https://www.oraarcana.com/**`.
+  - Local development redirect URLs are configured for localhost callback, confirm, and wildcard paths.
+  - Legacy Vercel redirect URLs are configured for callback, confirm, and wildcard paths.
+  - Email provider is enabled and Confirm email is enabled.
+  - Phone, SAML, Web3 Wallet, Apple, Azure, and other visible third-party providers are disabled.
+  - Magic Link / OTP template exists, is Ora Arcana branded, includes a sign-in link, and uses the Supabase confirmation URL variable.
+  - Production Magic Link test email was received; sender was correct; login returned to `oraarcana.com`; session worked after login.
+  - Expected production tables exist: `profiles`, `user_credits`, `credit_events`, `activation_codes`, `usage_events`, and `reading_logs`.
+  - RLS is enabled on all expected tables.
+  - Self-read policies exist for `profiles`, `user_credits`, `credit_events`, and `reading_logs`.
+  - `activation_codes` and `usage_events` have RLS enabled with no public policies, matching the server-only expectation.
+  - `consume_ai_reading_credit` RPC exists with verified input/return structure and `SECURITY DEFINER` mode.
+- Remaining manual verification:
+  - Redirect URL strictness is PARTIAL because wildcard redirects are broad; consider tightening before public launch.
+  - Full internal RPC body behavior was not fully inspected.
+  - Activation code operational policy and batch status need separate verification before sales/public launch.
 - Notes: Uses public Supabase URL/publishable key for client/server app access and a server-only secret key for privileged operations.
 
 ### OpenAI-Compatible AI Provider
@@ -82,22 +102,30 @@ Do not record API keys, tokens, passwords, secret values, or bearer tokens.
   - AI reading route uses isolated `AI_READING_OPENAI_*` variables before generic `OPENAI_*` fallbacks.
   - Default model is documented in `docs/CORE_BEHAVIOR_SPEC.md`.
   - API keys are server-only and must not be exposed to client components.
-- Manual verification required:
-  - Production provider key exists in the deployment environment.
-  - Production base URL/model are correct if using an OpenAI-compatible provider.
+- User-confirmed manual verification on 2026-06-20:
+  - Vercel environment variable names exist for `AI_READING_OPENAI_API_KEY`, `AI_READING_OPENAI_BASE_URL`, and `AI_READING_OPENAI_MODEL`.
+  - Vercel environment variable names also exist for legacy/compatibility `OPENAI_API_KEY`, `OPENAI_BASE_URL`, and `OPENAI_MODEL`.
+  - Values were hidden and were not recorded.
+- Manual verification still required:
   - Provider dashboard limits and billing are acceptable for launch testing.
 
 ### Resend / Email Provider
 
-- Status: Manual verification required
-- Purpose: Possible production email delivery provider for Supabase Auth
+- Status: Active via Supabase custom SMTP / production manually verified 2026-06-20
+- Purpose: Production email delivery provider for Supabase Auth
 - Repo-verified state:
   - No app runtime source references to Resend were found during the 2026-06-20 verification pass.
   - `docs/supabase-auth-v1.md` records that Custom SMTP was not configured at that time and that a provider such as Resend, Postmark, or SendGrid should be considered before commercial launch.
-- Manual verification required:
-  - Whether Supabase Auth currently uses Supabase default email or custom SMTP.
-  - Whether Resend is configured outside the repo.
-  - Sender/domain, template behavior, and deliverability in production.
+- User-confirmed manual verification on 2026-06-20:
+  - Supabase Custom SMTP is enabled.
+  - Sender email is `no-reply@oraarcana.com`.
+  - Sender name is `Ora Arcana`.
+  - SMTP host is `smtp.resend.com`.
+  - SMTP username is `resend`.
+  - SMTP port is `465`.
+  - Minimum interval per user is `60` seconds.
+  - SMTP password was hidden and was not recorded.
+  - Production Magic Link email delivery through this setup worked.
 - Notes: Do not store Resend API keys in docs.
 
 ### Feishu
@@ -130,18 +158,21 @@ Do not record API keys, tokens, passwords, secret values, or bearer tokens.
 
 ### DNS / Domain
 
-- Status: Manual verification required
+- Status: Partially verified through Vercel domain configuration
 - Purpose: Production domain routing, HTTPS, canonical URL, and optional `www` redirect
 - Known production route: `https://oraarcana.com/ai-guide`
 - Known Vercel route: `https://ai-tarot-guide.vercel.app/ai-guide`
 - Repo/docs-verified state:
   - Current docs name `oraarcana.com` as the known production route.
   - Current docs also preserve the Vercel route for launch/testing context.
-- Manual verification required:
-  - DNS records point to the intended hosting target.
-  - HTTPS is valid.
-  - `www` redirect behavior is intentional.
+- User-confirmed manual verification on 2026-06-20:
+  - Vercel shows Valid Configuration for `oraarcana.com`, `www.oraarcana.com`, and `ai-tarot-guide.vercel.app`.
+  - `www.oraarcana.com` redirects to `oraarcana.com` with a 308 redirect.
+  - HTTPS access worked with no visible browser certificate warning during production access testing.
+- Manual verification still required:
   - Canonical domain is confirmed before indexing.
+  - Independent DNS provider records if needed.
+  - Search Console, robots, sitemap, and indexing state.
 
 ### Notion
 
