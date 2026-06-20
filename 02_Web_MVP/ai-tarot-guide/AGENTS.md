@@ -29,19 +29,89 @@ This file gives AI agents stable workflow rules for Ora Arcana / AI Tarot Guide.
 
 Do not use this file for fast-changing project state, task priority, environment details, launch status, or service configuration. Those belong in the GitHub docs listed in `00_START_HERE.md`.
 
+## Context Budget Policy
+
+Do not read all docs by default.
+
+For every task, first read Core Context:
+
+* `00_START_HERE.md`
+* `AGENTS.md`
+* `docs/PROJECT_STATUS.md`
+* `docs/NEXT_TASK.md`
+
+Then read only task-relevant docs listed in `docs/NEXT_TASK.md`.
+
+### Product / route / core behavior work
+
+Read:
+
+* `docs/CORE_BEHAVIOR_SPEC.md`
+* `docs/DECISIONS.md`
+
+Use for:
+
+* `/ai-guide`
+* `/prepare`
+* `/ask`
+* `/draw`
+* `/reveal`
+* `/result`
+* `/readings`
+* auth
+* credits
+* redeem deck code
+* reading journal
+* language behavior
+* AI reading behavior
+* physical / online mode behavior
+
+### External service / environment work
+
+Read:
+
+* `docs/EXTERNAL_SERVICES.md`
+* `docs/ENVIRONMENT.md`
+* `docs/OPERATIONS_LOG.md` only if historical operations matter
+
+Use for:
+
+* Vercel
+* Supabase
+* Resend
+* DNS
+* GitHub Secrets
+* Feishu
+* `.env`
+* production verification
+
+### QA / regression work
+
+Read:
+
+* `docs/CORE_BEHAVIOR_SPEC.md`
+* only the specific relevant QA report under `docs/archive/qa/`
+
+Do not read the entire `docs/archive/` directory.
+
+### Historical review / root-cause analysis
+
+Read:
+
+* `docs/CHANGELOG.md`
+* `docs/OPERATIONS_LOG.md`
+* specific archive files only when explicitly relevant
+
+### Default rule
+
+If required context is unclear, ask for clarification or read the smallest likely relevant file.
+Do not bulk-read the repository or the full docs directory.
+
+`docs/archive/` is historical and must not be treated as current truth.
+
 ## Required Reading
 
-Before significant work, read:
-
-1. `00_START_HERE.md`
-2. `docs/NEXT_TASK.md`
-3. `docs/PROJECT_STATUS.md`
-4. `docs/DECISIONS.md`
-5. Relevant local files for the task
-
-Before touching route flow, auth, credits, deck code redemption, Reading Journal, AI-reading behavior, language handling, or tarot card behavior, also read:
-
-1. `docs/CORE_BEHAVIOR_SPEC.md`
+Use the Context Budget Policy above before significant work.
 
 Before launch, SEO, indexing, robots, sitemap, metadata, or site-lock work, also read:
 

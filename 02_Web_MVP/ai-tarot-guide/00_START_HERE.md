@@ -31,17 +31,17 @@ Use this source priority:
 
 ## First Reading Path
 
-Read these files in order:
+Use a context budget. Do not read all docs by default.
+
+For every task, read Core Context first:
 
 1. `AGENTS.md`
 2. `docs/NEXT_TASK.md`
 3. `docs/PROJECT_STATUS.md`
-4. `docs/CORE_BEHAVIOR_SPEC.md`
-5. `docs/DECISIONS.md`
-6. `docs/EXTERNAL_SERVICES.md`
-7. `docs/ENVIRONMENT.md`
 
-Then inspect the relevant code or docs for the task.
+Then read only the task-relevant docs listed in `docs/NEXT_TASK.md` or required by the Context Budget Policy in `AGENTS.md`.
+
+Do not bulk-read `docs/` or `docs/archive/`. `docs/archive/` is historical only and must never be treated as current truth.
 
 ## Project Identity
 

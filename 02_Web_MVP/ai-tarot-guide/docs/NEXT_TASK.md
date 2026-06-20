@@ -7,59 +7,67 @@
 
 ## Current Task
 
-`P1-LANG-URL-PRIORITY-TEST` Automated Language Priority Coverage
+`P1-AI-CONTEXT-BUDGET-POLICY` Context Budget Policy
 
 ## Goal
 
-Add browser-level automated coverage proving that `lang=en|zh` URL parameters override existing browser language persistence across the reading flow.
+Add a context budget policy to Ora Arcana / AI Tarot Guide's AI Project OS so future Codex / AI agents do not read all docs by default.
 
-This follows `P1-LANG-URL-PRIORITY-QA`, which found that the current source is URL-first and does not show a `localStorage` override bug, while the earlier normal-browser production observation remains unresolved without a current-build manual retest.
+The policy should reduce token usage, speed up tasks, and prevent historical docs from polluting current project reasoning.
+
+## Required Context
+
+Always read:
+
+* `00_START_HERE.md`
+* `AGENTS.md`
+* `docs/PROJECT_STATUS.md`
+* `docs/NEXT_TASK.md`
+
+Also read:
+
+* `templates/NEXT_TASK.template.md`
+* `docs/CHANGELOG.md`
+
+Do not read:
+
+* `docs/archive/`
+* unrelated QA reports
+* external service docs unless needed
+
+Context budget:
+
+* Lite / Standard
 
 ## Scope
 
-Add browser-level checks for:
+* Add the context budget policy to `AGENTS.md`.
+* Update `00_START_HERE.md` so it points agents to task-relevant reading instead of broad default reading.
+* Update `templates/NEXT_TASK.template.md` with a required context section.
+* Update this file for the current task.
+* Record the documentation-only change in `docs/CHANGELOG.md`.
 
-* `/ai-guide?lang=en`
-* `/ai-guide?lang=zh`
-* `localStorage` set to `zh` then visit `/ai-guide?lang=en`
-* `localStorage` set to `en` then visit `/ai-guide?lang=zh`
-* no URL `lang` with stored `zh`
-* `/ai-guide/result?lang=en` with stored `zh` and valid fallback reading state
+## Out Of Scope
 
-Also perform a manual production retest in the user's normal browser if available:
-
-* `https://oraarcana.com/ai-guide?lang=en`
-* `https://oraarcana.com/ai-guide?lang=zh`
-
-## Output Expected
-
-Report automated and manual findings as:
-
-* `P0`: Launch blockers
-* `P1`: Should fix soon
-* `P2`: Defer
-
-Include:
-
-* Browser/session type or test runner
-* URL tested
-* Expected language
-* Actual language
-* Whether localStorage or prior browser state appears to override the URL
-* File and route references if a regression is found
+* Application source code changes
+* Supabase schema changes
+* External service setting changes
+* Environment variable value changes
+* Secret recording
+* Reading or updating `docs/archive/` unless explicitly needed
 
 ## Constraints
 
-* This is a test-coverage task unless a current source bug is reproduced.
-* Do not change application behavior unless the user explicitly asks for a fix.
-* Do not change routing, auth, credits, or reading behavior during the check.
-* Preserve the hard rule that URL language takes priority and localStorage is fallback only when the URL does not provide language.
-* Do not enter full Launch QA until language priority has browser-level coverage or a manual current-build retest is recorded.
+* Do not read all docs.
+* Do not treat `docs/archive/` as current truth.
+* Keep the policy layered: Core Context first, then task-specific docs only.
+* Do not modify app code for this documentation-only task.
 
 ## Done Means
 
-* Browser-level tests cover URL language over opposite stored language.
-* No-URL language fallback behavior is covered.
-* Any current-build URL-priority violation is classified as P0/P1/P2.
-* Manual production retest result is recorded if performed.
-* If a fix is needed, the exact affected route/client files are identified before editing.
+* `AGENTS.md` includes Context Budget Policy.
+* `00_START_HERE.md` mentions context budget and task-relevant reading.
+* `templates/NEXT_TASK.template.md` includes Required Context, context budget levels, and archive limits.
+* `docs/NEXT_TASK.md` reflects `P1-AI-CONTEXT-BUDGET-POLICY`.
+* `docs/CHANGELOG.md` records the documentation-only policy update.
+* AI Project OS docs check passes.
