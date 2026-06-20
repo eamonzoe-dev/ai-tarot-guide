@@ -540,12 +540,13 @@ export function OracleShowroomHome({
   }
 
   function openAccountMenu() {
-    const accountArea = document.getElementById("reading-account");
+    const accountArea = document.getElementById("reading-account-panel");
     const accountButton =
-      accountArea?.querySelector<HTMLButtonElement>("button[aria-expanded]");
+      accountArea?.querySelector<HTMLButtonElement>(
+        "button[aria-expanded].pointer-events-auto",
+      );
 
-    accountArea?.scrollIntoView({ block: "center" });
-    window.setTimeout(() => accountButton?.click(), 80);
+    accountButton?.click();
   }
 
   function setNextCard(direction: number) {
@@ -565,6 +566,10 @@ export function OracleShowroomHome({
 
   return (
     <div className="min-h-svh bg-[#f4efe5] text-[#33291f]">
+      <div id="reading-account-panel">
+        <ActivationCodePanel lang={lang} hasLangParam={hasLangParam} />
+      </div>
+
       <header
         className={cx(
           "sticky top-0 isolate z-[240] border-b transition duration-300",
@@ -595,15 +600,7 @@ export function OracleShowroomHome({
               </Link>
             ))}
           </nav>
-          <div
-            className="pointer-events-auto relative z-[260] flex min-w-0 items-start justify-start [&>div]:w-full [&>div>div]:justify-start [&_button]:max-w-full [&_button]:overflow-hidden [&_button]:text-ellipsis [&_button]:whitespace-nowrap [&_button]:pointer-events-auto [&_button[aria-expanded]]:border-[#d8b76a]/45 [&_button[aria-expanded]]:bg-[#fffaf0]/78 [&_button[aria-expanded]]:text-[#5b4a36] [&_button[aria-expanded]]:shadow-[0_10px_28px_rgba(111,84,43,0.12)] [&_button[aria-expanded]]:backdrop-blur sm:justify-end sm:[&>div]:w-auto sm:[&>div>div]:justify-end sm:[&_button]:max-w-none"
-            id="reading-account"
-          >
-            <ActivationCodePanel
-              lang={lang}
-              hasLangParam={hasLangParam}
-            />
-          </div>
+          <div aria-hidden="true" className="hidden min-h-9 sm:block" />
         </div>
       </header>
 
