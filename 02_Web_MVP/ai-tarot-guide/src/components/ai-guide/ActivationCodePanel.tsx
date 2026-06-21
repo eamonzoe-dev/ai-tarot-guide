@@ -11,6 +11,7 @@ import {
   languageLabel,
   withLang,
 } from "@/lib/ai-guide/i18n";
+import { creditsToStardust } from "@/lib/ai-guide/credits";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
 const CREDITS_UPDATED_EVENT = "ora-arcana:credits-updated";
@@ -47,6 +48,10 @@ function getApiErrorMessage(value: unknown, fallback: string) {
   return typeof payload.error === "string" ? payload.error : fallback;
 }
 
+function formatStardust(value: number) {
+  return new Intl.NumberFormat("en-US").format(value);
+}
+
 export function ActivationCodePanel({
   lang,
   hasLangParam = true,
@@ -74,16 +79,16 @@ export function ActivationCodePanel({
   const copy = useMemo(
     () => ({
       closeAccountPanel: isZh ? "关闭账户面板" : "Close account panel",
-      credits: isZh ? "解读额度" : "Credits",
-      creditsCount: (value: number) => isZh ? `${value} 次解读额度` : `${value} Credits`,
-      topUp: isZh ? "补充额度" : "Top Up",
+      credits: isZh ? "星尘余额" : "Stardust Balance",
+      creditsCount: (value: number) => isZh ? `${formatStardust(value)} 星尘` : `${formatStardust(value)} Stardust`,
+      topUp: isZh ? "补充星尘" : "Add Stardust",
       notifications: isZh ? "通知" : "Notifications",
       readingAccount: isZh ? "阅读账户" : "Reading Account",
       signIn: isZh ? "登录" : "Sign in",
-      topUpTitle: isZh ? "额度补充即将开放。" : "Credit top-up is coming soon.",
+      topUpTitle: isZh ? "补充星尘即将开放。" : "Add Stardust is coming soon.",
       topUpBody: isZh
-        ? "目前可通过卡组码为阅读账户增加解读额度。"
-        : "For now, deck codes can add credits to your Reading Account.",
+        ? "星尘可用于解读、追问，以及后续不同 Ora 解读师体验。"
+        : "Use Stardust for readings, follow-up questions, and future Ora Reader experiences.",
       notificationsTitle: isZh ? "暂时没有通知。" : "No notifications yet.",
       notificationsBody: isZh
         ? "阅读提醒和账户更新稍后会出现在这里。"
@@ -117,8 +122,8 @@ export function ActivationCodePanel({
         : "Sign-in email sent. Check your inbox to enter the Reading Room.",
       signedOut: isZh ? "已退出登录。" : "Signed out.",
       unableToLoadCredits: isZh
-        ? "暂时无法读取解读额度。"
-        : "Unable to load Reading Credits.",
+        ? "暂时无法读取星尘余额。"
+        : "Unable to load Stardust Balance.",
       codeCouldNotRedeem: isZh
         ? "这个卡组码暂时无法兑换。"
         : "That code could not be redeemed.",
@@ -126,15 +131,17 @@ export function ActivationCodePanel({
         ? "这个卡组码暂时无法兑换。请检查后再试一次。"
         : "That code could not be redeemed. Check the code and try again.",
       redeemedButCreditsFailed: isZh
-        ? "卡组码已兑换，但解读额度暂时未能刷新。"
-        : "Deck code redeemed, but Reading Credits could not refresh.",
-      redeemedCreditsUpdated: isZh
-        ? "卡组码已兑换，解读额度已更新。"
-        : "Deck code redeemed. Credits updated.",
+        ? "卡组码已兑换，但星尘余额暂时未能刷新。"
+        : "Deck code redeemed, but Stardust Balance could not refresh.",
+      redeemedCreditsUpdated: (value: number) =>
+        isZh
+          ? `已添加 ${formatStardust(value)} 星尘。`
+          : `${formatStardust(value)} Stardust added.`,
       account: isZh ? "账户" : "Account",
-      creditsLoading: isZh ? "正在读取额度" : "Loading credits",
-      creditsLower: (value: number) => isZh ? `${value} 次额度` : `${value} credits`,
-      creditUseNote: isZh ? "每次 AI 解读会使用 1 次额度。" : "Each AI reading uses 1 credit.",
+      creditsLoading: isZh ? "正在读取星尘" : "Loading Stardust",
+      creditsLower: (value: number) => isZh ? `${formatStardust(value)} 可用星尘` : `${formatStardust(value)} Stardust available`,
+      creditUseNote: isZh ? "当前标准 Ora 解读消耗 100 星尘。" : "Standard Ora readings currently use 100 Stardust.",
+      readerPricingNote: isZh ? "不同 Ora 解读师可能消耗不同数量的星尘。" : "Different Ora Readers may use different amounts of Stardust.",
       readingRoom: isZh ? "阅读室" : "Reading Room",
       journal: isZh ? "解读日志" : "Journal",
       redeem: isZh ? "兑换" : "Redeem",
@@ -148,8 +155,8 @@ export function ActivationCodePanel({
       deckCode: isZh ? "卡组码" : "Deck code",
       deckCodePlaceholder: isZh ? "输入卡组码" : "Enter deck code",
       redeemBody: isZh
-        ? "实体卡组附带的激活码可为你的账户增加解读额度。"
-        : "Physical deck activation codes add credits to your account.",
+        ? "实体卡组附带的激活码可为你的账户增加星尘。"
+        : "Physical deck activation codes add Stardust to your account.",
       redeeming: isZh ? "兑换中..." : "Redeeming...",
       cancel: isZh ? "取消" : "Cancel",
       privacy: isZh ? "隐私" : "Privacy",
@@ -390,6 +397,10 @@ export function ActivationCodePanel({
         payload && typeof payload === "object"
           ? (payload as Record<string, unknown>).credits
           : null;
+      const redeemedCredits =
+        payload && typeof payload === "object"
+          ? (payload as Record<string, unknown>).redeemedCredits
+          : null;
 
       if (!isCredits(nextCredits)) {
         throw new Error(copy.redeemedButCreditsFailed);
@@ -398,7 +409,13 @@ export function ActivationCodePanel({
       setCredits(nextCredits);
       setActivationCode("");
       setIsRedeemFormOpen(false);
-      setStatus(copy.redeemedCreditsUpdated);
+      setStatus(
+        copy.redeemedCreditsUpdated(
+          creditsToStardust(
+            typeof redeemedCredits === "number" ? redeemedCredits : 0,
+          ),
+        ),
+      );
     } catch (redeemError) {
       setError(
         redeemError instanceof Error
@@ -411,6 +428,7 @@ export function ActivationCodePanel({
   }
 
   const creditsRemaining = credits?.remaining_credits ?? 0;
+  const stardustRemaining = creditsToStardust(creditsRemaining);
   const userInitial = (user?.email ?? "A").slice(0, 1).toUpperCase();
   const accountName =
     user?.email?.split("@")[0]?.trim() || (user ? copy.account : "");
@@ -615,7 +633,7 @@ export function ActivationCodePanel({
         {user ? (
           <>
             <span className="hidden min-h-9 items-center rounded-full border border-[#d8b76a]/42 bg-[#fffaf0]/82 px-2.5 text-[0.62rem] font-semibold uppercase tracking-[0.11em] text-[#5b4a36] shadow-[0_7px_18px_rgba(111,84,43,0.08),inset_0_1px_0_rgba(255,255,255,0.72)] backdrop-blur sm:inline-flex">
-              {isLoadingCredits ? copy.credits : copy.creditsCount(creditsRemaining)}
+              {isLoadingCredits ? copy.credits : copy.creditsCount(stardustRemaining)}
             </span>
             <button
               aria-expanded={isTopUpOpen}
@@ -753,9 +771,10 @@ export function ActivationCodePanel({
 
             <p className="rounded-full border border-[#d8b76a]/28 bg-[#fff7e8]/68 px-3 py-1.5 text-[0.72rem] leading-5 text-[#6f5f4b]">
               <span className="font-semibold text-[#6f4f20]">
-                {isLoadingCredits ? copy.creditsLoading : copy.creditsLower(creditsRemaining)}
+                {isLoadingCredits ? copy.creditsLoading : copy.creditsLower(stardustRemaining)}
               </span>{" "}
               · {copy.creditUseNote}
+              <span className="block">{copy.readerPricingNote}</span>
             </p>
 
             <div className="grid grid-cols-2 gap-1.5">

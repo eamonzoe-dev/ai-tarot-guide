@@ -130,16 +130,16 @@ function getAiReadingErrorMessage(code: string | undefined) {
     case "auth_required":
       return "Please sign in to generate your AI reading.";
     case "daily_limit_reached":
-      return "You have reached today's free AI reading limit.";
+      return "Today's AI reading limit has been reached. Please try again later.";
     case "no_credits_remaining":
     case "insufficient_credits":
-      return "You do not have enough AI readings. Please redeem a deck code to continue.";
+      return "You do not have enough Stardust for this reading. Redeem a deck code or add Stardust to continue.";
     case "quota_check_failed":
     case "credits_check_failed":
     case "credit_consume_failed":
     case "usage_record_failed":
     case "reading_log_failed":
-      return "AI reading quota check failed. Please try again later.";
+      return "Stardust availability check failed. Please try again later.";
     default:
       return "AI reading request failed.";
   }

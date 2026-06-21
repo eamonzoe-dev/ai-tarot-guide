@@ -163,7 +163,7 @@ export const dictionary = {
       "The personalized AI reading is temporarily unavailable. Your static reading remains available below.",
     aiFallbackNoticeTitle: "System fallback reading",
     aiFallbackNoticeBody:
-      "The live AI reader was unavailable, so Ora saved this fallback reflection instead. No credit was used.",
+      "The live AI reader was unavailable, so Ora saved this fallback reflection instead. No Stardust was used.",
     aiRetryReading: "Regenerate Reading",
     aiFollowUpSoon: "Follow-up questions will be supported soon.",
     aiFollowUpPlaceholder: "Continue the conversation soon...",
@@ -220,7 +220,7 @@ export const dictionary = {
     readingsInterpretationLabel: "Ora's interpretation",
     readingsFallbackBadge: "Fallback",
     readingsFallbackNote:
-      "System fallback saved because the live AI reader was unavailable. No credit was used.",
+      "System fallback saved because the live AI reader was unavailable. No Stardust was used.",
     readingsModePhysical: "Physical Deck",
     readingsModeOnline: "Online Draw",
     readingsModeFallback: "Reading",
@@ -368,7 +368,7 @@ export const dictionary = {
     aiReadingUnavailable: "AI 个性化解读暂时不可用。下方静态阅读仍可正常查看。",
     aiFallbackNoticeTitle: "系统备用解读",
     aiFallbackNoticeBody:
-      "实时 AI 解读暂时不可用，因此 Ora 保存了这份备用反思。本次没有消耗额度。",
+      "实时 AI 解读暂时不可用，因此 Ora 保存了这份备用反思。本次没有消耗星尘。",
     aiRetryReading: "重新生成解读",
     aiFollowUpSoon: "继续追问功能即将支持",
     aiFollowUpPlaceholder: "很快可以继续追问...",
@@ -423,7 +423,7 @@ export const dictionary = {
     readingsInterpretationLabel: "Ora 的解读",
     readingsFallbackBadge: "备用解读",
     readingsFallbackNote:
-      "实时 AI 解读不可用时保存的系统备用反思。本次没有消耗额度。",
+      "实时 AI 解读不可用时保存的系统备用反思。本次没有消耗星尘。",
     readingsModePhysical: "实体牌组",
     readingsModeOnline: "在线抽牌",
     readingsModeFallback: "解读",

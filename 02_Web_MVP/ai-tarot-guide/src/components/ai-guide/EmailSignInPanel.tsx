@@ -12,7 +12,7 @@ type EmailSignInPanelProps = {
 
 export function EmailSignInPanel({
   compact = false,
-  reason = "Sign in to save your readings, view your credits, and redeem a deck code.",
+  reason = "Sign in to save your readings, view your Stardust balance, and redeem a deck code.",
 }: EmailSignInPanelProps) {
   const supabase = useMemo(() => createSupabaseBrowserClient(), []);
   const [email, setEmail] = useState("");
