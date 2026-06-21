@@ -93,6 +93,63 @@ function normalizeFollowUpResponse(payload: FollowUpResponse) {
   };
 }
 
+function buildOraBubbleText(message: FollowUpMessage) {
+  return [message.answer, message.nextStep].filter(Boolean).join("\n\n");
+}
+
+function UserChatBubble({
+  label,
+  message,
+}: {
+  label: string;
+  message: string;
+}) {
+  return (
+    <div className="flex justify-end">
+      <div className="ml-auto max-w-[90%] sm:max-w-[78%]">
+        <p className="mb-1 pr-2 text-right text-[0.66rem] font-semibold uppercase tracking-[0.14em] text-[#a77f3c]">
+          {label}
+        </p>
+        <div className="ml-auto w-fit max-w-full rounded-[1.25rem] rounded-tr-sm border border-[#d6b16b]/30 bg-[#f3dfaa]/58 px-4 py-3 text-right shadow-[0_10px_24px_rgba(148,105,39,0.08)]">
+          <p className="whitespace-pre-wrap break-words text-right text-sm leading-7 text-[#4a3827]">
+            {message}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function OraChatBubble({
+  label,
+  message,
+  fallbackNotice,
+}: {
+  label: string;
+  message: string;
+  fallbackNotice?: string;
+}) {
+  return (
+    <div className="flex justify-start">
+      <div className="mr-auto max-w-[90%] sm:max-w-[78%]">
+        <p className="mb-1 pl-2 text-left text-[0.66rem] font-semibold uppercase tracking-[0.14em] text-[#9d7b3f]">
+          {label}
+        </p>
+        <div className="mr-auto w-fit max-w-full rounded-[1.25rem] rounded-tl-sm border border-[#d8bd82]/30 bg-white/66 px-4 py-3 text-left shadow-[0_10px_24px_rgba(116,83,36,0.06)]">
+          {fallbackNotice ? (
+            <p className="mb-2 whitespace-pre-wrap break-words text-left text-xs leading-5 text-[#8b7a61]">
+              {fallbackNotice}
+            </p>
+          ) : null}
+          <p className="whitespace-pre-wrap break-words text-left text-sm leading-7 text-[#4f4334]">
+            {message}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function ResultFollowUpPanel({
   lang,
   question,
@@ -125,6 +182,7 @@ export function ResultFollowUpPanel({
     !isTooLong &&
     !hasReachedLimit &&
     status !== "loading";
+  const originalQuestion = question.trim();
   const characterCounter = useMemo(
     () => `${trimmedQuestion.length}/${MAX_FOLLOW_UP_LENGTH}`,
     [trimmedQuestion.length],
@@ -201,9 +259,9 @@ export function ResultFollowUpPanel({
   }
 
   return (
-    <section className="mt-6 rounded-[1.4rem] border border-[#d8bd82]/38 bg-[#fffaf0]/70 p-4">
+    <section className="mt-7 rounded-[1.55rem] border border-[#d8bd82]/34 bg-[linear-gradient(180deg,rgba(255,250,241,0.72),rgba(255,255,255,0.46))] p-4 shadow-[0_18px_44px_rgba(116,83,36,0.07)]">
       <div>
-        <p className="text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-[#a77f3c]">
+        <p className="font-serif text-xl leading-tight text-[#4a3827]">
           {copy.aiFollowUpTitle}
         </p>
         <p className="mt-2 text-sm leading-6 text-[#7b6c58]">
@@ -211,94 +269,80 @@ export function ResultFollowUpPanel({
         </p>
       </div>
 
-      {messages.length > 0 ? (
-        <div className="mt-5 space-y-4">
-          {messages.map((message, index) => (
-            <article
-              className="rounded-[1.2rem] border border-[#d8bd82]/32 bg-white/46 p-4"
-              key={`${index}-${message.question.slice(0, 18)}`}
-            >
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#9d7b3f]">
-                {copy.aiFollowUpUserLabel}
-              </p>
-              <p className="mt-2 text-sm leading-7 text-[#4f4334]">
-                {message.question}
-              </p>
-              <p className="mt-4 text-xs font-semibold uppercase tracking-[0.18em] text-[#9d7b3f]">
-                {copy.aiFollowUpOraLabel}
-              </p>
-              {message.fallback ? (
-                <p className="mt-2 rounded-[1rem] border border-[#d8bd82]/34 bg-[#fffaf1]/72 px-3 py-2 text-xs leading-5 text-[#7b6c58]">
-                  {copy.aiFollowUpFallbackNotice}
-                </p>
-              ) : null}
-              <p className="mt-3 text-sm leading-7 text-[#4f4334]">
-                {message.answer}
-              </p>
-              {message.nextStep ? (
-                <div className="mt-4 border-t border-[#d8bd82]/34 pt-4">
-                  <p className="text-[0.64rem] font-semibold uppercase tracking-[0.18em] text-[#a77f3c]">
-                    {copy.aiNextStep}
-                  </p>
-                  <p className="mt-2 text-sm leading-7 text-[#4f4334]">
-                    {message.nextStep}
-                  </p>
-                </div>
-              ) : null}
-              {message.reflectionQuestion ? (
-                <div className="mt-4 border-t border-[#d8bd82]/34 pt-4">
-                  <p className="text-[0.64rem] font-semibold uppercase tracking-[0.18em] text-[#a77f3c]">
-                    {copy.aiReflectionQuestion}
-                  </p>
-                  <p className="mt-2 text-sm leading-7 text-[#4f4334]">
-                    {message.reflectionQuestion}
-                  </p>
-                </div>
-              ) : null}
-            </article>
-          ))}
-        </div>
-      ) : null}
+      <div className="mt-5 space-y-4">
+        <UserChatBubble label={copy.aiFollowUpUserLabel} message={originalQuestion} />
+        <OraChatBubble
+          label={copy.aiFollowUpOraLabel}
+          message={copy.aiFollowUpIntro}
+        />
 
-      <form className="mt-5" onSubmit={handleSubmit}>
-        <div className="sm:flex sm:items-start sm:gap-3">
-          <div className="min-w-0 flex-1">
-            <textarea
-              aria-describedby={helperId}
-              className="min-h-24 w-full resize-none rounded-[1.15rem] border border-[#d8bd82]/45 bg-white/64 px-4 py-3 text-sm leading-6 text-[#4f4334] outline-none placeholder:text-[#9d8f78] focus:border-[#c89d4f]/72 focus:ring-2 focus:ring-[#c89d4f]/18 disabled:opacity-60"
-              disabled={hasReachedLimit || status === "loading"}
-              maxLength={MAX_FOLLOW_UP_LENGTH + 1}
-              onChange={(event) => setFollowUpQuestion(event.target.value)}
-              placeholder={copy.aiFollowUpPlaceholder}
-              value={followUpQuestion}
-            />
-            <div
-              className="mt-2 flex items-center justify-between gap-3 text-xs text-[#8b7a61]"
-              id={helperId}
-            >
-              <span>
-                {hasReachedLimit
-                  ? copy.aiFollowUpLimitReached
-                  : isTooLong
+        {messages.length > 0
+          ? messages.map((message, index) => (
+              <div
+                className="space-y-3"
+                key={`${index}-${message.question.slice(0, 18)}`}
+              >
+                <UserChatBubble
+                  label={copy.aiFollowUpUserLabel}
+                  message={message.question}
+                />
+                <OraChatBubble
+                  fallbackNotice={
+                    message.fallback
+                      ? copy.aiFollowUpFallbackNotice
+                      : undefined
+                  }
+                  label={copy.aiFollowUpOraLabel}
+                  message={buildOraBubbleText(message)}
+                />
+              </div>
+            ))
+          : null}
+      </div>
+
+      {hasReachedLimit ? (
+        <p className="mt-5 rounded-[1.1rem] border border-[#d8bd82]/26 bg-white/42 px-4 py-3 text-sm leading-6 text-[#7b6c58]">
+          {copy.aiFollowUpLimitReached}
+        </p>
+      ) : (
+        <form className="mt-5" onSubmit={handleSubmit}>
+          <div className="rounded-[1.35rem] border border-[#d8bd82]/40 bg-white/54 p-2 shadow-[0_12px_28px_rgba(116,83,36,0.06)] sm:flex sm:items-end sm:gap-2">
+            <div className="min-w-0 flex-1">
+              <textarea
+                aria-describedby={helperId}
+                className="min-h-14 w-full resize-none rounded-[1rem] border border-transparent bg-transparent px-3 py-2 text-sm leading-6 text-[#4f4334] outline-none placeholder:text-[#9d8f78] focus:border-[#d8bd82]/45 focus:bg-white/42"
+                disabled={status === "loading"}
+                maxLength={MAX_FOLLOW_UP_LENGTH + 1}
+                onChange={(event) => setFollowUpQuestion(event.target.value)}
+                placeholder={copy.aiFollowUpPlaceholder}
+                value={followUpQuestion}
+              />
+              <div
+                className="flex items-center justify-between gap-3 px-3 pb-1 text-xs text-[#8b7a61]"
+                id={helperId}
+              >
+                <span>
+                  {isTooLong
                     ? copy.aiFollowUpTooLong
                     : status === "loading"
                       ? copy.aiFollowUpLoading
-                      : copy.aiFollowUpHelper}
-              </span>
-              <span aria-hidden="true" className="shrink-0">
-                {characterCounter}
-              </span>
+                      : copy.aiFollowUpComposerHint}
+                </span>
+                <span aria-hidden="true" className="shrink-0">
+                  {characterCounter}
+                </span>
+              </div>
             </div>
+            <button
+              className="min-h-11 w-full rounded-full border border-[#c89d4f]/62 bg-[linear-gradient(180deg,rgba(246,225,174,0.96),rgba(197,151,72,0.96))] px-5 text-xs font-semibold uppercase tracking-[0.16em] text-[#3a2a18] shadow-[0_12px_26px_rgba(148,105,39,0.14),inset_0_1px_0_rgba(255,255,255,0.58)] transition hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-[#c89d4f]/45 focus:ring-offset-2 focus:ring-offset-[#fffaf0] disabled:cursor-not-allowed disabled:opacity-55 disabled:hover:translate-y-0 sm:w-auto"
+              disabled={!canSubmit}
+              type="submit"
+            >
+              {status === "loading" ? copy.aiFollowUpLoading : copy.aiFollowUpButton}
+            </button>
           </div>
-          <button
-            className="mt-3 min-h-11 w-full rounded-full border border-[#c89d4f]/62 bg-[linear-gradient(180deg,rgba(246,225,174,0.96),rgba(197,151,72,0.96))] px-5 text-xs font-semibold uppercase tracking-[0.18em] text-[#3a2a18] shadow-[0_14px_30px_rgba(148,105,39,0.16),inset_0_1px_0_rgba(255,255,255,0.58)] transition hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-[#c89d4f]/45 focus:ring-offset-2 focus:ring-offset-[#fffaf0] disabled:cursor-not-allowed disabled:opacity-55 disabled:hover:translate-y-0 sm:mt-0 sm:w-auto"
-            disabled={!canSubmit}
-            type="submit"
-          >
-            {status === "loading" ? copy.aiFollowUpLoading : copy.aiFollowUpButton}
-          </button>
-        </div>
-      </form>
+        </form>
+      )}
 
       {errorMessage ? (
         <p className="mt-3 rounded-[1rem] border border-[#c48a73]/36 bg-[#fff5ed]/72 px-3 py-2 text-sm leading-6 text-[#8a4634]">
