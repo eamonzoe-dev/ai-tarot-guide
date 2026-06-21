@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { ActivationCodePanel } from "@/components/ai-guide/ActivationCodePanel";
 import { EmailSignInPanel } from "@/components/ai-guide/EmailSignInPanel";
 import { ReadingNav } from "@/components/ai-guide/ReadingNav";
+import { ResultFollowUpPanel } from "@/components/ai-guide/ResultFollowUpPanel";
 import {
   getTarotCardById,
   getTarotCardKeywords,
@@ -786,6 +787,7 @@ export function ResultClient({
 
   if (spread === "three-card") {
     const questionText = question || copy.noQuestion;
+    const resultQuestion = question || "";
     const homeHref = withLang("/ai-guide", {}, initialLang);
     const positions = [
       copy.threeCardSituation,
@@ -798,6 +800,13 @@ export function ResultClient({
     const isFallbackDisplay = isFallbackAiReading(aiReading);
     const shouldShowLocalFallback =
       aiReadingStatus !== "ready" || !aiDisplay || isFallbackDisplay;
+    const followUpStorageKey = `${buildAiReadingCacheKey({
+      mode,
+      orientation,
+      spread: "three-card",
+      cardIds: threeCardItems.map((item) => item.id).join(","),
+      question: resultQuestion,
+    })}:followUp:v1`;
 
     if (threeCardItems.length !== 3) {
       return (
@@ -1016,6 +1025,22 @@ export function ResultClient({
                 ) : null,
               )}
             </div>
+
+            <ResultFollowUpPanel
+              cards={threeCardItems.map((item, index) => ({
+                position: (["situation", "challenge", "guidance"] as const)[
+                  index
+                ],
+                cardId: item.id,
+              }))}
+              existingReading={aiReading}
+              lang={initialLang}
+              mode={mode}
+              orientation="upright"
+              question={resultQuestion}
+              spread="three-card"
+              storageKey={followUpStorageKey}
+            />
           </article>
         ) : null}
 
@@ -1136,6 +1161,7 @@ export function ResultClient({
   const cardTitle = getTarotCardTitle(card, initialLang);
   const cardKeywords = getTarotCardKeywords(card, initialLang);
   const questionText = question || copy.noQuestion;
+  const resultQuestion = question || "";
   const reflectionPrompt =
     card.reflectionQuestion || copy.reflectionFallback;
   const practicalAdvice = card.practicalAdvice || card.suggestion;
@@ -1145,6 +1171,13 @@ export function ResultClient({
     ? normalizeAiReadingForDisplay(aiReading)
     : undefined;
   const isFallbackDisplay = isFallbackAiReading(aiReading);
+  const followUpStorageKey = `${buildAiReadingCacheKey({
+    mode,
+    orientation,
+    spread: "single",
+    cardId: card.id,
+    question: resultQuestion,
+  })}:followUp:v1`;
   const fullReadingText = aiDisplay
     ? firstText(
         aiDisplay.fullReading,
@@ -1357,21 +1390,18 @@ export function ResultClient({
               </div>
             ) : null}
 
-            <div className="mt-6 rounded-[1.4rem] border border-[#d8bd82]/38 bg-[#fffaf0]/70 p-3 sm:flex sm:items-center sm:gap-3">
-              <input
-                className="min-h-11 w-full rounded-full border border-[#d8bd82]/45 bg-white/64 px-4 text-sm text-[#8b7a61] outline-none placeholder:text-[#9d8f78]"
-                disabled
-                placeholder={copy.aiFollowUpPlaceholder}
-                type="text"
+            {!isFallbackDisplay ? (
+              <ResultFollowUpPanel
+                cardId={card.id}
+                existingReading={aiReading}
+                lang={initialLang}
+                mode={mode}
+                orientation="upright"
+                question={resultQuestion}
+                spread="single"
+                storageKey={followUpStorageKey}
               />
-              <button
-                className="mt-3 min-h-11 w-full rounded-full border border-[#d8bd82]/45 bg-white/46 px-4 text-xs font-semibold uppercase tracking-[0.18em] text-[#8d6426] opacity-60 sm:mt-0 sm:w-auto"
-                disabled
-                type="button"
-              >
-                {copy.aiFollowUpSoon}
-              </button>
-            </div>
+            ) : null}
           </article>
         ) : null}
       </section>
