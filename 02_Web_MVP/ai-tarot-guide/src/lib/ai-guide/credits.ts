@@ -1,4 +1,5 @@
 export const STARDUST_PER_CREDIT = 100;
+export const FOLLOW_UP_STARDUST_COST = 20;
 
 export type LegacyCreditBalance = {
   remaining_credits: number;

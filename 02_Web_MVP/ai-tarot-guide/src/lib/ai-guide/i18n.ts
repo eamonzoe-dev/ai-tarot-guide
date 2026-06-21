@@ -167,9 +167,10 @@ export const dictionary = {
     aiRetryReading: "Regenerate Reading",
     aiFollowUpSoon: "Follow-up questions will be supported soon.",
     aiFollowUpTitle: "Continue with Ora",
+    aiFollowUpPrice: (value: number) => `Continue with Ora · ${value} Stardust`,
     aiFollowUpHelper:
       "This conversation stays with this reading and does not draw new cards.",
-    aiFollowUpComposerHint: "Keep it close to this reading.",
+    aiFollowUpComposerHint: "A successful reply uses 20 Stardust.",
     aiFollowUpIntro:
       "I'll stay with this card and the reading above. You can ask about one specific point.",
     aiFollowUpPlaceholder: "Ask Ora a follow-up…",
@@ -178,6 +179,8 @@ export const dictionary = {
     aiFollowUpLimitReached:
       "This reading's follow-up has reached its limit. Start a new reading to continue exploring.",
     aiFollowUpError: "Follow-up request failed. Please try again.",
+    aiFollowUpInsufficientStardust:
+      "Not enough Stardust. A follow-up needs 20 Stardust.",
     aiFollowUpTooLong: "Please keep follow-ups under 300 characters.",
     aiFollowUpUserLabel: "You",
     aiFollowUpOraLabel: "Ora",
@@ -388,8 +391,9 @@ export const dictionary = {
     aiRetryReading: "重新生成解读",
     aiFollowUpSoon: "继续追问功能即将支持",
     aiFollowUpTitle: "继续和 Ora 聊聊",
+    aiFollowUpPrice: (value: number) => `继续和 Ora 聊聊 · ${value} 星尘`,
     aiFollowUpHelper: "这段对话只围绕本次解读，不会重新抽牌。",
-    aiFollowUpComposerHint: "请围绕这次解读继续追问。",
+    aiFollowUpComposerHint: "成功回应后消耗 20 星尘。",
     aiFollowUpIntro:
       "我会继续围绕这张牌和上方解读回应你。你可以追问一个更具体的点。",
     aiFollowUpPlaceholder: "继续问 Ora…",
@@ -398,6 +402,7 @@ export const dictionary = {
     aiFollowUpLimitReached:
       "本次解读的追问已到这里。你可以开始一次新的解读，继续探索。",
     aiFollowUpError: "追问请求失败，请稍后再试。",
+    aiFollowUpInsufficientStardust: "星尘不足。继续追问需要 20 星尘。",
     aiFollowUpTooLong: "请将追问控制在 300 字以内。",
     aiFollowUpUserLabel: "你",
     aiFollowUpOraLabel: "Ora",

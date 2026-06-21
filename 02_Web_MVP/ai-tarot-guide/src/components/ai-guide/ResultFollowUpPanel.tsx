@@ -2,6 +2,7 @@
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
 
+import { FOLLOW_UP_STARDUST_COST } from "@/lib/ai-guide/credits";
 import { type Language, text } from "@/lib/ai-guide/i18n";
 
 type Spread = "single" | "three-card";
@@ -23,6 +24,12 @@ type FollowUpResponse = {
   fallback?: unknown;
 };
 
+type FollowUpApiResponse = FollowUpResponse & {
+  followUp?: unknown;
+  code?: unknown;
+  fallback?: unknown;
+};
+
 type ResultFollowUpPanelProps = {
   lang: Language;
   question: string;
@@ -40,6 +47,7 @@ type ResultFollowUpPanelProps = {
 
 const MAX_FOLLOW_UPS = 3;
 const MAX_FOLLOW_UP_LENGTH = 300;
+const CREDITS_UPDATED_EVENT = "ora-arcana:credits-updated";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
@@ -91,6 +99,27 @@ function normalizeFollowUpResponse(payload: FollowUpResponse) {
     reflectionQuestion: reflectionQuestion || undefined,
     fallback: payload.fallback === true,
   };
+}
+
+function getFollowUpPayload(payload: FollowUpApiResponse): FollowUpResponse {
+  if (isRecord(payload.followUp)) {
+    return {
+      ...(payload.followUp as FollowUpResponse),
+      fallback: payload.fallback,
+    };
+  }
+
+  return payload;
+}
+
+function createFollowUpRequestId() {
+  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
+    return crypto.randomUUID();
+  }
+
+  return `${Date.now().toString(36)}-${Math.random()
+    .toString(36)
+    .slice(2, 12)}`;
 }
 
 function buildOraBubbleText(message: FollowUpMessage) {
@@ -164,6 +193,10 @@ export function ResultFollowUpPanel({
   const copy = text(lang);
   const [messages, setMessages] = useState<FollowUpMessage[]>([]);
   const [followUpQuestion, setFollowUpQuestion] = useState("");
+  const [pendingFollowUp, setPendingFollowUp] = useState<{
+    text: string;
+    requestId: string;
+  } | null>(null);
   const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
   const hasReachedLimit = messages.length >= MAX_FOLLOW_UPS;
@@ -191,6 +224,7 @@ export function ResultFollowUpPanel({
   useEffect(() => {
     setMessages(readStoredMessages(storageKey));
     setFollowUpQuestion("");
+    setPendingFollowUp(null);
     setStatus("idle");
     setErrorMessage("");
   }, [storageKey]);
@@ -208,6 +242,17 @@ export function ResultFollowUpPanel({
 
     setStatus("loading");
     setErrorMessage("");
+    const followUpRequestId =
+      pendingFollowUp && pendingFollowUp.text === trimmedQuestion
+        ? pendingFollowUp.requestId
+        : createFollowUpRequestId();
+
+    if (!pendingFollowUp || pendingFollowUp.text !== trimmedQuestion) {
+      setPendingFollowUp({
+        text: trimmedQuestion,
+        requestId: followUpRequestId,
+      });
+    }
 
     try {
       const response = await fetch("/api/ai-reading/follow-up", {
@@ -219,6 +264,7 @@ export function ResultFollowUpPanel({
           lang,
           question,
           followUpQuestion: trimmedQuestion,
+          followUpRequestId,
           mode,
           spread,
           orientation,
@@ -226,15 +272,23 @@ export function ResultFollowUpPanel({
           existingReading,
         }),
       });
+      const payload = (await response.json()) as FollowUpApiResponse;
 
       if (!response.ok) {
+        const errorCode = typeof payload.code === "string" ? payload.code : "";
+
+        if (response.status === 402 || errorCode === "insufficient_stardust") {
+          setPendingFollowUp(null);
+          throw new Error("insufficient_stardust");
+        }
+
         throw new Error("follow_up_failed");
       }
 
-      const payload = (await response.json()) as FollowUpResponse;
-      const nextFollowUp = normalizeFollowUpResponse(payload);
+      const followUpPayload = getFollowUpPayload(payload);
+      const nextFollowUp = normalizeFollowUpResponse(followUpPayload);
 
-      if (!nextFollowUp.answer || payload.source !== "ai_follow_up") {
+      if (!nextFollowUp.answer || followUpPayload.source !== "ai_follow_up") {
         throw new Error("follow_up_failed");
       }
 
@@ -250,10 +304,19 @@ export function ResultFollowUpPanel({
           },
         ].slice(0, MAX_FOLLOW_UPS),
       );
+      if (!nextFollowUp.fallback) {
+        window.dispatchEvent(new Event(CREDITS_UPDATED_EVENT));
+      }
       setFollowUpQuestion("");
+      setPendingFollowUp(null);
       setStatus("idle");
-    } catch {
-      setErrorMessage(copy.aiFollowUpError);
+    } catch (followUpError) {
+      setErrorMessage(
+        followUpError instanceof Error &&
+          followUpError.message === "insufficient_stardust"
+          ? copy.aiFollowUpInsufficientStardust
+          : copy.aiFollowUpError,
+      );
       setStatus("error");
     }
   }
@@ -262,7 +325,7 @@ export function ResultFollowUpPanel({
     <section className="mt-7 rounded-[1.55rem] border border-[#d8bd82]/34 bg-[linear-gradient(180deg,rgba(255,250,241,0.72),rgba(255,255,255,0.46))] p-4 shadow-[0_18px_44px_rgba(116,83,36,0.07)]">
       <div>
         <p className="font-serif text-xl leading-tight text-[#4a3827]">
-          {copy.aiFollowUpTitle}
+          {copy.aiFollowUpPrice(FOLLOW_UP_STARDUST_COST)}
         </p>
         <p className="mt-2 text-sm leading-6 text-[#7b6c58]">
           {copy.aiFollowUpHelper}
@@ -313,7 +376,15 @@ export function ResultFollowUpPanel({
                 className="min-h-14 w-full resize-none rounded-[1rem] border border-transparent bg-transparent px-3 py-2 text-sm leading-6 text-[#4f4334] outline-none placeholder:text-[#9d8f78] focus:border-[#d8bd82]/45 focus:bg-white/42"
                 disabled={status === "loading"}
                 maxLength={MAX_FOLLOW_UP_LENGTH + 1}
-                onChange={(event) => setFollowUpQuestion(event.target.value)}
+                onChange={(event) => {
+                  const nextValue = event.target.value;
+
+                  setFollowUpQuestion(nextValue);
+
+                  if (nextValue.trim().length === 0) {
+                    setPendingFollowUp(null);
+                  }
+                }}
                 placeholder={copy.aiFollowUpPlaceholder}
                 value={followUpQuestion}
               />

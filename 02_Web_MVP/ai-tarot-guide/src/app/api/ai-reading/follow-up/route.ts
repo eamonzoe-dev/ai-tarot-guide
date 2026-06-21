@@ -6,7 +6,9 @@ import {
   getTarotCardLabel,
   getTarotCardTitle,
 } from "@/data/tarotCards";
+import { FOLLOW_UP_STARDUST_COST } from "@/lib/ai-guide/credits";
 import type { Language } from "@/lib/ai-guide/i18n";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 type Spread = "single" | "three-card";
@@ -16,6 +18,7 @@ type FollowUpRequest = {
   lang?: unknown;
   question?: unknown;
   followUpQuestion?: unknown;
+  followUpRequestId?: unknown;
   mode?: unknown;
   spread?: unknown;
   orientation?: unknown;
@@ -49,9 +52,21 @@ const DEFAULT_OPENAI_MODEL = "gpt-4.1-mini";
 const DEFAULT_OPENAI_BASE_URL = "https://api.openai.com/v1";
 const MAX_QUESTION_LENGTH = 500;
 const MAX_FOLLOW_UP_LENGTH = 300;
+const MAX_FOLLOW_UP_REQUEST_ID_LENGTH = 120;
 const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000;
 const DEFAULT_RATE_LIMIT_PER_HOUR = 12;
 const rateLimitBuckets = new Map<string, RateLimitBucket>();
+
+type StardustBalance = {
+  remaining_stardust: number;
+  total_stardust: number;
+  remaining_credits: number;
+  total_credits: number;
+};
+
+type ConsumeStardustResult = StardustBalance & {
+  credit_event_id: string | null;
+};
 
 class UpstreamRequestError extends Error {
   status: number;
@@ -232,6 +247,69 @@ function normalizeFollowUpResponse(reading: FollowUpResponse) {
     source: "ai_follow_up" as const,
     fallback: reading.fallback === true ? true : undefined,
   };
+}
+
+function normalizeStardustBalance(value: unknown): StardustBalance | null {
+  if (!isRecord(value)) {
+    return null;
+  }
+
+  return {
+    remaining_stardust:
+      typeof value.remaining_stardust === "number"
+        ? value.remaining_stardust
+        : 0,
+    total_stardust:
+      typeof value.total_stardust === "number" ? value.total_stardust : 0,
+    remaining_credits:
+      typeof value.remaining_credits === "number"
+        ? value.remaining_credits
+        : 0,
+    total_credits:
+      typeof value.total_credits === "number" ? value.total_credits : 0,
+  };
+}
+
+function normalizeConsumeStardustResult(
+  value: unknown,
+): ConsumeStardustResult | null {
+  const balance = normalizeStardustBalance(value);
+
+  if (!balance || !isRecord(value)) {
+    return null;
+  }
+
+  return {
+    ...balance,
+    credit_event_id:
+      typeof value.credit_event_id === "string" ? value.credit_event_id : null,
+  };
+}
+
+function isInsufficientStardustError(error: unknown) {
+  return (
+    isRecord(error) &&
+    typeof error.message === "string" &&
+    error.message.includes("insufficient_stardust")
+  );
+}
+
+function insufficientStardustResponse() {
+  return NextResponse.json(
+    {
+      error: "You do not have enough Stardust for this follow-up.",
+      code: "insufficient_stardust",
+      requiredStardust: FOLLOW_UP_STARDUST_COST,
+    },
+    { status: 402 },
+  );
+}
+
+function buildFallbackResponse(lang: Language) {
+  return NextResponse.json({
+    followUp: buildFallbackFollowUp(lang),
+    fallback: true,
+  });
 }
 
 function buildFallbackFollowUp(lang: Language) {
@@ -426,6 +504,7 @@ export async function POST(request: Request) {
   const lang = normalizeLanguage(body.lang);
   const question = stringValue(body.question);
   const followUpQuestion = stringValue(body.followUpQuestion);
+  const followUpRequestId = stringValue(body.followUpRequestId);
   const mode = normalizeMode(body.mode);
   const spread = normalizeSpread(body.spread);
   const orientation = normalizeOrientation(body.orientation);
@@ -445,6 +524,19 @@ export async function POST(request: Request) {
   ) {
     return NextResponse.json(
       { error: "invalid_follow_up_question" },
+      { status: 400 },
+    );
+  }
+
+  if (
+    !followUpRequestId ||
+    followUpRequestId.length > MAX_FOLLOW_UP_REQUEST_ID_LENGTH
+  ) {
+    return NextResponse.json(
+      {
+        error: "follow_up_request_id_required",
+        code: "follow_up_request_id_required",
+      },
       { status: 400 },
     );
   }
@@ -481,6 +573,91 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: threeCardResult.error }, { status: 400 });
   }
 
+  const admin = createSupabaseAdminClient();
+  const creditsResult = await admin
+    .from("user_credits")
+    .select(
+      "remaining_stardust,total_stardust,remaining_credits,total_credits",
+    )
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (creditsResult.error) {
+    return NextResponse.json(
+      {
+        error: "Stardust balance is not available for follow-up charges.",
+        code: "stardust_balance_unavailable",
+      },
+      { status: 500 },
+    );
+  }
+
+  let creditsData = creditsResult.data;
+
+  if (!creditsData) {
+    const createdCreditsResult = await admin
+      .from("user_credits")
+      .insert({
+        user_id: user.id,
+        remaining_credits: 0,
+        total_credits: 0,
+        remaining_stardust: 0,
+        total_stardust: 0,
+      })
+      .select(
+        "remaining_stardust,total_stardust,remaining_credits,total_credits",
+      )
+      .single();
+
+    if (createdCreditsResult.error) {
+      return NextResponse.json(
+        {
+          error: "Stardust balance is not available for follow-up charges.",
+          code: "stardust_balance_unavailable",
+        },
+        { status: 500 },
+      );
+    }
+
+    creditsData = createdCreditsResult.data;
+  }
+
+  const currentBalance = normalizeStardustBalance(creditsData);
+
+  if (!currentBalance) {
+    return NextResponse.json(
+      {
+        error: "Stardust balance is not available for follow-up charges.",
+        code: "stardust_balance_unavailable",
+      },
+      { status: 500 },
+    );
+  }
+
+  if (currentBalance.remaining_stardust < FOLLOW_UP_STARDUST_COST) {
+    const existingChargeResult = await admin
+      .from("credit_events")
+      .select("id")
+      .eq("user_id", user.id)
+      .eq("source", "ai_follow_up")
+      .eq("idempotency_key", followUpRequestId)
+      .maybeSingle();
+
+    if (existingChargeResult.error) {
+      return NextResponse.json(
+        {
+          error: "Unable to verify this follow-up charge.",
+          code: "follow_up_charge_check_failed",
+        },
+        { status: 500 },
+      );
+    }
+
+    if (!existingChargeResult.data) {
+      return insufficientStardustResponse();
+    }
+  }
+
   const rateLimitKey = user.id
     ? `user:${user.id}`
     : `ip:${getClientIp(request)}`;
@@ -513,30 +690,30 @@ export async function POST(request: Request) {
   const baseURL = customBaseURL || DEFAULT_OPENAI_BASE_URL;
 
   if (!apiKey) {
-    return NextResponse.json(buildFallbackFollowUp(lang));
+    return buildFallbackResponse(lang);
   }
 
+  const prompt = buildUserPrompt({
+    lang,
+    question,
+    followUpQuestion,
+    mode,
+    spread,
+    orientation,
+    cardId: spread === "single" ? cardId : undefined,
+    cards: threeCardResult.cards ?? undefined,
+    existingReading: body.existingReading,
+  });
+  let followUp: ReturnType<typeof normalizeFollowUpResponse>;
+
   try {
-    const prompt = buildUserPrompt({
-      lang,
-      question,
-      followUpQuestion,
-      mode,
-      spread,
-      orientation,
-      cardId: spread === "single" ? cardId : undefined,
-      cards: threeCardResult.cards ?? undefined,
-      existingReading: body.existingReading,
-    });
-    const followUp = await requestFollowUp({
+    followUp = await requestFollowUp({
       baseURL,
       apiKey,
       model,
       lang,
       prompt,
     });
-
-    return NextResponse.json(followUp);
   } catch (error) {
     console.error("AI follow-up generation failed:", {
       spread,
@@ -547,6 +724,62 @@ export async function POST(request: Request) {
       errorName: error instanceof Error ? error.name : "UnknownError",
     });
 
-    return NextResponse.json(buildFallbackFollowUp(lang));
+    return buildFallbackResponse(lang);
   }
+
+  let consumeResult;
+
+  try {
+    consumeResult = await admin.rpc("consume_stardust", {
+      p_user_id: user.id,
+      p_amount_stardust: FOLLOW_UP_STARDUST_COST,
+      p_event_type: "ai_follow_up_consume",
+      p_source: "ai_follow_up",
+      p_note: "Follow-up question",
+      p_idempotency_key: followUpRequestId,
+    });
+  } catch {
+    return NextResponse.json(
+      {
+        error: "Unable to charge Stardust for this follow-up.",
+        code: "follow_up_charge_failed",
+      },
+      { status: 500 },
+    );
+  }
+
+  if (consumeResult.error) {
+    if (isInsufficientStardustError(consumeResult.error)) {
+      return insufficientStardustResponse();
+    }
+
+    return NextResponse.json(
+      {
+        error: "Unable to charge Stardust for this follow-up.",
+        code: "follow_up_charge_failed",
+      },
+      { status: 500 },
+    );
+  }
+
+  const firstConsumeResult = Array.isArray(consumeResult.data)
+    ? consumeResult.data[0]
+    : consumeResult.data;
+  const stardust = normalizeConsumeStardustResult(firstConsumeResult);
+
+  if (!stardust) {
+    return NextResponse.json(
+      {
+        error: "Unable to charge Stardust for this follow-up.",
+        code: "follow_up_charge_invalid_response",
+      },
+      { status: 500 },
+    );
+  }
+
+  return NextResponse.json({
+    followUp,
+    fallback: false,
+    stardust,
+  });
 }
