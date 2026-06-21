@@ -81,6 +81,8 @@ export function ActivationCodePanel({
       closeAccountPanel: isZh ? "关闭账户面板" : "Close account panel",
       credits: isZh ? "星尘余额" : "Stardust Balance",
       creditsCount: (value: number) => isZh ? `${formatStardust(value)} 星尘` : `${formatStardust(value)} Stardust`,
+      stardustCompact: (value: number) => `⚡ ${formatStardust(value)}`,
+      getMoreStardust: isZh ? "获取更多星尘" : "Get more Stardust",
       topUp: isZh ? "补充星尘" : "Add Stardust",
       notifications: isZh ? "通知" : "Notifications",
       readingAccount: isZh ? "阅读账户" : "Reading Account",
@@ -632,16 +634,16 @@ export function ActivationCodePanel({
       <div className="relative z-[290] flex min-w-0 items-center justify-end gap-1.5">
         {user ? (
           <>
-            <span className="hidden min-h-9 items-center rounded-full border border-[#d8b76a]/42 bg-[#fffaf0]/82 px-2.5 text-[0.62rem] font-semibold uppercase tracking-[0.11em] text-[#5b4a36] shadow-[0_7px_18px_rgba(111,84,43,0.08),inset_0_1px_0_rgba(255,255,255,0.72)] backdrop-blur sm:inline-flex">
-              {isLoadingCredits ? copy.credits : copy.creditsCount(stardustRemaining)}
-            </span>
             <button
-              aria-expanded={isTopUpOpen}
-              className="hidden min-h-9 items-center rounded-full border border-[#caa96a]/55 bg-[#f7e5b8]/82 px-2.5 text-[0.6rem] font-semibold uppercase tracking-[0.11em] text-[#5b3c16] shadow-[0_7px_18px_rgba(157,123,63,0.09),inset_0_1px_0_rgba(255,255,255,0.68)] transition hover:-translate-y-0.5 hover:border-[#9d7b3f] sm:inline-flex"
+              aria-label={copy.getMoreStardust}
+              className="group relative hidden min-h-9 items-center rounded-full border border-[#d8b76a]/42 bg-[#fffaf0]/82 px-2.5 text-[0.68rem] font-semibold tracking-normal text-[#5b4a36] shadow-[0_7px_18px_rgba(111,84,43,0.08),inset_0_1px_0_rgba(255,255,255,0.72)] backdrop-blur transition hover:-translate-y-0.5 hover:border-[#caa96a] hover:bg-[#fff7e8] focus:outline-none focus:ring-2 focus:ring-[#d8b76a]/35 sm:inline-flex"
               onClick={openTopUpPreview}
               type="button"
             >
-              {copy.topUp}
+              {isLoadingCredits ? "⚡ ..." : copy.stardustCompact(stardustRemaining)}
+              <span className="pointer-events-none absolute right-0 top-[calc(100%+0.45rem)] z-20 w-max max-w-[12rem] rounded-full border border-[#d8b76a]/42 bg-[#fffaf0]/96 px-3 py-1.5 text-[0.62rem] font-semibold text-[#5b4a36] opacity-0 shadow-[0_10px_24px_rgba(111,84,43,0.12)] transition group-hover:opacity-100 group-focus-visible:opacity-100">
+                {copy.getMoreStardust}
+              </span>
             </button>
             <button
               aria-expanded={isNotificationsOpen}
