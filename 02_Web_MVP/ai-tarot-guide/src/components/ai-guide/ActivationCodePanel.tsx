@@ -11,16 +11,17 @@ import {
   languageLabel,
   withLang,
 } from "@/lib/ai-guide/i18n";
-import { creditsToStardust } from "@/lib/ai-guide/credits";
+import {
+  creditsToStardust,
+  getRemainingStardust,
+  type StardustCreditBalance,
+} from "@/lib/ai-guide/credits";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
 const CREDITS_UPDATED_EVENT = "ora-arcana:credits-updated";
 const CREDITS_REFRESH_THROTTLE_MS = 1500;
 
-type Credits = {
-  remaining_credits: number;
-  total_credits: number;
-};
+type Credits = StardustCreditBalance;
 
 type ActivationCodePanelProps = {
   lang: Language;
@@ -35,7 +36,11 @@ function isCredits(value: unknown): value is Credits {
   const credits = value as Record<string, unknown>;
   return (
     typeof credits.remaining_credits === "number" &&
-    typeof credits.total_credits === "number"
+    typeof credits.total_credits === "number" &&
+    (credits.remaining_stardust === undefined ||
+      typeof credits.remaining_stardust === "number") &&
+    (credits.total_stardust === undefined ||
+      typeof credits.total_stardust === "number")
   );
 }
 
@@ -418,6 +423,7 @@ export function ActivationCodePanel({
           ),
         ),
       );
+      await loadCredits();
     } catch (redeemError) {
       setError(
         redeemError instanceof Error
@@ -429,8 +435,7 @@ export function ActivationCodePanel({
     }
   }
 
-  const creditsRemaining = credits?.remaining_credits ?? 0;
-  const stardustRemaining = creditsToStardust(creditsRemaining);
+  const stardustRemaining = credits ? getRemainingStardust(credits) : 0;
   const userInitial = (user?.email ?? "A").slice(0, 1).toUpperCase();
   const accountName =
     user?.email?.split("@")[0]?.trim() || (user ? copy.account : "");
