@@ -7,7 +7,7 @@
 
 ## Current Task
 
-`P0-20D-PRE-DRAW-DIALOGUE-PROTOTYPE` Pre-Draw Dialogue Prototype
+`P0-20E-SINGLE-AHA-SENTENCE-GENERATOR-PROTOTYPE` Single Aha Sentence Generator Prototype
 
 ## Current Main Branch Truth
 
@@ -19,6 +19,7 @@ The latest known `main` state is after:
 * `P0-20A` Ora Aha & Memory Engine Spec
 * `P0-20B` Reflection Signal Extraction Schema
 * `P0-20C` Micro-Slice Bank Seed Data
+* `P0-20D` Pre-Draw Dialogue Prototype
 
 Latest known main commit before P0-20A documentation work:
 
@@ -31,6 +32,10 @@ Current local P0-20A commit:
 Current local P0-20B commit:
 
 * `cb904e3 Add reflection signal schema`
+
+Current local P0-20C commit:
+
+* `80aa3a1 Add micro-slice bank seed data`
 
 Current stage:
 
@@ -52,29 +57,32 @@ Current product truth:
 * Aha Engine V2 and Memory Engine product direction is introduced in `docs/ORA_AHA_MEMORY_ENGINE_SPEC.md`.
 * Reflection Signal schema/types/validation are introduced in `src/lib/ora/reflectionSignal.ts`.
 * Micro-Slice Bank seed data is introduced in `src/lib/ora/microSliceBank.ts`.
+* Pre-draw dialogue prototype route is introduced at `/ai-guide/dialogue-demo`.
 
 ## Recently Completed
 
-`P0-20C-MICRO-SLICE-BANK-SEED-DATA` is completed as a foundational seed data update.
+`P0-20D-PRE-DRAW-DIALOGUE-PROTOTYPE` is completed as an internal prototype update.
 
 Completed output:
 
-* Added `src/lib/ora/microSliceBank.ts`.
-* Defined the `MicroSlice` type and first seed bank covering 14 state keys from the P0-20A spec.
-* Added Chinese and English concrete lines, softened Chinese variants, required signals, risk levels, do-not-use rules, anchor hints, and tags.
-* Added `getMicroSlicesByStateKey`, `getMicroSlicesByTopic`, `getMicroSliceById`, and `getAllMicroSlices`.
-* Added `validateMicroSliceBank()` for seed-data integrity checks.
-* Did not change `/ask`, `/result`, Supabase schema, payment, credits, Stardust, spreads, orientation, prediction behavior, or page UI.
+* Added `src/lib/ora/preDrawDialogue.ts`.
+* Added `src/components/ai-guide/PreDrawDialoguePrototype.tsx`.
+* Added the independent internal route `src/app/ai-guide/dialogue-demo/page.tsx`.
+* The route supports rough scenario detection, two rounds of branch choices, Reflection Signal preview, validation, and Micro-Slice Bank matching.
+* The prototype stops before draw and does not call AI, APIs, storage, credits, Stardust, Supabase, or the formal reading flow.
+* Did not change `/ask`, `/result`, Supabase schema, payment, credits, Stardust, AI reading charge logic, spreads, orientation, prediction behavior, main navigation, or formal page UI.
 
 ## Goal
 
-Prototype the Pre-Draw Dialogue layer that can turn a user's surface question into a small set of structured Reflection Signals before card interpretation.
+Prototype a single Aha sentence generator that takes a validated Reflection Signal and one selected Micro-Slice, then produces one concrete, non-predictive reflective sentence.
 
 The next task should build directly on:
 
 * `docs/ORA_AHA_MEMORY_ENGINE_SPEC.md`
 * `src/lib/ora/reflectionSignal.ts`
 * `src/lib/ora/microSliceBank.ts`
+* `src/lib/ora/preDrawDialogue.ts`
+* `src/app/ai-guide/dialogue-demo/page.tsx`
 
 ## Required Context
 
@@ -91,6 +99,7 @@ Always read:
 * `docs/CHANGELOG.md`
 * `src/lib/ora/reflectionSignal.ts`
 * `src/lib/ora/microSliceBank.ts`
+* `src/lib/ora/preDrawDialogue.ts`
 
 Do not read:
 
@@ -104,13 +113,15 @@ Context budget:
 
 ## Scope
 
-P0-20D should focus on:
+P0-20E should focus on:
 
-* A lightweight pre-draw dialogue prototype or policy module.
-* Branching questions that move from topic to action, then from emotion to concrete behavior.
-* Compatibility with `ReflectionSignalInput` and Micro-Slice Bank state keys.
+* A deterministic or lightly templated single Aha sentence prototype.
+* One sentence only.
+* Card as mirror, not evidence.
+* A concrete life micro-slice.
+* At least two of: time texture, action, body sensation, user anchor.
 * No prediction copy and no claim to know hidden facts.
-* Clear separation from the current production reading flow unless explicit UI integration is requested.
+* Compatibility with the dialogue demo preview, if integration is explicitly requested.
 
 ## Out Of Scope
 
@@ -127,8 +138,9 @@ Do not pull these into the next task unless explicitly requested:
 * Supabase schema changes without explicit approval
 * Memory persistence implementation
 * A visible user memory UI
-* Aha sentence generation
-* Page UI changes
+* AI/API generation
+* Payment, credits, or Stardust changes
+* Main navigation changes
 * Multi-turn chatbot behavior that replaces the current reading flow
 
 ## Constraints
@@ -142,17 +154,17 @@ The next task must not break the existing reading flow:
 * Do not introduce prediction copy.
 * Do not modify Supabase schema.
 * Do not modify payment, credits, or Stardust logic.
+* Do not change AI reading API charge logic.
 * Do not change page UI unless explicitly requested.
-* If implementation is explicitly requested, preserve existing route params and hard flow constraints.
+* Do not wire prototype logic into the formal reading flow unless explicitly requested.
 * Codex must not push unless the user explicitly approves it.
 
 ## Done Means
 
-For P0-20D:
+For P0-20E:
 
-* Pre-draw dialogue prototype/policy is introduced in a focused file or doc.
-* It can map short dialogue turns toward Reflection Signal state keys without replacing current `/ask`.
-* Copy remains reflective, descriptive, and non-predictive.
+* Single Aha sentence generator prototype is introduced in a focused file or demo-only integration.
+* Output remains one sentence and concrete without predictive claims.
 * AI Project OS docs are updated if current project truth changes.
 * `node scripts/check-ai-docs.mjs` passes.
 * `npm.cmd run build` passes if source files are changed.

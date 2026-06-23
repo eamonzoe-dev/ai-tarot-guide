@@ -83,6 +83,7 @@ Completed or recorded milestones:
 * `P0-20A` Aha Engine V2 + Memory Engine spec introduced in `docs/ORA_AHA_MEMORY_ENGINE_SPEC.md`
 * `P0-20B` Reflection Signal Extraction schema introduced in `src/lib/ora/reflectionSignal.ts`
 * `P0-20C` Micro-Slice Bank seed data introduced in `src/lib/ora/microSliceBank.ts`
+* `P0-20D` Pre-draw dialogue prototype introduced at `/ai-guide/dialogue-demo`
 * AI Project OS Standard docs established
 
 Latest known main branch:
@@ -100,6 +101,8 @@ The Memory Engine direction is longitudinal reflective companionship: memory sho
 `P0-20B` added the first Reflection Signal Extraction schema/types/validation layer. This is foundational only and is not wired into the current `/ask`, `/draw`, `/reveal`, `/result`, Stardust, payment, or Supabase flows.
 
 `P0-20C` added the first Micro-Slice Bank seed data layer for 14 descriptive state keys. This is foundational only and is not wired into the current reading flow or page UI.
+
+`P0-20D` added an independent internal pre-draw dialogue prototype route at `/ai-guide/dialogue-demo`. It validates the "dialogue before draw" concept without calling AI, consuming Stardust, changing API charge logic, or entering the formal reading flow.
 
 ## Current Visual Direction
 

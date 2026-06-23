@@ -12,6 +12,7 @@
 * Add Ora Aha & Memory Engine spec.
 * Add Reflection Signal Extraction schema.
 * Add Micro-Slice Bank seed data.
+* Add Pre-Draw Dialogue Prototype.
 
 ## 2026-06-23
 
