@@ -14,6 +14,7 @@
 * Add Micro-Slice Bank seed data.
 * Add Pre-Draw Dialogue Prototype.
 * Add Single Aha Sentence Generator Prototype.
+* Add Aha Prototype QA and Copy Tightening.
 
 ## 2026-06-23
 

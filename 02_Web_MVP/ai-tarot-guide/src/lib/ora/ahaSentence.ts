@@ -38,6 +38,11 @@ const FORBIDDEN_AHA_TERMS = [
   "必然会",
   "你需要倾听内心",
   "你最近压力很大",
+  "根据你的历史记录",
+  "这是你第",
+  "你又",
+  "你总是",
+  "我早就说过",
 ];
 
 const EN_FORBIDDEN_AHA_PATTERNS = [
@@ -46,11 +51,51 @@ const EN_FORBIDDEN_AHA_PATTERNS = [
   /\bwill definitely\b/i,
   /\bdestined to\b/i,
   /\bneed to listen to your heart\b/i,
+  /\bbased on your history\b/i,
+  /\byou always\b/i,
+  /\bi told you before\b/i,
 ];
 
-function compactAnchors(exactAnchors: string[]): string[] {
-  return exactAnchors.map((anchor) => anchor.trim()).filter(Boolean).slice(0, 3);
-}
+const PREFERRED_ANCHOR_PARTS = [
+  "睡不下",
+  "旧决定",
+  "选错",
+  "回来",
+  "还是一样",
+  "白费",
+  "证明",
+  "没准备好",
+  "不敢发",
+  "装作没事",
+  "一停下来",
+  "空掉",
+  "等回复",
+  "旧消息",
+  "语气",
+  "第一步",
+  "打不开",
+  "查资料",
+  "小事",
+  "卡住",
+  "边界",
+] as const;
+
+const GENERIC_ANCHORS = [
+  "迷茫",
+  "想太多",
+  "方向",
+  "问题",
+  "选择",
+  "confused",
+  "lost",
+  "question",
+  "choice",
+] as const;
+
+type AnchorCandidate = {
+  value: string;
+  score: number;
+};
 
 function getZhMicroLine(input: AhaSentenceInput): string {
   const { riskLevel, softenedVersionZh, concreteLineZh, concreteLineEn } =
@@ -80,6 +125,141 @@ function getEnMicroLine(input: AhaSentenceInput): string {
 
 function countSentenceEndings(sentence: string): number {
   return (sentence.match(/[。！？.!?]/g) ?? []).length;
+}
+
+function selectSuitableAnchors(exactAnchors: string[]): string[] {
+  const candidates = exactAnchors.flatMap(expandAnchorCandidates);
+  const bestByValue = new Map<string, AnchorCandidate>();
+
+  for (const candidate of candidates) {
+    if (!isSuitableAnchor(candidate.value)) {
+      continue;
+    }
+
+    const previous = bestByValue.get(candidate.value);
+    if (!previous || candidate.score > previous.score) {
+      bestByValue.set(candidate.value, candidate);
+    }
+  }
+
+  return Array.from(bestByValue.values())
+    .sort((left, right) => right.score - left.score)
+    .slice(0, 3)
+    .map((candidate) => candidate.value);
+}
+
+function expandAnchorCandidates(anchor: string, anchorIndex: number): AnchorCandidate[] {
+  const normalized = normalizeAnchor(anchor);
+  if (!normalized) {
+    return [];
+  }
+
+  const preferredParts = PREFERRED_ANCHOR_PARTS.filter((part) =>
+    normalized.includes(part),
+  ).map((part, partIndex) => ({
+    value: part,
+    score: 120 - anchorIndex * 4 - partIndex,
+  }));
+
+  return [
+    ...preferredParts,
+    {
+      value: normalized,
+      score: scoreAnchor(normalized, anchorIndex),
+    },
+  ];
+}
+
+function normalizeAnchor(anchor: string): string {
+  return anchor
+    .trim()
+    .replace(/[“”"']/g, "")
+    .replace(/\s+/g, " ");
+}
+
+function scoreAnchor(anchor: string, anchorIndex: number): number {
+  let score = 40 - anchorIndex * 3;
+
+  if (PREFERRED_ANCHOR_PARTS.some((part) => anchor.includes(part))) {
+    score += 40;
+  }
+
+  if (GENERIC_ANCHORS.some((generic) => anchor.toLowerCase() === generic)) {
+    score -= 80;
+  }
+
+  if (anchor.length >= 2 && anchor.length <= 6) {
+    score += 16;
+  }
+
+  return score;
+}
+
+function isSuitableAnchor(anchor: string): boolean {
+  if (!anchor) {
+    return false;
+  }
+
+  if (anchor.length > 14) {
+    return false;
+  }
+
+  if (/[。！？.!?，,；;]/.test(anchor)) {
+    return false;
+  }
+
+  if (/^(我|你|他|她).{4,}/.test(anchor)) {
+    return false;
+  }
+
+  if (GENERIC_ANCHORS.some((generic) => anchor.toLowerCase() === generic)) {
+    return false;
+  }
+
+  return true;
+}
+
+function buildZhSentence(input: AhaSentenceInput, line: string, anchor?: string): string {
+  const riskLevel = input.microSlice.riskLevel;
+  const shouldUseSoftened =
+    riskLevel !== "low" && Boolean(input.microSlice.softenedVersionZh?.trim());
+  const bridgedLine = anchor ? bridgeZhAnchor(anchor, line, shouldUseSoftened) : line;
+
+  return shouldUseSoftened
+    ? `【${input.card.name}】像是在照见一种状态：${bridgedLine}`
+    : `【${input.card.name}】像是在照见：${bridgedLine}`;
+}
+
+function bridgeZhAnchor(
+  anchor: string,
+  line: string,
+  shouldUseSoftened: boolean,
+): string {
+  if (line.includes(anchor)) {
+    return line;
+  }
+
+  if (shouldUseSoftened) {
+    return `你说的「${anchor}」，也许可以先放轻成这个画面：${line}`;
+  }
+
+  if (line.startsWith("你可能")) {
+    return line.replace("你可能", `你说的「${anchor}」，可能`);
+  }
+
+  if (line.startsWith("它像是在照见")) {
+    return line.replace("它像是在照见", `你说的「${anchor}」，像是在照见`);
+  }
+
+  return `你说的「${anchor}」，${line}`;
+}
+
+function buildEnSentence(input: AhaSentenceInput, line: string, anchor?: string): string {
+  if (anchor && !line.includes(anchor)) {
+    return `${input.card.name} mirrors the moment around "${anchor}": ${line}`;
+  }
+
+  return `${input.card.name} mirrors this pattern: ${line}`;
 }
 
 export function validateAhaSentence(
@@ -118,17 +298,15 @@ export function validateAhaSentence(
 }
 
 export function generateAhaSentence(input: AhaSentenceInput): AhaSentenceResult {
-  const candidateAnchors = compactAnchors(input.exactAnchors);
+  const candidateAnchors = selectSuitableAnchors(input.exactAnchors);
   const isZh = input.locale === "zh";
   const riskLevel = input.microSlice.riskLevel;
   const line = isZh ? getZhMicroLine(input) : getEnMicroLine(input);
+  const anchor = candidateAnchors[0];
 
-  const sentence =
-    isZh && riskLevel !== "low" && input.microSlice.softenedVersionZh?.trim()
-      ? `【${input.card.name}】像是在照见一种状态：${line}`
-      : isZh
-        ? `【${input.card.name}】像是在照见：${line}`
-        : `${input.card.name} mirrors this pattern: ${line}`;
+  const sentence = isZh
+    ? buildZhSentence(input, line, anchor)
+    : buildEnSentence(input, line, anchor);
 
   const usedAnchors = candidateAnchors.filter((anchor) =>
     sentence.includes(anchor),
@@ -137,7 +315,7 @@ export function generateAhaSentence(input: AhaSentenceInput): AhaSentenceResult 
   const validation = validateAhaSentence(sentence);
 
   if (usedAnchors.length === 0) {
-    warnings.push("No exact anchor appeared in generated sentence.");
+    warnings.push("No suitable exact anchor appeared in generated sentence.");
   }
 
   if (!validation.ok) {

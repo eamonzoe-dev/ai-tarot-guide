@@ -7,7 +7,7 @@
 
 ## Current Task
 
-`P0-20F-AHA-PROTOTYPE-QA-AND-COPY-TIGHTENING` Aha Prototype QA and Copy Tightening
+`P0-20G-AHA-ENGINE-PROMPT-CONTRACT-FOR-AI-GENERATION` Aha Engine Prompt Contract for AI Generation
 
 ## Current Main Branch Truth
 
@@ -21,10 +21,11 @@ The latest known `main` state is after:
 * `P0-20C` Micro-Slice Bank Seed Data
 * `P0-20D` Pre-Draw Dialogue Prototype
 * `P0-20E` Single Aha Sentence Generator Prototype
+* `P0-20F` Aha Prototype QA and Copy Tightening
 
-Latest known main commit before P0-20E work:
+Latest known main commit before P0-20F work:
 
-* `3ab18c3 Add pre-draw dialogue prototype`
+* `c87e5ca Add aha sentence generator prototype`
 
 Current local P0-20A commit:
 
@@ -41,6 +42,10 @@ Current local P0-20C commit:
 Current local P0-20D commit:
 
 * `3ab18c3 Add pre-draw dialogue prototype`
+
+Current local P0-20E commit:
+
+* `c87e5ca Add aha sentence generator prototype`
 
 Current stage:
 
@@ -64,23 +69,24 @@ Current product truth:
 * Micro-Slice Bank seed data is introduced in `src/lib/ora/microSliceBank.ts`.
 * Pre-draw dialogue prototype route is introduced at `/ai-guide/dialogue-demo`.
 * Single Aha sentence generator prototype is introduced in `src/lib/ora/ahaSentence.ts` and previewed in the dialogue demo.
+* Aha prototype copy tightening is introduced in `src/lib/ora/ahaSentence.ts` and the dialogue demo preview.
 
 ## Recently Completed
 
-`P0-20E-SINGLE-AHA-SENTENCE-GENERATOR-PROTOTYPE` is completed as an internal prototype update.
+`P0-20F-AHA-PROTOTYPE-QA-AND-COPY-TIGHTENING` is completed as an internal prototype update.
 
 Completed output:
 
-* Added `src/lib/ora/ahaSentence.ts`.
-* Added deterministic single-sentence Aha generation from locale, exact anchors, a mock drawn card, and one matched Micro-Slice.
-* Added validation for forbidden predictive, advisory, and abstract phrases.
-* Integrated an AHA SENTENCE PREVIEW block into `src/components/ai-guide/PreDrawDialoguePrototype.tsx`.
+* Tightened `src/lib/ora/ahaSentence.ts` anchor selection so short, concrete user anchors are preferred over broad terms.
+* Added anchor bridge sentence patterns so AHA SENTENCE PREVIEW can naturally include the user's words.
+* Expanded copy validation for surveillance-feeling memory phrases.
+* Updated `src/components/ai-guide/PreDrawDialoguePrototype.tsx` to display used anchors with quote styling and warnings as `None` when empty.
 * The dialogue demo still stops before draw and does not call AI, APIs, storage, credits, Stardust, Supabase, or the formal reading flow.
 * Did not change `/ask`, `/result`, Supabase schema, payment, credits, Stardust, AI reading charge logic, spreads, orientation, prediction behavior, main navigation, or formal page UI.
 
 ## Goal
 
-QA and tighten the Aha prototype copy so the pre-draw dialogue, matched Micro-Slice, Reflection Signal preview, and single Aha sentence feel concrete, gentle, non-predictive, and internally consistent.
+Define the prompt contract for a future AI-generated Aha sentence so the deterministic prototype rules can become a safe model-facing interface without wiring AI into the formal reading flow yet.
 
 The next task should build directly on:
 
@@ -122,13 +128,12 @@ Context budget:
 
 ## Scope
 
-P0-20F should focus on:
+P0-20G should focus on:
 
-* QA-ing `/ai-guide/dialogue-demo?lang=zh` and `/ai-guide/dialogue-demo?lang=en`.
-* Tightening branch-question copy, Micro-Slice matches, and generated Aha sentence output.
-* Keeping the Aha sentence one sentence, concrete, and non-predictive.
-* Preserving card-as-mirror framing, not card-as-evidence framing.
-* Improving warnings or validation only if needed for the prototype.
+* A typed prompt/input-output contract for future AI generation.
+* Explicit guardrails for reflection-not-prediction, card-as-mirror, and user-anchor use.
+* Clear validation expectations for one-sentence Aha output.
+* Keeping the contract prototype-only and not wired into the formal reading flow.
 
 ## Out Of Scope
 
@@ -168,10 +173,10 @@ The next task must not break the existing reading flow:
 
 ## Done Means
 
-For P0-20F:
+For P0-20G:
 
-* Dialogue demo QA notes or copy refinements are completed in the smallest useful scope.
-* Output remains concrete, one-sentence where applicable, and free of predictive claims.
+* Aha Engine prompt contract docs or types are introduced in the smallest useful scope.
+* Output rules remain concrete, one-sentence where applicable, and free of predictive claims.
 * AI Project OS docs are updated if current project truth changes.
 * `node scripts/check-ai-docs.mjs` passes.
 * `npm.cmd run build` passes if source files are changed.

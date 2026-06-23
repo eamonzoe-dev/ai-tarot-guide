@@ -55,7 +55,7 @@ const copy = {
     usedSliceId: "usedSliceId",
     usedAnchors: "usedAnchors",
     warnings: "warnings",
-    noWarnings: "No warnings.",
+    none: "None",
   },
   zh: {
     inputLabel: "原始问题",
@@ -88,7 +88,7 @@ const copy = {
     usedSliceId: "usedSliceId",
     usedAnchors: "usedAnchors",
     warnings: "warnings",
-    noWarnings: "No warnings.",
+    none: "None",
   },
 } as const;
 
@@ -373,11 +373,15 @@ export function PreDrawDialoguePrototype({
                   [ui.usedSliceId, ahaSentencePreview.usedSliceId],
                   [
                     ui.usedAnchors,
-                    ahaSentencePreview.usedAnchors.join(", ") || "-",
+                    formatPreviewAnchors(
+                      ahaSentencePreview.usedAnchors,
+                      lang,
+                      ui.none,
+                    ),
                   ],
                   [
                     ui.warnings,
-                    ahaSentencePreview.warnings.join(" | ") || ui.noWarnings,
+                    ahaSentencePreview.warnings.join(" | ") || ui.none,
                   ],
                 ]}
               />
@@ -480,6 +484,20 @@ function DialogueStepPanel({
       </div>
     </section>
   );
+}
+
+function formatPreviewAnchors(
+  anchors: string[],
+  lang: Language,
+  emptyLabel: string,
+): string {
+  if (anchors.length === 0) {
+    return emptyLabel;
+  }
+
+  return anchors
+    .map((anchor) => (lang === "zh" ? `「${anchor}」` : `"${anchor}"`))
+    .join(", ");
 }
 
 function PreviewRows({ rows }: { rows: Array<[string, string]> }) {
