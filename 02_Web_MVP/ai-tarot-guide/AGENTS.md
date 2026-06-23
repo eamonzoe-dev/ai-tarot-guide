@@ -19,9 +19,21 @@ Before writing Next.js code:
 # AGENTS.md
 
 - Status: Active
-- Last updated: 2026-06-20
+- Last updated: 2026-06-23
 - Owner: eamonzoe
 - Source priority: Stable workflow rules only. For current facts, follow `00_START_HERE.md` and the docs source priority.
+
+## Project Memory Pack
+
+`docs/AI_MEMORY_PACK.md` is the first project-level context entry for all AI assistants working on Ora Arcana / AI Tarot Guide.
+
+Before starting a new task, read:
+
+1. `docs/AI_MEMORY_PACK.md`
+2. `AGENTS.md`
+3. The task-relevant current docs listed in `docs/NEXT_TASK.md`
+
+If chat memory and repository docs conflict, use the repository docs as source of truth.
 
 ## Purpose
 
@@ -36,6 +48,7 @@ Do not read all docs by default.
 For every task, first read Core Context:
 
 * `00_START_HERE.md`
+* `docs/AI_MEMORY_PACK.md`
 * `AGENTS.md`
 * `docs/PROJECT_STATUS.md`
 * `docs/NEXT_TASK.md`
@@ -154,7 +167,7 @@ Preserve these hard product rules unless the user explicitly asks to change them
 3. `/result` prioritizes URL `searchParams`.
 4. `/result` uses localStorage fallback only when URL parameters are missing.
 5. The reading flow is upright-only.
-6. The reading flow is single-card only.
+6. The reading flow supports current single-card and online three-card spreads.
 7. `lang=en|zh` behavior is URL-first, with localStorage only as fallback.
 8. Keep the 78-card tarot deck structure intact.
 
@@ -162,7 +175,7 @@ In this codebase these routes are currently under `/ai-guide`, such as `/ai-guid
 
 During the launch freeze, do not casually add:
 
-* Multi-card spreads
+* Additional spreads beyond current single-card and online three-card
 * Reversed cards
 * Stripe payments
 * Google login
@@ -313,7 +326,7 @@ Do not:
 * Remove URL searchParams logic
 * Replace the native GET form
 * Force a new design system
-* Introduce multi-card spreads
+* Introduce additional spreads beyond current single-card and online three-card
 * Introduce reversed cards
 * Add Stripe payments
 * Add real Google or Apple login
