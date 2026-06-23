@@ -5,6 +5,12 @@
 - Owner: eamonzoe
 - Source priority: Completed work history. Read after higher-priority current-state docs.
 
+## Unreleased
+
+### Added
+
+* Add Ora Aha & Memory Engine spec.
+
 ## 2026-06-23
 
 ### Synced
