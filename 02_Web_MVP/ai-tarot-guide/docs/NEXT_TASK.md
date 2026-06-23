@@ -7,7 +7,7 @@
 
 ## Current Task
 
-`P0-20L-AHA-DEMO-PRODUCT-REVIEW-AND-INTEGRATION-DECISION` Aha Demo Product Review and Integration Decision
+`P0-20M-CLOSED-BETA-AHA-DEMO-TEST-SCRIPT` Closed Beta Aha Demo Test Script
 
 ## Current Main Branch Truth
 
@@ -27,6 +27,7 @@ The latest known `main` state is after:
 * `P0-20I` Aha Demo AI Contract Preview Panel
 * `P0-20J` Aha Demo End-to-End QA Pack
 * `P0-20K` Aha Demo Multi-Scenario QA Fixes
+* `P0-20L` Aha Demo Product Review and Integration Decision
 
 Latest known main commit before P0-20J work:
 
@@ -70,7 +71,11 @@ Current local P0-20I commit:
 
 Current local P0-20K commit:
 
-* `Tighten aha demo multi-scenario QA` (see closeout output for hash)
+* `aaac409 Tighten aha demo multi-scenario QA`
+
+Current local P0-20L commit:
+
+* `Add aha engine product review` (see closeout output for hash)
 
 Current stage:
 
@@ -100,8 +105,17 @@ Current product truth:
 * AI prompt contract and mock output validation previews are introduced in the internal dialogue demo.
 * Aha demo end-to-end QA pack is introduced in `docs/AHA_DEMO_QA_PACK.md`.
 * Aha demo multi-scenario QA fixes are recorded in `docs/AHA_DEMO_QA_PACK.md` section 16.
+* Aha Engine product review and integration options are introduced in `docs/AHA_ENGINE_PRODUCT_REVIEW.md`.
 
 ## Recently Completed
+
+`P0-20L-AHA-DEMO-PRODUCT-REVIEW-AND-INTEGRATION-DECISION` is completed as a docs-only product review.
+
+Completed output:
+
+* Added `docs/AHA_ENGINE_PRODUCT_REVIEW.md` covering what has been built, the product hypothesis, current strengths/weaknesses, 4 integration options (A: do not integrate yet, B: optional pre-draw refinement, C: aha sentence as reveal interstitial, D: full Aha Engine in result page), a recommended decision, required product questions, proposed next experiments, integration guardrails, and a recommended next task.
+* Recommended Option B or a lightweight Option C over Option D; explicitly did not authorize any integration.
+* Did not change `src/`, page UI, `/ask`, `/result`, Supabase schema, payment, credits, Stardust, AI reading API, spreads, orientation, prediction behavior, or main navigation.
 
 `P0-20K-AHA-DEMO-MULTI-SCENARIO-QA-FIXES` is completed.
 
@@ -119,10 +133,11 @@ Completed output:
 
 ## Goal
 
-Decide whether and how the Aha demo prototype chain should move toward real product integration, now that the multi-scenario QA pack is clean across all 4 scenarios and the negative-input cases.
+Write a closed-beta manual test script and feedback form for the Aha demo, per `docs/AHA_ENGINE_PRODUCT_REVIEW.md` section 9 and section 11, so real human testers can generate signal before any integration decision is made.
 
 The next task should build directly on:
 
+* `docs/AHA_ENGINE_PRODUCT_REVIEW.md`
 * `docs/AHA_DEMO_QA_PACK.md`
 * `docs/ORA_AHA_MEMORY_ENGINE_SPEC.md`
 * `src/lib/ora/reflectionSignal.ts`
@@ -166,12 +181,12 @@ Context budget:
 
 ## Scope
 
-P0-20L should focus on:
+P0-20M should focus on:
 
-* Reviewing the now-clean Aha demo chain end to end as a product decision, not a QA pass.
-* Deciding whether the dialogue-before-draw pattern, deterministic aha sentence, and AI prompt contract are ready to inform real product direction.
-* Producing a clear recommendation (continue as internal prototype only, expand QA further, or begin a scoped integration plan) without performing the integration itself unless explicitly requested.
-* Keeping the route internal and prototype-only unless the user explicitly approves a wiring change.
+* Writing a step-by-step manual test script that walks closed-beta testers through both the current production flow and `/ai-guide/dialogue-demo`.
+* Writing a feedback form capturing the aha / discomfort / specificity signals listed in `docs/AHA_ENGINE_PRODUCT_REVIEW.md` section 9.
+* Covering Chinese and English input, and all 4 scenario types (confusion, relationship waiting, project continue, self sensitivity).
+* Keeping the route internal and prototype-only; this task does not run the test itself or change integration status.
 
 ## Out Of Scope
 
@@ -211,9 +226,9 @@ The next task must not break the existing reading flow:
 
 ## Done Means
 
-For P0-20L:
+For P0-20M:
 
-* A clear product recommendation is recorded for the Aha demo's next step.
+* A repeatable closed-beta test script and feedback form exist for the Aha demo.
 * The Aha demo chain remains concrete, one-sentence, JSON-compatible, and free of predictive claims.
 * AI Project OS docs are updated if current project truth changes.
 * `node scripts/check-ai-docs.mjs` passes.

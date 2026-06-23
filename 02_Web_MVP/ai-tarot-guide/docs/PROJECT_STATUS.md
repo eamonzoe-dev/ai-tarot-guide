@@ -91,6 +91,7 @@ Completed or recorded milestones:
 * `P0-20I` Aha demo AI contract preview panel introduced in `/ai-guide/dialogue-demo`
 * `P0-20J` Aha demo QA pack introduced in `docs/AHA_DEMO_QA_PACK.md`
 * `P0-20K` Aha demo multi-scenario QA fixes recorded in `docs/AHA_DEMO_QA_PACK.md` section 16
+* `P0-20L` Aha Engine product review introduced in `docs/AHA_ENGINE_PRODUCT_REVIEW.md`
 * AI Project OS Standard docs established
 
 Latest known main branch:
@@ -124,6 +125,8 @@ The Memory Engine direction is longitudinal reflective companionship: memory sho
 `P0-20J` added the Aha demo end-to-end QA pack. It fixes the internal `/ai-guide/dialogue-demo?lang=zh` prototype chain into repeatable manual QA cases without changing source code, page UI, AI calls, Stardust, Supabase, or the formal reading flow.
 
 `P0-20K` ran the QA pack across all 4 scenarios (16 dialogue leaf-paths) plus the negative-input cases and fixed concrete issues found: a duplicated card-mirror phrase and a double-softened anchor bridge in `src/lib/ora/ahaSentence.ts`, a dead preferred-anchor entry, a false-positive advice-pattern trigger in `src/lib/ora/microSliceBank.ts` that was breaking the confusion-scenario fallback used by several negative-input cases, a weak self-sensitivity branch mapping in `src/lib/ora/preDrawDialogue.ts`, and missing concrete-life-slice clue words in `src/lib/ora/ahaOutputValidator.ts`. All fixes and accepted non-blockers are recorded in `docs/AHA_DEMO_QA_PACK.md` section 16. No change was made to `/ask`, `/result`, Supabase, payment, credits, Stardust, the AI reading API, spreads, orientation, prediction behavior, or main navigation.
+
+`P0-20L` reviewed the Aha Engine V2 prototype as a product decision rather than a QA pass. `docs/AHA_ENGINE_PRODUCT_REVIEW.md` records what has been built, current strengths and risks, 4 integration options ranging from "do not integrate yet" to "full Aha Engine in result page," and recommends starting with a lightweight optional pre-draw refinement or reveal interstitial rather than a full result-page integration. The review does not authorize any integration; it recommends a closed-beta test script (`P0-20M`) as the next step. No `src/` or page UI was changed.
 
 ## Current Visual Direction
 
