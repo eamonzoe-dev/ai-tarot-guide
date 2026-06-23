@@ -90,6 +90,7 @@ Completed or recorded milestones:
 * `P0-20H` AI Aha output validator introduced in `src/lib/ora/ahaOutputValidator.ts`
 * `P0-20I` Aha demo AI contract preview panel introduced in `/ai-guide/dialogue-demo`
 * `P0-20J` Aha demo QA pack introduced in `docs/AHA_DEMO_QA_PACK.md`
+* `P0-20K` Aha demo multi-scenario QA fixes recorded in `docs/AHA_DEMO_QA_PACK.md` section 16
 * AI Project OS Standard docs established
 
 Latest known main branch:
@@ -121,6 +122,8 @@ The Memory Engine direction is longitudinal reflective companionship: memory sho
 `P0-20I` added the internal Aha demo AI contract preview panel. The dialogue demo now shows the future prompt contract, expected output shape, and mock output validator result without calling AI, consuming Stardust, or entering the formal reading flow.
 
 `P0-20J` added the Aha demo end-to-end QA pack. It fixes the internal `/ai-guide/dialogue-demo?lang=zh` prototype chain into repeatable manual QA cases without changing source code, page UI, AI calls, Stardust, Supabase, or the formal reading flow.
+
+`P0-20K` ran the QA pack across all 4 scenarios (16 dialogue leaf-paths) plus the negative-input cases and fixed concrete issues found: a duplicated card-mirror phrase and a double-softened anchor bridge in `src/lib/ora/ahaSentence.ts`, a dead preferred-anchor entry, a false-positive advice-pattern trigger in `src/lib/ora/microSliceBank.ts` that was breaking the confusion-scenario fallback used by several negative-input cases, a weak self-sensitivity branch mapping in `src/lib/ora/preDrawDialogue.ts`, and missing concrete-life-slice clue words in `src/lib/ora/ahaOutputValidator.ts`. All fixes and accepted non-blockers are recorded in `docs/AHA_DEMO_QA_PACK.md` section 16. No change was made to `/ask`, `/result`, Supabase, payment, credits, Stardust, the AI reading API, spreads, orientation, prediction behavior, or main navigation.
 
 ## Current Visual Direction
 

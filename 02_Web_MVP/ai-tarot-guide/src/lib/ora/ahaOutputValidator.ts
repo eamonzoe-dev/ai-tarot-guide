@@ -85,6 +85,9 @@ const zhLifeSliceClues = [
   "选错",
   "证明",
   "白费",
+  "标签页",
+  "不舒服",
+  "喘口气",
 ];
 
 const enLifeSliceClues = [

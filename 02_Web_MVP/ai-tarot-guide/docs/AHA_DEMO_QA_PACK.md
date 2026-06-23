@@ -276,3 +276,26 @@ Notes:
 `P0-20K Aha Demo Multi-Scenario QA Fixes`
 
 Only start copy or matching fixes after this QA Pack reveals real issues.
+
+## 16. P0-20K QA Notes
+
+Coverage: ran the default confusion case, all 4 leaf branches each for relationship waiting, project continue, and self sensitivity (16 full dialogue paths total), plus the 5 negative inputs, using a one-off local script that exercises the real `preDrawDialogue.ts`, `microSliceBank.ts`, `ahaSentence.ts`, and `ahaOutputValidator.ts` modules directly (no UI automation tool was available in this session).
+
+Fixes made:
+
+* `src/lib/ora/ahaSentence.ts`: the sentence template always prefixed `像是在照见` (or `像是在照见一种状态`), but 7 of 15 `concreteLineZh` values in the micro-slice bank also start with `它像是在照见`, so the generated sentence literally repeated the phrase twice. Added `stripCardMirrorPrefix` so the wrapper supplies the phrase exactly once.
+* `src/lib/ora/ahaSentence.ts`: when an anchor was bridged into a medium/high-risk slice, `bridgeZhAnchor` always prepended `也许可以先放轻成这个画面：`, even though the softened line itself already starts with its own `如果...也许可以放轻成` framing. This produced a double-softened, garbled sentence for every medium-risk slice with an anchor (this is exactly what the relationship-waiting case hit). Fixed by skipping the extra preamble when the line already starts with `如果`.
+* `src/lib/ora/ahaSentence.ts`: `PREFERRED_ANCHOR_PARTS` contained `装作没事`, but the actual anchor text everywhere in the codebase is `装没事` (no `作`), so this entry never matched anything. Fixed the typo and added `敏感` / `受伤` so self-sensitivity anchors can surface naturally.
+* `src/lib/ora/microSliceBank.ts`: `future_as_escape_001.concreteLineZh` contained `你需要先借一个远处的自己喘口气`, which tripped the AI output validator's advice-pattern check (`你需要(?!倾听内心)`) and made the mock validation fail with a hard error. This path is reachable from the confusion-scenario default fallback, so several negative-input QA cases (`迷茫`, empty input, `I feel stuck`, `asdfasdf`) showed a failed mock validation. Reworded to `于是先借一个远处的自己喘口气` to remove the false-positive trigger while keeping the same meaning.
+* `src/lib/ora/preDrawDialogue.ts`: self-sensitivity's `read_tone -> allowed_hurt` branch mapped to `identity_protection`, whose micro-slice content is about choosing between two options. That topic does not match "am I allowed to feel hurt", produced a sentence referencing an unintroduced "choice", and triggered the validator's concrete-life-slice warning. Remapped to `anger_softening`, which is already used by the other self-sensitivity branches and fits this tension (self-permission before a feeling is taken seriously) more directly.
+* `src/lib/ora/ahaOutputValidator.ts`: `zhLifeSliceClues` was missing a few concrete words (`标签页`, `不舒服`, `喘口气`) that already exist in legitimate micro-slice text, causing avoidable "Sentence may lack concrete life-slice language" warnings on otherwise valid sentences. Added them.
+
+After these fixes, all 16 dialogue leaf-paths across the 4 scenarios produce a single-sentence, single `像是在照见` mention, validate with `ok: true`, zero errors, and zero warnings. The documented default QA case (Section 5) is unchanged and still passes all its hard checks.
+
+Verified against the negative inputs in Section 9: none crash, none predict, and the previously-failing fallback path (confusion scenario default branch) now also validates cleanly.
+
+Accepted non-blockers (not changed in P0-20K):
+
+* Self-sensitivity's `read_tone -> went_cold` branch lands on `rereading_for_tone`, which is correct and shared with relationship-waiting, but is not in this doc's original preferred `candidateStateKey` list for self sensitivity. The original preferred list in Section 8 (`anger_softening / draft_without_sending / checking_for_permission`) does not match what the dialogue tree can actually reach; the tree's real reachable set for self sensitivity is `anger_softening / rereading_for_tone` (after the `allowed_hurt` fix above). This is a documentation-vs-code mismatch worth correcting in a future docs pass, not a code defect — `rereading_for_tone` is a semantically correct match for "did they go cold."
+* Some branches pick a generic-feeling anchor (e.g. `查资料`, `第一步`) rather than the more emotionally loaded anchors listed as "尽量包含" in Sections 6-8. This is acceptable: the anchor scoring favors concrete, short, non-generic terms over longer phrases, and every branch still uses a real user-provided anchor naturally, just not always the most evocative one.
+* `exactAnchors` truncation at 8 items can drop a relevant anchor hint (e.g. `敏感`) when many anchor hints accumulate across both dialogue rounds. Not fixed in P0-20K to avoid changing the anchor pipeline's general truncation behavior; flagged for future tightening if it recurs.

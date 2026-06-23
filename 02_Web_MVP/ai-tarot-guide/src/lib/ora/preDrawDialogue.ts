@@ -542,8 +542,8 @@ export const preDrawDialogueScenarios: readonly DialogueScenarioDefinition[] = [
               "What are you really trying to confirm now: whether the sentence went cold, or why your body heard distance first?",
           },
           allowed_hurt: {
-            selectedState: "identity protection",
-            candidateStateKey: "identity_protection",
+            selectedState: "anger softening",
+            candidateStateKey: "anger_softening",
             anchorHints: ["太敏感", "受伤", "怎么看自己"],
             finalReflectiveQuestionZh:
               "你现在真正想确认的，是自己有没有资格受伤，还是为什么受伤会动摇你对自己的判断？",

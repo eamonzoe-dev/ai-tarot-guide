@@ -256,7 +256,7 @@ export const microSliceBank: readonly MicroSlice[] = [
     microScene:
       "The user leans on an imagined future because the present is too cramped to sit in directly.",
     concreteLineZh:
-      "它像是在照见你把注意力放到很远以后的画面里：不是那个画面不好，而是此刻太窄了，你需要先借一个远处的自己喘口气。",
+      "它像是在照见你把注意力放到很远以后的画面里：不是那个画面不好，而是此刻太窄了，于是先借一个远处的自己喘口气。",
     concreteLineEn:
       "It looks like placing your attention far ahead: not because that image is wrong, but because the present feels narrow enough that you borrow a distant version of yourself to breathe.",
     riskLevel: "low",

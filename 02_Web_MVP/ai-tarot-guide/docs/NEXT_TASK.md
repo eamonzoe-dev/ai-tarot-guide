@@ -7,7 +7,7 @@
 
 ## Current Task
 
-`P0-20K-AHA-DEMO-MULTI-SCENARIO-QA-FIXES` Aha Demo Multi-Scenario QA Fixes
+`P0-20L-AHA-DEMO-PRODUCT-REVIEW-AND-INTEGRATION-DECISION` Aha Demo Product Review and Integration Decision
 
 ## Current Main Branch Truth
 
@@ -26,6 +26,7 @@ The latest known `main` state is after:
 * `P0-20H` AI Aha Output Validator
 * `P0-20I` Aha Demo AI Contract Preview Panel
 * `P0-20J` Aha Demo End-to-End QA Pack
+* `P0-20K` Aha Demo Multi-Scenario QA Fixes
 
 Latest known main commit before P0-20J work:
 
@@ -67,6 +68,10 @@ Current local P0-20I commit:
 
 * `0911907 Add aha demo AI contract preview`
 
+Current local P0-20K commit:
+
+* `Tighten aha demo multi-scenario QA` (see closeout output for hash)
+
 Current stage:
 
 * Pre-launch / closed beta prep
@@ -94,21 +99,27 @@ Current product truth:
 * AI Aha output validator is introduced in `src/lib/ora/ahaOutputValidator.ts`.
 * AI prompt contract and mock output validation previews are introduced in the internal dialogue demo.
 * Aha demo end-to-end QA pack is introduced in `docs/AHA_DEMO_QA_PACK.md`.
+* Aha demo multi-scenario QA fixes are recorded in `docs/AHA_DEMO_QA_PACK.md` section 16.
 
 ## Recently Completed
 
-`P0-20J-AHA-DEMO-END-TO-END-QA-PACK` is completed as a docs-only QA update.
+`P0-20K-AHA-DEMO-MULTI-SCENARIO-QA-FIXES` is completed.
 
 Completed output:
 
-* Added `docs/AHA_DEMO_QA_PACK.md`.
-* Documented the default Chinese confusion / late-night rumination QA case.
-* Documented relationship waiting, project continue, self sensitivity, negative inputs, copy quality, safety, regression guardrails, and manual QA result template.
-* Did not change `src/`, `/ask`, `/result`, Supabase schema, payment, credits, Stardust, AI reading API, spreads, orientation, prediction behavior, page UI, main navigation, or formal page UI.
+* Ran the Section 5 default case, all 16 leaf dialogue paths across the 4 scenario trees, and the Section 9 negative-input cases against the real `preDrawDialogue.ts`, `microSliceBank.ts`, `ahaSentence.ts`, and `ahaOutputValidator.ts` modules.
+* Fixed a duplicated "像是在照见" mirror phrase in `src/lib/ora/ahaSentence.ts` when the matched micro-slice's concrete line already started with that phrase.
+* Fixed a double-softened/garbled sentence in `src/lib/ora/ahaSentence.ts`'s anchor bridging for medium/high-risk slices.
+* Fixed a dead `PREFERRED_ANCHOR_PARTS` entry (typo `装作没事` vs actual `装没事`) and added `敏感` / `受伤` in `src/lib/ora/ahaSentence.ts`.
+* Fixed a false-positive advice-pattern trigger in `future_as_escape_001`'s concrete line in `src/lib/ora/microSliceBank.ts` (this slice is reachable from the confusion-scenario default fallback and was breaking several negative-input QA cases).
+* Remapped self-sensitivity's `read_tone -> allowed_hurt` branch from `identity_protection` to `anger_softening` in `src/lib/ora/preDrawDialogue.ts` for a closer semantic fit.
+* Widened `zhLifeSliceClues` in `src/lib/ora/ahaOutputValidator.ts` to remove avoidable concrete-life-slice warnings.
+* Documented all findings, fixes, and accepted non-blockers in `docs/AHA_DEMO_QA_PACK.md` section 16.
+* Did not wire any prototype logic into the formal reading flow, did not change `/ask`, `/result`, Supabase schema, payment, credits, Stardust, AI reading API, spreads, orientation, prediction behavior, page UI, or main navigation.
 
 ## Goal
 
-Use the QA Pack to identify and fix real multi-scenario issues in the internal Aha demo. Only change copy or matching when a documented QA case shows a concrete failure.
+Decide whether and how the Aha demo prototype chain should move toward real product integration, now that the multi-scenario QA pack is clean across all 4 scenarios and the negative-input cases.
 
 The next task should build directly on:
 
@@ -155,12 +166,12 @@ Context budget:
 
 ## Scope
 
-P0-20K should focus on:
+P0-20L should focus on:
 
-* Running the QA Pack across the default, relationship, project, self-sensitivity, and negative cases.
-* Fixing only concrete issues found in the internal demo chain.
-* Tightening scenario matching, anchor handling, or copy only where QA shows a real failure.
-* Keeping the route internal and prototype-only.
+* Reviewing the now-clean Aha demo chain end to end as a product decision, not a QA pass.
+* Deciding whether the dialogue-before-draw pattern, deterministic aha sentence, and AI prompt contract are ready to inform real product direction.
+* Producing a clear recommendation (continue as internal prototype only, expand QA further, or begin a scoped integration plan) without performing the integration itself unless explicitly requested.
+* Keeping the route internal and prototype-only unless the user explicitly approves a wiring change.
 
 ## Out Of Scope
 
@@ -200,10 +211,9 @@ The next task must not break the existing reading flow:
 
 ## Done Means
 
-For P0-20K:
+For P0-20L:
 
-* Multi-scenario QA findings are recorded.
-* Any fixes are scoped to documented failures.
+* A clear product recommendation is recorded for the Aha demo's next step.
 * The Aha demo chain remains concrete, one-sentence, JSON-compatible, and free of predictive claims.
 * AI Project OS docs are updated if current project truth changes.
 * `node scripts/check-ai-docs.mjs` passes.

@@ -66,7 +66,7 @@ const PREFERRED_ANCHOR_PARTS = [
   "证明",
   "没准备好",
   "不敢发",
-  "装作没事",
+  "装没事",
   "一停下来",
   "空掉",
   "等回复",
@@ -78,6 +78,8 @@ const PREFERRED_ANCHOR_PARTS = [
   "小事",
   "卡住",
   "边界",
+  "敏感",
+  "受伤",
 ] as const;
 
 const GENERIC_ANCHORS = [
@@ -219,11 +221,22 @@ function isSuitableAnchor(anchor: string): boolean {
   return true;
 }
 
+const CARD_MIRROR_PREFIX = "它像是在照见";
+
+function stripCardMirrorPrefix(line: string): string {
+  return line.startsWith(CARD_MIRROR_PREFIX)
+    ? line.slice(CARD_MIRROR_PREFIX.length)
+    : line;
+}
+
 function buildZhSentence(input: AhaSentenceInput, line: string, anchor?: string): string {
   const riskLevel = input.microSlice.riskLevel;
   const shouldUseSoftened =
     riskLevel !== "low" && Boolean(input.microSlice.softenedVersionZh?.trim());
-  const bridgedLine = anchor ? bridgeZhAnchor(anchor, line, shouldUseSoftened) : line;
+  const normalizedLine = stripCardMirrorPrefix(line);
+  const bridgedLine = anchor
+    ? bridgeZhAnchor(anchor, normalizedLine, shouldUseSoftened)
+    : normalizedLine;
 
   return shouldUseSoftened
     ? `【${input.card.name}】像是在照见一种状态：${bridgedLine}`
@@ -239,16 +252,16 @@ function bridgeZhAnchor(
     return line;
   }
 
+  if (line.startsWith("如果")) {
+    return `你说的「${anchor}」，${line}`;
+  }
+
   if (shouldUseSoftened) {
     return `你说的「${anchor}」，也许可以先放轻成这个画面：${line}`;
   }
 
   if (line.startsWith("你可能")) {
     return line.replace("你可能", `你说的「${anchor}」，可能`);
-  }
-
-  if (line.startsWith("它像是在照见")) {
-    return line.replace("它像是在照见", `你说的「${anchor}」，像是在照见`);
   }
 
   return `你说的「${anchor}」，${line}`;

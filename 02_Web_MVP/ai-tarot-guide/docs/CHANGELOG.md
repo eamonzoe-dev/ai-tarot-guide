@@ -20,6 +20,10 @@
 * Add Aha Demo AI Contract Preview Panel.
 * Add Aha Demo End-to-End QA Pack.
 
+### Fixed
+
+* Fix Aha demo multi-scenario QA issues: duplicated card-mirror phrase and double-softened anchor bridge in the aha sentence generator, dead preferred-anchor entry, a false-positive advice-pattern trigger in the confusion-scenario fallback micro-slice, a weak self-sensitivity branch mapping, and missing concrete-life-slice clue words in the AI output validator.
+
 ## 2026-06-23
 
 ### Synced
