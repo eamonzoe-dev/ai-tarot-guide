@@ -84,11 +84,12 @@ Completed or recorded milestones:
 * `P0-20B` Reflection Signal Extraction schema introduced in `src/lib/ora/reflectionSignal.ts`
 * `P0-20C` Micro-Slice Bank seed data introduced in `src/lib/ora/microSliceBank.ts`
 * `P0-20D` Pre-draw dialogue prototype introduced at `/ai-guide/dialogue-demo`
+* `P0-20E` Single Aha sentence generator prototype introduced in `src/lib/ora/ahaSentence.ts`
 * AI Project OS Standard docs established
 
 Latest known main branch:
 
-* `aebcba4 Add paid follow-up Stardust charge`
+* `3ab18c3 Add pre-draw dialogue prototype`
 
 ## Current Product Direction Update
 
@@ -103,6 +104,8 @@ The Memory Engine direction is longitudinal reflective companionship: memory sho
 `P0-20C` added the first Micro-Slice Bank seed data layer for 14 descriptive state keys. This is foundational only and is not wired into the current reading flow or page UI.
 
 `P0-20D` added an independent internal pre-draw dialogue prototype route at `/ai-guide/dialogue-demo`. It validates the "dialogue before draw" concept without calling AI, consuming Stardust, changing API charge logic, or entering the formal reading flow.
+
+`P0-20E` added a deterministic single Aha sentence generator prototype. It combines a matched Micro-Slice and card-as-mirror symbolic lens into one concrete, non-predictive sentence inside the internal dialogue demo only.
 
 ## Current Visual Direction
 

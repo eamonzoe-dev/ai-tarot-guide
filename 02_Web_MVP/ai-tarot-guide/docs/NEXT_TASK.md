@@ -7,7 +7,7 @@
 
 ## Current Task
 
-`P0-20E-SINGLE-AHA-SENTENCE-GENERATOR-PROTOTYPE` Single Aha Sentence Generator Prototype
+`P0-20F-AHA-PROTOTYPE-QA-AND-COPY-TIGHTENING` Aha Prototype QA and Copy Tightening
 
 ## Current Main Branch Truth
 
@@ -20,10 +20,11 @@ The latest known `main` state is after:
 * `P0-20B` Reflection Signal Extraction Schema
 * `P0-20C` Micro-Slice Bank Seed Data
 * `P0-20D` Pre-Draw Dialogue Prototype
+* `P0-20E` Single Aha Sentence Generator Prototype
 
-Latest known main commit before P0-20A documentation work:
+Latest known main commit before P0-20E work:
 
-* `aebcba4 Add paid follow-up Stardust charge`
+* `3ab18c3 Add pre-draw dialogue prototype`
 
 Current local P0-20A commit:
 
@@ -36,6 +37,10 @@ Current local P0-20B commit:
 Current local P0-20C commit:
 
 * `80aa3a1 Add micro-slice bank seed data`
+
+Current local P0-20D commit:
+
+* `3ab18c3 Add pre-draw dialogue prototype`
 
 Current stage:
 
@@ -58,23 +63,24 @@ Current product truth:
 * Reflection Signal schema/types/validation are introduced in `src/lib/ora/reflectionSignal.ts`.
 * Micro-Slice Bank seed data is introduced in `src/lib/ora/microSliceBank.ts`.
 * Pre-draw dialogue prototype route is introduced at `/ai-guide/dialogue-demo`.
+* Single Aha sentence generator prototype is introduced in `src/lib/ora/ahaSentence.ts` and previewed in the dialogue demo.
 
 ## Recently Completed
 
-`P0-20D-PRE-DRAW-DIALOGUE-PROTOTYPE` is completed as an internal prototype update.
+`P0-20E-SINGLE-AHA-SENTENCE-GENERATOR-PROTOTYPE` is completed as an internal prototype update.
 
 Completed output:
 
-* Added `src/lib/ora/preDrawDialogue.ts`.
-* Added `src/components/ai-guide/PreDrawDialoguePrototype.tsx`.
-* Added the independent internal route `src/app/ai-guide/dialogue-demo/page.tsx`.
-* The route supports rough scenario detection, two rounds of branch choices, Reflection Signal preview, validation, and Micro-Slice Bank matching.
-* The prototype stops before draw and does not call AI, APIs, storage, credits, Stardust, Supabase, or the formal reading flow.
+* Added `src/lib/ora/ahaSentence.ts`.
+* Added deterministic single-sentence Aha generation from locale, exact anchors, a mock drawn card, and one matched Micro-Slice.
+* Added validation for forbidden predictive, advisory, and abstract phrases.
+* Integrated an AHA SENTENCE PREVIEW block into `src/components/ai-guide/PreDrawDialoguePrototype.tsx`.
+* The dialogue demo still stops before draw and does not call AI, APIs, storage, credits, Stardust, Supabase, or the formal reading flow.
 * Did not change `/ask`, `/result`, Supabase schema, payment, credits, Stardust, AI reading charge logic, spreads, orientation, prediction behavior, main navigation, or formal page UI.
 
 ## Goal
 
-Prototype a single Aha sentence generator that takes a validated Reflection Signal and one selected Micro-Slice, then produces one concrete, non-predictive reflective sentence.
+QA and tighten the Aha prototype copy so the pre-draw dialogue, matched Micro-Slice, Reflection Signal preview, and single Aha sentence feel concrete, gentle, non-predictive, and internally consistent.
 
 The next task should build directly on:
 
@@ -82,7 +88,9 @@ The next task should build directly on:
 * `src/lib/ora/reflectionSignal.ts`
 * `src/lib/ora/microSliceBank.ts`
 * `src/lib/ora/preDrawDialogue.ts`
+* `src/lib/ora/ahaSentence.ts`
 * `src/app/ai-guide/dialogue-demo/page.tsx`
+* `src/components/ai-guide/PreDrawDialoguePrototype.tsx`
 
 ## Required Context
 
@@ -100,6 +108,7 @@ Always read:
 * `src/lib/ora/reflectionSignal.ts`
 * `src/lib/ora/microSliceBank.ts`
 * `src/lib/ora/preDrawDialogue.ts`
+* `src/lib/ora/ahaSentence.ts`
 
 Do not read:
 
@@ -113,15 +122,13 @@ Context budget:
 
 ## Scope
 
-P0-20E should focus on:
+P0-20F should focus on:
 
-* A deterministic or lightly templated single Aha sentence prototype.
-* One sentence only.
-* Card as mirror, not evidence.
-* A concrete life micro-slice.
-* At least two of: time texture, action, body sensation, user anchor.
-* No prediction copy and no claim to know hidden facts.
-* Compatibility with the dialogue demo preview, if integration is explicitly requested.
+* QA-ing `/ai-guide/dialogue-demo?lang=zh` and `/ai-guide/dialogue-demo?lang=en`.
+* Tightening branch-question copy, Micro-Slice matches, and generated Aha sentence output.
+* Keeping the Aha sentence one sentence, concrete, and non-predictive.
+* Preserving card-as-mirror framing, not card-as-evidence framing.
+* Improving warnings or validation only if needed for the prototype.
 
 ## Out Of Scope
 
@@ -161,10 +168,10 @@ The next task must not break the existing reading flow:
 
 ## Done Means
 
-For P0-20E:
+For P0-20F:
 
-* Single Aha sentence generator prototype is introduced in a focused file or demo-only integration.
-* Output remains one sentence and concrete without predictive claims.
+* Dialogue demo QA notes or copy refinements are completed in the smallest useful scope.
+* Output remains concrete, one-sentence where applicable, and free of predictive claims.
 * AI Project OS docs are updated if current project truth changes.
 * `node scripts/check-ai-docs.mjs` passes.
 * `npm.cmd run build` passes if source files are changed.

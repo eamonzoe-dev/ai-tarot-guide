@@ -13,6 +13,7 @@
 * Add Reflection Signal Extraction schema.
 * Add Micro-Slice Bank seed data.
 * Add Pre-Draw Dialogue Prototype.
+* Add Single Aha Sentence Generator Prototype.
 
 ## 2026-06-23
 

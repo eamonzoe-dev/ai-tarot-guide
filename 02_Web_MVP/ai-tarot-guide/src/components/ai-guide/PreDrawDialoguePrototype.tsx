@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 
 import { TarotButton } from "@/components/ai-guide/TarotButton";
 import type { Language } from "@/lib/ai-guide/i18n";
+import { generateAhaSentence } from "@/lib/ora/ahaSentence";
 import { getMicroSlicesByStateKey } from "@/lib/ora/microSliceBank";
 import {
   buildPreDrawDialogueResult,
@@ -48,6 +49,13 @@ const copy = {
     softened: "Softened version",
     risk: "Risk",
     signalJson: "Reflection Signal preview",
+    ahaPreview: "AHA SENTENCE PREVIEW",
+    prototypeOnly: "Prototype preview only. Not a formal reading.",
+    ahaSentence: "sentence",
+    usedSliceId: "usedSliceId",
+    usedAnchors: "usedAnchors",
+    warnings: "warnings",
+    noWarnings: "No warnings.",
   },
   zh: {
     inputLabel: "原始问题",
@@ -74,8 +82,21 @@ const copy = {
     softened: "柔化版本",
     risk: "风险",
     signalJson: "Reflection Signal preview",
+    ahaPreview: "AHA SENTENCE PREVIEW",
+    prototypeOnly: "仅 prototype 预览，不是正式解读。",
+    ahaSentence: "sentence",
+    usedSliceId: "usedSliceId",
+    usedAnchors: "usedAnchors",
+    warnings: "warnings",
+    noWarnings: "No warnings.",
   },
 } as const;
+
+const mockDialogueCard = {
+  id: "two-of-swords",
+  name: "宝剑二",
+  symbolicLens: "回避选择、暂停判断、用不看见来维持暂时平衡",
+};
 
 export function PreDrawDialoguePrototype({
   lang,
@@ -171,11 +192,7 @@ export function PreDrawDialoguePrototype({
         riskLevel: slice.riskLevel,
         confidence: Math.max(0.62, 0.86 - index * 0.08),
       })),
-      drawnCard: {
-        id: "two-of-swords",
-        name: "宝剑二",
-        symbolicLens: "回避选择、暂停判断、用不看见来维持暂时平衡",
-      },
+      drawnCard: mockDialogueCard,
       finalAhaConstraints: defaultFinalAhaConstraints,
     };
   }, [
@@ -191,6 +208,23 @@ export function PreDrawDialoguePrototype({
 
   const validationResult = reflectionSignalPreview
     ? validateReflectionSignalInput(reflectionSignalPreview)
+    : undefined;
+
+  const ahaSentencePreview = result?.matchedMicroSlices[0]
+    ? generateAhaSentence({
+        locale: lang,
+        surfaceQuestion: surfaceQuestion.trim(),
+        exactAnchors: result.exactAnchors,
+        card: mockDialogueCard,
+        microSlice: {
+          sliceId: result.matchedMicroSlices[0].sliceId,
+          stateKey: result.matchedMicroSlices[0].stateKey,
+          concreteLineZh: result.matchedMicroSlices[0].concreteLineZh,
+          concreteLineEn: result.matchedMicroSlices[0].concreteLineEn,
+          softenedVersionZh: result.matchedMicroSlices[0].softenedVersionZh,
+          riskLevel: result.matchedMicroSlices[0].riskLevel,
+        },
+      })
     : undefined;
 
   function resetChoices() {
@@ -317,6 +351,38 @@ export function PreDrawDialoguePrototype({
               </article>
             ))}
           </section>
+
+          {ahaSentencePreview && (
+            <section className="ora-surface-luminous rounded-2xl p-4">
+              <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <p className="atelier-label text-[0.64rem] font-semibold">
+                    {ui.ahaPreview}
+                  </p>
+                  <p className="mt-2 text-xs leading-5 text-[#d8c9ae]">
+                    {ui.prototypeOnly}
+                  </p>
+                </div>
+                <span className="rounded-full border border-[#d9bd80]/40 px-3 py-1 text-xs text-[#ead7a6]">
+                  {ui.risk}: {ahaSentencePreview.riskLevel}
+                </span>
+              </div>
+              <PreviewRows
+                rows={[
+                  [ui.ahaSentence, ahaSentencePreview.sentence],
+                  [ui.usedSliceId, ahaSentencePreview.usedSliceId],
+                  [
+                    ui.usedAnchors,
+                    ahaSentencePreview.usedAnchors.join(", ") || "-",
+                  ],
+                  [
+                    ui.warnings,
+                    ahaSentencePreview.warnings.join(" | ") || ui.noWarnings,
+                  ],
+                ]}
+              />
+            </section>
+          )}
 
           <section className="ora-surface-archive rounded-2xl p-4">
             <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
