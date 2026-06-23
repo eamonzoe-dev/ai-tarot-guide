@@ -27,6 +27,13 @@ Before writing Next.js code:
 
 `docs/AI_MEMORY_PACK.md` is the first project-level context entry for all AI assistants working on Ora Arcana / AI Tarot Guide.
 
+Bootstrap and current-fact boundaries:
+
+* `docs/AI_MEMORY_PACK.md` is the bootstrap entry point.
+* `AGENTS.md` defines stable agent workflow rules.
+* `docs/NEXT_TASK.md`, `docs/PROJECT_STATUS.md`, and related docs resolve current task facts.
+* All AI agents, including Codex and Claude Code, must follow the same git safety gate: do not push without explicit user approval.
+
 Before starting a new task, read:
 
 1. `docs/AI_MEMORY_PACK.md`

@@ -11,7 +11,9 @@
 
 * Completed `P0-MEMORY-1` by adding `docs/AI_MEMORY_PACK.md` as the first project-level AI memory entry.
 * Added `docs/AI_CONTEXT_CHATGPT_DIGEST.md` as the expanded ChatGPT-derived durable project memory digest.
+* Added `docs/AI_CONTEXT_CLAUDE_DIGEST.md` for Claude-specific durable collaboration memory.
 * Linked the digest from `docs/AI_MEMORY_PACK.md`.
+* Clarified bootstrap order versus current task source-of-truth order in Memory Pack / AGENTS docs.
 * Updated `AGENTS.md` to require reading the Memory Pack before new tasks.
 * Completed `P0-19A Main Branch Truth Sync` as a documentation-only update.
 * Synced current docs with latest known main branch commit `aebcba4 Add paid follow-up Stardust charge`.

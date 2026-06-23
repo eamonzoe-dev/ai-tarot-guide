@@ -31,6 +31,10 @@ Do not guess project state from memory. Read the docs.
 
 For expanded ChatGPT-derived durable project context, read `docs/AI_CONTEXT_CHATGPT_DIGEST.md`.
 
+For Claude-specific durable collaboration memory, read `docs/AI_CONTEXT_CLAUDE_DIGEST.md`.
+
+`docs/AI_MEMORY_PACK.md` defines the bootstrap order for AI assistants. Task-specific current facts are still resolved through the current source-of-truth docs such as `docs/NEXT_TASK.md`, `docs/PROJECT_STATUS.md`, and `docs/DECISIONS.md`.
+
 ## 3. Project Identity
 
 Project name:
