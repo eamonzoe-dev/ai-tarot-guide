@@ -29,6 +29,8 @@ When chat memory and repository docs conflict, follow the repository docs.
 
 Do not guess project state from memory. Read the docs.
 
+For expanded ChatGPT-derived durable project context, read `docs/AI_CONTEXT_CHATGPT_DIGEST.md`.
+
 ## 3. Project Identity
 
 Project name:
