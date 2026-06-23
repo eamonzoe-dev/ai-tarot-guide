@@ -7,7 +7,7 @@
 
 ## Current Task
 
-`P0-20B-REFLECTION-SIGNAL-EXTRACTION-SCHEMA` Reflection Signal Extraction Schema
+`P0-20C-MICRO-SLICE-BANK-SEED-DATA` Micro-Slice Bank Seed Data
 
 ## Current Main Branch Truth
 
@@ -17,10 +17,15 @@ The latest known `main` state is after:
 * `P0-17D` AI reading support for three-card spread
 * `P0-18E` Paid follow-up Stardust charge
 * `P0-20A` Ora Aha & Memory Engine Spec
+* `P0-20B` Reflection Signal Extraction Schema
 
 Latest known main commit before P0-20A documentation work:
 
 * `aebcba4 Add paid follow-up Stardust charge`
+
+Current local P0-20A commit:
+
+* `1ad3e6a Add Ora Aha and Memory Engine spec`
 
 Current stage:
 
@@ -40,23 +45,29 @@ Current product truth:
 * Paid AI follow-up consumes `20` Stardust.
 * Activation Code, Reading Account, Reading Journal, AI Reading, and paid follow-up are all part of the current system.
 * Aha Engine V2 and Memory Engine product direction is introduced in `docs/ORA_AHA_MEMORY_ENGINE_SPEC.md`.
+* Reflection Signal schema/types/validation are introduced in `src/lib/ora/reflectionSignal.ts`.
 
 ## Recently Completed
 
-`P0-20A-ORA-AHA-MEMORY-ENGINE-SPEC` is completed as a documentation-only product spec update.
+`P0-20B-REFLECTION-SIGNAL-EXTRACTION-SCHEMA` is completed as a foundational code and docs update.
 
 Completed output:
 
-* Added `docs/ORA_AHA_MEMORY_ENGINE_SPEC.md`.
-* Defined Aha Engine V2 as descriptive specificity, not predictive specificity.
-* Defined the Micro-Slice Bank, pre-draw dialogue strategy, Reflection Signal example shape, Aha sentence rules, Memory Engine foundations, recall levels, recall triggers, safe memory language, retention layers, memory object structure, recall scoring, and follow-up roadmap.
-* Did not change application source, Supabase files, package files, or route behavior.
+* Added `src/lib/ora/reflectionSignal.ts`.
+* Defined `Locale`, `DialogueRole`, `RiskLevel`, `defaultFinalAhaConstraints`, `ReflectionSignalInput`, and related nested types.
+* Added `validateReflectionSignalInput(value)` and `isReflectionSignalInput(value)`.
+* Added validation for non-empty surface question, at least one dialogue turn, exact anchor arrays, risk level, confidence range, required final Aha constraints, and forbidden prediction-related fields.
+* Added `sampleReflectionSignalInput` with the Chinese late-night rumination dialogue and the Two of Swords.
+* Did not change `/ask`, `/result`, Supabase schema, payment, credits, Stardust, spread, orientation, or prediction behavior.
 
 ## Goal
 
-Add the Reflection Signal Extraction Schema that will let future Aha Engine work capture the user's current reflective state from the initial question and 2-3 rounds of pre-draw dialogue.
+Add the first Micro-Slice Bank seed data so future Aha Engine V2 work can map Reflection Signals to concrete, safe, non-predictive life scenes.
 
-The next task should translate the P0-20A spec into a focused schema and policy artifact first. If implementation is requested, keep it behind existing route behavior and do not disrupt the current reading flow.
+The next task should build directly on:
+
+* `docs/ORA_AHA_MEMORY_ENGINE_SPEC.md`
+* `src/lib/ora/reflectionSignal.ts`
 
 ## Required Context
 
@@ -71,6 +82,7 @@ Always read:
 * `docs/ORA_AHA_MEMORY_ENGINE_SPEC.md`
 * `docs/DECISIONS.md`
 * `docs/CHANGELOG.md`
+* `src/lib/ora/reflectionSignal.ts`
 
 Do not read:
 
@@ -84,15 +96,13 @@ Context budget:
 
 ## Scope
 
-P0-20B should focus on:
+P0-20C should focus on:
 
-* A structured Reflection Signal schema.
-* Allowed values for selected state, rumination type, agency position, hidden cost, confidence, and exact user anchors.
-* Rules for deriving signals from user-provided text and pre-draw dialogue.
-* Rules for lowering specificity when signals are weak.
-* Safety boundaries for not inventing facts, predictions, diagnoses, or sensitive details.
-* Compatibility with single-card and online three-card upright readings.
-* Documentation of how the schema will later connect to the Micro-Slice Bank and Aha sentence generator.
+* A small seed bank of micro-slices for the initial `state_key` examples in the P0-20A spec.
+* Stable IDs, state keys, surface topics, required signals, concrete lines in Chinese and English, risk levels, do-not-use rules, and softened versions.
+* Compatibility with `MicroSliceCandidate` from `src/lib/ora/reflectionSignal.ts`.
+* Safe copy that remains reflective and descriptive, not predictive.
+* Clear separation between seed data and any future generation logic.
 
 ## Out Of Scope
 
@@ -109,6 +119,8 @@ Do not pull these into the next task unless explicitly requested:
 * Supabase schema changes without explicit approval
 * Memory persistence implementation
 * A visible user memory UI
+* Aha sentence generation
+* Pre-draw dialogue UI or route changes
 * Multi-turn chatbot behavior that replaces the current reading flow
 
 ## Constraints
@@ -120,24 +132,20 @@ The next task must not break the existing reading flow:
 * Do not introduce multi-card spreads beyond the current online three-card support.
 * Do not introduce reversed cards.
 * Do not introduce prediction copy.
-* Do not modify app code for documentation-only work.
+* Do not modify Supabase schema.
+* Do not modify payment, credits, or Stardust logic.
 * If implementation is explicitly requested, preserve existing route params and hard flow constraints.
 * Codex must not push unless the user explicitly approves it.
 
 ## Done Means
 
-For documentation-only P0-20B:
+For P0-20C:
 
-* Reflection Signal schema is documented clearly enough for implementation.
-* The schema references `docs/ORA_AHA_MEMORY_ENGINE_SPEC.md` and preserves its boundaries.
+* Micro-Slice Bank seed data is introduced in a focused file.
+* Seed data validates against the existing Reflection Signal / micro-slice shape or a compatible dedicated type.
+* Copy is concrete but non-predictive.
 * AI Project OS docs are updated if current project truth changes.
 * `node scripts/check-ai-docs.mjs` passes.
+* `npm run build` passes if source files are changed.
 * A local commit is created only after checks pass.
 * No push is performed unless explicitly approved.
-
-For implementation P0-20B, if explicitly requested:
-
-* The schema is introduced without changing route contracts.
-* The current ask, draw, reveal, result, Stardust, journal, and language behavior remains intact.
-* Relevant tests or build checks pass.
-* AI Project OS docs are updated.

@@ -81,6 +81,7 @@ Completed or recorded milestones:
 * `P0-17D` AI reading support added for three-card spread
 * `P0-18E` Paid follow-up Stardust charge added
 * `P0-20A` Aha Engine V2 + Memory Engine spec introduced in `docs/ORA_AHA_MEMORY_ENGINE_SPEC.md`
+* `P0-20B` Reflection Signal Extraction schema introduced in `src/lib/ora/reflectionSignal.ts`
 * AI Project OS Standard docs established
 
 Latest known main branch:
@@ -94,6 +95,8 @@ Latest known main branch:
 The new Aha Engine V2 direction is descriptive specificity: Ora should infer gentle, concrete life micro-slices from the user's own expression and short pre-draw dialogue, while avoiding prediction, diagnosis, or claims of knowing hidden facts.
 
 The Memory Engine direction is longitudinal reflective companionship: memory should help Ora recall the right thread at the right moment, notice change, and avoid feeling like surveillance or a history-record display.
+
+`P0-20B` added the first Reflection Signal Extraction schema/types/validation layer. This is foundational only and is not wired into the current `/ask`, `/draw`, `/reveal`, `/result`, Stardust, payment, or Supabase flows.
 
 ## Current Visual Direction
 

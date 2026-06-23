@@ -10,6 +10,7 @@
 ### Added
 
 * Add Ora Aha & Memory Engine spec.
+* Add Reflection Signal Extraction schema.
 
 ## 2026-06-23
 
