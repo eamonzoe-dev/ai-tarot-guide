@@ -7,7 +7,7 @@
 
 ## Current Task
 
-`P0-20J-AHA-DEMO-END-TO-END-QA-PACK` Aha Demo End-to-End QA Pack
+`P0-20K-AHA-DEMO-MULTI-SCENARIO-QA-FIXES` Aha Demo Multi-Scenario QA Fixes
 
 ## Current Main Branch Truth
 
@@ -25,10 +25,11 @@ The latest known `main` state is after:
 * `P0-20G` Aha Engine Prompt Contract for AI Generation
 * `P0-20H` AI Aha Output Validator
 * `P0-20I` Aha Demo AI Contract Preview Panel
+* `P0-20J` Aha Demo End-to-End QA Pack
 
-Latest known main commit before P0-20I work:
+Latest known main commit before P0-20J work:
 
-* `899380f Add AI aha output validator`
+* `0911907 Add aha demo AI contract preview`
 
 Current local P0-20A commit:
 
@@ -62,6 +63,10 @@ Current local P0-20H commit:
 
 * `899380f Add AI aha output validator`
 
+Current local P0-20I commit:
+
+* `0911907 Add aha demo AI contract preview`
+
 Current stage:
 
 * Pre-launch / closed beta prep
@@ -88,25 +93,26 @@ Current product truth:
 * AI Aha prompt contract is introduced in `src/lib/ora/ahaPromptContract.ts`.
 * AI Aha output validator is introduced in `src/lib/ora/ahaOutputValidator.ts`.
 * AI prompt contract and mock output validation previews are introduced in the internal dialogue demo.
+* Aha demo end-to-end QA pack is introduced in `docs/AHA_DEMO_QA_PACK.md`.
 
 ## Recently Completed
 
-`P0-20I-AHA-DEMO-AI-CONTRACT-PREVIEW-PANEL` is completed as a demo-only prototype update.
+`P0-20J-AHA-DEMO-END-TO-END-QA-PACK` is completed as a docs-only QA update.
 
 Completed output:
 
-* Added AI Prompt Contract Preview to `src/components/ai-guide/PreDrawDialoguePrototype.tsx`.
-* Added Mock AI Output Validation preview using deterministic aha output and `parseAndValidateAhaAiOutput`.
-* The internal demo now shows Reflection Signal, matched Micro-Slice, deterministic AHA preview, prompt contract, and mock validator result together.
-* The preview does not call AI, APIs, storage, credits, Stardust, Supabase, or the formal reading flow.
-* Did not change `/ask`, `/result`, Supabase schema, payment, credits, Stardust, AI reading API, spreads, orientation, prediction behavior, page UI, main navigation, or formal page UI.
+* Added `docs/AHA_DEMO_QA_PACK.md`.
+* Documented the default Chinese confusion / late-night rumination QA case.
+* Documented relationship waiting, project continue, self sensitivity, negative inputs, copy quality, safety, regression guardrails, and manual QA result template.
+* Did not change `src/`, `/ask`, `/result`, Supabase schema, payment, credits, Stardust, AI reading API, spreads, orientation, prediction behavior, page UI, main navigation, or formal page UI.
 
 ## Goal
 
-Create an end-to-end QA pack for the internal Aha demo so the deterministic chain, prompt contract preview, and mock validator can be checked consistently before any future AI generation work.
+Use the QA Pack to identify and fix real multi-scenario issues in the internal Aha demo. Only change copy or matching when a documented QA case shows a concrete failure.
 
 The next task should build directly on:
 
+* `docs/AHA_DEMO_QA_PACK.md`
 * `docs/ORA_AHA_MEMORY_ENGINE_SPEC.md`
 * `src/lib/ora/reflectionSignal.ts`
 * `src/lib/ora/microSliceBank.ts`
@@ -149,11 +155,11 @@ Context budget:
 
 ## Scope
 
-P0-20J should focus on:
+P0-20K should focus on:
 
-* Documenting or scripting the default Aha demo QA path.
-* Verifying the default Chinese QA case end to end.
-* Checking that Reflection Signal validation, deterministic AHA preview, AI prompt contract preview, and mock output validation remain coherent together.
+* Running the QA Pack across the default, relationship, project, self-sensitivity, and negative cases.
+* Fixing only concrete issues found in the internal demo chain.
+* Tightening scenario matching, anchor handling, or copy only where QA shows a real failure.
 * Keeping the route internal and prototype-only.
 
 ## Out Of Scope
@@ -194,10 +200,10 @@ The next task must not break the existing reading flow:
 
 ## Done Means
 
-For P0-20J:
+For P0-20K:
 
-* A compact QA pack exists for the internal dialogue demo.
-* The default QA case is documented and/or verified.
+* Multi-scenario QA findings are recorded.
+* Any fixes are scoped to documented failures.
 * The Aha demo chain remains concrete, one-sentence, JSON-compatible, and free of predictive claims.
 * AI Project OS docs are updated if current project truth changes.
 * `node scripts/check-ai-docs.mjs` passes.

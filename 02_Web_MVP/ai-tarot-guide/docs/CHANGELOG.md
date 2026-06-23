@@ -18,6 +18,7 @@
 * Add AI Aha Prompt Contract.
 * Add AI Aha Output Validator.
 * Add Aha Demo AI Contract Preview Panel.
+* Add Aha Demo End-to-End QA Pack.
 
 ## 2026-06-23
 
