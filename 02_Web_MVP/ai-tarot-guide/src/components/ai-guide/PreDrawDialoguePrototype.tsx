@@ -5,6 +5,11 @@ import { useMemo, useState } from "react";
 import { TarotButton } from "@/components/ai-guide/TarotButton";
 import type { Language } from "@/lib/ai-guide/i18n";
 import { generateAhaSentence } from "@/lib/ora/ahaSentence";
+import {
+  buildAhaPromptContract,
+  type AhaPromptContractInput,
+} from "@/lib/ora/ahaPromptContract";
+import { parseAndValidateAhaAiOutput } from "@/lib/ora/ahaOutputValidator";
 import { getMicroSlicesByStateKey } from "@/lib/ora/microSliceBank";
 import {
   buildPreDrawDialogueResult,
@@ -55,6 +60,24 @@ const copy = {
     usedSliceId: "usedSliceId",
     usedAnchors: "usedAnchors",
     warnings: "warnings",
+    aiContractPreview: "AI PROMPT CONTRACT PREVIEW",
+    aiContractNote:
+      "Internal prototype only. No AI call is made here, and this is not formal reading output.",
+    aiContractSubtitle:
+      "This panel only shows the contract that a future AI aha generator must follow.",
+    systemPrompt: "systemPrompt",
+    userPrompt: "userPrompt",
+    expectedOutputShape: "expectedOutputShape",
+    forbiddenPatterns: "forbiddenPatterns",
+    requiredChecks: "requiredChecks",
+    mockValidationPreview: "MOCK AI OUTPUT VALIDATION",
+    mockValidationNote:
+      "Prototype only. This validates a mock JSON output made from the deterministic aha sentence; no prediction, API call, or Stardust use happens here.",
+    rawMockJson: "raw mock JSON",
+    validationStatus: "validation",
+    ok: "ok",
+    failed: "failed",
+    errors: "errors",
     none: "None",
   },
   zh: {
@@ -88,6 +111,24 @@ const copy = {
     usedSliceId: "usedSliceId",
     usedAnchors: "usedAnchors",
     warnings: "warnings",
+    aiContractPreview: "AI PROMPT CONTRACT PREVIEW",
+    aiContractNote:
+      "Internal prototype only. No AI call, no formal reading output, no prediction.",
+    aiContractSubtitle:
+      "This panel only shows the contract that a future AI aha generator must follow.",
+    systemPrompt: "systemPrompt",
+    userPrompt: "userPrompt",
+    expectedOutputShape: "expectedOutputShape",
+    forbiddenPatterns: "forbiddenPatterns",
+    requiredChecks: "requiredChecks",
+    mockValidationPreview: "MOCK AI OUTPUT VALIDATION",
+    mockValidationNote:
+      "Prototype only. This validates mock JSON from the deterministic aha sentence; it does not call AI or use Stardust.",
+    rawMockJson: "raw mock JSON",
+    validationStatus: "validation",
+    ok: "ok",
+    failed: "failed",
+    errors: "errors",
     none: "None",
   },
 } as const;
@@ -210,22 +251,90 @@ export function PreDrawDialoguePrototype({
     ? validateReflectionSignalInput(reflectionSignalPreview)
     : undefined;
 
-  const ahaSentencePreview = result?.matchedMicroSlices[0]
+  const firstMatchedMicroSlice = result?.matchedMicroSlices[0];
+
+  const ahaSentencePreview = result && firstMatchedMicroSlice
     ? generateAhaSentence({
         locale: lang,
         surfaceQuestion: surfaceQuestion.trim(),
         exactAnchors: result.exactAnchors,
         card: mockDialogueCard,
         microSlice: {
-          sliceId: result.matchedMicroSlices[0].sliceId,
-          stateKey: result.matchedMicroSlices[0].stateKey,
-          concreteLineZh: result.matchedMicroSlices[0].concreteLineZh,
-          concreteLineEn: result.matchedMicroSlices[0].concreteLineEn,
-          softenedVersionZh: result.matchedMicroSlices[0].softenedVersionZh,
-          riskLevel: result.matchedMicroSlices[0].riskLevel,
+          sliceId: firstMatchedMicroSlice.sliceId,
+          stateKey: firstMatchedMicroSlice.stateKey,
+          concreteLineZh: firstMatchedMicroSlice.concreteLineZh,
+          concreteLineEn: firstMatchedMicroSlice.concreteLineEn,
+          softenedVersionZh: firstMatchedMicroSlice.softenedVersionZh,
+          riskLevel: firstMatchedMicroSlice.riskLevel,
         },
       })
     : undefined;
+
+  const ahaPromptContractInput = useMemo<AhaPromptContractInput | undefined>(() => {
+    if (!result || !firstOption || !secondOption || !firstMatchedMicroSlice) {
+      return undefined;
+    }
+
+    return {
+      locale: lang,
+      surfaceQuestion: surfaceQuestion.trim(),
+      exactAnchors: result.exactAnchors,
+      dialogueSummary: {
+        selectedState: result.selectedState,
+        userSelectedBehavior:
+          lang === "zh" ? secondOption.labelZh : secondOption.labelEn,
+        ruminationType: result.candidateStateKey,
+        agencyPosition: "pre_draw_dialogue_prototype",
+        hiddenCost: result.anchorHints.slice(0, 3).join(", "),
+      },
+      card: mockDialogueCard,
+      microSlice: {
+        sliceId: firstMatchedMicroSlice.sliceId,
+        stateKey: firstMatchedMicroSlice.stateKey,
+        concreteLineZh: firstMatchedMicroSlice.concreteLineZh,
+        concreteLineEn: firstMatchedMicroSlice.concreteLineEn,
+        softenedVersionZh: firstMatchedMicroSlice.softenedVersionZh,
+        riskLevel: firstMatchedMicroSlice.riskLevel,
+      },
+      constraints: defaultFinalAhaConstraints,
+    };
+  }, [
+    firstMatchedMicroSlice,
+    firstOption,
+    lang,
+    result,
+    secondOption,
+    surfaceQuestion,
+  ]);
+
+  const ahaPromptContract = ahaPromptContractInput
+    ? buildAhaPromptContract(ahaPromptContractInput)
+    : undefined;
+
+  const mockAhaRawOutput = ahaSentencePreview
+    ? JSON.stringify(
+        {
+          sentence: ahaSentencePreview.sentence,
+          usedAnchors: ahaSentencePreview.usedAnchors,
+          riskLevel: ahaSentencePreview.riskLevel,
+          notes:
+            "Mock output generated from deterministic prototype for validator preview.",
+        },
+        null,
+        2,
+      )
+    : undefined;
+
+  const mockAhaValidation =
+    mockAhaRawOutput && result && firstMatchedMicroSlice
+      ? parseAndValidateAhaAiOutput(mockAhaRawOutput, {
+          locale: lang,
+          cardName: mockDialogueCard.name,
+          exactAnchors: result.exactAnchors,
+          expectedRiskLevel: firstMatchedMicroSlice.riskLevel,
+          mustIncludeUserAnchor: true,
+        })
+      : undefined;
 
   function resetChoices() {
     setFirstOptionId(undefined);
@@ -388,6 +497,91 @@ export function PreDrawDialoguePrototype({
             </section>
           )}
 
+          {ahaPromptContract && (
+            <section className="ora-surface-archive rounded-2xl p-4">
+              <div className="mb-4">
+                <p className="atelier-label text-[0.64rem] font-semibold">
+                  {ui.aiContractPreview}
+                </p>
+                <p className="mt-2 text-xs leading-5 text-[#d8c9ae]">
+                  {ui.aiContractNote}
+                </p>
+                <p className="mt-1 text-xs leading-5 text-[#b9a789]">
+                  {ui.aiContractSubtitle}
+                </p>
+              </div>
+              <div className="grid gap-3">
+                <PromptPreviewBlock
+                  label={ui.systemPrompt}
+                  value={ahaPromptContract.systemPrompt}
+                />
+                <PromptPreviewBlock
+                  label={ui.userPrompt}
+                  value={ahaPromptContract.userPrompt}
+                />
+                <PromptPreviewBlock
+                  label={ui.expectedOutputShape}
+                  value={ahaPromptContract.expectedOutputShape}
+                />
+                <PreviewRows
+                  rows={[
+                    [
+                      ui.forbiddenPatterns,
+                      `${ahaPromptContract.forbiddenPatterns.length}`,
+                    ],
+                    [
+                      ui.requiredChecks,
+                      `${ahaPromptContract.requiredChecks.length}`,
+                    ],
+                  ]}
+                />
+              </div>
+            </section>
+          )}
+
+          {mockAhaRawOutput && mockAhaValidation && (
+            <section className="ora-surface-archive rounded-2xl p-4">
+              <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <p className="atelier-label text-[0.64rem] font-semibold">
+                    {ui.mockValidationPreview}
+                  </p>
+                  <p className="mt-2 text-xs leading-5 text-[#d8c9ae]">
+                    {ui.mockValidationNote}
+                  </p>
+                </div>
+                <span
+                  className={`rounded-full border px-3 py-1 text-xs ${
+                    mockAhaValidation.ok
+                      ? "border-[#6f8f61]/50 text-[#cfe0b8]"
+                      : "border-[#a36a58]/50 text-[#e7b2a2]"
+                  }`}
+                >
+                  {mockAhaValidation.ok ? ui.ok : ui.failed}
+                </span>
+              </div>
+              <PromptPreviewBlock label={ui.rawMockJson} value={mockAhaRawOutput} />
+              <div className="mt-3">
+                <PreviewRows
+                  rows={[
+                    [
+                      ui.validationStatus,
+                      mockAhaValidation.ok ? ui.ok : ui.failed,
+                    ],
+                    [
+                      ui.errors,
+                      mockAhaValidation.errors.join(" | ") || ui.none,
+                    ],
+                    [
+                      ui.warnings,
+                      mockAhaValidation.warnings.join(" | ") || ui.none,
+                    ],
+                  ]}
+                />
+              </div>
+            </section>
+          )}
+
           <section className="ora-surface-archive rounded-2xl p-4">
             <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
               <p className="atelier-label text-[0.64rem] font-semibold">
@@ -498,6 +692,25 @@ function formatPreviewAnchors(
   return anchors
     .map((anchor) => (lang === "zh" ? `「${anchor}」` : `"${anchor}"`))
     .join(", ");
+}
+
+function PromptPreviewBlock({
+  label,
+  value,
+}: {
+  label: string;
+  value: string;
+}) {
+  return (
+    <div className="rounded-xl border border-[#6d5a35]/60 bg-[#0b0907]/64 p-3">
+      <p className="text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-[#d2b06d]">
+        {label}
+      </p>
+      <pre className="mt-2 max-h-72 overflow-auto whitespace-pre-wrap break-words text-xs leading-5 text-[#d8c9ae]">
+        {value}
+      </pre>
+    </div>
+  );
 }
 
 function PreviewRows({ rows }: { rows: Array<[string, string]> }) {

@@ -88,11 +88,12 @@ Completed or recorded milestones:
 * `P0-20F` Aha prototype copy tightening introduced in `src/lib/ora/ahaSentence.ts`
 * `P0-20G` AI Aha prompt contract introduced in `src/lib/ora/ahaPromptContract.ts`
 * `P0-20H` AI Aha output validator introduced in `src/lib/ora/ahaOutputValidator.ts`
+* `P0-20I` Aha demo AI contract preview panel introduced in `/ai-guide/dialogue-demo`
 * AI Project OS Standard docs established
 
 Latest known main branch:
 
-* `ca72eda Add AI aha prompt contract`
+* `899380f Add AI aha output validator`
 
 ## Current Product Direction Update
 
@@ -115,6 +116,8 @@ The Memory Engine direction is longitudinal reflective companionship: memory sho
 `P0-20G` added the AI Aha prompt contract for future model generation. It defines structured input, system/user prompt builders, JSON-only output expectations, forbidden patterns, required checks, and validation without calling AI or entering the formal reading flow.
 
 `P0-20H` added the AI Aha output validator for future model responses. It parses JSON, validates the expected shape, checks one-sentence and safety constraints, compares anchors and risk level, and stays outside the formal reading flow.
+
+`P0-20I` added the internal Aha demo AI contract preview panel. The dialogue demo now shows the future prompt contract, expected output shape, and mock output validator result without calling AI, consuming Stardust, or entering the formal reading flow.
 
 ## Current Visual Direction
 

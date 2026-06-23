@@ -17,6 +17,7 @@
 * Add Aha Prototype QA and Copy Tightening.
 * Add AI Aha Prompt Contract.
 * Add AI Aha Output Validator.
+* Add Aha Demo AI Contract Preview Panel.
 
 ## 2026-06-23
 

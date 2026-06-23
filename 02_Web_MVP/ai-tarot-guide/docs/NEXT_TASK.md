@@ -7,7 +7,7 @@
 
 ## Current Task
 
-`P0-20I-AHA-DEMO-AI-CONTRACT-PREVIEW-PANEL` Aha Demo AI Contract Preview Panel
+`P0-20J-AHA-DEMO-END-TO-END-QA-PACK` Aha Demo End-to-End QA Pack
 
 ## Current Main Branch Truth
 
@@ -24,10 +24,11 @@ The latest known `main` state is after:
 * `P0-20F` Aha Prototype QA and Copy Tightening
 * `P0-20G` Aha Engine Prompt Contract for AI Generation
 * `P0-20H` AI Aha Output Validator
+* `P0-20I` Aha Demo AI Contract Preview Panel
 
-Latest known main commit before P0-20H work:
+Latest known main commit before P0-20I work:
 
-* `ca72eda Add AI aha prompt contract`
+* `899380f Add AI aha output validator`
 
 Current local P0-20A commit:
 
@@ -57,6 +58,10 @@ Current local P0-20G commit:
 
 * `ca72eda Add AI aha prompt contract`
 
+Current local P0-20H commit:
+
+* `899380f Add AI aha output validator`
+
 Current stage:
 
 * Pre-launch / closed beta prep
@@ -82,21 +87,23 @@ Current product truth:
 * Aha prototype copy tightening is introduced in `src/lib/ora/ahaSentence.ts` and the dialogue demo preview.
 * AI Aha prompt contract is introduced in `src/lib/ora/ahaPromptContract.ts`.
 * AI Aha output validator is introduced in `src/lib/ora/ahaOutputValidator.ts`.
+* AI prompt contract and mock output validation previews are introduced in the internal dialogue demo.
 
 ## Recently Completed
 
-`P0-20H-AI-AHA-OUTPUT-VALIDATOR` is completed as a validator-only prototype update.
+`P0-20I-AHA-DEMO-AI-CONTRACT-PREVIEW-PANEL` is completed as a demo-only prototype update.
 
 Completed output:
 
-* Added `src/lib/ora/ahaOutputValidator.ts`.
-* Defined JSON parsing, shape validation, sentence safety checks, one-sentence checks, card mirror checks, anchor warnings, risk comparison, life-slice warnings, and sample raw outputs.
-* The validator does not call AI, APIs, storage, credits, Stardust, Supabase, or the formal reading flow.
+* Added AI Prompt Contract Preview to `src/components/ai-guide/PreDrawDialoguePrototype.tsx`.
+* Added Mock AI Output Validation preview using deterministic aha output and `parseAndValidateAhaAiOutput`.
+* The internal demo now shows Reflection Signal, matched Micro-Slice, deterministic AHA preview, prompt contract, and mock validator result together.
+* The preview does not call AI, APIs, storage, credits, Stardust, Supabase, or the formal reading flow.
 * Did not change `/ask`, `/result`, Supabase schema, payment, credits, Stardust, AI reading API, spreads, orientation, prediction behavior, page UI, main navigation, or formal page UI.
 
 ## Goal
 
-Add an internal preview panel to the dialogue demo so the prompt contract and output validator can be inspected together without calling AI or entering the formal reading flow.
+Create an end-to-end QA pack for the internal Aha demo so the deterministic chain, prompt contract preview, and mock validator can be checked consistently before any future AI generation work.
 
 The next task should build directly on:
 
@@ -107,8 +114,8 @@ The next task should build directly on:
 * `src/lib/ora/ahaSentence.ts`
 * `src/lib/ora/ahaPromptContract.ts`
 * `src/lib/ora/ahaOutputValidator.ts`
-* `src/app/ai-guide/dialogue-demo/page.tsx`
 * `src/components/ai-guide/PreDrawDialoguePrototype.tsx`
+* `src/app/ai-guide/dialogue-demo/page.tsx`
 
 ## Required Context
 
@@ -142,12 +149,12 @@ Context budget:
 
 ## Scope
 
-P0-20I should focus on:
+P0-20J should focus on:
 
-* Displaying the generated prompt contract preview in the internal dialogue demo.
-* Displaying sample validator results for future AI output.
-* Keeping the panel clearly labeled as internal/prototype-only.
-* Not calling AI and not wiring anything into the formal reading flow.
+* Documenting or scripting the default Aha demo QA path.
+* Verifying the default Chinese QA case end to end.
+* Checking that Reflection Signal validation, deterministic AHA preview, AI prompt contract preview, and mock output validation remain coherent together.
+* Keeping the route internal and prototype-only.
 
 ## Out Of Scope
 
@@ -187,10 +194,11 @@ The next task must not break the existing reading flow:
 
 ## Done Means
 
-For P0-20I:
+For P0-20J:
 
-* A demo-only AI contract/validator preview panel is introduced in the smallest useful scope.
-* Output rules remain concrete, one-sentence, JSON-compatible, and free of predictive claims.
+* A compact QA pack exists for the internal dialogue demo.
+* The default QA case is documented and/or verified.
+* The Aha demo chain remains concrete, one-sentence, JSON-compatible, and free of predictive claims.
 * AI Project OS docs are updated if current project truth changes.
 * `node scripts/check-ai-docs.mjs` passes.
 * `npm.cmd run build` passes if source files are changed.
