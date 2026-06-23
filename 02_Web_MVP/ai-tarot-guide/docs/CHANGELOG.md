@@ -15,6 +15,7 @@
 * Add Pre-Draw Dialogue Prototype.
 * Add Single Aha Sentence Generator Prototype.
 * Add Aha Prototype QA and Copy Tightening.
+* Add AI Aha Prompt Contract.
 
 ## 2026-06-23
 

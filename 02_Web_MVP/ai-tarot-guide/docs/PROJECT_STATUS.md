@@ -86,11 +86,12 @@ Completed or recorded milestones:
 * `P0-20D` Pre-draw dialogue prototype introduced at `/ai-guide/dialogue-demo`
 * `P0-20E` Single Aha sentence generator prototype introduced in `src/lib/ora/ahaSentence.ts`
 * `P0-20F` Aha prototype copy tightening introduced in `src/lib/ora/ahaSentence.ts`
+* `P0-20G` AI Aha prompt contract introduced in `src/lib/ora/ahaPromptContract.ts`
 * AI Project OS Standard docs established
 
 Latest known main branch:
 
-* `c87e5ca Add aha sentence generator prototype`
+* `e22bda7 Tighten aha sentence prototype copy`
 
 ## Current Product Direction Update
 
@@ -109,6 +110,8 @@ The Memory Engine direction is longitudinal reflective companionship: memory sho
 `P0-20E` added a deterministic single Aha sentence generator prototype. It combines a matched Micro-Slice and card-as-mirror symbolic lens into one concrete, non-predictive sentence inside the internal dialogue demo only.
 
 `P0-20F` tightened the deterministic Aha sentence prototype copy. It prefers short concrete user anchors, bridges them into the sentence naturally, and keeps surveillance-feeling or predictive phrases out of the preview.
+
+`P0-20G` added the AI Aha prompt contract for future model generation. It defines structured input, system/user prompt builders, JSON-only output expectations, forbidden patterns, required checks, and validation without calling AI or entering the formal reading flow.
 
 ## Current Visual Direction
 

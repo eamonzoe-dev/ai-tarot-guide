@@ -7,7 +7,7 @@
 
 ## Current Task
 
-`P0-20G-AHA-ENGINE-PROMPT-CONTRACT-FOR-AI-GENERATION` Aha Engine Prompt Contract for AI Generation
+`P0-20H-AI-AHA-OUTPUT-VALIDATOR` AI Aha Output Validator
 
 ## Current Main Branch Truth
 
@@ -22,10 +22,11 @@ The latest known `main` state is after:
 * `P0-20D` Pre-Draw Dialogue Prototype
 * `P0-20E` Single Aha Sentence Generator Prototype
 * `P0-20F` Aha Prototype QA and Copy Tightening
+* `P0-20G` Aha Engine Prompt Contract for AI Generation
 
-Latest known main commit before P0-20F work:
+Latest known main commit before P0-20G work:
 
-* `c87e5ca Add aha sentence generator prototype`
+* `e22bda7 Tighten aha sentence prototype copy`
 
 Current local P0-20A commit:
 
@@ -46,6 +47,10 @@ Current local P0-20D commit:
 Current local P0-20E commit:
 
 * `c87e5ca Add aha sentence generator prototype`
+
+Current local P0-20F commit:
+
+* `e22bda7 Tighten aha sentence prototype copy`
 
 Current stage:
 
@@ -70,23 +75,23 @@ Current product truth:
 * Pre-draw dialogue prototype route is introduced at `/ai-guide/dialogue-demo`.
 * Single Aha sentence generator prototype is introduced in `src/lib/ora/ahaSentence.ts` and previewed in the dialogue demo.
 * Aha prototype copy tightening is introduced in `src/lib/ora/ahaSentence.ts` and the dialogue demo preview.
+* AI Aha prompt contract is introduced in `src/lib/ora/ahaPromptContract.ts`.
 
 ## Recently Completed
 
-`P0-20F-AHA-PROTOTYPE-QA-AND-COPY-TIGHTENING` is completed as an internal prototype update.
+`P0-20G-AHA-ENGINE-PROMPT-CONTRACT-FOR-AI-GENERATION` is completed as a contract-only prototype update.
 
 Completed output:
 
-* Tightened `src/lib/ora/ahaSentence.ts` anchor selection so short, concrete user anchors are preferred over broad terms.
-* Added anchor bridge sentence patterns so AHA SENTENCE PREVIEW can naturally include the user's words.
-* Expanded copy validation for surveillance-feeling memory phrases.
-* Updated `src/components/ai-guide/PreDrawDialoguePrototype.tsx` to display used anchors with quote styling and warnings as `None` when empty.
-* The dialogue demo still stops before draw and does not call AI, APIs, storage, credits, Stardust, Supabase, or the formal reading flow.
-* Did not change `/ask`, `/result`, Supabase schema, payment, credits, Stardust, AI reading charge logic, spreads, orientation, prediction behavior, main navigation, or formal page UI.
+* Added `src/lib/ora/ahaPromptContract.ts`.
+* Defined typed input, system prompt builder, user prompt builder, expected JSON output shape, forbidden patterns, required output checks, validation, and sample fixture.
+* Updated `docs/ORA_AHA_MEMORY_ENGINE_SPEC.md` with AI Aha Prompt Contract boundaries.
+* The contract does not call AI, APIs, storage, credits, Stardust, Supabase, or the formal reading flow.
+* Did not change `/ask`, `/result`, Supabase schema, payment, credits, Stardust, AI reading API, spreads, orientation, prediction behavior, page UI, main navigation, or formal page UI.
 
 ## Goal
 
-Define the prompt contract for a future AI-generated Aha sentence so the deterministic prototype rules can become a safe model-facing interface without wiring AI into the formal reading flow yet.
+Add a validator for future AI Aha JSON output so model-generated sentences can be checked before any display or future integration.
 
 The next task should build directly on:
 
@@ -95,6 +100,7 @@ The next task should build directly on:
 * `src/lib/ora/microSliceBank.ts`
 * `src/lib/ora/preDrawDialogue.ts`
 * `src/lib/ora/ahaSentence.ts`
+* `src/lib/ora/ahaPromptContract.ts`
 * `src/app/ai-guide/dialogue-demo/page.tsx`
 * `src/components/ai-guide/PreDrawDialoguePrototype.tsx`
 
@@ -115,6 +121,7 @@ Always read:
 * `src/lib/ora/microSliceBank.ts`
 * `src/lib/ora/preDrawDialogue.ts`
 * `src/lib/ora/ahaSentence.ts`
+* `src/lib/ora/ahaPromptContract.ts`
 
 Do not read:
 
@@ -128,12 +135,12 @@ Context budget:
 
 ## Scope
 
-P0-20G should focus on:
+P0-20H should focus on:
 
-* A typed prompt/input-output contract for future AI generation.
-* Explicit guardrails for reflection-not-prediction, card-as-mirror, and user-anchor use.
-* Clear validation expectations for one-sentence Aha output.
-* Keeping the contract prototype-only and not wired into the formal reading flow.
+* Parsing or validating the future AI Aha JSON output shape.
+* Reusing forbidden patterns and required checks from the prompt contract where useful.
+* Confirming one-sentence, card-as-mirror, anchor, risk, and no-prediction rules.
+* Keeping the validator prototype-only and not wired into the formal reading flow.
 
 ## Out Of Scope
 
@@ -173,10 +180,10 @@ The next task must not break the existing reading flow:
 
 ## Done Means
 
-For P0-20G:
+For P0-20H:
 
-* Aha Engine prompt contract docs or types are introduced in the smallest useful scope.
-* Output rules remain concrete, one-sentence where applicable, and free of predictive claims.
+* AI Aha output validator docs or types are introduced in the smallest useful scope.
+* Output rules remain concrete, one-sentence, JSON-compatible, and free of predictive claims.
 * AI Project OS docs are updated if current project truth changes.
 * `node scripts/check-ai-docs.mjs` passes.
 * `npm.cmd run build` passes if source files are changed.

@@ -424,3 +424,26 @@ Implementation constraints for follow-up work:
 * Do not add additional spreads beyond current single-card and online three-card scope.
 * Do not introduce prediction copy.
 * Do not turn memory into a visible surveillance log.
+
+## 15. AI Aha Prompt Contract
+
+The deterministic Aha sentence generator is the current prototype layer. It is useful for testing the product shape, anchor handling, and copy guardrails without calling AI.
+
+Future AI generation must run only under a prompt contract. The contract is defined in `src/lib/ora/ahaPromptContract.ts` and should be treated as the boundary between Reflection Signal data and any model-generated Aha sentence.
+
+Contract principles:
+
+* The AI generator must receive structured input: Reflection Signal summary, exact anchors, matched Micro-Slice, drawn card symbolic lens, and final Aha constraints.
+* The AI must not freely improvise beyond those inputs.
+* The tarot card must be used as a mirror, not as evidence.
+* The output must stay descriptive and concrete: one lived moment, behavior, time texture, or private contradiction.
+* The AI must not predict future events.
+* The AI must not claim external facts or hidden knowledge.
+* The AI must not judge what another person thinks, feels, or will do.
+* The AI must not give advice, diagnose the user, or turn the line into abstract reassurance.
+* The output must be JSON-only.
+* The expected output shape is `sentence`, `usedAnchors`, `riskLevel`, and `notes`.
+* The output must still pass a validator before it can be displayed.
+* If no suitable exact anchor is used, `notes` must explain why.
+
+This contract is not connected to the formal reading flow yet. Any future AI Aha generation must be approved separately before it can call an API, consume Stardust, affect `/ask`, affect `/result`, or appear in the production reading experience.
