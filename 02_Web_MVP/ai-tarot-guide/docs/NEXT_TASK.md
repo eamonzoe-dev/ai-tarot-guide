@@ -7,7 +7,7 @@
 
 ## Current Task
 
-`P0-20N-CLOSED-BETA-FEEDBACK-TABLE-FEISHU-TEMPLATE` Closed Beta Feedback Table / Feishu Template
+`P0-20O-MANUAL-CLOSED-BETA-FEEDBACK-RUNBOOK` Manual Closed Beta Feedback Runbook
 
 ## Current Main Branch Truth
 
@@ -29,6 +29,7 @@ The latest known `main` state is after:
 * `P0-20K` Aha Demo Multi-Scenario QA Fixes
 * `P0-20L` Aha Demo Product Review and Integration Decision
 * `P0-20M` Closed Beta Aha Demo Test Script
+* `P0-20N` Closed Beta Feedback Table / Feishu Template
 
 Latest known main commit before P0-20J work:
 
@@ -80,7 +81,11 @@ Current local P0-20L commit:
 
 Current local P0-20M commit:
 
-* `Add aha demo closed beta test script` (see closeout output for hash)
+* `d2eaabc Add aha demo closed beta test script`
+
+Current local P0-20N commit:
+
+* `Add aha demo feedback table template` (see closeout output for hash)
 
 Current stage:
 
@@ -112,8 +117,17 @@ Current product truth:
 * Aha demo multi-scenario QA fixes are recorded in `docs/AHA_DEMO_QA_PACK.md` section 16.
 * Aha Engine product review and integration options are introduced in `docs/AHA_ENGINE_PRODUCT_REVIEW.md`.
 * Aha demo closed beta test script is introduced in `docs/AHA_DEMO_CLOSED_BETA_TEST_SCRIPT.md`.
+* Aha demo feedback table / Feishu template is introduced in `docs/AHA_DEMO_FEEDBACK_TABLE_TEMPLATE.md`.
 
 ## Recently Completed
+
+`P0-20N-CLOSED-BETA-FEEDBACK-TABLE-FEISHU-TEMPLATE` is completed as a docs-only data structure template.
+
+Completed output:
+
+* Added `docs/AHA_DEMO_FEEDBACK_TABLE_TEMPLATE.md` covering purpose, data collection principles, recommended table name and views, full field schema with types/required flags/notes, score definitions, derived metrics, Feishu view suggestions, manual entry instructions, feedback interpretation rules, decision thresholds, 3 de-identified example rows, and a recommended next task.
+* Did not call the Feishu API or any external service; this task only produces a manual table structure.
+* Did not change `src/`, page UI, `/ask`, `/result`, Supabase schema, payment, credits, Stardust, AI reading API, spreads, orientation, prediction behavior, or main navigation.
 
 `P0-20M-CLOSED-BETA-AHA-DEMO-TEST-SCRIPT` is completed as a docs-only test procedure.
 
@@ -147,10 +161,11 @@ Completed output:
 
 ## Goal
 
-Prepare a feedback collection table / Feishu template that matches the Data Capture Template in `docs/AHA_DEMO_CLOSED_BETA_TEST_SCRIPT.md` section 14, so real closed-beta test results have a consistent place to land before any integration decision is made.
+Write the runbook for actually running the closed-beta test: who is responsible, how to start the local demo, how to record results into `docs/AHA_DEMO_FEEDBACK_TABLE_TEMPLATE.md`, and how to debrief afterward.
 
 The next task should build directly on:
 
+* `docs/AHA_DEMO_FEEDBACK_TABLE_TEMPLATE.md`
 * `docs/AHA_DEMO_CLOSED_BETA_TEST_SCRIPT.md`
 * `docs/AHA_ENGINE_PRODUCT_REVIEW.md`
 * `docs/AHA_DEMO_QA_PACK.md`
@@ -196,10 +211,11 @@ Context budget:
 
 ## Scope
 
-P0-20N should focus on:
+P0-20O should focus on:
 
-* Producing a feedback table / Feishu template matching the field list in `docs/AHA_DEMO_CLOSED_BETA_TEST_SCRIPT.md` section 14.
-* Keeping the template docs-only and prototype-only; this task does not run the test itself or change integration status.
+* Writing a manual runbook for actually executing the closed-beta test sessions described in `docs/AHA_DEMO_CLOSED_BETA_TEST_SCRIPT.md`.
+* Assigning roles, local environment setup steps, recording instructions into `docs/AHA_DEMO_FEEDBACK_TABLE_TEMPLATE.md`, and a debrief procedure.
+* Keeping the runbook docs-only and prototype-only; this task does not run the actual test sessions or change integration status.
 
 ## Out Of Scope
 
@@ -239,9 +255,9 @@ The next task must not break the existing reading flow:
 
 ## Done Means
 
-For P0-20N:
+For P0-20O:
 
-* A repeatable feedback collection table / Feishu template exists, matching the closed-beta test script's data capture fields.
+* A repeatable manual runbook exists for executing closed-beta test sessions and recording results into the feedback table template.
 * The Aha demo chain remains concrete, one-sentence, JSON-compatible, and free of predictive claims.
 * AI Project OS docs are updated if current project truth changes.
 * `node scripts/check-ai-docs.mjs` passes.

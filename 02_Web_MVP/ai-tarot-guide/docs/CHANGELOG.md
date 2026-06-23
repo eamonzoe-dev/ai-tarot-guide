@@ -28,6 +28,7 @@
 
 * Add Aha Engine product review with integration options and a recommended closed-beta test script next task.
 * Add Aha demo closed beta test script with moderator script, feedback form, scoring rubric, and data capture template.
+* Add Aha demo feedback table / Feishu template with field schema, score definitions, derived metrics, and decision thresholds.
 
 ## 2026-06-23
 

@@ -93,6 +93,7 @@ Completed or recorded milestones:
 * `P0-20K` Aha demo multi-scenario QA fixes recorded in `docs/AHA_DEMO_QA_PACK.md` section 16
 * `P0-20L` Aha Engine product review introduced in `docs/AHA_ENGINE_PRODUCT_REVIEW.md`
 * `P0-20M` Closed beta Aha demo test script introduced in `docs/AHA_DEMO_CLOSED_BETA_TEST_SCRIPT.md`
+* `P0-20N` Closed beta feedback table / Feishu template introduced in `docs/AHA_DEMO_FEEDBACK_TABLE_TEMPLATE.md`
 * AI Project OS Standard docs established
 
 Latest known main branch:
@@ -130,6 +131,8 @@ The Memory Engine direction is longitudinal reflective companionship: memory sho
 `P0-20L` reviewed the Aha Engine V2 prototype as a product decision rather than a QA pass. `docs/AHA_ENGINE_PRODUCT_REVIEW.md` records what has been built, current strengths and risks, 4 integration options ranging from "do not integrate yet" to "full Aha Engine in result page," and recommends starting with a lightweight optional pre-draw refinement or reveal interstitial rather than a full result-page integration. The review does not authorize any integration; it recommends a closed-beta test script (`P0-20M`) as the next step. No `src/` or page UI was changed.
 
 `P0-20M` produced `docs/AHA_DEMO_CLOSED_BETA_TEST_SCRIPT.md`, a procedure for running 5 real human testers through `/ai-guide/dialogue-demo`, with a moderator script, 4 required test cases, an observation checklist, a scaled/open feedback form, a scoring rubric, a decision matrix, a data capture template, and explicit safety/privacy rules. This task did not run any real tests; it only produced the procedure and forms. No `src/` or page UI was changed.
+
+`P0-20N` produced `docs/AHA_DEMO_FEEDBACK_TABLE_TEMPLATE.md`, a manual data table structure (usable in Feishu, Google Sheets, or Airtable) for recording closed-beta feedback: full field schema with types/required flags, score definitions, derived metrics, recommended Feishu views, manual entry instructions, feedback interpretation rules, decision thresholds, and de-identified example rows. This task did not call the Feishu API and did not run any real tests. No `src/` or page UI was changed.
 
 ## Current Visual Direction
 
