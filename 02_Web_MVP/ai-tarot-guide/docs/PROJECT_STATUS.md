@@ -94,6 +94,7 @@ Completed or recorded milestones:
 * `P0-20L` Aha Engine product review introduced in `docs/AHA_ENGINE_PRODUCT_REVIEW.md`
 * `P0-20M` Closed beta Aha demo test script introduced in `docs/AHA_DEMO_CLOSED_BETA_TEST_SCRIPT.md`
 * `P0-20N` Closed beta feedback table / Feishu template introduced in `docs/AHA_DEMO_FEEDBACK_TABLE_TEMPLATE.md`
+* `P0-21A` Lightweight pre-draw lens design introduced in `docs/PRE_DRAW_LENS_DESIGN.md`
 * AI Project OS Standard docs established
 
 Latest known main branch:
@@ -133,6 +134,8 @@ The Memory Engine direction is longitudinal reflective companionship: memory sho
 `P0-20M` produced `docs/AHA_DEMO_CLOSED_BETA_TEST_SCRIPT.md`, a procedure for running 5 real human testers through `/ai-guide/dialogue-demo`, with a moderator script, 4 required test cases, an observation checklist, a scaled/open feedback form, a scoring rubric, a decision matrix, a data capture template, and explicit safety/privacy rules. This task did not run any real tests; it only produced the procedure and forms. No `src/` or page UI was changed.
 
 `P0-20N` produced `docs/AHA_DEMO_FEEDBACK_TABLE_TEMPLATE.md`, a manual data table structure (usable in Feishu, Google Sheets, or Airtable) for recording closed-beta feedback: full field schema with types/required flags, score definitions, derived metrics, recommended Feishu views, manual entry instructions, feedback interpretation rules, decision thresholds, and de-identified example rows. This task did not call the Feishu API and did not run any real tests. No `src/` or page UI was changed.
+
+`P0-21A` is a product pivot following self-testing of the `P0-20` Aha Demo prototype. The two-round pre-draw dialogue and the AI-generated aha sentence are **not recommended for the formal reading flow at this time**: self-testing found the two rounds of selection felt like a hassle, the aha sentence did not feel specific enough to justify itself, and it carried a slight surveillance feeling. `docs/PRE_DRAW_LENS_DESIGN.md` proposes a much lighter replacement for the pre-draw moment: a single optional, skippable, one-screen lens that lets the user choose which angle of their question to focus on, with no inference, no concrete-life-slice sentence, and no AI call. The recommended next step is `P0-21B Lightweight Lens Internal Prototype`, an isolated prototype not connected to the formal flow. No `src/` or page UI was changed for `P0-21A`.
 
 ## Current Visual Direction
 

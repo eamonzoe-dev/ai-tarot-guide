@@ -7,7 +7,9 @@
 
 ## Current Task
 
-`P0-20O-MANUAL-CLOSED-BETA-FEEDBACK-RUNBOOK` Manual Closed Beta Feedback Runbook
+`P0-21B-LIGHTWEIGHT-LENS-INTERNAL-PROTOTYPE` Lightweight Lens Internal Prototype
+
+`P0-20O Manual Closed Beta Feedback Runbook` is paused. After self-testing the `P0-20` Aha Demo prototype, the user decided not to continue the heavier closed-beta runbook process and instead pivoted directly to a lighter pre-draw experience. See `P0-21A` below.
 
 ## Current Main Branch Truth
 
@@ -30,6 +32,7 @@ The latest known `main` state is after:
 * `P0-20L` Aha Demo Product Review and Integration Decision
 * `P0-20M` Closed Beta Aha Demo Test Script
 * `P0-20N` Closed Beta Feedback Table / Feishu Template
+* `P0-21A` Lightweight Pre-Draw Lens Design
 
 Latest known main commit before P0-20J work:
 
@@ -85,7 +88,11 @@ Current local P0-20M commit:
 
 Current local P0-20N commit:
 
-* `Add aha demo feedback table template` (see closeout output for hash)
+* `2f276f1 Add aha demo feedback table template`
+
+Current local P0-21A commit:
+
+* `Add lightweight pre-draw lens design` (see closeout output for hash)
 
 Current stage:
 
@@ -118,8 +125,17 @@ Current product truth:
 * Aha Engine product review and integration options are introduced in `docs/AHA_ENGINE_PRODUCT_REVIEW.md`.
 * Aha demo closed beta test script is introduced in `docs/AHA_DEMO_CLOSED_BETA_TEST_SCRIPT.md`.
 * Aha demo feedback table / Feishu template is introduced in `docs/AHA_DEMO_FEEDBACK_TABLE_TEMPLATE.md`.
+* Aha Engine V2's two-round pre-draw dialogue and aha sentence are not recommended for the formal reading flow after self-testing; a lightweight pre-draw lens design is introduced instead in `docs/PRE_DRAW_LENS_DESIGN.md`.
 
 ## Recently Completed
+
+`P0-21A-LIGHTWEIGHT-PRE-DRAW-LENS-DESIGN` is completed as a docs-only design document.
+
+Completed output:
+
+* Added `docs/PRE_DRAW_LENS_DESIGN.md` covering the product decision to pause the `P0-20` two-round Aha dialogue for the formal flow, the self-test reasons why, the new lightweight-lens hypothesis, UX principles, a proposed `prepare -> ask -> lens -> draw -> reveal -> result` flow, Chinese/English lens option copy, a URL-parameter data model candidate, a result-page usage candidate, visual direction, risks, success criteria, implementation options, a recommended decision, guardrails, and a recommended next task.
+* Recorded that `P0-20O Manual Closed Beta Feedback Runbook` is paused because the user pivoted directly to a lighter pre-draw design after self-testing the Aha Demo prototype.
+* Did not change `src/`, page UI, `/ask`, `/result`, Supabase schema, payment, credits, Stardust, AI reading API, spreads, orientation, prediction behavior, or main navigation.
 
 `P0-20N-CLOSED-BETA-FEEDBACK-TABLE-FEISHU-TEMPLATE` is completed as a docs-only data structure template.
 
@@ -161,23 +177,16 @@ Completed output:
 
 ## Goal
 
-Write the runbook for actually running the closed-beta test: who is responsible, how to start the local demo, how to record results into `docs/AHA_DEMO_FEEDBACK_TABLE_TEMPLATE.md`, and how to debrief afterward.
+Build an isolated internal prototype for the Lightweight Pre-Draw Lens described in `docs/PRE_DRAW_LENS_DESIGN.md`: a single, skippable, one-screen lens selection step, not connected to the formal reading flow, to validate that it feels significantly lighter than the paused `P0-20` two-round dialogue.
 
 The next task should build directly on:
 
-* `docs/AHA_DEMO_FEEDBACK_TABLE_TEMPLATE.md`
-* `docs/AHA_DEMO_CLOSED_BETA_TEST_SCRIPT.md`
+* `docs/PRE_DRAW_LENS_DESIGN.md`
 * `docs/AHA_ENGINE_PRODUCT_REVIEW.md`
 * `docs/AHA_DEMO_QA_PACK.md`
+* `docs/AHA_DEMO_CLOSED_BETA_TEST_SCRIPT.md`
+* `docs/AHA_DEMO_FEEDBACK_TABLE_TEMPLATE.md`
 * `docs/ORA_AHA_MEMORY_ENGINE_SPEC.md`
-* `src/lib/ora/reflectionSignal.ts`
-* `src/lib/ora/microSliceBank.ts`
-* `src/lib/ora/preDrawDialogue.ts`
-* `src/lib/ora/ahaSentence.ts`
-* `src/lib/ora/ahaPromptContract.ts`
-* `src/lib/ora/ahaOutputValidator.ts`
-* `src/components/ai-guide/PreDrawDialoguePrototype.tsx`
-* `src/app/ai-guide/dialogue-demo/page.tsx`
 
 ## Required Context
 
@@ -211,11 +220,11 @@ Context budget:
 
 ## Scope
 
-P0-20O should focus on:
+P0-21B should focus on:
 
-* Writing a manual runbook for actually executing the closed-beta test sessions described in `docs/AHA_DEMO_CLOSED_BETA_TEST_SCRIPT.md`.
-* Assigning roles, local environment setup steps, recording instructions into `docs/AHA_DEMO_FEEDBACK_TABLE_TEMPLATE.md`, and a debrief procedure.
-* Keeping the runbook docs-only and prototype-only; this task does not run the actual test sessions or change integration status.
+* Building an internal-only prototype route (e.g. `/ai-guide/lens-demo`) or isolated component for the one-screen lens described in `docs/PRE_DRAW_LENS_DESIGN.md`.
+* Implementing the skip-by-default, optional `lens` selection with the Chinese/English candidate copy from that design doc.
+* Keeping the prototype isolated from `/ask`, `/draw`, `/reveal`, `/result`, main navigation, AI calls, Stardust, and Supabase.
 
 ## Out Of Scope
 
@@ -255,10 +264,10 @@ The next task must not break the existing reading flow:
 
 ## Done Means
 
-For P0-20O:
+For P0-21B:
 
-* A repeatable manual runbook exists for executing closed-beta test sessions and recording results into the feedback table template.
-* The Aha demo chain remains concrete, one-sentence, JSON-compatible, and free of predictive claims.
+* An isolated internal prototype exists for the one-screen lens, not wired into the formal reading flow.
+* The lens step is skippable, makes no AI call, consumes no Stardust/credits, and saves no memory.
 * AI Project OS docs are updated if current project truth changes.
 * `node scripts/check-ai-docs.mjs` passes.
 * `npm.cmd run build` passes if source files are changed.
