@@ -1,9 +1,32 @@
 # Changelog
 
 - Status: Active
-- Last updated: 2026-06-20
+- Last updated: 2026-06-23
 - Owner: eamonzoe
 - Source priority: Completed work history. Read after higher-priority current-state docs.
+
+## 2026-06-23
+
+### Synced
+
+* Completed `P0-19A Main Branch Truth Sync` as a documentation-only update.
+* Synced current docs with latest known main branch commit `aebcba4 Add paid follow-up Stardust charge`.
+* Updated project truth from single-card-only wording to current single-card plus online three-card support.
+* Updated current account language from Reading Credits-only wording to Stardust with legacy credit compatibility.
+* Recorded current charge model: `1` legacy Reading Credit = `100` Stardust, main AI reading uses `100` Stardust, and paid follow-up uses `20` Stardust.
+* Updated next-task handoff away from completed `P1-AI-GIT-WORKFLOW-POLICY`.
+
+### Recorded Main Branch Milestones
+
+* `P0-17C`: Added current three-card spread flow.
+* `P0-17D`: Added AI reading support for three-card spread.
+* `P0-18E`: Added paid follow-up Stardust charge.
+
+### Not Changed
+
+* Application source code was not modified.
+* Supabase migrations were not modified.
+* API behavior, UI behavior, and package configuration were not modified.
 
 ## 2026-06-20
 

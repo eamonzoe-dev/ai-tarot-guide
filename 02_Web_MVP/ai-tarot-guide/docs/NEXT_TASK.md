@@ -1,19 +1,49 @@
 # Next Task
 
 - Status: Active
-- Last updated: 2026-06-20
+- Last updated: 2026-06-23
 - Owner: eamonzoe
 - Source priority: Highest priority current task file.
 
 ## Current Task
 
-`P1-AI-GIT-WORKFLOW-POLICY` Git Workflow Policy
+`P0-19B-CLOSED-BETA-QA-PREP` Closed beta QA prep after main-branch truth sync
+
+## Current Main Branch Truth
+
+The latest known `main` state is after:
+
+* `P0-17C` Three-card spread flow
+* `P0-17D` AI reading support for three-card spread
+* `P0-18E` Paid follow-up Stardust charge
+
+Latest known main commit at the time of this sync:
+
+* `aebcba4 Add paid follow-up Stardust charge`
+
+Current stage:
+
+* Pre-launch / closed beta prep
+* Not public launch
+* Protected production/Vercel deployment is reported successful on latest main
+
+Current product truth:
+
+* Single-card spread is supported.
+* Three-card spread is supported for online readings.
+* Upright-only remains active.
+* Reversals are still out of scope.
+* Stardust is the current account balance unit and remains compatible with legacy Reading Credits semantics.
+* `1` legacy Reading Credit = `100` Stardust.
+* Main AI reading consumes `100` Stardust through the legacy credit/RPC path.
+* Paid AI follow-up consumes `20` Stardust.
+* Activation Code, Reading Account, Reading Journal, AI Reading, and paid follow-up are all part of the current system.
 
 ## Goal
 
-Update the AI Project OS workflow so Codex does not push to `origin/main` by default.
+Prepare the next closed beta QA pass against the current main branch truth.
 
-Codex should normally modify files, run checks, create a local commit, and then stop. The user performs the final `git push` unless they explicitly approve Codex to push.
+The next agent should verify the current reading system end to end without changing product behavior unless a concrete bug is found and approved for implementation.
 
 ## Required Context
 
@@ -22,57 +52,75 @@ Always read:
 * `AGENTS.md`
 * `00_START_HERE.md`
 * `docs/NEXT_TASK.md`
-* `templates/NEXT_TASK.template.md`
+* `docs/PROJECT_STATUS.md`
+* `docs/CORE_BEHAVIOR_SPEC.md`
+* `docs/DECISIONS.md`
 * `docs/CHANGELOG.md`
+
+For external-service verification, also read:
+
+* `docs/EXTERNAL_SERVICES.md`
+* `docs/ENVIRONMENT.md`
 
 Do not read:
 
-* `docs/archive/`
-* all docs
-* unrelated QA reports or historical logs
-* external service docs
+* the full `docs/archive/` directory
+* unrelated historical QA reports
+* unrelated planning notes
 
 Context budget:
 
-* Lite
+* Standard
 
 ## Scope
 
-* Add Git workflow policy to `AGENTS.md`.
-* Add Git Closeout guidance to `templates/NEXT_TASK.template.md`.
-* Update this file if appropriate.
-* Record the documentation-only change in `docs/CHANGELOG.md`.
+Closed beta QA should focus on:
+
+* Physical single-card flow
+* Online single-card flow
+* Online three-card flow
+* URL-first result recovery and localStorage fallback
+* `lang=en|zh` URL-first language behavior
+* Reading Account sign-in state
+* Activation Code redeem behavior
+* Stardust balance display and compatibility with legacy credits
+* Main AI reading charge behavior
+* Paid follow-up charge behavior
+* Reading Journal save and display behavior
+* Mobile Safari and mobile Chrome ask-form reliability
 
 ## Out Of Scope
 
-* Application source code changes
-* Supabase schema changes
-* External service setting changes
-* Secret recording
-* Pushing to `origin/main` unless explicitly approved
+Do not pull these into the next task unless explicitly requested:
+
+* Public launch
+* Search indexing changes
+* Stripe payments
+* Real Google login
+* Real Apple login
+* Reversed cards
+* Additional spreads beyond current single-card and online three-card
+* Major visual redesign
+* Supabase schema changes without explicit approval
 
 ## Constraints
 
-* Do not read all docs.
-* Do not read `docs/archive/`.
-* Do not modify app code for this documentation-only task.
+* `/ai-guide/ask` must remain a native HTML GET form.
+* `/ai-guide/result` must remain URL-first.
+* `lang=en|zh` must remain URL-first.
+* Current readings remain upright-only.
+* Three-card support does not imply reversed-card support.
+* Do not modify app code for documentation-only work.
 * Codex must not push unless the user explicitly approves it.
-
-## Git Closeout
-
-Default:
-
-* Run checks.
-* Create a local commit.
-* Do not push unless explicitly approved.
-* Ask user to run `git push` after reporting the commit hash.
 
 ## Done Means
 
-* `AGENTS.md` includes Git Workflow Policy.
-* `templates/NEXT_TASK.template.md` includes Git Closeout guidance.
-* `docs/NEXT_TASK.md` reflects `P1-AI-GIT-WORKFLOW-POLICY`.
-* `docs/CHANGELOG.md` records the documentation-only policy update.
-* AI Project OS docs check passes.
-* A local commit is created.
+For a QA/audit pass:
+
+* Findings are separated into P0 blockers, P1 follow-ups, and P2 polish.
+* Route and file references are included.
+* Any implementation work is explicitly scoped and verified.
+* AI Project OS docs are updated if current project truth changes.
+* `node scripts/check-ai-docs.mjs` passes after doc changes.
+* A local commit is created only after checks pass.
 * No push is performed unless explicitly approved.

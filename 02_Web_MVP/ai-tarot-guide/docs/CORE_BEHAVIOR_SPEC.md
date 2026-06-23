@@ -1,7 +1,7 @@
 # CORE_BEHAVIOR_SPEC
 
 - Status: Current
-- Last updated: 2026-06-20
+- Last updated: 2026-06-23
 - Owner: AI Project OS
 - Source priority: High
 
@@ -9,7 +9,7 @@
 
 This document defines the expected behavior of Ora Arcana / AI Tarot Guide core product flows.
 
-Future AI agents should use it before changing route flow, auth, credits, deck code redemption, Reading Journal, AI-reading behavior, language handling, or tarot card behavior.
+Future AI agents should use it before changing route flow, auth, Stardust / legacy credit compatibility, deck code redemption, Reading Journal, AI-reading behavior, paid follow-up behavior, language handling, or tarot card behavior.
 
 This is a current behavior spec, not a history essay. If a behavior is not confirmed by the current docs or inspected source files, it is marked `Verification needed.`
 
@@ -69,14 +69,16 @@ Required query params:
 What must not change:
 
 * Must preserve separate physical and online entry paths.
-* Physical entry should lead to `/ai-guide/prepare` with `mode=physical`, `spread=single`, and `orientation=upright`.
-* Online entry should lead to `/ai-guide/prepare` with `mode=online`, `spread=single`, and `orientation=upright`.
+* Physical single-card entry should lead to `/ai-guide/prepare` with `mode=physical`, `spread=single`, and `orientation=upright`.
+* Online single-card entry should lead to `/ai-guide/prepare` with `mode=online`, `spread=single`, and `orientation=upright`.
+* Online three-card entry should lead to `/ai-guide/prepare` with `mode=online`, `spread=three-card`, and `orientation=upright`.
 * Reading Journal remains reachable from the reading room.
 
 Expected handoff:
 
 * Physical: `/ai-guide/prepare?mode=physical&spread=single&orientation=upright&lang=<lang>`
 * Online: `/ai-guide/prepare?mode=online&spread=single&orientation=upright&lang=<lang>`
+* Online three-card: `/ai-guide/prepare?mode=online&spread=three-card&orientation=upright&lang=<lang>`
 * Journal: `/ai-guide/readings?lang=<lang>`
 
 ### `/ai-guide/prepare`
@@ -89,7 +91,7 @@ Purpose:
 Required query params:
 
 * `mode=physical|online`
-* `spread=single`
+* `spread=single|three-card`
 * `orientation=upright`
 * Optional `lang=en|zh`
 * Optional `step=breath|settle|ready`
@@ -97,13 +99,14 @@ Required query params:
 What must not change:
 
 * Must preserve `mode`, `spread`, `orientation`, and `lang` through the ritual.
-* Must normalize unsupported spread/orientation values back to `single` and `upright`.
+* Must normalize unsupported spread values back to `single`; `three-card` is supported.
+* Must normalize unsupported orientation values back to `upright`.
 * Must preserve the split between physical and online copy at the final prepare step.
 
 Expected handoff:
 
 * If not ready: next `/ai-guide/prepare` step.
-* If ready: `/ai-guide/ask?mode=<mode>&spread=single&orientation=upright&lang=<lang>`
+* If ready: `/ai-guide/ask?mode=<mode>&spread=<spread>&orientation=upright&lang=<lang>`
 
 ### `/ai-guide/ask`
 
@@ -114,7 +117,7 @@ Purpose:
 Required query params:
 
 * `mode=physical|online`
-* `spread=single`
+* `spread=single|three-card`
 * `orientation=upright`
 * Optional `lang=en|zh`
 
@@ -129,7 +132,7 @@ What must not change:
 
 Expected handoff:
 
-* `/ai-guide/draw?mode=<mode>&spread=single&orientation=upright&lang=<lang>&question=<question>`
+* `/ai-guide/draw?mode=<mode>&spread=<spread>&orientation=upright&lang=<lang>&question=<question>`
 
 ### `/ai-guide/draw`
 
@@ -143,21 +146,22 @@ Required query params:
 
 * `mode=physical|online`
 * `question=<user question>`
-* Optional `spread=single`
+* Optional `spread=single|three-card`
 * Optional `orientation=upright`
 * Optional `lang=en|zh`
 * Optional `ritualStep=0|1|2` for online mode
 
 What must not change:
 
-* Must preserve `question`, `mode`, `spread=single`, `orientation=upright`, and `lang`.
+* Must preserve `question`, `mode`, `spread`, `orientation=upright`, and `lang`.
 * If question is missing and cannot be recovered, it redirects back to `/ai-guide/ask`.
 * Online mode must perform an online draw and generate a tarot card id before reveal.
 * Physical mode must not select a card for the user; it must lead the user to select the card drawn by hand.
 
 Expected handoff:
 
-* Online: `/ai-guide/reveal?mode=online&spread=single&orientation=upright&question=<question>&card=<cardId>&lang=<lang>`
+* Online single-card: `/ai-guide/reveal?mode=online&spread=single&orientation=upright&question=<question>&card=<cardId>&lang=<lang>`
+* Online three-card: `/ai-guide/reveal?mode=online&spread=three-card&orientation=upright&question=<question>&cards=<cardIds>&lang=<lang>`
 * Physical: `/ai-guide/reveal?mode=physical&spread=single&orientation=upright&question=<question>&lang=<lang>`
 
 ### `/ai-guide/reveal`
@@ -172,21 +176,23 @@ Required query params:
 
 * `mode=physical|online`
 * `question=<user question>`
-* `spread=single`
+* `spread=single|three-card`
 * `orientation=upright`
-* Optional `card=<cardId>`; required before result can show a card.
+* Optional `card=<cardId>`; required for single-card result.
+* Optional `cards=<cardIds>`; required for three-card result.
 * Optional `lang=en|zh`
 
 What must not change:
 
 * Physical and online reveal behavior must stay distinct.
-* Physical mode must preserve result compatibility by sending the selected card id to `/ai-guide/result`.
+* Physical mode must preserve single-card result compatibility by sending the selected card id to `/ai-guide/result`.
 * Online mode must handle a missing or invalid card safely by offering a return to draw or reading room.
-* The result URL must include mode, spread, orientation, question, card, and lang.
+* The result URL must include mode, spread, orientation, question, lang, and either card or cards.
 
 Expected handoff:
 
-* `/ai-guide/result?mode=<mode>&spread=single&orientation=upright&question=<question>&card=<cardId>&lang=<lang>`
+* Single-card: `/ai-guide/result?mode=<mode>&spread=single&orientation=upright&question=<question>&card=<cardId>&lang=<lang>`
+* Three-card: `/ai-guide/result?mode=online&spread=three-card&orientation=upright&question=<question>&cards=<cardIds>&lang=<lang>`
 
 ### `/ai-guide/result`
 
@@ -194,31 +200,33 @@ Purpose:
 
 * Shows the reading result for the selected card and question.
 * Displays static card reference content.
-* Attempts to generate an AI personalized reading when the user is signed in and has credits.
+* Attempts to generate an AI personalized reading when the user is signed in and has enough Stardust / compatible legacy credits.
 
 Required query params:
 
 * `mode=physical|online`
-* `spread=single`
+* `spread=single|three-card`
 * `orientation=upright`
 * `question=<user question>`
-* `card=<cardId>`
+* `card=<cardId>` for single-card
+* `cards=<cardIds>` for three-card
 * Optional `lang=en|zh`
 
 What must not change:
 
 * URL `searchParams` are the primary source of truth.
 * `localStorage` and `sessionStorage` may only be fallback/recovery/cache layers.
-* The page must not make an AI-reading request unless card, question, mode, and `orientation=upright` are present.
+* The page must not make an AI-reading request unless question, mode, supported spread, `orientation=upright`, and the required card/card list are present.
 * Invalid card ids must be handled safely with a no-card/invalid-reading state.
-* AI reading request payload must preserve `cardId`, `question`, `lang`, `mode`, `orientation`, `spread=single`, and `clientRequestId`.
+* AI reading request payload must preserve `cardId` for single-card, `cards` / `cardIds` for three-card, `question`, `lang`, `mode`, `orientation`, `spread`, and `clientRequestId`.
 
 Expected handoff:
 
 * Display reading result.
 * User may start another reading or return to ask route.
 * If AI reading fails due auth, show sign-in UI.
-* If AI reading succeeds or fallback returns, display AI reading and refresh credits display.
+* If AI reading succeeds or fallback returns, display AI reading and refresh Stardust display.
+* User may ask one paid follow-up from a successful reading where the follow-up panel is available.
 
 ### `/ai-guide/readings`
 
@@ -297,8 +305,10 @@ Expected handoff:
 * `lang=en|zh` must remain stable.
 * Physical and online modes must remain distinct.
 * Single-card reading flow must remain stable.
+* Online three-card reading flow is supported and must remain upright-only.
 * Preserve `mode`, `spread`, `orientation`, `question`, `card`, and `lang` across handoffs.
-* Do not add multi-card spreads unless the user explicitly changes scope.
+* Preserve `cards` for three-card handoffs.
+* Do not add additional spreads beyond current single-card and online three-card unless the user explicitly changes scope.
 * Do not add Stripe payments, real Google login, real Apple login, complex Journal search/filter, major visual redesign, advanced animation, or oracle-card-specific reading rules during launch stabilization unless explicitly requested.
 
 ## 5. Reading Modes
@@ -314,14 +324,14 @@ Expected behavior:
 * `/ai-guide/draw` moves through shuffle, cut, and draw.
 * On draw step 2, the system randomly selects a card id from the tarot card list.
 * `/ai-guide/reveal` displays the drawn card state.
-* `/ai-guide/result` receives the selected card and question through the URL.
-* AI reading may be generated if auth, credits, provider configuration, validation, and rate limit allow.
+* `/ai-guide/result` receives the selected card or cards and question through the URL.
+* AI reading may be generated if auth, Stardust / compatible legacy credits, provider configuration, validation, and rate limit allow.
 
 Do not change:
 
 * The online mode route params.
 * The shuffle/cut/draw sequence.
-* The single-card upright result contract.
+* The upright result contract for single-card and three-card readings.
 
 ### Physical Mode
 
@@ -333,8 +343,8 @@ Expected behavior:
 * `/ai-guide/draw` instructs the user to prepare, shuffle, cut, and draw from their physical deck.
 * `/ai-guide/reveal` lets the user select the same card they drew physically.
 * `/ai-guide/result` receives mode, question, card, spread, orientation, and lang through the URL.
-* The physical path itself should not consume credits.
-* Credits may be consumed only if an AI reading is generated successfully according to the current AI reading rules.
+* The physical path itself should not consume Stardust.
+* Stardust / compatible legacy credits may be consumed only if an AI reading is generated successfully according to the current AI reading rules.
 
 Do not change:
 
@@ -349,7 +359,7 @@ Expected behavior:
 * The deck is built from Major Arcana plus Minor Arcana suits.
 * Minor Arcana are generated from four suits and standard ranks.
 * Current readings are upright-only.
-* Current readings are single-card only.
+* Current readings support single-card and online three-card spreads.
 * Card id/title must remain compatible with result generation, AI reading generation, and Reading Journal display.
 * Invalid card ids must be handled safely.
 
@@ -400,8 +410,8 @@ Expected behavior:
 * Magic Link redirect target is `/auth/callback?next=<current path>`.
 * `/auth/callback` exchanges the Supabase auth code for a session and redirects to a safe local `next` path.
 * `/auth/confirm` can complete sign-in from code or hash tokens.
-* Signed-in account UI shows the user's email-derived account display and Reading Credits.
-* Sign out uses Supabase `signOut`, clears account/credits display state, and closes account/redeem panels.
+* Signed-in account UI shows the user's email-derived account display and Stardust balance.
+* Sign out uses Supabase `signOut`, clears account/Stardust display state, and closes account/redeem panels.
 
 Logged-out user:
 
@@ -423,26 +433,41 @@ Verification needed:
 * Redirect URL strictness remains PARTIAL because broad wildcard redirects are currently configured.
 * Confirm the exact `/auth/callback` versus `/auth/confirm` path behavior if route-specific auth changes are planned.
 
-## 9. Credits Behavior
+## 9. Stardust / Legacy Credits Behavior
 
-Reading Credits concept:
+Stardust concept:
 
-* Reading Credits are required for successful AI personalized readings.
-* Account UI says each AI reading uses 1 credit.
-* Credits are fetched from `/api/credits/me`.
-* `/api/credits/me` creates a zero-credit row for signed-in users without one.
+* Stardust is the current user-facing balance unit for Ora readings and paid follow-up.
+* Legacy Reading Credits remain part of the system for compatibility.
+* Compatibility rule: `1` legacy Reading Credit = `100` Stardust.
+* Main AI reading currently consumes `100` Stardust through the legacy credit/RPC path.
+* Paid AI follow-up consumes `20` Stardust through the Stardust charge path.
+* Balances are fetched from `/api/credits/me`.
+* `/api/credits/me` returns `remaining_stardust` and `total_stardust` when available, and falls back to converting legacy credits when Stardust columns are not available.
+* `/api/credits/me` creates a zero-balance row for signed-in users without one.
 
-AI reading credit behavior:
+AI reading Stardust / credit behavior:
 
 * `/api/ai-reading` checks auth first.
 * `/api/ai-reading` gets or creates the signed-in user's credits row.
-* If `remaining_credits <= 0`, `/api/ai-reading` returns `402` with `code=insufficient_credits`.
+* If the user has no compatible reading balance, `/api/ai-reading` returns `402` with `code=insufficient_credits`.
 * AI reading attempts are rate-limited by IP with a default of 10 per hour unless `AI_READING_RATE_LIMIT_PER_HOUR` is configured.
-* Credits are consumed only after successful upstream AI generation.
+* Main reading balance is consumed only after successful upstream AI generation.
 * With `clientRequestId`, the route uses `finalize_ai_reading_result`, which is expected to atomically save and charge once.
-* Without `clientRequestId`, the route consumes a credit via `consume_ai_reading_credit`, records usage, then writes a reading log.
+* Without `clientRequestId`, the route consumes a legacy credit via `consume_ai_reading_credit`, records usage, then writes a reading log.
 * If upstream AI generation fails, the route returns a system fallback reading with `fallback=true` and `fallback_used=true`; it records usage as `charged=false`.
-* Current fallback UI says no credit was used.
+* Current fallback UI says no Stardust was used.
+
+Paid follow-up behavior:
+
+* `/api/ai-reading/follow-up` requires a signed-in user.
+* Follow-up supports `spread=single` and `spread=three-card`.
+* Follow-up requires the original reading context plus a follow-up question and `followUpRequestId`.
+* Follow-up question max length is 300 characters.
+* Successful paid follow-up consumes `20` Stardust using `consume_stardust` with source `ai_follow_up`.
+* Follow-up charge uses `followUpRequestId` as an idempotency key.
+* If the user has fewer than `20` Stardust and no matching prior charge, the route returns `402` with `code=insufficient_stardust`.
+* If upstream follow-up generation fails, the route returns a fallback follow-up and does not charge Stardust.
 
 Duplicate charge prevention / idempotency:
 
@@ -451,22 +476,22 @@ Duplicate charge prevention / idempotency:
 * If an existing reading is found, it returns that reading instead of generating/charging again.
 * The server handles duplicate finalize/log cases by looking up an existing reading.
 
-User credit display refresh:
+User Stardust display refresh:
 
-* Account UI refreshes credits on account menu open, window focus, document visibility, and `ora-arcana:credits-updated`.
-* Result page dispatches `ora-arcana:credits-updated` when an AI reading response is ready.
+* Account UI refreshes Stardust on account menu open, window focus, document visibility, and `ora-arcana:credits-updated`.
+* Result page dispatches `ora-arcana:credits-updated` when an AI reading or paid follow-up response is ready.
 
 Verification needed:
 
 * `consume_ai_reading_credit` existence, signature, return structure, and `SECURITY DEFINER` mode were manually verified by metadata-only Supabase checks on 2026-06-20.
-* Full internal RPC behavior for `consume_ai_reading_credit`, `finalize_ai_reading_result`, and `redeem_activation_code` remains deeper verification.
-* Manual QA should confirm no double-charge on reload, back/forward navigation, retry, and React dev remount scenarios.
+* Full internal RPC behavior for `consume_ai_reading_credit`, `finalize_ai_reading_result`, `consume_stardust`, and `redeem_activation_code` remains deeper verification.
+* Manual QA should confirm no double-charge on reload, back/forward navigation, retry, follow-up retry, and React dev remount scenarios.
 
 ## 10. Redeem Deck Code Behavior
 
 Purpose:
 
-* Activation/deck codes add Reading Credits to a signed-in user's Reading Account.
+* Activation/deck codes add Stardust / compatible legacy Reading Credits to a signed-in user's Reading Account.
 * UI copy connects deck codes to physical deck activation codes.
 
 Expected behavior:
@@ -478,8 +503,8 @@ Expected behavior:
 * Empty code returns `activation_code_required`.
 * Codes over 80 characters return `activation_code_too_long`.
 * The API calls Supabase RPC `redeem_activation_code`.
-* Successful redemption returns updated `remaining_credits` and `total_credits`, plus redeemed credit count.
-* Account UI updates credits after successful redemption.
+* Successful redemption returns updated legacy credit fields and the UI converts or displays Stardust balance when available.
+* Account UI updates Stardust after successful redemption.
 * Known API error states include:
   * `activation_code_not_found`
   * `activation_code_unavailable`
@@ -502,7 +527,7 @@ Verification needed:
 
 * Exact claimed/unclaimed schema behavior.
 * Expiry rule details.
-* Number of credits per code.
+* Exact Stardust / legacy credit amount per code.
 * Physical deck purchase linkage beyond current UI copy.
 
 ## 11. Reading Journal Behavior
@@ -555,7 +580,9 @@ Endpoint:
 
 Input contract:
 
-* `cardId`
+* `cardId` for single-card
+* `cards` for three-card
+* `cardIds` / `cards` route-derived values for three-card client state
 * `question`
 * `lang`
 * `mode`
@@ -568,12 +595,13 @@ Validation:
 * JSON body must be an object.
 * `question` must be a string.
 * `question` is required and must be under 500 characters.
-* `spread` must be `single`.
+* `spread` must be `single` or `three-card`.
 * `mode` must be `physical` or `online`.
-* `cardId` must resolve to a tarot card.
+* For `spread=single`, `cardId` must resolve to a tarot card.
+* For `spread=three-card`, exactly three distinct cards must be provided with `situation`, `challenge`, and `guidance` positions.
 * `orientation` must be `upright`.
 * User must be signed in.
-* User must have remaining credits.
+* User must have enough Stardust / compatible legacy credits.
 * Provider API key must be configured.
 
 Environment abstraction:
@@ -600,6 +628,7 @@ Structured result:
   * `nextStep`
   * `reflectionQuestion`
 * Optional display aliases include `cardMessage`, `cardMeaning`, and `closingNote`.
+* Three-card readings include structured position-aware reading data for situation, challenge, and guidance.
 
 Timeout and rate limit:
 
@@ -611,11 +640,21 @@ Timeout and rate limit:
 
 Fallback behavior:
 
-* If upstream AI generation fails or times out after validation/auth/credits pass, the endpoint returns a system fallback reading.
+* If upstream AI generation fails or times out after validation/auth/Stardust checks pass, the endpoint returns a system fallback reading.
 * Fallback reading is marked with `fallback=true`, `readingSource=system_fallback`, and `fallbackReason=upstream_failure`.
 * Fallback usage is recorded with `charged=false`.
-* Fallback readings should not consume credits.
+* Fallback readings should not consume Stardust.
 * If `clientRequestId` exists, fallback reading may be saved to `reading_logs` with `credits_event_id=null`.
+
+Paid follow-up endpoint:
+
+* Server-side endpoint: `/api/ai-reading/follow-up`.
+* Method: `POST`.
+* Client caller: result page follow-up panel.
+* Requires auth, existing reading context, original question, follow-up question, supported spread, `orientation=upright`, and `followUpRequestId`.
+* Supports single-card and three-card readings.
+* Successful live AI follow-up consumes `20` Stardust.
+* Fallback follow-up responses do not consume Stardust.
 
 Prompt injection protection:
 
@@ -648,7 +687,7 @@ Important detail:
 
 Verification needed:
 
-* Manual QA should confirm English and Chinese flows across physical mode, online mode, result, auth prompts, credits display, redeem flow, and journal.
+* Manual QA should confirm English and Chinese flows across physical mode, online mode, result, auth prompts, Stardust display, redeem flow, paid follow-up, and journal.
 
 ## 14. External Service Dependencies
 
@@ -659,7 +698,7 @@ Product behavior depending on it:
 * Email Magic Link sign-in.
 * Auth callback/session handling.
 * Signed-in-only AI reading generation.
-* Signed-in-only credits, redeem, and journal behavior.
+* Signed-in-only Stardust, redeem, paid follow-up, and journal behavior.
 
 Docs/source can verify:
 
@@ -682,7 +721,7 @@ Manual production verification on 2026-06-20 confirmed:
 * Resend custom SMTP is enabled.
 * Production Magic Link email was received and returned to a working `oraarcana.com` session.
 
-### Supabase DB / Credits / Reading Logs / Activation Codes
+### Supabase DB / Stardust / Legacy Credits / Reading Logs / Activation Codes
 
 Product behavior depending on it:
 
@@ -701,7 +740,7 @@ Docs/source can verify:
 Requires manual verification:
 
 * Full internal RPC behavior.
-* Exact credit amounts per activation code.
+* Exact Stardust / legacy credit amounts per activation code.
 * Idempotency guarantees inside database functions.
 
 Manual production verification on 2026-06-20 confirmed:
@@ -816,7 +855,7 @@ Manual production verification on 2026-06-20 confirmed:
 
 ## 15. Do-Not-Break Checklist
 
-Before finishing route/auth/credits/redeem/journal/AI-reading work, confirm:
+Before finishing route/auth/Stardust/redeem/journal/AI-reading work, confirm:
 
 * [ ] Route params are unchanged unless explicitly approved.
 * [ ] `/ai-guide/ask` native GET form is intact.
@@ -824,20 +863,22 @@ Before finishing route/auth/credits/redeem/journal/AI-reading work, confirm:
 * [ ] `/ai-guide/result` remains URL-first.
 * [ ] `localStorage`/`sessionStorage` remain fallback/recovery/cache only.
 * [ ] `mode=physical|online` remains stable.
-* [ ] `spread=single` remains stable.
+* [ ] `spread=single|three-card` remains stable.
 * [ ] `orientation=upright` remains stable.
 * [ ] `lang=en|zh` remains stable.
 * [ ] Physical and online flows remain distinct.
 * [ ] Single-card flow remains stable.
+* [ ] Online three-card flow remains stable.
 * [ ] Upright-only behavior remains intact.
 * [ ] No reversed cards are introduced in V1.
 * [ ] 78-card tarot deck structure remains intact.
 * [ ] Invalid or missing card ids are handled safely.
 * [ ] Empty/missing questions are handled safely.
 * [ ] AI reading still requires signed-in user.
-* [ ] AI reading still requires credits.
-* [ ] Credits are not double-charged.
-* [ ] Fallback AI failure path does not incorrectly consume credits.
+* [ ] AI reading still requires Stardust / compatible legacy credits.
+* [ ] Stardust / compatible legacy credits are not double-charged.
+* [ ] Paid follow-up charges exactly 20 Stardust only after successful live follow-up.
+* [ ] Fallback AI failure path does not incorrectly consume Stardust.
 * [ ] Successful AI readings are saved to the journal.
 * [ ] Fallback saved-readings behavior is preserved and clearly labeled.
 * [ ] Logged-out Reading Journal behavior remains intact.
@@ -853,22 +894,24 @@ Before finishing route/auth/credits/redeem/journal/AI-reading work, confirm:
 Manual QA checklist for future behavior work:
 
 * [ ] Logged-out reading attempt reaches static result and shows sign-in requirement for AI reading.
-* [ ] Signed-in reading with credits generates AI reading.
-* [ ] Signed-in reading with no credits shows no-credit behavior.
-* [ ] Fallback AI failure path returns fallback reading and does not consume credits.
+* [ ] Signed-in reading with enough Stardust generates AI reading.
+* [ ] Signed-in reading with no Stardust shows no-balance behavior.
+* [ ] Fallback AI failure path returns fallback reading and does not consume Stardust.
 * [ ] Reading Journal saves and reads successful AI readings.
 * [ ] Reading Journal displays fallback readings with fallback label if fallback was saved.
 * [ ] Redeem Deck Code flow requires sign-in.
-* [ ] Redeem Deck Code flow adds credits after valid code redemption.
+* [ ] Redeem Deck Code flow adds Stardust / compatible legacy credits after valid code redemption.
 * [ ] Used/unavailable/expired/invalid deck code states are handled.
 * [ ] Physical mode flow: `/ai-guide` -> prepare -> ask -> draw -> reveal -> result.
-* [ ] Online mode flow: `/ai-guide` -> prepare -> ask -> draw shuffle/cut/draw -> reveal -> result.
+* [ ] Online single-card flow: `/ai-guide` -> prepare -> ask -> draw shuffle/cut/draw -> reveal -> result.
+* [ ] Online three-card flow: `/ai-guide` -> prepare -> ask -> draw shuffle/cut/draw -> reveal -> result.
 * [ ] English flow works from entry through result and journal.
 * [ ] Chinese flow works from entry through result and journal.
-* [ ] Account menu displays Reading Credits for signed-in users.
-* [ ] Sign out clears visible account/credits state.
-* [ ] Reloading result does not double-charge credits.
+* [ ] Account menu displays Stardust for signed-in users.
+* [ ] Sign out clears visible account/Stardust state.
+* [ ] Reloading result does not double-charge Stardust / compatible legacy credits.
 * [ ] Retrying AI reading does not double-charge the same request unless intentionally generating a new reading.
+* [ ] Retrying paid follow-up does not double-charge the same `followUpRequestId`.
 * [ ] Mobile Safari preserves ask form submission reliability.
 * [ ] Build passes.
 
@@ -878,8 +921,8 @@ These could not be fully confirmed from docs/source inspection alone:
 
 * Existing-browser language localStorage versus URL-priority behavior.
 * Supabase redirect URL strictness before public launch.
-* Full internal RPC behavior for credit and redeem functions.
-* Exact credit amount per activation code.
+* Full internal RPC behavior for Stardust, legacy credit, follow-up charge, and redeem functions.
+* Exact Stardust / legacy credit amount per activation code.
 * Exact claimed/unclaimed/expiry implementation for activation codes.
 * Whether GitHub Actions or GitHub Secrets are used outside current AI Project OS docs.
 * Google Search Console, robots, sitemap, noindex, and site-lock state.
@@ -917,12 +960,15 @@ Source files inspected:
 * `src/app/ai-guide/result/ResultClient.tsx`
 * `src/app/ai-guide/readings/page.tsx`
 * `src/app/api/ai-reading/route.ts`
+* `src/app/api/ai-reading/follow-up/route.ts`
 * `src/app/api/credits/me/route.ts`
 * `src/app/api/activation/redeem/route.ts`
 * `src/app/auth/callback/route.ts`
 * `src/app/auth/confirm/page.tsx`
 * `src/components/ai-guide/ActivationCodePanel.tsx`
 * `src/components/ai-guide/EmailSignInPanel.tsx`
+* `src/components/ai-guide/ResultFollowUpPanel.tsx`
+* `src/lib/ai-guide/credits.ts`
 * `src/lib/ai-guide/i18n.ts`
 * `src/lib/supabase/client.ts`
 * `src/lib/supabase/server.ts`

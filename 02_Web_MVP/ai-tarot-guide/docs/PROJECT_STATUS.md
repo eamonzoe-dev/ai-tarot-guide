@@ -1,7 +1,7 @@
 # Project Status
 
 - Status: Active
-- Last updated: 2026-06-20
+- Last updated: 2026-06-23
 - Owner: eamonzoe
 - Source priority: Current project facts. Read after `docs/NEXT_TASK.md`.
 
@@ -19,8 +19,9 @@ Current product shape:
 * TypeScript
 * Tailwind CSS
 * localStorage flow recovery
-* Supabase auth, credits, activation codes, and reading logs
+* Supabase auth, Stardust / legacy credit compatibility, activation codes, and reading logs
 * OpenAI-compatible AI reading route
+* Paid AI reading follow-up route
 * Vercel deployment
 
 Primary route:
@@ -55,8 +56,10 @@ Online draw flow:
 
 Reading mode:
 
-* Single-card only
+* Single-card supported
+* Online three-card spread supported
 * Upright-only
+* Reversals are not supported
 * Full 78-card tarot deck structure must remain intact
 
 Language behavior:
@@ -74,7 +77,14 @@ Completed or recorded milestones:
 * Vercel deployment ready and verified online
 * `P0-16D-3` Auth modal portal fix deployed and verified online
 * `P0-17A` SEO / Launch Checklist committed and pushed
+* `P0-17C` Three-card spread flow added to current main branch
+* `P0-17D` AI reading support added for three-card spread
+* `P0-18E` Paid follow-up Stardust charge added
 * AI Project OS Standard docs established
+
+Latest known main branch:
+
+* `aebcba4 Add paid follow-up Stardust charge`
 
 ## Current Visual Direction
 
@@ -108,7 +118,7 @@ Avoid:
 
 ## Current Launch Posture
 
-Do not enter full launch QA until interaction and function priorities are screened.
+Do not enter public launch QA until closed beta interaction and function priorities are screened.
 
 Current next product step is tracked in `docs/NEXT_TASK.md`.
 
@@ -117,15 +127,39 @@ Launch-sensitive areas:
 * Account modal
 * Email sign-in
 * Reading flow
-* AI reading and credits
+* AI reading and Stardust charging
 * Redeem Deck Code
 * Reading Journal
+* Paid follow-up
 * Mobile Safari and mobile Chrome
 * Launch visibility, SEO, noindex, and site lock
 
+## Current Account / Stardust Model
+
+Stardust is the current user-facing account balance unit.
+
+Current compatibility rule:
+
+* `1` legacy Reading Credit = `100` Stardust
+
+Current charge behavior:
+
+* Main AI reading consumes `100` Stardust through the existing legacy credit/RPC path.
+* Paid AI follow-up consumes `20` Stardust through the Stardust charge path.
+* Fallback AI readings and fallback follow-up replies should not consume Stardust.
+
+Current account system includes:
+
+* Reading Account
+* Activation Code redeem
+* Stardust balance display
+* AI Reading
+* Paid follow-up
+* Reading Journal
+
 ## External Service Verification Snapshot
 
-Current verification result: PARTIAL / strong production-readiness progress.
+Current verification result: PARTIAL / strong closed-beta-readiness progress.
 
 User-confirmed manual production verification on 2026-06-20:
 
@@ -146,6 +180,12 @@ User-confirmed manual production verification on 2026-06-20:
 * Expected Supabase tables exist, RLS is enabled, user self-read policies exist, and server-only tables are protected from direct public access.
 * `consume_ai_reading_credit` RPC exists with verified input/return structure.
 
+Main branch state confirmed from local git history on 2026-06-23:
+
+* Latest local `main` and `origin/main` pointed to `aebcba4 Add paid follow-up Stardust charge`.
+* Recent commits include Stardust display, three-card flow, three-card AI reading, Stardust balance migration, credit RPC sync, credits API Stardust reads, and paid follow-up Stardust charge.
+* User-provided project context states the latest Production/Vercel deployment after `P0-18E` is successful.
+
 Remaining manual verification:
 
 * Existing-browser language localStorage versus URL-priority behavior passed current source inspection in `docs/archive/qa/P1-LANG-URL-PRIORITY-QA.md`; the earlier normal-browser production observation remains unresolved until a manual production retest on the latest deployment.
@@ -156,13 +196,13 @@ Remaining manual verification:
 * Feishu automation write status still needs verification if expected.
 * Activation code operational policy and batch status may need separate verification before sales/public launch.
 
-Do not treat this as final public-launch readiness. The protected production stack is substantially verified, but launch-indexing and several operational checks remain open.
+Do not treat this as final public-launch readiness. The protected production stack is substantially verified, but closed beta QA, launch-indexing, and several operational checks remain open.
 
 ## Non-Goals During Stabilization
 
 Do not pull these into the launch freeze unless the user explicitly changes priority:
 
-* Multi-card spreads
+* Additional spreads beyond current single-card and online three-card
 * Reversed cards
 * Stripe payments
 * Google login

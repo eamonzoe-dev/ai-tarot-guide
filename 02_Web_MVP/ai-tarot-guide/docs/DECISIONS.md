@@ -1,7 +1,7 @@
 # Decisions
 
 - Status: Active
-- Last updated: 2026-06-20
+- Last updated: 2026-06-23
 - Owner: eamonzoe
 - Source priority: Current and historical decisions. Decision states must be Active, Deprecated, Replaced, or Pending.
 
@@ -14,7 +14,7 @@ Use one of these states for every decision:
 * Replaced: Superseded by a newer decision.
 * Pending: Proposed or under discussion, not yet current truth.
 
-## Active Decisions
+## Recorded Decisions
 
 ### DEC-001: GitHub Docs Are Source Of Truth
 
@@ -76,13 +76,15 @@ localStorage is fallback only when URL parameters are missing.
 
 ### DEC-006: Reading Mode Is Single-Card Upright
 
-- State: Active
+- State: Replaced
 - Date: 2026-06-20
 - Owner: eamonzoe
 
 The MVP reading flow is single-card and upright-only.
 
 Do not add multi-card spreads or reversed cards unless explicitly requested.
+
+Replaced by `DEC-009` after current main added online three-card spread support.
 
 ### DEC-007: AI Reading Uses Isolated Environment Variables First
 
@@ -98,7 +100,37 @@ AI reading should prefer `AI_READING_OPENAI_*` variables before generic `OPENAI_
 - Date: 2026-06-20
 - Owner: eamonzoe
 
-During pre-launch stabilization, do not add Stripe payments, real Google login, real Apple login, complex Journal search/filter, major visual redesign, advanced animations, multi-card spreads, or reversed cards unless the user explicitly changes priority.
+During pre-launch stabilization, do not add Stripe payments, real Google login, real Apple login, complex Journal search/filter, major visual redesign, advanced animations, additional spreads beyond current single-card and online three-card, or reversed cards unless the user explicitly changes priority.
+
+### DEC-009: Reading Modes Are Upright Single-Card And Online Three-Card
+
+- State: Active
+- Date: 2026-06-23
+- Owner: eamonzoe
+
+The current main branch supports:
+
+* Single-card readings.
+* Online three-card readings.
+* Upright-only orientation.
+
+Reversed cards remain out of scope.
+
+Do not add spreads beyond current single-card and online three-card unless explicitly requested.
+
+### DEC-010: Stardust Is Current Balance Unit With Legacy Credit Compatibility
+
+- State: Active
+- Date: 2026-06-23
+- Owner: eamonzoe
+
+Stardust is the current user-facing balance unit for the account system.
+
+Legacy Reading Credits remain compatible:
+
+* `1` legacy Reading Credit = `100` Stardust.
+* Main AI reading consumes `100` Stardust through the legacy credit/RPC path.
+* Paid follow-up consumes `20` Stardust through the Stardust charge path.
 
 ## Pending Decisions
 
@@ -110,4 +142,4 @@ No deprecated decisions recorded.
 
 ## Replaced Decisions
 
-No replaced decisions recorded.
+* `DEC-006` was replaced by `DEC-009`.
