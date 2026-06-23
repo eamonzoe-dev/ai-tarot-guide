@@ -12,7 +12,9 @@
 * Completed `P0-MEMORY-1` by adding `docs/AI_MEMORY_PACK.md` as the first project-level AI memory entry.
 * Added `docs/AI_CONTEXT_CHATGPT_DIGEST.md` as the expanded ChatGPT-derived durable project memory digest.
 * Added `docs/AI_CONTEXT_CLAUDE_DIGEST.md` for Claude-specific durable collaboration memory.
+* Added `docs/AI_BOOTSTRAP_PROMPTS.md` with reusable startup prompts for ChatGPT, Claude Code, Codex, and general AI assistants.
 * Linked the digest from `docs/AI_MEMORY_PACK.md`.
+* Linked bootstrap prompts from `docs/AI_MEMORY_PACK.md`.
 * Clarified bootstrap order versus current task source-of-truth order in Memory Pack / AGENTS docs.
 * Updated `AGENTS.md` to require reading the Memory Pack before new tasks.
 * Completed `P0-19A Main Branch Truth Sync` as a documentation-only update.
