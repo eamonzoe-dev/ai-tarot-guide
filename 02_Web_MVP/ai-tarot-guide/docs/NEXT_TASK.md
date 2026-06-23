@@ -7,7 +7,7 @@
 
 ## Current Task
 
-`P0-20H-AI-AHA-OUTPUT-VALIDATOR` AI Aha Output Validator
+`P0-20I-AHA-DEMO-AI-CONTRACT-PREVIEW-PANEL` Aha Demo AI Contract Preview Panel
 
 ## Current Main Branch Truth
 
@@ -23,10 +23,11 @@ The latest known `main` state is after:
 * `P0-20E` Single Aha Sentence Generator Prototype
 * `P0-20F` Aha Prototype QA and Copy Tightening
 * `P0-20G` Aha Engine Prompt Contract for AI Generation
+* `P0-20H` AI Aha Output Validator
 
-Latest known main commit before P0-20G work:
+Latest known main commit before P0-20H work:
 
-* `e22bda7 Tighten aha sentence prototype copy`
+* `ca72eda Add AI aha prompt contract`
 
 Current local P0-20A commit:
 
@@ -52,6 +53,10 @@ Current local P0-20F commit:
 
 * `e22bda7 Tighten aha sentence prototype copy`
 
+Current local P0-20G commit:
+
+* `ca72eda Add AI aha prompt contract`
+
 Current stage:
 
 * Pre-launch / closed beta prep
@@ -76,22 +81,22 @@ Current product truth:
 * Single Aha sentence generator prototype is introduced in `src/lib/ora/ahaSentence.ts` and previewed in the dialogue demo.
 * Aha prototype copy tightening is introduced in `src/lib/ora/ahaSentence.ts` and the dialogue demo preview.
 * AI Aha prompt contract is introduced in `src/lib/ora/ahaPromptContract.ts`.
+* AI Aha output validator is introduced in `src/lib/ora/ahaOutputValidator.ts`.
 
 ## Recently Completed
 
-`P0-20G-AHA-ENGINE-PROMPT-CONTRACT-FOR-AI-GENERATION` is completed as a contract-only prototype update.
+`P0-20H-AI-AHA-OUTPUT-VALIDATOR` is completed as a validator-only prototype update.
 
 Completed output:
 
-* Added `src/lib/ora/ahaPromptContract.ts`.
-* Defined typed input, system prompt builder, user prompt builder, expected JSON output shape, forbidden patterns, required output checks, validation, and sample fixture.
-* Updated `docs/ORA_AHA_MEMORY_ENGINE_SPEC.md` with AI Aha Prompt Contract boundaries.
-* The contract does not call AI, APIs, storage, credits, Stardust, Supabase, or the formal reading flow.
+* Added `src/lib/ora/ahaOutputValidator.ts`.
+* Defined JSON parsing, shape validation, sentence safety checks, one-sentence checks, card mirror checks, anchor warnings, risk comparison, life-slice warnings, and sample raw outputs.
+* The validator does not call AI, APIs, storage, credits, Stardust, Supabase, or the formal reading flow.
 * Did not change `/ask`, `/result`, Supabase schema, payment, credits, Stardust, AI reading API, spreads, orientation, prediction behavior, page UI, main navigation, or formal page UI.
 
 ## Goal
 
-Add a validator for future AI Aha JSON output so model-generated sentences can be checked before any display or future integration.
+Add an internal preview panel to the dialogue demo so the prompt contract and output validator can be inspected together without calling AI or entering the formal reading flow.
 
 The next task should build directly on:
 
@@ -101,6 +106,7 @@ The next task should build directly on:
 * `src/lib/ora/preDrawDialogue.ts`
 * `src/lib/ora/ahaSentence.ts`
 * `src/lib/ora/ahaPromptContract.ts`
+* `src/lib/ora/ahaOutputValidator.ts`
 * `src/app/ai-guide/dialogue-demo/page.tsx`
 * `src/components/ai-guide/PreDrawDialoguePrototype.tsx`
 
@@ -122,6 +128,7 @@ Always read:
 * `src/lib/ora/preDrawDialogue.ts`
 * `src/lib/ora/ahaSentence.ts`
 * `src/lib/ora/ahaPromptContract.ts`
+* `src/lib/ora/ahaOutputValidator.ts`
 
 Do not read:
 
@@ -135,12 +142,12 @@ Context budget:
 
 ## Scope
 
-P0-20H should focus on:
+P0-20I should focus on:
 
-* Parsing or validating the future AI Aha JSON output shape.
-* Reusing forbidden patterns and required checks from the prompt contract where useful.
-* Confirming one-sentence, card-as-mirror, anchor, risk, and no-prediction rules.
-* Keeping the validator prototype-only and not wired into the formal reading flow.
+* Displaying the generated prompt contract preview in the internal dialogue demo.
+* Displaying sample validator results for future AI output.
+* Keeping the panel clearly labeled as internal/prototype-only.
+* Not calling AI and not wiring anything into the formal reading flow.
 
 ## Out Of Scope
 
@@ -180,9 +187,9 @@ The next task must not break the existing reading flow:
 
 ## Done Means
 
-For P0-20H:
+For P0-20I:
 
-* AI Aha output validator docs or types are introduced in the smallest useful scope.
+* A demo-only AI contract/validator preview panel is introduced in the smallest useful scope.
 * Output rules remain concrete, one-sentence, JSON-compatible, and free of predictive claims.
 * AI Project OS docs are updated if current project truth changes.
 * `node scripts/check-ai-docs.mjs` passes.

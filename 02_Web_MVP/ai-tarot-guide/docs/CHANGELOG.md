@@ -16,6 +16,7 @@
 * Add Single Aha Sentence Generator Prototype.
 * Add Aha Prototype QA and Copy Tightening.
 * Add AI Aha Prompt Contract.
+* Add AI Aha Output Validator.
 
 ## 2026-06-23
 
