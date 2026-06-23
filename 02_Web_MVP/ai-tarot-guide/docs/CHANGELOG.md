@@ -1,7 +1,7 @@
 # Changelog
 
 - Status: Active
-- Last updated: 2026-06-23
+- Last updated: 2026-06-24
 - Owner: eamonzoe
 - Source priority: Completed work history. Read after higher-priority current-state docs.
 
@@ -11,6 +11,7 @@
 
 * Add Ora Aha & Memory Engine spec.
 * Add Reflection Signal Extraction schema.
+* Add Micro-Slice Bank seed data.
 
 ## 2026-06-23
 

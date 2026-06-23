@@ -1,7 +1,7 @@
 # Project Status
 
 - Status: Active
-- Last updated: 2026-06-23
+- Last updated: 2026-06-24
 - Owner: eamonzoe
 - Source priority: Current project facts. Read after `docs/NEXT_TASK.md`.
 
@@ -82,6 +82,7 @@ Completed or recorded milestones:
 * `P0-18E` Paid follow-up Stardust charge added
 * `P0-20A` Aha Engine V2 + Memory Engine spec introduced in `docs/ORA_AHA_MEMORY_ENGINE_SPEC.md`
 * `P0-20B` Reflection Signal Extraction schema introduced in `src/lib/ora/reflectionSignal.ts`
+* `P0-20C` Micro-Slice Bank seed data introduced in `src/lib/ora/microSliceBank.ts`
 * AI Project OS Standard docs established
 
 Latest known main branch:
@@ -97,6 +98,8 @@ The new Aha Engine V2 direction is descriptive specificity: Ora should infer gen
 The Memory Engine direction is longitudinal reflective companionship: memory should help Ora recall the right thread at the right moment, notice change, and avoid feeling like surveillance or a history-record display.
 
 `P0-20B` added the first Reflection Signal Extraction schema/types/validation layer. This is foundational only and is not wired into the current `/ask`, `/draw`, `/reveal`, `/result`, Stardust, payment, or Supabase flows.
+
+`P0-20C` added the first Micro-Slice Bank seed data layer for 14 descriptive state keys. This is foundational only and is not wired into the current reading flow or page UI.
 
 ## Current Visual Direction
 
