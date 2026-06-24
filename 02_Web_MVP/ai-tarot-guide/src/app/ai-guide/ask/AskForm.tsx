@@ -90,7 +90,7 @@ export function AskForm({
         </section>
 
         <form
-          action="/ai-guide/draw"
+          action="/ai-guide/lens"
           method="get"
           onSubmit={(event) => {
             const normalizedQuestion = question.trim();

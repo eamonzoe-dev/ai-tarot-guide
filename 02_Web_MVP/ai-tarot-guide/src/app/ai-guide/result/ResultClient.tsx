@@ -31,7 +31,21 @@ const LATEST_RITUAL_KEY = "aiTarot:latestRitual";
 const AI_READING_CACHE_PREFIX = "aiTarot:aiReading:v1";
 const AI_READING_CLIENT_REQUEST_PREFIX = "aiTarot:aiReadingRequest:v1";
 const CREDITS_UPDATED_EVENT = "ora-arcana:credits-updated";
+const CLARIFY_NOTE_MAX_LENGTH = 180;
 const activeAiReadingRequests = new Set<string>();
+
+const clarifyDisplayCopy = {
+  en: {
+    focusLabel: "This reading will begin from:",
+    noteLabel: "Brought in with it:",
+    noteOnlyLabel: "This reading will begin with your note:",
+  },
+  zh: {
+    focusLabel: "这次解读会先从这里进入：",
+    noteLabel: "一起带入：",
+    noteOnlyLabel: "这次解读会带着你的补充进入：",
+  },
+} as const;
 
 type ResultClientProps = {
   initialMode: "physical" | "online" | "";
@@ -42,6 +56,10 @@ type ResultClientProps = {
   initialQuestion: string;
   initialLang: Language;
   hasLangParam: boolean;
+  initialClarifyId: string;
+  initialClarifyLabel: string;
+  initialClarifyFocus: string;
+  initialClarifyNote: string;
 };
 
 const READING_LABEL_PATTERN =
@@ -411,6 +429,9 @@ function buildAiReadingCacheKey({
   cardId,
   cardIds,
   question,
+  clarifyId,
+  clarifyFocus,
+  clarifyNote,
 }: {
   mode: "physical" | "online";
   orientation: string;
@@ -418,6 +439,9 @@ function buildAiReadingCacheKey({
   cardId?: string;
   cardIds?: string;
   question: string;
+  clarifyId?: string;
+  clarifyFocus?: string;
+  clarifyNote?: string;
 }) {
   return [
     AI_READING_CACHE_PREFIX,
@@ -426,6 +450,9 @@ function buildAiReadingCacheKey({
     orientation,
     spread === "three-card" ? cardIds : cardId,
     question,
+    clarifyId || "",
+    clarifyFocus || "",
+    clarifyNote || "",
   ].join(":");
 }
 
@@ -438,9 +465,20 @@ export function ResultClient({
   initialQuestion,
   initialLang,
   hasLangParam,
+  initialClarifyId,
+  initialClarifyLabel,
+  initialClarifyFocus,
+  initialClarifyNote,
 }: ResultClientProps) {
   const router = useRouter();
   const copy = text(initialLang);
+  const clarifyUi = clarifyDisplayCopy[initialLang];
+  const clarifyId = initialClarifyId.trim();
+  const clarifyLabel = initialClarifyLabel.trim();
+  const clarifyFocus = initialClarifyFocus.trim();
+  const clarifyNote = initialClarifyNote.trim().slice(0, CLARIFY_NOTE_MAX_LENGTH);
+  const hasClarifyContext = Boolean(clarifyFocus || clarifyNote);
+  const isCustomNoteOnly = clarifyId === "custom";
   const [mode, setMode] = useState<"physical" | "online" | undefined>(
     initialMode || undefined,
   );
@@ -509,6 +547,9 @@ export function ResultClient({
         cardId: card?.id,
         cardIds: threeCardIds,
         question,
+        clarifyId,
+        clarifyFocus,
+        clarifyNote,
       });
       const cachedReading = sessionStorage.getItem(cacheKey);
 
@@ -569,6 +610,10 @@ export function ResultClient({
           orientation,
           spread: normalizedSpread,
           clientRequestId,
+          ...(clarifyId ? { clarifyId } : {}),
+          ...(clarifyLabel ? { clarifyLabel } : {}),
+          ...(clarifyFocus ? { clarifyFocus } : {}),
+          ...(clarifyNote ? { clarifyNote } : {}),
         }),
       })
         .then(async (response) => {
@@ -644,6 +689,10 @@ export function ResultClient({
     spread,
     selectedCards,
     threeCardItems,
+    clarifyId,
+    clarifyLabel,
+    clarifyFocus,
+    clarifyNote,
   ]);
 
   useEffect(() => {
@@ -1177,6 +1226,9 @@ export function ResultClient({
     spread: "single",
     cardId: card.id,
     question: resultQuestion,
+    clarifyId,
+    clarifyFocus,
+    clarifyNote,
   })}:followUp:v1`;
   const fullReadingText = aiDisplay
     ? firstText(
@@ -1302,6 +1354,29 @@ export function ResultClient({
         </div>
       </LuminousPanel>
 
+      {hasClarifyContext ? (
+        <div className="mx-auto w-full max-w-[820px] px-1 text-xs leading-5 text-[#8b7a61]">
+          {isCustomNoteOnly ? (
+            <p>
+              {clarifyUi.noteOnlyLabel} {clarifyFocus}
+            </p>
+          ) : (
+            <>
+              {clarifyLabel || clarifyFocus ? (
+                <p>
+                  {clarifyUi.focusLabel} {clarifyLabel || clarifyFocus}
+                </p>
+              ) : null}
+              {clarifyNote ? (
+                <p className="mt-1">
+                  {clarifyUi.noteLabel} {clarifyNote}
+                </p>
+              ) : null}
+            </>
+          )}
+        </div>
+      ) : null}
+
       <section className="mx-auto w-full max-w-[820px]">
         {aiReadingStatus === "loading" ? (
           <LuminousThinkingState
@@ -1326,14 +1401,16 @@ export function ResultClient({
               type="button"
               onClick={() => {
                 if (card && question && mode) {
-                  const retryCacheKey = [
-                    AI_READING_CACHE_PREFIX,
-                    "single",
+                  const retryCacheKey = buildAiReadingCacheKey({
                     mode,
                     orientation,
-                    card.id,
+                    spread: "single",
+                    cardId: card.id,
                     question,
-                  ].join(":");
+                    clarifyId,
+                    clarifyFocus,
+                    clarifyNote,
+                  });
                   sessionStorage.removeItem(retryCacheKey);
                   sessionStorage.removeItem(`${retryCacheKey}:error`);
                 }

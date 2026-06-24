@@ -34,6 +34,10 @@ export default async function DrawPage({
     orientation?: string | string[];
     lang?: string | string[];
     ritualStep?: string | string[];
+    clarifyId?: string | string[];
+    clarifyLabel?: string | string[];
+    clarifyFocus?: string | string[];
+    clarifyNote?: string | string[];
   }>;
 }) {
   const {
@@ -42,6 +46,10 @@ export default async function DrawPage({
     spread: spreadParam,
     lang: langParam,
     ritualStep: ritualStepParam,
+    clarifyId: clarifyIdParam,
+    clarifyLabel: clarifyLabelParam,
+    clarifyFocus: clarifyFocusParam,
+    clarifyNote: clarifyNoteParam,
   } = await searchParams;
   const spreadValue = normalizeValue(spreadParam);
   const spread: Spread = spreadValue === "three-card" ? "three-card" : "single";
@@ -55,6 +63,10 @@ export default async function DrawPage({
       initialLang={normalizeLanguage(langParam)}
       hasLangParam={Boolean(langParam)}
       initialRitualStep={ritualStep}
+      initialClarifyId={normalizeValue(clarifyIdParam)}
+      initialClarifyLabel={normalizeValue(clarifyLabelParam)}
+      initialClarifyFocus={normalizeValue(clarifyFocusParam)}
+      initialClarifyNote={normalizeValue(clarifyNoteParam)}
     />
   );
 }

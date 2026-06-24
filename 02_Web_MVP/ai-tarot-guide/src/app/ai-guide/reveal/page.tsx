@@ -16,10 +16,25 @@ export default async function RevealPage({
     cards?: string | string[];
     orientation?: string | string[];
     lang?: string | string[];
+    clarifyId?: string | string[];
+    clarifyLabel?: string | string[];
+    clarifyFocus?: string | string[];
+    clarifyNote?: string | string[];
   }>;
 }) {
-  const { mode, question, spread, card, cards, orientation, lang } =
-    await searchParams;
+  const {
+    mode,
+    question,
+    spread,
+    card,
+    cards,
+    orientation,
+    lang,
+    clarifyId,
+    clarifyLabel,
+    clarifyFocus,
+    clarifyNote,
+  } = await searchParams;
 
   return (
     <RevealClient
@@ -31,6 +46,10 @@ export default async function RevealPage({
       initialOrientation={normalizeValue(orientation)}
       initialLang={normalizeLanguage(lang)}
       hasLangParam={Boolean(lang)}
+      initialClarifyId={normalizeValue(clarifyId)}
+      initialClarifyLabel={normalizeValue(clarifyLabel)}
+      initialClarifyFocus={normalizeValue(clarifyFocus)}
+      initialClarifyNote={normalizeValue(clarifyNote)}
     />
   );
 }

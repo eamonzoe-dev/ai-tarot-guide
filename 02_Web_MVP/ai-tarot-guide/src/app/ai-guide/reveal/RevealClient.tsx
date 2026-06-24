@@ -33,6 +33,10 @@ type RevealClientProps = {
   initialOrientation: string;
   initialLang: Language;
   hasLangParam: boolean;
+  initialClarifyId: string;
+  initialClarifyLabel: string;
+  initialClarifyFocus: string;
+  initialClarifyNote: string;
 };
 
 type RitualState = {
@@ -43,6 +47,10 @@ type RitualState = {
   card: string;
   cards: string;
   lang: Language;
+  clarifyId: string;
+  clarifyLabel: string;
+  clarifyFocus: string;
+  clarifyNote: string;
 };
 
 function isReadingMode(value: string): value is ReadingMode {
@@ -80,6 +88,22 @@ function buildResultHref(ritual: RitualState) {
     params.set("cards", ritual.cards);
   }
 
+  if (ritual.clarifyId) {
+    params.set("clarifyId", ritual.clarifyId);
+  }
+
+  if (ritual.clarifyLabel) {
+    params.set("clarifyLabel", ritual.clarifyLabel);
+  }
+
+  if (ritual.clarifyFocus) {
+    params.set("clarifyFocus", ritual.clarifyFocus);
+  }
+
+  if (ritual.clarifyNote) {
+    params.set("clarifyNote", ritual.clarifyNote);
+  }
+
   return `/ai-guide/result?${params.toString()}`;
 }
 
@@ -91,6 +115,10 @@ function resolveInitialRitual({
   initialCards,
   initialOrientation,
   initialLang,
+  initialClarifyId,
+  initialClarifyLabel,
+  initialClarifyFocus,
+  initialClarifyNote,
 }: Omit<RevealClientProps, "hasLangParam">): RitualState {
   const mode: ReadingMode = isReadingMode(initialMode)
     ? initialMode
@@ -104,6 +132,10 @@ function resolveInitialRitual({
     card: initialCard,
     cards: initialCards,
     lang: initialLang,
+    clarifyId: initialClarifyId,
+    clarifyLabel: initialClarifyLabel,
+    clarifyFocus: initialClarifyFocus,
+    clarifyNote: initialClarifyNote,
   };
 }
 
@@ -195,6 +227,10 @@ export function RevealClient({
   initialOrientation,
   initialLang,
   hasLangParam,
+  initialClarifyId,
+  initialClarifyLabel,
+  initialClarifyFocus,
+  initialClarifyNote,
 }: RevealClientProps) {
   const router = useRouter();
   const copy = text(initialLang);
@@ -207,9 +243,19 @@ export function RevealClient({
       initialCards,
       initialOrientation,
       initialLang,
+      initialClarifyId,
+      initialClarifyLabel,
+      initialClarifyFocus,
+      initialClarifyNote,
     }),
   );
   const [selectedPhysicalCard, setSelectedPhysicalCard] = useState("");
+  const [revealed, setRevealed] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setRevealed(true), 380);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     const stored = readLatestRitual();
@@ -464,12 +510,18 @@ export function RevealClient({
 
         <LuminousRevealCard />
 
-        <p className="mt-2 text-[0.64rem] font-semibold uppercase tracking-[0.26em] text-[#a77f3c]">
-          {copy.onlineDeck}
-        </p>
-        <p className="mx-auto mt-2 max-w-[24rem] text-sm leading-6 text-[#7b6c58]">
-          {copy.onlineDeckDescription}
-        </p>
+        <div
+          className={`transition-all duration-500 ${
+            revealed ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"
+          }`}
+        >
+          <p className="mt-2 text-[0.64rem] font-semibold uppercase tracking-[0.26em] text-[#a77f3c]">
+            {copy.onlineDeck}
+          </p>
+          <p className="mx-auto mt-2 max-w-[24rem] text-sm leading-6 text-[#7b6c58]">
+            {copy.onlineDeckDescription}
+          </p>
+        </div>
 
         {card.image && (
           <Image
@@ -483,9 +535,15 @@ export function RevealClient({
         )}
       </section>
 
-      <LuminousAction href={buildResultHref(ritual)}>
-        {copy.openReading}
-      </LuminousAction>
+      <div
+        className={`transition-all duration-500 ${
+          revealed ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"
+        }`}
+      >
+        <LuminousAction href={buildResultHref(ritual)}>
+          {copy.openReading}
+        </LuminousAction>
+      </div>
     </LuminousShell>
   );
 }

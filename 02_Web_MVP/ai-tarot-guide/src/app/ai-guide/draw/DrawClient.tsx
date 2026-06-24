@@ -22,6 +22,17 @@ type DrawClientProps = {
   initialLang: Language;
   hasLangParam: boolean;
   initialRitualStep: number;
+  initialClarifyId: string;
+  initialClarifyLabel: string;
+  initialClarifyFocus: string;
+  initialClarifyNote: string;
+};
+
+type ClarifyParams = {
+  id: string;
+  label: string;
+  focus: string;
+  note: string;
 };
 
 function buildQuery(
@@ -32,6 +43,7 @@ function buildQuery(
   card?: string,
   cards?: string,
   ritualStep?: number,
+  clarify?: ClarifyParams,
 ) {
   const params = new URLSearchParams({
     mode,
@@ -51,6 +63,22 @@ function buildQuery(
 
   if (ritualStep) {
     params.set("ritualStep", String(ritualStep));
+  }
+
+  if (clarify?.id) {
+    params.set("clarifyId", clarify.id);
+  }
+
+  if (clarify?.label) {
+    params.set("clarifyLabel", clarify.label);
+  }
+
+  if (clarify?.focus) {
+    params.set("clarifyFocus", clarify.focus);
+  }
+
+  if (clarify?.note) {
+    params.set("clarifyNote", clarify.note);
   }
 
   return params.toString();
@@ -195,8 +223,18 @@ export function DrawClient({
   initialLang,
   hasLangParam,
   initialRitualStep,
+  initialClarifyId,
+  initialClarifyLabel,
+  initialClarifyFocus,
+  initialClarifyNote,
 }: DrawClientProps) {
   const router = useRouter();
+  const clarify: ClarifyParams = {
+    id: initialClarifyId,
+    label: initialClarifyLabel,
+    focus: initialClarifyFocus,
+    note: initialClarifyNote,
+  };
   const copy = text(initialLang);
   const onlineSteps = [
     {
@@ -224,6 +262,7 @@ export function DrawClient({
   const [question, setQuestion] = useState<string | undefined>(
     initialQuestion || undefined,
   );
+  const [stepSettled, setStepSettled] = useState(false);
   const [drawnCard, setDrawnCard] = useState<string | undefined>(undefined);
   const [drawnCards, setDrawnCards] = useState<string | undefined>(undefined);
   const currentOnlineStep = onlineSteps[initialRitualStep];
@@ -238,6 +277,7 @@ export function DrawClient({
           undefined,
           undefined,
           initialRitualStep + 1,
+          clarify,
         )}`
       : `/ai-guide/reveal?${buildQuery(
           "online",
@@ -246,7 +286,17 @@ export function DrawClient({
           initialLang,
           initialSpread === "single" ? drawnCard : undefined,
           initialSpread === "three-card" ? drawnCards : undefined,
+          undefined,
+          clarify,
         )}`;
+
+  useEffect(() => {
+    queueMicrotask(() => {
+      setStepSettled(false);
+    });
+    const settleTimer = setTimeout(() => setStepSettled(true), 20);
+    return () => clearTimeout(settleTimer);
+  }, [initialRitualStep]);
 
   useEffect(() => {
     const storedQuestion = localStorage.getItem(USER_QUESTION_KEY) ?? "";
@@ -408,7 +458,11 @@ export function DrawClient({
             })}
           </div>
 
-          <div className="mt-8 text-center">
+          <div
+            className={`mt-8 text-center transition-all duration-300 ${
+              stepSettled ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"
+            }`}
+          >
             <p className="text-[0.64rem] font-semibold uppercase tracking-[0.26em] text-[#a77f3c]">
               {copy.shuffle} · {copy.cut} · {copy.draw}
             </p>
@@ -425,7 +479,11 @@ export function DrawClient({
             </div>
           </div>
 
-          <div className="mt-6 flex justify-center">
+          <div
+            className={`mt-6 flex justify-center transition-all duration-500 ${
+              stepSettled ? "translate-y-0 opacity-100" : "translate-y-3 opacity-0"
+            }`}
+          >
             <LuminousCardBack activeStep={initialRitualStep} />
           </div>
         </section>
@@ -497,6 +555,10 @@ export function DrawClient({
           initialSpread,
           question,
           initialLang,
+          undefined,
+          undefined,
+          undefined,
+          clarify,
         )}`}
       >
         {copy.haveDrawnCard}
