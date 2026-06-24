@@ -14,6 +14,7 @@ type AskFormProps = {
   orientation: "upright";
   lang: Language;
   hasLangParam: boolean;
+  initialQuestion?: string;
 };
 
 export function AskForm({
@@ -22,12 +23,17 @@ export function AskForm({
   orientation,
   lang,
   hasLangParam,
+  initialQuestion = "",
 }: AskFormProps) {
-  const [question, setQuestion] = useState("");
+  const [question, setQuestion] = useState(initialQuestion);
   const [error, setError] = useState("");
   const copy = text(lang);
 
   useEffect(() => {
+    if (initialQuestion) {
+      return;
+    }
+
     const storedQuestion = localStorage.getItem(USER_QUESTION_KEY);
 
     if (storedQuestion) {
@@ -35,7 +41,7 @@ export function AskForm({
         setQuestion(storedQuestion);
       });
     }
-  }, []);
+  }, [initialQuestion]);
 
   return (
     <main className="relative min-h-svh overflow-hidden bg-[#f6f0e5] px-0 py-0 text-[#2f261d] sm:px-6 sm:py-6 lg:px-8">

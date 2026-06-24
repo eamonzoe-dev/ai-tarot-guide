@@ -265,6 +265,12 @@ export function OracleShowroomHome({
       chips: isZh
         ? ["关系", "工作", "自我", "选择", "未来"]
         : ["Love", "Work", "Self", "Decision", "Future"],
+      askOraTitle: isZh ? "向 Ora 提问" : "Ask Ora",
+      askOraDescription: isZh
+        ? "写下你现在想问的一句话，Ora 会带你抽一张牌。"
+        : "Write the one thing you want to ask. Ora will guide you through a draw.",
+      askOraButton: isZh ? "开始这次解读" : "Begin this reading",
+      examplesLabel: isZh ? "也可以从这些问题开始" : "Or start from one of these",
       questions: isZh
         ? [
             "我还没有看清什么？",
@@ -858,7 +864,42 @@ export function OracleShowroomHome({
               ))}
             </div>
           </div>
-          <div className="mt-12 grid gap-x-4 gap-y-6 sm:grid-cols-2 lg:grid-cols-4">
+
+          <form
+            action="/ai-guide/ask"
+            method="get"
+            className="mt-10 max-w-2xl rounded-[1.6rem] border border-[#caa96a]/40 bg-[#fffaf0]/82 p-5 shadow-[0_22px_58px_rgba(102,75,33,0.12),inset_0_1px_0_rgba(255,255,255,0.7)] backdrop-blur-md sm:p-6"
+          >
+            <input name="lang" type="hidden" value={lang} />
+            <input name="mode" type="hidden" value="online" />
+            <input name="spread" type="hidden" value="single" />
+            <input name="orientation" type="hidden" value="upright" />
+
+            <label
+              className="block text-[0.66rem] font-semibold uppercase tracking-[0.2em] text-[#9d7b3f]"
+              htmlFor="homepage-ask-ora-question"
+            >
+              {copy.askOraTitle}
+            </label>
+            <p className="mt-2 text-sm leading-6 text-[#766955]">
+              {copy.askOraDescription}
+            </p>
+            <textarea
+              className="mt-4 w-full resize-none rounded-[1.1rem] border border-[#caa96a]/40 bg-white/70 p-3.5 text-base leading-7 text-[#3f352b] outline-none placeholder:text-[#a9967a] transition focus:border-[#b9934f]/70 focus:bg-white/90 focus:ring-2 focus:ring-[#d6b36d]/22"
+              id="homepage-ask-ora-question"
+              name="question"
+              placeholder={copy.askOraDescription}
+              rows={2}
+            />
+            <button className="showroom-action-primary mt-4" type="submit">
+              {copy.askOraButton}
+            </button>
+          </form>
+
+          <p className="mt-10 text-[0.66rem] font-semibold uppercase tracking-[0.18em] text-[#9d7b3f]">
+            {copy.examplesLabel}
+          </p>
+          <div className="mt-4 grid gap-x-4 gap-y-6 sm:grid-cols-2 lg:grid-cols-4">
             {copy.questions.map((question, index) => {
               const paper = [
                 "bg-[#fffbf4]/90",

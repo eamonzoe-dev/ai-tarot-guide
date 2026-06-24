@@ -22,6 +22,7 @@ export default async function AskPage({
     spread?: string | string[];
     orientation?: string | string[];
     lang?: string | string[];
+    question?: string | string[];
   }>;
 }) {
   const {
@@ -29,6 +30,7 @@ export default async function AskPage({
     spread: spreadParam,
     orientation: orientationParam,
     lang: langParam,
+    question: questionParam,
   } = await searchParams;
   const mode = normalizeMode(modeParam);
   const lang = normalizeLanguage(langParam);
@@ -37,6 +39,7 @@ export default async function AskPage({
   const spread: Spread = spreadValue === "three-card" ? "three-card" : "single";
   const orientation: Orientation =
     orientationValue === "upright" ? "upright" : "upright";
+  const initialQuestion = normalizeValue(questionParam).trim();
 
   return (
     <AskForm
@@ -45,6 +48,7 @@ export default async function AskPage({
       orientation={orientation}
       lang={lang}
       hasLangParam={Boolean(langParam)}
+      initialQuestion={initialQuestion}
     />
   );
 }
