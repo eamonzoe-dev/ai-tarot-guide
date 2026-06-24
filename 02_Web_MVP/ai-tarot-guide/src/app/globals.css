@@ -1,33 +1,100 @@
 @import "tailwindcss";
 
-:root {
-  --background: #030303;
-  --foreground: #eee8dd;
-  --atelier-ink: #050506;
-  --atelier-wood: #100b08;
-  --atelier-wood-soft: #1a130e;
-  --atelier-leather: #17110d;
-  --atelier-brass: #c39b58;
-  --ritual-gold: #d9bd80;
-  --ritual-gold-muted: #9a7b42;
-  --atelier-paper: #d8c9ae;
-  --atelier-paper-deep: #b9a789;
-  --atelier-blue: #6f8da3;
-  --ora-ink-black: #030303;
-  --ora-deep-black: #070604;
-  --ora-dark-walnut: #100b08;
-  --ora-charcoal-brown: #1a130e;
-  --ora-aged-brass: #b58a48;
-  --ora-muted-gold: #d2b06d;
-  --ora-champagne-gold: #ead7a6;
-  --ora-warm-parchment: #d8c9ae;
-  --ora-bone-white: #f4efe5;
-  --ora-pearl-gray: #cfc9bc;
-  --ora-mist-taupe: #8f826f;
-  --ora-soft-ember: #c88b4a;
-  --ora-deep-verdigris: #31483f;
-  --font-geist-sans: Arial, Helvetica, sans-serif;
+:root,
+:root[data-theme="day"] {
+  color-scheme: light;
+  --c-bg: #f5efe2;
+  --c-bg-elevated: #faf6ec;
+  --c-surface: #faf6ec;
+  --c-surface-2: #ece3d0;
+  --c-surface-3: #f0e7d0;
+  --c-ritual: #283a2e;
+  --c-ritual-strong: #1c2a21;
+  --c-text: #26221c;
+  --c-text-soft: #6e6557;
+  --c-text-muted: #8a806f;
+  --c-text-inverse: #faf6ec;
+  --c-border: #e2d7c2;
+  --c-border-strong: #d6c9ae;
+  --c-accent: #a07c36;
+  --c-accent-hover: #b6924a;
+  --c-accent-text: #846225;
+  --c-accent-wash: #f0e7d0;
+  --c-danger: #8a4634;
+  --c-danger-bg: #fff1ea;
+  --c-danger-border: #d9a08e;
+  --c-focus: #a07c36;
+  --c-selection-bg: #a07c36;
+  --c-selection-text: #faf6ec;
+  --shadow-card: none;
+  --shadow-soft: none;
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.25rem;
+  --radius-pill: 9999px;
+  --maxw: 980px;
+  --gutter: clamp(20px, 5vw, 64px);
+  --font-display-lat: "Cormorant Garamond", Georgia, serif;
+  --font-serif-lat: "Spectral", Georgia, serif;
+  --font-serif-cjk: "Noto Serif SC", "Songti SC", serif;
+  --font-sans-cjk: "Noto Sans SC", Arial, Helvetica, sans-serif;
+  --font-geist-sans: var(--font-sans-cjk);
   --font-geist-mono: ui-monospace, SFMono-Regular, Consolas, monospace;
+  --background: var(--c-bg);
+  --foreground: var(--c-text);
+  --atelier-ink: var(--c-bg);
+  --atelier-wood: var(--c-surface-2);
+  --atelier-wood-soft: var(--c-surface);
+  --atelier-leather: var(--c-surface);
+  --atelier-brass: var(--c-accent);
+  --ritual-gold: var(--c-accent);
+  --ritual-gold-muted: var(--c-accent-text);
+  --atelier-paper: var(--c-surface);
+  --atelier-paper-deep: var(--c-surface-2);
+  --atelier-blue: var(--c-ritual);
+  --ora-ink-black: var(--c-text);
+  --ora-deep-black: var(--c-bg);
+  --ora-dark-walnut: var(--c-text);
+  --ora-charcoal-brown: var(--c-surface-2);
+  --ora-aged-brass: var(--c-accent);
+  --ora-muted-gold: var(--c-accent);
+  --ora-champagne-gold: var(--c-accent-hover);
+  --ora-warm-parchment: var(--c-surface-2);
+  --ora-bone-white: var(--c-bg-elevated);
+  --ora-pearl-gray: var(--c-border);
+  --ora-mist-taupe: var(--c-text-soft);
+  --ora-soft-ember: var(--c-accent-hover);
+  --ora-deep-verdigris: var(--c-ritual);
+}
+
+:root[data-theme="night"] {
+  color-scheme: dark;
+  --c-bg: #13161f;
+  --c-bg-elevated: #1b1f2b;
+  --c-surface: #1b1f2b;
+  --c-surface-2: #0e1118;
+  --c-surface-3: #2a3a31;
+  --c-ritual: #3c5547;
+  --c-ritual-strong: #2a3a31;
+  --c-text: #efe9db;
+  --c-text-soft: #a29f90;
+  --c-text-muted: #76746a;
+  --c-text-inverse: #13161f;
+  --c-border: #2a2f3d;
+  --c-border-strong: #3a4052;
+  --c-accent: #d8b25a;
+  --c-accent-hover: #ecc97a;
+  --c-accent-text: #ecc97a;
+  --c-accent-wash: rgba(216, 178, 90, 0.1);
+  --c-danger: #f0b3a0;
+  --c-danger-bg: rgba(138, 70, 52, 0.18);
+  --c-danger-border: rgba(240, 179, 160, 0.38);
+  --c-focus: #ecc97a;
+  --c-selection-bg: #d8b25a;
+  --c-selection-text: #13161f;
+  --shadow-card: none;
+  --shadow-soft: none;
 }
 
 @theme inline {
@@ -40,13 +107,336 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans-cjk);
+  font-weight: 300;
+  line-height: 1.75;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
 }
 
 button,
 textarea,
 input {
   font: inherit;
+}
+
+::selection {
+  background: var(--c-selection-bg);
+  color: var(--c-selection-text);
+}
+
+:where(a, button, input, textarea, select):focus-visible {
+  outline: 2px solid var(--c-focus);
+  outline-offset: 3px;
+}
+
+.ora-page-shell {
+  isolation: isolate;
+  min-height: 100svh;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--c-bg-elevated) 48%, transparent), transparent 34rem),
+    var(--c-bg);
+  color: var(--c-text);
+}
+
+:root[data-theme="night"] .ora-page-shell {
+  background:
+    radial-gradient(1px 1px at 12% 22%, rgba(239, 233, 219, 0.28), transparent),
+    radial-gradient(1px 1px at 63% 48%, rgba(216, 178, 90, 0.24), transparent),
+    linear-gradient(180deg, color-mix(in srgb, var(--c-bg-elevated) 38%, transparent), transparent 34rem),
+    var(--c-bg);
+}
+
+.ora-route-container {
+  position: relative;
+  z-index: 1;
+  margin-inline: auto;
+  width: 100%;
+  max-width: 42rem;
+  padding: 1.75rem 1.25rem;
+}
+
+@media (min-width: 640px) {
+  .ora-route-container {
+    padding: 2.25rem 1.5rem;
+  }
+}
+
+.wordmark {
+  font-family: var(--font-display-lat);
+  font-style: italic;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+.t-display,
+.t-h1,
+.t-h2,
+.t-h3,
+.reading {
+  color: var(--c-text);
+  font-family: var(--font-serif-cjk);
+  text-wrap: balance;
+}
+
+.t-display {
+  font-size: clamp(2.75rem, 8vw, 4.75rem);
+  font-weight: 500;
+  line-height: 1.04;
+}
+
+.t-h1 {
+  font-size: clamp(2.35rem, 7vw, 3.5rem);
+  font-weight: 500;
+  line-height: 1.12;
+}
+
+.t-h2 {
+  font-size: clamp(1.7rem, 4.5vw, 2.35rem);
+  font-weight: 500;
+  line-height: 1.26;
+}
+
+.t-h3 {
+  font-size: clamp(1.18rem, 3vw, 1.5rem);
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.t-body-lg {
+  color: var(--c-text);
+  font-family: var(--font-serif-cjk);
+  font-size: 1.1rem;
+  font-weight: 400;
+  line-height: 1.85;
+}
+
+.t-body {
+  color: var(--c-text-soft);
+  font-family: var(--font-sans-cjk);
+  font-size: 1rem;
+  font-weight: 300;
+  line-height: 1.75;
+}
+
+.eyebrow {
+  color: var(--c-accent-text);
+  font-family: var(--font-sans-cjk);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+
+.caption {
+  color: var(--c-text-soft);
+  font-family: var(--font-sans-cjk);
+  font-size: 0.83rem;
+  font-weight: 300;
+  line-height: 1.65;
+}
+
+.micro {
+  color: var(--c-text-muted);
+  font-family: var(--font-sans-cjk);
+  font-size: 0.69rem;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+}
+
+.reading {
+  font-size: 1.05rem;
+  font-weight: 400;
+  line-height: 1.95;
+}
+
+.btn {
+  display: inline-flex;
+  min-height: 3rem;
+  touch-action: manipulation;
+  user-select: none;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  padding: 0.85rem 1.35rem;
+  text-align: center;
+  color: var(--c-text);
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease,
+    transform 120ms ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn:disabled,
+.btn[aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.55;
+  transform: none;
+}
+
+.btn--primary {
+  border-color: var(--c-accent);
+  background: var(--c-accent);
+  color: var(--c-text-inverse);
+}
+
+.btn--primary:hover {
+  border-color: var(--c-accent-hover);
+  background: var(--c-accent-hover);
+}
+
+.btn--ghost {
+  border-color: var(--c-accent);
+  background: transparent;
+  color: var(--c-accent-text);
+}
+
+.btn--ghost:hover {
+  background: var(--c-accent-wash);
+}
+
+.btn--surface {
+  border-color: var(--c-border);
+  background: var(--c-surface);
+  color: var(--c-text);
+}
+
+.btn--surface:hover {
+  border-color: var(--c-border-strong);
+  color: var(--c-accent-text);
+}
+
+.btn--text {
+  min-height: auto;
+  border: 0;
+  background: transparent;
+  padding: 0.2rem 0;
+  color: var(--c-accent-text);
+}
+
+.card,
+.well,
+.ritual {
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-lg);
+}
+
+.card {
+  background: var(--c-surface);
+  color: var(--c-text);
+}
+
+.well {
+  background: var(--c-surface-2);
+  color: var(--c-text);
+}
+
+.ritual {
+  border-color: color-mix(in srgb, var(--c-accent) 38%, var(--c-border));
+  background: var(--c-ritual);
+  color: var(--c-text-inverse);
+}
+
+.input {
+  width: 100%;
+  border: 1px solid var(--c-border-strong);
+  border-radius: var(--radius-lg);
+  background: var(--c-surface);
+  color: var(--c-text);
+  outline: none;
+}
+
+.input::placeholder {
+  color: var(--c-text-muted);
+}
+
+.input:focus {
+  border-color: var(--c-accent);
+}
+
+.rule {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  color: var(--c-accent-text);
+}
+
+.rule::before,
+.rule::after {
+  content: "";
+  height: 1px;
+  flex: 1;
+  background: var(--c-border);
+}
+
+.theme-toggle {
+  display: inline-flex;
+  min-height: 2.5rem;
+  touch-action: manipulation;
+  align-items: center;
+  gap: 0.4rem;
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-pill);
+  background: var(--c-surface);
+  color: var(--c-text-soft);
+  padding: 0.35rem;
+}
+
+.theme-toggle__option {
+  display: inline-flex;
+  min-height: 1.85rem;
+  min-width: 1.85rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-pill);
+  color: var(--c-text-muted);
+  transition:
+    background-color 160ms ease,
+    color 160ms ease;
+}
+
+.theme-toggle__option[data-active="true"] {
+  background: var(--c-accent);
+  color: var(--c-text-inverse);
+}
+
+.theme-toggle svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+  }
+
+  .btn,
+  .theme-toggle__option {
+    transition: none;
+  }
+
+  .btn:hover,
+  .btn:active {
+    transform: none;
+  }
 }
 
 .atelier-page {
@@ -1955,4 +2345,78 @@ input {
     transition: none;
     transform: none;
   }
+}
+
+/* Visual-system bridge for legacy route classes during the redesign pass. */
+.atelier-page,
+.tarot-ink {
+  background: var(--c-bg);
+  color: var(--c-text);
+}
+
+.atelier-grain {
+  opacity: 0.08;
+  mix-blend-mode: normal;
+}
+
+.ritual-room-container {
+  background: transparent;
+  color: var(--c-text);
+}
+
+.atelier-panel,
+.atelier-paper-dark,
+.ora-surface-archive,
+.ora-surface-ritual,
+.ora-surface-luminous,
+.ora-reading-dossier-surface {
+  border-color: var(--c-border);
+  background: var(--c-surface);
+  color: var(--c-text);
+  box-shadow: none;
+}
+
+.atelier-paper,
+.ora-surface-parchment {
+  border-color: var(--c-border);
+  background: var(--c-surface-2);
+  color: var(--c-text);
+  box-shadow: none;
+}
+
+.atelier-label {
+  color: var(--c-accent-text);
+}
+
+.ritual-action-link {
+  border-color: var(--c-border);
+  background: var(--c-surface);
+  color: var(--c-text);
+  box-shadow: none;
+}
+
+.ritual-action-link:hover {
+  border-color: var(--c-accent);
+  color: var(--c-accent-text);
+  box-shadow: none;
+}
+
+.ora-card-back {
+  border-color: var(--c-border-strong);
+  background: var(--c-surface-2);
+  color: var(--c-accent-text);
+  box-shadow: none;
+}
+
+.ora-card-back::before,
+.ora-card-back-symbol,
+.ora-card-back-symbol::before,
+.ora-card-back-symbol::after {
+  border-color: var(--c-border-strong);
+}
+
+.ora-glow-soft,
+.ora-glow-ritual,
+.ora-motion-card-hover:hover {
+  box-shadow: none;
 }

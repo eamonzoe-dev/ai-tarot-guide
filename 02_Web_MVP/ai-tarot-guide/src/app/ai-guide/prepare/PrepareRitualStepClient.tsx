@@ -76,22 +76,22 @@ export function PrepareRitualStepClient({
       <RitualCoreV2 pulseCount={pulseCount} state={step} />
 
       <div
-        className={`ritual-demo-copy ritual-prepare-copy ${
+        className={`ritual-demo-copy ritual-prepare-copy card mx-auto max-w-sm px-5 py-6 text-center ${
           transitionPhase === "out" ? "ritual-demo-copy-out" : ""
         } ${transitionPhase === "in" ? "ritual-demo-copy-in" : ""}`}
       >
-        <p className="ritual-step-indicator mb-5">
+        <p className="ritual-step-indicator eyebrow mb-5">
           {readingRoom} / {count}
         </p>
-        <h1 className="font-serif text-4xl leading-tight text-[#f4efe5]">
+        <h1 className="t-h1">
           {main}
         </h1>
-        <p className="mx-auto mt-5 max-w-xs text-sm leading-7 text-[#c8c0b4]">
+        <p className="caption mx-auto mt-5 max-w-xs">
           {sub}
         </p>
       </div>
 
-      <div className="ritual-prepare-card relative z-20 mx-auto my-8" />
+      <div className="ritual-prepare-card ora-card-back relative z-20 mx-auto my-8 h-20 w-12" />
 
       <div className="ritual-prepare-action relative z-40">
         <TarotButton

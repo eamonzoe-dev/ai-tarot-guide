@@ -149,13 +149,7 @@ function LuminousShell({
   hasLangParam: boolean;
 }) {
   return (
-    <main className="relative min-h-svh overflow-hidden bg-[#f6f0e5] px-0 py-0 text-[#34271b] sm:px-6 sm:py-6 lg:px-8">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.98),rgba(246,240,229,0.9)_42%,rgba(226,213,188,0.5)_100%)]" />
-      <div className="pointer-events-none absolute left-1/2 top-16 h-[32rem] w-[32rem] -translate-x-1/2 rounded-full border border-[#c9a86a]/16 opacity-80" />
-      <div className="pointer-events-none absolute left-1/2 top-28 h-[23rem] w-[23rem] -translate-x-1/2 rounded-full border border-[#d8bd82]/20 opacity-80" />
-      <div className="pointer-events-none absolute left-1/2 top-44 h-[13rem] w-[13rem] -translate-x-1/2 rounded-full border border-[#ead7aa]/34 opacity-80" />
-      <div className="pointer-events-none absolute -left-16 bottom-10 h-64 w-64 rounded-full bg-[#d7bd82]/12 blur-3xl" />
-      <div className="pointer-events-none absolute -right-20 top-40 h-72 w-72 rounded-full bg-white/45 blur-3xl" />
+    <main className="ora-page-shell relative min-h-svh overflow-hidden px-0 py-0 sm:px-6 sm:py-6 lg:px-8">
       <ActivationCodePanel lang={lang} hasLangParam={hasLangParam} />
 
       <div className="relative z-10 mx-auto flex min-h-svh w-full max-w-[720px] flex-col gap-6 px-5 py-7 sm:min-h-0 sm:px-6 sm:py-9">
@@ -171,7 +165,7 @@ function LuminousNav({
   lang: Language;
 }) {
   return (
-    <div className="rounded-[2rem] border border-[#d7bd82]/40 bg-white/42 px-4 py-3 shadow-[0_18px_60px_rgba(123,93,45,0.08)] backdrop-blur-md">
+    <div className="card px-4 py-3">
       <ReadingNav lang={lang} />
     </div>
   );
@@ -188,8 +182,8 @@ function LuminousAction({
 }) {
   const className =
     variant === "ghost"
-      ? "flex min-h-12 touch-manipulation select-none items-center justify-center rounded-full border border-[#c89d4f]/45 bg-white/45 px-5 text-center text-xs font-semibold uppercase tracking-[0.2em] text-[#6f552b] shadow-[0_14px_32px_rgba(148,105,39,0.10)] transition hover:-translate-y-0.5 hover:bg-white/70 focus:outline-none focus:ring-2 focus:ring-[#c89d4f]/35 focus:ring-offset-2 focus:ring-offset-[#f6f0e5]"
-      : "flex min-h-12 touch-manipulation select-none items-center justify-center rounded-full border border-[#c89d4f]/70 bg-[linear-gradient(180deg,rgba(246,225,174,0.98),rgba(197,151,72,0.98))] px-5 text-center text-xs font-semibold uppercase tracking-[0.2em] text-[#3a2a18] shadow-[0_18px_38px_rgba(148,105,39,0.22),inset_0_1px_0_rgba(255,255,255,0.55)] transition hover:-translate-y-0.5 hover:shadow-[0_22px_44px_rgba(148,105,39,0.26),inset_0_1px_0_rgba(255,255,255,0.62)] focus:outline-none focus:ring-2 focus:ring-[#c89d4f]/45 focus:ring-offset-2 focus:ring-offset-[#f6f0e5]";
+      ? "btn btn--ghost w-full"
+      : "btn btn--primary w-full";
 
   return (
     <Link className={className} href={href}>
@@ -201,18 +195,12 @@ function LuminousAction({
 function LuminousRevealCard() {
   return (
     <div className="relative mx-auto h-[24rem] w-full max-w-[22rem]">
-      <div className="pointer-events-none absolute left-1/2 top-1/2 h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#d2b06d]/20" />
-      <div className="pointer-events-none absolute left-1/2 top-1/2 h-52 w-52 -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#d2b06d]/26" />
-      <div className="pointer-events-none absolute left-1/2 top-1/2 h-px w-64 -translate-x-1/2 bg-gradient-to-r from-transparent via-[#caa664]/40 to-transparent" />
-      <div className="pointer-events-none absolute left-1/2 top-1/2 h-64 w-px -translate-y-1/2 bg-gradient-to-b from-transparent via-[#caa664]/32 to-transparent" />
+      <div className="pointer-events-none absolute left-1/2 top-1/2 h-px w-64 -translate-x-1/2 bg-[var(--c-border-strong)]" />
+      <div className="pointer-events-none absolute left-1/2 top-1/2 h-64 w-px -translate-y-1/2 bg-[var(--c-border)]" />
 
-      <div className="absolute left-1/2 top-8 h-[19rem] w-48 -translate-x-1/2 rounded-[1.65rem] border border-[#cfa85e]/52 bg-[#fffaf0]/88 shadow-[0_32px_75px_rgba(121,84,30,0.18),0_0_80px_rgba(211,178,109,0.24),inset_0_1px_0_rgba(255,255,255,0.78)]">
-        <div className="absolute inset-4 rounded-[1.25rem] border border-[#d8bd82]/48" />
-        <div className="absolute left-1/2 top-10 h-20 w-20 -translate-x-1/2 rounded-full border border-[#d8bd82]/42" />
-        <div className="absolute bottom-10 left-1/2 h-20 w-20 -translate-x-1/2 rounded-full border border-[#d8bd82]/34" />
-        <div className="absolute left-1/2 top-1/2 h-14 w-14 -translate-x-1/2 -translate-y-1/2 rotate-45 border border-[#cfa85e]/52" />
-        <div className="absolute left-1/2 top-1/2 h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#cfa85e]/58" />
-        <div className="absolute inset-x-9 top-1/2 h-px bg-gradient-to-r from-transparent via-[#d2b06d]/40 to-transparent" />
+      <div className="ora-card-back absolute left-1/2 top-8 h-[19rem] w-48 -translate-x-1/2">
+        <div className="absolute inset-4 rounded-[1.25rem] border border-[var(--c-border-strong)]" />
+        <div className="absolute left-1/2 top-1/2 h-14 w-14 -translate-x-1/2 -translate-y-1/2 rotate-45 border border-[var(--c-accent)]" />
       </div>
     </div>
   );
@@ -339,17 +327,15 @@ export function RevealClient({
         <LuminousNav lang={initialLang} />
 
         <header className="space-y-4 text-center">
-          <div className="mx-auto flex items-center justify-center gap-3 text-[#a77f3c]">
-            <span className="h-px w-10 bg-[#d2b06d]/55" />
-            <span className="text-[0.66rem] font-semibold uppercase tracking-[0.28em]">
+          <div className="rule mx-auto max-w-xs">
+            <span className="eyebrow">
               {copy.physicalCardMode}
             </span>
-            <span className="h-px w-10 bg-[#d2b06d]/55" />
           </div>
-          <h1 className="font-serif text-[2.55rem] leading-tight text-[#34271b] sm:text-[3rem]">
+          <h1 className="t-h1">
             {copy.revealPhysicalTitle}
           </h1>
-          <p className="mx-auto max-w-[31rem] text-sm leading-7 text-[#7b6c58]">
+          <p className="caption mx-auto max-w-[31rem]">
             {copy.revealPhysicalDescription}
           </p>
         </header>
@@ -358,9 +344,9 @@ export function RevealClient({
           {tarotCardGroups.map((group) => (
             <section
               key={group.title}
-              className="rounded-[1.75rem] border border-[#d8bd82]/45 bg-[#fffaf1]/74 p-3 shadow-[0_18px_50px_rgba(116,83,36,0.08)] backdrop-blur-md"
+              className="card p-3"
             >
-              <h2 className="mb-3 px-1 text-[0.64rem] font-semibold uppercase tracking-[0.26em] text-[#a77f3c]">
+              <h2 className="eyebrow mb-3 px-1">
                 {getGroupTitle(group.title, initialLang)}
               </h2>
               <div className="grid grid-cols-2 gap-3">
@@ -389,30 +375,27 @@ export function RevealClient({
         <LuminousNav lang={initialLang} />
 
         <header className="space-y-4 text-center">
-          <div className="mx-auto flex items-center justify-center gap-3 text-[#a77f3c]">
-            <span className="h-px w-10 bg-[#d2b06d]/55" />
-            <span className="text-[0.66rem] font-semibold uppercase tracking-[0.28em]">
+          <div className="rule mx-auto max-w-xs">
+            <span className="eyebrow">
               {copy.threeCardSpread}
             </span>
-            <span className="h-px w-10 bg-[#d2b06d]/55" />
           </div>
-          <h1 className="font-serif text-[2.6rem] leading-tight text-[#34271b] sm:text-[3.25rem]">
+          <h1 className="t-h1">
             {copy.threeCardsAreDrawn}
           </h1>
-          <p className="mx-auto max-w-[31rem] text-sm leading-7 text-[#7b6c58]">
+          <p className="caption mx-auto max-w-[31rem]">
             {copy.threeCardsAreDrawnDescription}
           </p>
         </header>
 
-        <section className="relative overflow-hidden rounded-[2.25rem] border border-[#cfad6d]/50 bg-[#fffdf7]/82 p-5 shadow-[0_28px_80px_rgba(111,78,31,0.12),inset_0_1px_0_rgba(255,255,255,0.75)] backdrop-blur-md sm:p-6">
-          <div className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-[#d2b06d]/60 to-transparent" />
+        <section className="card p-5 sm:p-6">
           <div className="grid gap-4 sm:grid-cols-3">
             {threeCardItems.map((threeCard, index) => (
               <article
-                className="rounded-[1.45rem] border border-[#d8bd82]/42 bg-[#fffaf0]/72 p-4 text-center shadow-[0_16px_40px_rgba(116,83,36,0.09)]"
+                className="well p-4 text-center"
                 key={`${threeCard.id}-${threeCardPositions[index]}`}
               >
-                <p className="text-[0.62rem] font-semibold uppercase tracking-[0.2em] text-[#a77f3c]">
+                <p className="eyebrow text-[0.62rem]">
                   {threeCardPositions[index]}
                 </p>
                 <div className="mx-auto mt-4 w-20">
@@ -422,17 +405,17 @@ export function RevealClient({
                       alt={`${getTarotCardTitle(threeCard, initialLang)} tarot card`}
                       width={160}
                       height={284}
-                      className="block h-auto w-full rounded-[0.7rem] border border-[#d8bd82]/50 object-cover shadow-[0_16px_32px_rgba(116,83,36,0.16)]"
+                      className="block h-auto w-full rounded-[0.7rem] border border-[var(--c-border)] object-cover"
                     />
                   ) : (
-                    <div className="flex aspect-[9/16] w-full items-center justify-center rounded-[0.7rem] border border-[#d8bd82]/50 bg-[#fffaf0]/86 p-1 shadow-[0_16px_32px_rgba(116,83,36,0.14)]">
-                      <span className="font-serif text-[0.68rem] leading-tight text-[#3f3021]">
+                    <div className="flex aspect-[9/16] w-full items-center justify-center rounded-[0.7rem] border border-[var(--c-border)] bg-[var(--c-surface)] p-1">
+                      <span className="font-serif text-[0.68rem] leading-tight text-[var(--c-text)]">
                         {getTarotCardTitle(threeCard, initialLang)}
                       </span>
                     </div>
                   )}
                 </div>
-                <h2 className="mt-4 font-serif text-xl leading-tight text-[#34271b]">
+                <h2 className="t-h3 mt-4">
                   {getTarotCardTitle(threeCard, initialLang)}
                 </h2>
               </article>
@@ -457,14 +440,14 @@ export function RevealClient({
       <LuminousShell lang={initialLang} hasLangParam={hasLangParam}>
         <LuminousNav lang={initialLang} />
 
-        <section className="my-auto rounded-[2rem] border border-[#d8bd82]/45 bg-[#fffaf1]/74 p-6 text-center shadow-[0_24px_70px_rgba(116,83,36,0.10)] backdrop-blur-md">
-          <p className="text-[0.66rem] font-semibold uppercase tracking-[0.28em] text-[#a77f3c]">
+        <section className="card my-auto p-6 text-center">
+          <p className="eyebrow">
             {copy.onlineDrawMode}
           </p>
-          <h1 className="mt-4 font-serif text-4xl leading-tight text-[#34271b]">
+          <h1 className="t-h2 mt-4">
             {title}
           </h1>
-          <p className="mt-4 text-sm leading-7 text-[#7b6c58]">
+          <p className="caption mt-4">
             {description}
           </p>
           <div className="mt-6 space-y-3">
@@ -489,25 +472,20 @@ export function RevealClient({
       <LuminousNav lang={initialLang} />
 
       <header className="space-y-4 text-center">
-        <div className="mx-auto flex items-center justify-center gap-3 text-[#a77f3c]">
-          <span className="h-px w-10 bg-[#d2b06d]/55" />
-          <span className="text-[0.66rem] font-semibold uppercase tracking-[0.28em]">
+        <div className="rule mx-auto max-w-xs">
+          <span className="eyebrow">
             {copy.onlineDrawMode}
           </span>
-          <span className="h-px w-10 bg-[#d2b06d]/55" />
         </div>
-        <h1 className="font-serif text-[2.6rem] leading-tight text-[#34271b] sm:text-[3.25rem]">
+        <h1 className="t-h1">
           {copy.cardIsDrawn}
         </h1>
-        <p className="mx-auto max-w-[31rem] text-sm leading-7 text-[#7b6c58]">
+        <p className="caption mx-auto max-w-[31rem]">
           {copy.cardIsDrawnDescription}
         </p>
       </header>
 
-      <section className="relative overflow-hidden rounded-[2.25rem] border border-[#cfad6d]/50 bg-[#fffdf7]/82 p-5 text-center shadow-[0_28px_80px_rgba(111,78,31,0.12),inset_0_1px_0_rgba(255,255,255,0.75)] backdrop-blur-md sm:p-6">
-        <div className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-[#d2b06d]/60 to-transparent" />
-        <div className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full border border-[#d2b06d]/20" />
-
+      <section className="card p-5 text-center sm:p-6">
         <LuminousRevealCard />
 
         <div
@@ -515,10 +493,10 @@ export function RevealClient({
             revealed ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"
           }`}
         >
-          <p className="mt-2 text-[0.64rem] font-semibold uppercase tracking-[0.26em] text-[#a77f3c]">
+          <p className="eyebrow mt-2">
             {copy.onlineDeck}
           </p>
-          <p className="mx-auto mt-2 max-w-[24rem] text-sm leading-6 text-[#7b6c58]">
+          <p className="caption mx-auto mt-2 max-w-[24rem]">
             {copy.onlineDeckDescription}
           </p>
         </div>

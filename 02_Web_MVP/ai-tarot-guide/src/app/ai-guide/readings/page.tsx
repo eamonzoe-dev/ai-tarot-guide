@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { ThemeToggle } from "@/components/ai-guide/ThemeToggle";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { normalizeLanguage, text, withLang } from "@/lib/ai-guide/i18n";
@@ -146,53 +147,29 @@ export default async function MyReadingsPage({
   }
 
   return (
-    <main className="relative flex min-h-svh flex-1 overflow-hidden bg-[#f6f0e5] px-0 py-0 text-[#3d3024] sm:px-6 sm:py-6 lg:px-8">
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.98),rgba(246,240,229,0.9)_42%,rgba(226,213,188,0.46)_100%)]"
-      />
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute left-1/2 top-16 h-[34rem] w-[34rem] -translate-x-1/2 rounded-full border border-[#c9a86a]/16 opacity-80"
-      />
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute left-1/2 top-32 h-[22rem] w-[22rem] -translate-x-1/2 rounded-full border border-[#d8bd82]/22 opacity-80"
-      />
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute left-1/2 top-48 h-px w-[42rem] -translate-x-1/2 bg-gradient-to-r from-transparent via-[#caa664]/22 to-transparent"
-      />
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -left-20 bottom-10 h-72 w-72 rounded-full bg-[#d7bd82]/12 blur-3xl"
-      />
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -right-20 top-40 h-72 w-72 rounded-full bg-white/44 blur-3xl"
-      />
-
+    <main className="ora-page-shell relative flex min-h-svh flex-1 overflow-hidden px-0 py-0 sm:px-6 sm:py-6 lg:px-8">
       <section className="relative z-10 mx-auto flex min-h-svh w-full max-w-5xl flex-col px-5 py-6 sm:min-h-0 sm:px-6 sm:py-8">
         <header className="flex items-center justify-between gap-4">
           <Link
-            className="text-xs font-semibold uppercase tracking-[0.2em] text-[#9d7b3f] transition hover:text-[#5b4a36]"
+            className="btn btn--text text-xs"
             href={backHref}
           >
             {t.readingsBack}
           </Link>
-          <p className="font-serif text-lg text-[#5b4a36]">Ora Arcana</p>
+          <div className="flex items-center gap-3">
+            <p className="wordmark text-lg text-[var(--c-text)]">Ora Arcana</p>
+            <ThemeToggle />
+          </div>
         </header>
 
         <section className="mx-auto w-full max-w-3xl pt-10 text-center sm:pt-14">
-          <p className="mb-3 flex items-center justify-center gap-3 text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-[#9d7b3f]">
-            <span className="h-px w-8 bg-gradient-to-r from-transparent via-[#d8b76a]/70 to-transparent" />
+          <p className="eyebrow mb-3 flex items-center justify-center gap-3">
             {t.readingsEyebrow}
-            <span className="h-px w-8 bg-gradient-to-r from-transparent via-[#d8b76a]/70 to-transparent" />
           </p>
-          <h1 className="font-serif text-4xl leading-tight text-[#4f4235] drop-shadow-[0_1px_0_rgba(255,255,255,0.6)] sm:text-5xl">
+          <h1 className="t-h1">
             {t.readingsTitle}
           </h1>
-          <p className="mx-auto mt-4 max-w-xl text-sm leading-7 text-[#766955] sm:text-base">
+          <p className="caption mx-auto mt-4 max-w-xl sm:text-base">
             {t.readingsIntro}
           </p>
         </section>
@@ -211,7 +188,7 @@ export default async function MyReadingsPage({
                 {t.readingsAuthNote}
               </p>
               <Link
-                className="mt-5 inline-flex min-h-11 items-center justify-center rounded-full border border-[#c89d4f]/72 bg-[linear-gradient(180deg,rgba(246,225,174,0.98),rgba(197,151,72,0.98))] px-5 text-xs font-semibold uppercase tracking-[0.18em] text-[#3a2a18] shadow-[0_16px_34px_rgba(148,105,39,0.18),inset_0_1px_0_rgba(255,255,255,0.58)] transition hover:-translate-y-0.5"
+                className="btn btn--primary mt-5"
                 href={backHref}
               >
                 {t.readingsReturn}
@@ -227,7 +204,7 @@ export default async function MyReadingsPage({
                 {t.readingsErrorBody}
               </p>
               <Link
-                className="mt-5 inline-flex min-h-11 items-center justify-center rounded-full border border-[#c89d4f]/50 bg-white/54 px-5 text-xs font-semibold uppercase tracking-[0.18em] text-[#7b5b2a] shadow-[0_12px_28px_rgba(148,105,39,0.10)] transition hover:-translate-y-0.5 hover:bg-white/74"
+                className="btn btn--ghost mt-5"
                 href={backHref}
               >
                 {t.readingsReturn}

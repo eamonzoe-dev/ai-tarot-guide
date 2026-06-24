@@ -222,11 +222,13 @@ export function ResultFollowUpPanel({
   );
 
   useEffect(() => {
-    setMessages(readStoredMessages(storageKey));
-    setFollowUpQuestion("");
-    setPendingFollowUp(null);
-    setStatus("idle");
-    setErrorMessage("");
+    queueMicrotask(() => {
+      setMessages(readStoredMessages(storageKey));
+      setFollowUpQuestion("");
+      setPendingFollowUp(null);
+      setStatus("idle");
+      setErrorMessage("");
+    });
   }, [storageKey]);
 
   useEffect(() => {
@@ -322,12 +324,12 @@ export function ResultFollowUpPanel({
   }
 
   return (
-    <section className="mt-7 rounded-[1.55rem] border border-[#d8bd82]/34 bg-[linear-gradient(180deg,rgba(255,250,241,0.72),rgba(255,255,255,0.46))] p-4 shadow-[0_18px_44px_rgba(116,83,36,0.07)]">
+    <section className="card mt-7 p-4">
       <div>
-        <p className="font-serif text-xl leading-tight text-[#4a3827]">
+        <p className="t-h3">
           {copy.aiFollowUpPrice(FOLLOW_UP_STARDUST_COST)}
         </p>
-        <p className="mt-2 text-sm leading-6 text-[#7b6c58]">
+        <p className="caption mt-2">
           {copy.aiFollowUpHelper}
         </p>
       </div>
@@ -364,16 +366,16 @@ export function ResultFollowUpPanel({
       </div>
 
       {hasReachedLimit ? (
-        <p className="mt-5 rounded-[1.1rem] border border-[#d8bd82]/26 bg-white/42 px-4 py-3 text-sm leading-6 text-[#7b6c58]">
+        <p className="well mt-5 px-4 py-3 text-sm leading-6">
           {copy.aiFollowUpLimitReached}
         </p>
       ) : (
         <form className="mt-5" onSubmit={handleSubmit}>
-          <div className="rounded-[1.35rem] border border-[#d8bd82]/40 bg-white/54 p-2 shadow-[0_12px_28px_rgba(116,83,36,0.06)] sm:flex sm:items-end sm:gap-2">
+          <div className="well p-2 sm:flex sm:items-end sm:gap-2">
             <div className="min-w-0 flex-1">
               <textarea
                 aria-describedby={helperId}
-                className="min-h-14 w-full resize-none rounded-[1rem] border border-transparent bg-transparent px-3 py-2 text-sm leading-6 text-[#4f4334] outline-none placeholder:text-[#9d8f78] focus:border-[#d8bd82]/45 focus:bg-white/42"
+                className="min-h-14 w-full resize-none rounded-[1rem] border border-transparent bg-transparent px-3 py-2 text-sm leading-6 text-[var(--c-text)] outline-none placeholder:text-[var(--c-text-muted)] focus:border-[var(--c-accent)]"
                 disabled={status === "loading"}
                 maxLength={MAX_FOLLOW_UP_LENGTH + 1}
                 onChange={(event) => {
@@ -389,7 +391,7 @@ export function ResultFollowUpPanel({
                 value={followUpQuestion}
               />
               <div
-                className="flex items-center justify-between gap-3 px-3 pb-1 text-xs text-[#8b7a61]"
+                className="caption flex items-center justify-between gap-3 px-3 pb-1 text-xs"
                 id={helperId}
               >
                 <span>
@@ -405,7 +407,7 @@ export function ResultFollowUpPanel({
               </div>
             </div>
             <button
-              className="min-h-11 w-full rounded-full border border-[#c89d4f]/62 bg-[linear-gradient(180deg,rgba(246,225,174,0.96),rgba(197,151,72,0.96))] px-5 text-xs font-semibold uppercase tracking-[0.16em] text-[#3a2a18] shadow-[0_12px_26px_rgba(148,105,39,0.14),inset_0_1px_0_rgba(255,255,255,0.58)] transition hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-[#c89d4f]/45 focus:ring-offset-2 focus:ring-offset-[#fffaf0] disabled:cursor-not-allowed disabled:opacity-55 disabled:hover:translate-y-0 sm:w-auto"
+              className="btn btn--primary min-h-11 w-full disabled:cursor-not-allowed disabled:opacity-55 sm:w-auto"
               disabled={!canSubmit}
               type="submit"
             >
@@ -416,7 +418,7 @@ export function ResultFollowUpPanel({
       )}
 
       {errorMessage ? (
-        <p className="mt-3 rounded-[1rem] border border-[#c48a73]/36 bg-[#fff5ed]/72 px-3 py-2 text-sm leading-6 text-[#8a4634]">
+        <p className="mt-3 rounded-[1rem] border border-[var(--c-danger-border)] bg-[var(--c-danger-bg)] px-3 py-2 text-sm leading-6 text-[var(--c-danger)]">
           {errorMessage}
         </p>
       ) : null}

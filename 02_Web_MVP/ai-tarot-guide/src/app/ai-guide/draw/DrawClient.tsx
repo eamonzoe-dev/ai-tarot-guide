@@ -136,13 +136,7 @@ function LuminousShell({
   hasLangParam: boolean;
 }) {
   return (
-    <main className="relative min-h-svh overflow-hidden bg-[#f6f0e5] px-0 py-0 text-[#34271b] sm:px-6 sm:py-6 lg:px-8">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.98),rgba(246,240,229,0.9)_42%,rgba(226,213,188,0.5)_100%)]" />
-      <div className="pointer-events-none absolute left-1/2 top-16 h-[32rem] w-[32rem] -translate-x-1/2 rounded-full border border-[#c9a86a]/16 opacity-80" />
-      <div className="pointer-events-none absolute left-1/2 top-28 h-[23rem] w-[23rem] -translate-x-1/2 rounded-full border border-[#d8bd82]/20 opacity-80" />
-      <div className="pointer-events-none absolute left-1/2 top-44 h-[13rem] w-[13rem] -translate-x-1/2 rounded-full border border-[#ead7aa]/34 opacity-80" />
-      <div className="pointer-events-none absolute -left-16 bottom-10 h-64 w-64 rounded-full bg-[#d7bd82]/12 blur-3xl" />
-      <div className="pointer-events-none absolute -right-20 top-40 h-72 w-72 rounded-full bg-white/45 blur-3xl" />
+    <main className="ora-page-shell relative min-h-svh overflow-hidden px-0 py-0 sm:px-6 sm:py-6 lg:px-8">
       <ActivationCodePanel lang={lang} hasLangParam={hasLangParam} />
 
       <div className="relative z-10 mx-auto flex min-h-svh w-full max-w-[720px] flex-col gap-6 px-5 py-7 sm:min-h-0 sm:px-6 sm:py-9">
@@ -158,7 +152,7 @@ function LuminousNav({
   lang: Language;
 }) {
   return (
-    <div className="rounded-[2rem] border border-[#d7bd82]/40 bg-white/42 px-4 py-3 shadow-[0_18px_60px_rgba(123,93,45,0.08)] backdrop-blur-md">
+    <div className="card px-4 py-3">
       <ReadingNav lang={lang} />
     </div>
   );
@@ -173,7 +167,7 @@ function LuminousAction({
 }) {
   return (
     <Link
-      className="flex min-h-12 touch-manipulation select-none items-center justify-center rounded-full border border-[#c89d4f]/70 bg-[linear-gradient(180deg,rgba(246,225,174,0.98),rgba(197,151,72,0.98))] px-5 text-center text-xs font-semibold uppercase tracking-[0.2em] text-[#3a2a18] shadow-[0_18px_38px_rgba(148,105,39,0.22),inset_0_1px_0_rgba(255,255,255,0.55)] transition hover:-translate-y-0.5 hover:shadow-[0_22px_44px_rgba(148,105,39,0.26),inset_0_1px_0_rgba(255,255,255,0.62)] focus:outline-none focus:ring-2 focus:ring-[#c89d4f]/45 focus:ring-offset-2 focus:ring-offset-[#f6f0e5]"
+      className="btn btn--primary w-full"
       href={href}
     >
       {children}
@@ -195,21 +189,16 @@ function LuminousCardBack({
 
   return (
     <div className="relative mx-auto h-72 w-full max-w-[24rem]">
-      <div className="pointer-events-none absolute left-1/2 top-1/2 h-64 w-64 -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#d2b06d]/20" />
-      <div className="pointer-events-none absolute left-1/2 top-1/2 h-44 w-44 -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#d2b06d]/26" />
-      <div className="pointer-events-none absolute left-1/2 top-1/2 h-px w-56 -translate-x-1/2 bg-gradient-to-r from-transparent via-[#caa664]/40 to-transparent" />
-      <div className="pointer-events-none absolute left-1/2 top-1/2 h-56 w-px -translate-y-1/2 bg-gradient-to-b from-transparent via-[#caa664]/32 to-transparent" />
+      <div className="pointer-events-none absolute left-1/2 top-1/2 h-px w-56 -translate-x-1/2 bg-[var(--c-border-strong)]" />
+      <div className="pointer-events-none absolute left-1/2 top-1/2 h-56 w-px -translate-y-1/2 bg-[var(--c-border)]" />
 
       {fanRotation.map((rotationClass, index) => (
         <div
           key={index}
-          className={`absolute left-1/2 top-8 h-56 w-36 -translate-x-1/2 rounded-[1.35rem] border border-[#cfa85e]/45 bg-[#fffaf0]/82 shadow-[0_24px_55px_rgba(121,84,30,0.16),inset_0_1px_0_rgba(255,255,255,0.74)] transition-transform duration-500 ${rotationClass}`}
+          className={`ora-card-back absolute left-1/2 top-8 h-56 w-36 -translate-x-1/2 transition-transform duration-500 ${rotationClass}`}
         >
-          <div className="absolute inset-3 rounded-[1rem] border border-[#d8bd82]/44" />
-          <div className="absolute left-1/2 top-8 h-16 w-16 -translate-x-1/2 rounded-full border border-[#d8bd82]/42" />
-          <div className="absolute bottom-8 left-1/2 h-16 w-16 -translate-x-1/2 rounded-full border border-[#d8bd82]/32" />
-          <div className="absolute left-1/2 top-1/2 h-11 w-11 -translate-x-1/2 -translate-y-1/2 rotate-45 border border-[#cfa85e]/48" />
-          <div className="absolute left-1/2 top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#cfa85e]/52" />
+          <div className="absolute inset-3 rounded-[1rem] border border-[var(--c-border-strong)]" />
+          <div className="absolute left-1/2 top-1/2 h-11 w-11 -translate-x-1/2 -translate-y-1/2 rotate-45 border border-[var(--c-accent)]" />
         </div>
       ))}
     </div>
@@ -353,17 +342,17 @@ export function DrawClient({
   if (question === undefined) {
     return (
       <LuminousShell lang={initialLang} hasLangParam={hasLangParam}>
-        <section className="my-auto rounded-[2rem] border border-[#d8bd82]/45 bg-[#fffaf1]/74 p-6 text-center shadow-[0_24px_70px_rgba(116,83,36,0.10)] backdrop-blur-md">
-          <p className="text-[0.66rem] font-semibold uppercase tracking-[0.28em] text-[#a77f3c]">
+        <section className="card my-auto p-6 text-center">
+          <p className="eyebrow">
             {copy.readingRoom}
           </p>
-          <h1 className="mt-4 font-serif text-4xl leading-tight text-[#34271b]">
+          <h1 className="t-h2 mt-4">
             {copy.readingCard}
           </h1>
-          <p className="mt-4 text-sm leading-7 text-[#7b6c58]">
+          <p className="caption mt-4">
             {copy.gatheringReading}
           </p>
-          <p className="mt-6 text-sm text-[#80715d]">
+          <p className="caption mt-6 text-sm">
             {copy.preparingMessage}
           </p>
         </section>
@@ -378,17 +367,17 @@ export function DrawClient({
   if (initialMode === "online" && initialRitualStep === 2 && !selectedCards) {
     return (
       <LuminousShell lang={initialLang} hasLangParam={hasLangParam}>
-        <section className="my-auto rounded-[2rem] border border-[#d8bd82]/45 bg-[#fffaf1]/74 p-6 text-center shadow-[0_24px_70px_rgba(116,83,36,0.10)] backdrop-blur-md">
-          <p className="text-[0.66rem] font-semibold uppercase tracking-[0.28em] text-[#a77f3c]">
+        <section className="card my-auto p-6 text-center">
+          <p className="eyebrow">
             {copy.readingRoom}
           </p>
-          <h1 className="mt-4 font-serif text-4xl leading-tight text-[#34271b]">
+          <h1 className="t-h2 mt-4">
             {copy.readingCard}
           </h1>
-          <p className="mt-4 text-sm leading-7 text-[#7b6c58]">
+          <p className="caption mt-4">
             {copy.gatheringReading}
           </p>
-          <p className="mt-6 text-sm text-[#80715d]">
+          <p className="caption mt-6 text-sm">
             {copy.preparingMessage}
           </p>
         </section>
@@ -402,31 +391,27 @@ export function DrawClient({
         <LuminousNav lang={initialLang} />
 
         <header className="space-y-4 text-center">
-          <div className="mx-auto flex items-center justify-center gap-3 text-[#a77f3c]">
-            <span className="h-px w-10 bg-[#d2b06d]/55" />
-            <span className="text-[0.66rem] font-semibold uppercase tracking-[0.28em]">
+          <div className="rule mx-auto max-w-xs">
+            <span className="eyebrow">
               {copy.onlineDrawMode}
             </span>
-            <span className="h-px w-10 bg-[#d2b06d]/55" />
           </div>
-          <h1 className="font-serif text-[2.6rem] leading-tight text-[#34271b] sm:text-[3.25rem]">
+          <h1 className="t-h1">
             {copy.onlineDraw}
           </h1>
-          <p className="mx-auto max-w-[31rem] text-sm leading-7 text-[#7b6c58]">
+          <p className="caption mx-auto max-w-[31rem]">
             {copy.onlineDrawDescription}
           </p>
         </header>
 
-        <section className="relative overflow-hidden rounded-[2rem] border border-[#d8bd82]/45 bg-[#fffaf1]/74 p-5 shadow-[0_24px_70px_rgba(116,83,36,0.10)] backdrop-blur-md">
-          <div className="pointer-events-none absolute -right-8 -top-8 h-28 w-28 rounded-full border border-[#d2b06d]/20" />
-          <p className="text-[0.64rem] font-semibold uppercase tracking-[0.26em] text-[#a77f3c]">
+        <section className="well p-5">
+          <p className="eyebrow">
             {copy.yourQuestion}
           </p>
-          <p className="mt-3 text-sm leading-6 text-[#4f4334]">{question}</p>
+          <p className="mt-3 text-sm leading-6 text-[var(--c-text)]">{question}</p>
         </section>
 
-        <section className="relative overflow-hidden rounded-[2.25rem] border border-[#cfad6d]/50 bg-[#fffdf7]/82 p-5 shadow-[0_28px_80px_rgba(111,78,31,0.12),inset_0_1px_0_rgba(255,255,255,0.75)] backdrop-blur-md sm:p-6">
-          <div className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-[#d2b06d]/60 to-transparent" />
+        <section className="card p-5 sm:p-6">
           <div className="grid grid-cols-3 gap-2 text-center">
             {onlineSteps.map((step, index) => {
               const isActive = index === initialRitualStep;
@@ -435,20 +420,20 @@ export function DrawClient({
               return (
                 <div key={step.label} className="relative">
                   {index > 0 && (
-                    <div className="absolute right-1/2 top-3 h-px w-full bg-[#d8bd82]/40" />
+                    <div className="absolute right-1/2 top-3 h-px w-full bg-[var(--c-border)]" />
                   )}
                   <div
                     className={`relative z-10 mx-auto mb-3 h-6 w-6 rounded-full border ${
                       isActive
-                        ? "border-[#c89d4f] bg-[#d8b460] shadow-[0_0_22px_rgba(200,157,79,0.35)]"
+                        ? "border-[var(--c-accent)] bg-[var(--c-accent)]"
                         : isComplete
-                          ? "border-[#c89d4f]/70 bg-[#f5dfa8]"
-                          : "border-[#d8bd82]/60 bg-[#fff8ea]"
+                          ? "border-[var(--c-accent)] bg-[var(--c-accent-wash)]"
+                          : "border-[var(--c-border-strong)] bg-[var(--c-surface-2)]"
                     }`}
                   />
                   <p
                     className={`text-[0.62rem] font-semibold uppercase tracking-[0.22em] ${
-                      isActive ? "text-[#8d6426]" : "text-[#9b8b73]"
+                      isActive ? "text-[var(--c-accent-text)]" : "text-[var(--c-text-muted)]"
                     }`}
                   >
                     {step.label}
@@ -463,16 +448,16 @@ export function DrawClient({
               stepSettled ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"
             }`}
           >
-            <p className="text-[0.64rem] font-semibold uppercase tracking-[0.26em] text-[#a77f3c]">
+            <p className="eyebrow">
               {copy.shuffle} · {copy.cut} · {copy.draw}
             </p>
-            <h2 className="mt-4 font-serif text-[2.35rem] leading-tight text-[#34271b] sm:text-[2.75rem]">
+            <h2 className="t-h2 mt-4">
               {currentOnlineStep.title}
             </h2>
-            <p className="mt-3 text-sm leading-6 text-[#7b6c58]">
+            <p className="caption mt-3">
               {currentOnlineStep.description}
             </p>
-            <div className="mt-4 space-y-1 text-sm leading-6 text-[#6f624f]">
+            <div className="caption mt-4 space-y-1">
               {currentOnlineStep.lines.map((line) => (
                 <p key={line}>{line}</p>
               ))}
@@ -500,53 +485,50 @@ export function DrawClient({
       <LuminousNav lang={initialLang} />
 
       <header className="space-y-4 text-center">
-        <div className="mx-auto flex items-center justify-center gap-3 text-[#a77f3c]">
-          <span className="h-px w-10 bg-[#d2b06d]/55" />
-          <span className="text-[0.66rem] font-semibold uppercase tracking-[0.28em]">
+        <div className="rule mx-auto max-w-xs">
+          <span className="eyebrow">
             {copy.physicalDeck}
           </span>
-          <span className="h-px w-10 bg-[#d2b06d]/55" />
         </div>
-        <h1 className="font-serif text-[2.6rem] leading-tight text-[#34271b] sm:text-[3.25rem]">
+        <h1 className="t-h1">
           {copy.physicalDrawTitle}
         </h1>
-        <p className="mx-auto max-w-[31rem] text-sm leading-7 text-[#7b6c58]">
+        <p className="caption mx-auto max-w-[31rem]">
           {copy.physicalDrawDescription}
         </p>
       </header>
 
-      <section className="relative overflow-hidden rounded-[2.25rem] border border-[#cfad6d]/50 bg-[#fffdf7]/82 p-5 text-sm leading-7 text-[#6f624f] shadow-[0_28px_80px_rgba(111,78,31,0.12),inset_0_1px_0_rgba(255,255,255,0.75)] backdrop-blur-md sm:p-6">
-        <div className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-[#d2b06d]/60 to-transparent" />
-        <p className="text-[0.64rem] font-semibold uppercase tracking-[0.26em] text-[#a77f3c]">
+      <section className="card p-5 text-sm leading-7 sm:p-6">
+        <p className="eyebrow">
           {copy.yourQuestion}
         </p>
-        <p className="mt-3 text-[#4f4334]">{question}</p>
-        <p className="mt-3 text-sm leading-6 text-[#80715d]">
+        <p className="mt-3 text-[var(--c-text)]">{question}</p>
+        <p className="caption mt-3 text-sm">
           {copy.keepQuestion}
         </p>
 
-        <div className="my-5 h-px bg-gradient-to-r from-transparent via-[#d2b06d]/46 to-transparent" />
+        <div className="my-5 h-px bg-[var(--c-border)]" />
 
         <ol className="space-y-4">
-          <li className="rounded-[1.35rem] border border-[#d8bd82]/38 bg-[#fffaf0]/68 p-4">
-            <p className="font-semibold text-[#3f3021]">1. {copy.prepareStep}</p>
+          <li className="well p-4">
+            <p className="font-semibold text-[var(--c-text)]">1. {copy.prepareStep}</p>
             <p className="mt-1">{copy.prepareDeck}</p>
           </li>
-          <li className="rounded-[1.35rem] border border-[#d8bd82]/38 bg-[#fffaf0]/68 p-4">
-            <p className="font-semibold text-[#3f3021]">2. {copy.shuffle}</p>
+          <li className="well p-4">
+            <p className="font-semibold text-[var(--c-text)]">2. {copy.shuffle}</p>
             <p className="mt-1">{copy.shuffleDeck}</p>
           </li>
-          <li className="rounded-[1.35rem] border border-[#d8bd82]/38 bg-[#fffaf0]/68 p-4">
-            <p className="font-semibold text-[#3f3021]">3. {copy.cut}</p>
+          <li className="well p-4">
+            <p className="font-semibold text-[var(--c-text)]">3. {copy.cut}</p>
             <p className="mt-1">{copy.cutDeck}</p>
           </li>
-          <li className="rounded-[1.35rem] border border-[#d8bd82]/38 bg-[#fffaf0]/68 p-4">
-            <p className="font-semibold text-[#3f3021]">4. {copy.draw}</p>
+          <li className="well p-4">
+            <p className="font-semibold text-[var(--c-text)]">4. {copy.draw}</p>
             <p className="mt-1">{copy.drawDeck}</p>
           </li>
         </ol>
 
-        <p className="mt-5 text-[#4f4334]">{copy.selectSameCard}</p>
+        <p className="mt-5 text-[var(--c-text)]">{copy.selectSameCard}</p>
       </section>
 
       <LuminousAction

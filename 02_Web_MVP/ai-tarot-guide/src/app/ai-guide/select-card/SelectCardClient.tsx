@@ -86,7 +86,7 @@ export function SelectCardClient({
         description="Gathering your saved question."
       >
         <ReadingNav lang={initialLang} />
-        <p className="text-sm text-[#a9a59d]">{copy.preparingCardList}</p>
+        <p className="caption">{copy.preparingCardList}</p>
       </PageContainer>
     );
   }
@@ -116,8 +116,8 @@ export function SelectCardClient({
       </div>
       <div className="space-y-6 pb-8">
         {tarotCardGroups.map((group) => (
-          <section key={group.title} className="atelier-panel p-3">
-            <h2 className="atelier-label mb-3 px-1 text-xs font-semibold">
+          <section key={group.title} className="card p-3">
+            <h2 className="eyebrow mb-3 px-1">
               {getGroupTitle(group.title, initialLang)}
             </h2>
             <div className="grid grid-cols-2 gap-3">

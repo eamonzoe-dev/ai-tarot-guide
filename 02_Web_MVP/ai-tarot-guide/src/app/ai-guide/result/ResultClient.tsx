@@ -231,16 +231,7 @@ function LuminousShell({
   lang: Language;
 }) {
   return (
-    <main className="relative min-h-svh overflow-hidden bg-[#f6f0e5] px-0 py-0 text-[#352a1f] sm:px-6 sm:py-6 lg:px-8">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.98),rgba(246,240,229,0.9)_42%,rgba(226,213,188,0.48)_100%)]" />
-      <div className="pointer-events-none absolute left-1/2 top-16 h-[32rem] w-[32rem] -translate-x-1/2 rounded-full border border-[#c9a86a]/16 opacity-80" />
-      <div className="pointer-events-none absolute left-1/2 top-28 h-[23rem] w-[23rem] -translate-x-1/2 rounded-full border border-[#d8bd82]/20 opacity-80" />
-      <div className="pointer-events-none absolute left-1/2 top-44 h-[13rem] w-[13rem] -translate-x-1/2 rounded-full border border-[#ead7aa]/34 opacity-80" />
-      <div className="pointer-events-none absolute left-1/2 top-1/2 h-px w-[44rem] -translate-x-1/2 bg-gradient-to-r from-transparent via-[#caa664]/20 to-transparent" />
-      <div className="pointer-events-none absolute left-6 top-28 h-24 w-px bg-gradient-to-b from-transparent via-[#c9a86a]/28 to-transparent sm:left-14" />
-      <div className="pointer-events-none absolute right-6 top-40 h-24 w-px bg-gradient-to-b from-transparent via-[#c9a86a]/28 to-transparent sm:right-14" />
-      <div className="pointer-events-none absolute -left-16 bottom-10 h-64 w-64 rounded-full bg-[#d7bd82]/10 blur-3xl" />
-      <div className="pointer-events-none absolute -right-20 top-40 h-72 w-72 rounded-full bg-white/42 blur-3xl" />
+    <main className="ora-page-shell relative min-h-svh overflow-hidden px-0 py-0 sm:px-6 sm:py-6 lg:px-8">
       <ActivationCodePanel lang={lang} />
 
       <div className="relative z-10 mx-auto flex min-h-svh w-full max-w-[900px] flex-col gap-5 px-5 py-7 sm:min-h-0 sm:px-6 sm:py-9">
@@ -259,9 +250,8 @@ function LuminousPanel({
 }) {
   return (
     <section
-      className={`relative overflow-hidden rounded-[2rem] border border-[#d8bd82]/42 bg-[linear-gradient(180deg,rgba(255,250,241,0.92),rgba(248,241,229,0.86))] shadow-[0_24px_70px_rgba(116,83,36,0.10),inset_0_1px_0_rgba(255,255,255,0.72)] backdrop-blur-md ${className}`}
+      className={`card relative overflow-hidden ${className}`}
     >
-      <div className="pointer-events-none absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-[#d2b06d]/60 to-transparent" />
       {children}
     </section>
   );
@@ -279,11 +269,9 @@ function LuminousActionLink({
   className?: string;
 }) {
   const base =
-    "flex min-h-12 touch-manipulation select-none items-center justify-center rounded-full px-5 text-center text-xs font-semibold uppercase tracking-[0.2em] transition focus:outline-none focus:ring-2 focus:ring-[#c89d4f]/45 focus:ring-offset-2 focus:ring-offset-[#f6f0e5]";
-  const primary =
-    "border border-[#c89d4f]/72 bg-[linear-gradient(180deg,rgba(246,225,174,0.98),rgba(197,151,72,0.98))] text-[#3a2a18] shadow-[0_18px_38px_rgba(148,105,39,0.22),inset_0_1px_0_rgba(255,255,255,0.58)] hover:-translate-y-0.5 hover:shadow-[0_22px_44px_rgba(148,105,39,0.26),inset_0_1px_0_rgba(255,255,255,0.65)]";
-  const ghost =
-    "border border-[#c89d4f]/42 bg-white/50 text-[#6f552b] shadow-[0_14px_32px_rgba(148,105,39,0.10)] hover:-translate-y-0.5 hover:bg-white/72";
+    "btn w-full";
+  const primary = "btn--primary";
+  const ghost = "btn--ghost";
 
   return (
     <Link
@@ -304,7 +292,7 @@ function LuminousTag({
 }) {
   return (
     <span
-      className={`inline-flex items-center rounded-full border border-[#d8bd82]/48 bg-[#fffaf1]/88 px-3 py-1 text-[0.66rem] font-semibold uppercase tracking-[0.16em] text-[#8d6426] ${className}`}
+      className={`inline-flex items-center rounded-full border border-[var(--c-border)] bg-[var(--c-surface)] px-3 py-1 text-[0.66rem] font-semibold uppercase tracking-[0.16em] text-[var(--c-accent-text)] ${className}`}
     >
       {children}
     </span>
@@ -323,21 +311,33 @@ function LuminousThinkingState({
       <div className="mx-auto flex max-w-md flex-col items-center text-center">
         <div
           aria-hidden="true"
-          className="relative h-28 w-20 rounded-[1rem] border border-[#d7bd82]/38 bg-[linear-gradient(180deg,rgba(255,250,241,0.98),rgba(242,231,211,0.88))] shadow-[0_0_36px_rgba(217,189,128,0.12)]"
+          className="ora-card-back relative h-28 w-20 rounded-[1rem]"
         >
-          <div className="absolute inset-2 rounded-[0.75rem] border border-[#d8bd82]/44" />
-          <div className="absolute inset-x-2 top-4 h-px bg-gradient-to-r from-transparent via-[#caa664]/40 to-transparent" />
-          <div className="absolute inset-x-3 bottom-4 h-px bg-gradient-to-r from-transparent via-[#caa664]/30 to-transparent" />
-          <div className="absolute left-1/2 top-1/2 h-12 w-12 -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#d9bd80]/22" />
+          <div className="absolute inset-2 rounded-[0.75rem] border border-[var(--c-border-strong)]" />
         </div>
 
-        <p className="mt-5 text-xs uppercase tracking-[0.24em] text-[#a77f3c]">
+        <p className="eyebrow mt-5">
           {title}
         </p>
-        <p className="mt-3 max-w-sm text-sm leading-7 text-[#7b6c58]">
+        <p className="caption mt-3 max-w-sm">
           {subtitle}
         </p>
       </div>
+    </LuminousPanel>
+  );
+}
+
+function ReadingBoundaryNotice({ lang }: { lang: Language }) {
+  return (
+    <LuminousPanel className="px-4 py-3 sm:px-5">
+      <p className="micro text-[var(--c-accent-text)]">
+        {lang === "zh"
+          ? "本次 AI 个性化解读会消耗 100 星尘。"
+          : "This AI personalized reading uses 100 Stardust."}
+      </p>
+      <p className="caption mt-2 text-xs">
+        {text(lang).disclaimer}
+      </p>
     </LuminousPanel>
   );
 }
@@ -814,19 +814,19 @@ export function ResultClient({
     return (
       <LuminousShell lang={initialLang}>
         <LuminousPanel className="my-auto px-6 py-8 text-center">
-          <p className="text-[0.66rem] font-semibold uppercase tracking-[0.28em] text-[#a77f3c]">
+          <p className="eyebrow">
             {copy.readingDossier}
           </p>
-          <h1 className="mt-4 font-serif text-4xl leading-tight text-[#34271b]">
+          <h1 className="t-h2 mt-4">
             {copy.readingCard}
           </h1>
-          <p className="mt-4 text-sm leading-7 text-[#7b6c58]">
+          <p className="caption mt-4">
             {copy.gatheringReading}
           </p>
-          <div className="mt-6 rounded-[1.5rem] border border-[#d8bd82]/38 bg-white/46 px-4 py-3">
+          <div className="card mt-6 px-4 py-3">
             <ReadingNav lang={initialLang} />
           </div>
-          <p className="mt-5 text-sm text-[#80715d]">
+          <p className="caption mt-5 text-sm">
             {copy.preparingMessage}
           </p>
         </LuminousPanel>
@@ -861,13 +861,13 @@ export function ResultClient({
       return (
         <LuminousShell lang={initialLang}>
           <LuminousPanel className="my-auto px-6 py-8 text-center">
-            <p className="text-[0.66rem] font-semibold uppercase tracking-[0.28em] text-[#a77f3c]">
+            <p className="eyebrow">
               {copy.readingDossier}
             </p>
-            <h1 className="mt-4 font-serif text-4xl leading-tight text-[#34271b]">
+            <h1 className="t-h2 mt-4">
               {copy.invalidReadingTitle}
             </h1>
-            <p className="mt-4 text-sm leading-7 text-[#7b6c58]">
+            <p className="caption mt-4">
               {copy.invalidReadingDescription}
             </p>
             <LuminousActionLink className="mt-6" href={homeHref}>
@@ -880,20 +880,22 @@ export function ResultClient({
 
     return (
       <LuminousShell lang={initialLang}>
-        <header className="flex items-center justify-between gap-4 text-[0.66rem] font-semibold uppercase tracking-[0.28em] text-[#a77f3c]">
+        <header className="flex items-center justify-between gap-4 text-[0.66rem] font-semibold uppercase tracking-[0.28em] text-[var(--c-accent-text)]">
           <span>{copy.readingDossier}</span>
           <span className="text-right">{copy.threeCardSpread}</span>
         </header>
 
-        <div className="rounded-[2rem] border border-[#d7bd82]/40 bg-white/42 px-4 py-3 shadow-[0_18px_60px_rgba(123,93,45,0.08)] backdrop-blur-md">
+        <div className="card px-4 py-3">
           <ReadingNav lang={initialLang} />
         </div>
 
+        <ReadingBoundaryNotice lang={initialLang} />
+
         <LuminousPanel className="p-5 sm:p-6">
-          <p className="text-[0.62rem] font-semibold uppercase tracking-[0.26em] text-[#a77f3c]">
+          <p className="eyebrow">
             {copy.yourQuestion}
           </p>
-          <p className="mt-3 text-sm leading-7 text-[#4f4334] sm:text-base">
+          <p className="mt-3 text-sm leading-7 text-[var(--c-text)] sm:text-base">
             {questionText}
           </p>
         </LuminousPanel>
@@ -1284,16 +1286,18 @@ export function ResultClient({
         ];
   return (
     <LuminousShell lang={initialLang}>
-      <header className="flex items-center justify-between gap-4 text-[0.66rem] font-semibold uppercase tracking-[0.28em] text-[#a77f3c]">
+      <header className="flex items-center justify-between gap-4 text-[0.66rem] font-semibold uppercase tracking-[0.28em] text-[var(--c-accent-text)]">
         <span>{copy.readingDossier}</span>
         <span className="text-right">
           {mode === "online" ? copy.onlineDrawMode : copy.physicalDeck}
         </span>
       </header>
 
-      <div className="rounded-[2rem] border border-[#d7bd82]/40 bg-white/42 px-4 py-3 shadow-[0_18px_60px_rgba(123,93,45,0.08)] backdrop-blur-md">
+      <div className="card px-4 py-3">
         <ReadingNav lang={initialLang} />
       </div>
+
+      <ReadingBoundaryNotice lang={initialLang} />
 
       <LuminousPanel className="p-5 sm:p-6">
         <div className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full border border-[#d2b06d]/20" />

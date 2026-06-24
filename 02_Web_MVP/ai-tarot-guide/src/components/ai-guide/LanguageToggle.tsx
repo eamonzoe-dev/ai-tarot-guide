@@ -47,7 +47,7 @@ export function LanguageToggle({
 
   return (
     <div
-      className="inline-flex min-h-10 items-center rounded-full border border-[#6d5a35]/55 bg-[#080706]/80 p-1 text-[0.62rem] font-semibold uppercase tracking-[0.18em] text-[#a9a59d] shadow-[inset_0_1px_0_rgba(255,245,224,0.05)]"
+      className="inline-flex min-h-10 items-center rounded-full border border-[var(--c-border)] bg-[var(--c-surface)] p-1 text-[0.62rem] font-semibold uppercase tracking-[0.18em] text-[var(--c-text-soft)]"
       aria-label="Language"
     >
       {(["en", "zh"] as const).map((nextLang) => (
@@ -57,8 +57,8 @@ export function LanguageToggle({
           onClick={() => rememberLanguage(nextLang)}
           className={`flex min-h-8 touch-manipulation items-center rounded-full px-3 transition ${
             lang === nextLang
-              ? "bg-[#2b2114] text-[#f2dfb9] shadow-[0_0_18px_rgba(214,179,109,0.12)]"
-              : "text-[#9f947f] hover:text-[#efe8d9]"
+              ? "bg-[var(--c-accent)] text-[var(--c-text-inverse)]"
+              : "text-[var(--c-text-muted)] hover:text-[var(--c-text)]"
           }`}
         >
           {nextLang === "en" ? "EN" : languageLabel(nextLang)}

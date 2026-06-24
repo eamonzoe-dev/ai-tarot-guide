@@ -4,6 +4,7 @@ import Link from "next/link";
 import { type CSSProperties, useEffect, useMemo, useState } from "react";
 
 import { ActivationCodePanel } from "@/components/ai-guide/ActivationCodePanel";
+import { ThemeToggle } from "@/components/ai-guide/ThemeToggle";
 import { type Language } from "@/lib/ai-guide/i18n";
 
 type OracleShowroomHomeProps = {
@@ -189,7 +190,7 @@ export function OracleShowroomHome({
       physical: isZh ? "使用实体卡组" : "Use Physical Deck",
       explore: isZh ? "浏览卡牌" : "Explore the Cards",
       journal: isZh ? "解读日志" : "Reading Journal",
-      questionSlip: isZh ? "问题纸条" : "Question slip",
+      questionSlip: "问题纸条",
       waitingQuestion: isZh ? "此刻等待被问出的是什么？" : "What is waiting to be asked?",
       choosePath: isZh ? "选择你的解读" : "Choose Your Reading",
       paths: isZh
@@ -445,12 +446,35 @@ export function OracleShowroomHome({
         : "Unlock your deck's companion experience.",
       redeemDeckCode: isZh ? "兑换卡组码" : "Redeem Deck Code",
       trustTitle: isZh ? "这是一件反思工具，不是一台预言机器。" : "A reflective tool, not a prediction machine.",
-      trustItems: isZh
-        ? ["以隐私为先", "AI 辅助象征解读", "用于反思与娱乐"]
-        : ["Private by design", "AI-guided symbolism", "For reflection and entertainment"],
-      trustBody: isZh
-        ? "Ora 支持象征性的自我反思与有结构的注意力整理。它不是医疗、法律、财务或心理建议。"
-        : "Ora supports symbolic reflection and structured attention. It is not medical, legal, financial, or psychological advice.",
+      trustCards: isZh
+        ? [
+            {
+              title: "以隐私为先",
+              body: "账号、卡组码与解读记录只为保存你的阅读体验服务，不作为公开展示内容。",
+            },
+            {
+              title: "AI 辅助象征解读",
+              body: "Ora 帮你整理牌义与问题之间的关系，不把牌面包装成确定答案。",
+            },
+            {
+              title: "用于反思与娱乐",
+              body: "解读适合作为自我观察的入口，不替代医疗、法律、财务或心理专业建议。",
+            },
+          ]
+        : [
+            {
+              title: "Private by design",
+              body: "Account, deck-code, and reading data exist to support your reading experience, not to become public content.",
+            },
+            {
+              title: "AI-guided symbolism",
+              body: "Ora helps connect card symbolism with your question without turning the cards into fixed answers.",
+            },
+            {
+              title: "For reflection and entertainment",
+              body: "Readings are prompts for attention and self-reflection, not medical, legal, financial, or psychological advice.",
+            },
+          ],
       trustLinks: isZh
         ? { privacy: "隐私", terms: "条款", disclaimer: "免责声明", contact: "联系" }
         : { privacy: "Privacy", terms: "Terms", disclaimer: "Disclaimer", contact: "Contact" },
@@ -571,7 +595,7 @@ export function OracleShowroomHome({
   }
 
   return (
-    <div className="min-h-svh bg-[#f4efe5] text-[#33291f]">
+    <div className="ora-page-shell min-h-svh">
       <div id="reading-account-panel">
         <ActivationCodePanel lang={lang} hasLangParam={hasLangParam} />
       </div>
@@ -580,33 +604,35 @@ export function OracleShowroomHome({
         className={cx(
           "sticky top-0 isolate z-[240] border-b transition duration-300",
           compactHeader
-            ? "border-[#d8b76a]/30 bg-[#fff9ee]/86 shadow-[0_10px_30px_rgba(88,64,31,0.08)] backdrop-blur"
-            : "border-transparent bg-[#f4efe5]/88 backdrop-blur-sm",
+            ? "border-[var(--c-border)] bg-[var(--c-surface)] backdrop-blur"
+            : "border-transparent bg-[var(--c-bg)] backdrop-blur-sm",
         )}
       >
         <div className="pointer-events-auto mx-auto grid w-full max-w-7xl grid-cols-1 items-start gap-3 px-4 py-4 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:gap-4 sm:px-6 lg:px-8 sm:items-center">
           <Link
-            className="inline-flex min-h-9 shrink-0 items-center justify-self-start pt-0 font-serif text-lg leading-none text-[#4f4235] transition hover:text-[#9d7b3f] sm:min-w-0"
+            className="wordmark inline-flex min-h-9 shrink-0 items-center justify-self-start pt-0 text-lg leading-none text-[var(--c-text)] transition hover:text-[var(--c-accent-text)] sm:min-w-0"
             href={homeHref}
           >
             Ora Arcana
           </Link>
           <nav
             aria-label={copy.sectionNavigationLabel}
-            className="hidden items-center justify-center gap-4 text-[0.68rem] font-medium text-[#7a6b56] xl:flex xl:gap-5"
+            className="hidden items-center justify-center gap-4 text-[0.68rem] font-medium text-[var(--c-text-soft)] xl:flex xl:gap-5"
           >
             {sectionNavItems.map((item) => (
               <Link
-                className="group relative whitespace-nowrap transition hover:text-[#4f4235]"
+                className="group relative whitespace-nowrap transition hover:text-[var(--c-text)]"
                 href={item.href}
                 key={item.label}
               >
                 {item.label}
-                <span className="absolute inset-x-0 -bottom-1 h-px scale-x-0 bg-[#9d7b3f] transition group-hover:scale-x-100" />
+                <span className="absolute inset-x-0 -bottom-1 h-px scale-x-0 bg-[var(--c-accent)] transition group-hover:scale-x-100" />
               </Link>
             ))}
           </nav>
-          <div aria-hidden="true" className="hidden min-h-9 sm:block" />
+          <div className="justify-self-start sm:justify-self-end">
+            <ThemeToggle />
+          </div>
         </div>
       </header>
 
@@ -821,9 +847,9 @@ export function OracleShowroomHome({
                 )}
                 data-reveal-id={`path-${item.id}`}
                 data-showroom-reveal
+                data-disabled="true"
                 key={item.id}
                 style={revealStyle(index)}
-                aria-disabled="true"
               >
                 {content}
               </div>
@@ -1277,8 +1303,8 @@ export function OracleShowroomHome({
               if (mode.disabled) {
                 return (
                   <article
-                    aria-disabled="true"
                     className={cardClassName}
+                    data-disabled="true"
                     data-reveal-id={`mode-${index}`}
                     data-showroom-reveal
                     key={mode.title}
@@ -1428,7 +1454,7 @@ export function OracleShowroomHome({
             {copy.trustTitle}
           </h2>
           <div className="mt-8 grid gap-4 lg:grid-cols-3">
-            {copy.trustItems.map((item, index) => (
+            {copy.trustCards.map((item, index) => (
               <div
                 className={cx(
                   revealClass(`trust-${index}`),
@@ -1436,12 +1462,12 @@ export function OracleShowroomHome({
                 )}
                 data-reveal-id={`trust-${index}`}
                 data-showroom-reveal
-                key={item}
+                key={item.title}
                 style={revealStyle(index)}
               >
-                <h3 className="font-serif text-2xl text-[#4f4235]">{item}</h3>
+                <h3 className="font-serif text-2xl text-[#4f4235]">{item.title}</h3>
                 <p className="mt-3 text-sm leading-7 text-[#766955]">
-                  {copy.trustBody}
+                  {item.body}
                 </p>
               </div>
             ))}
@@ -1508,38 +1534,33 @@ export function OracleShowroomHome({
           transition:
             transform 260ms ease,
             border-color 260ms ease,
-            box-shadow 260ms ease,
             color 260ms ease,
             background 260ms ease;
         }
 
         .showroom-action-primary,
         .showroom-final-primary {
-          border: 1px solid rgba(157, 123, 63, 0.55);
-          background: linear-gradient(180deg, #f6e1ae, #c59748);
-          color: #352513;
-          box-shadow:
-            0 16px 34px rgba(148, 105, 39, 0.18),
-            inset 0 1px 0 rgba(255, 255, 255, 0.5);
+          border: 1px solid var(--c-accent);
+          background: var(--c-accent);
+          color: var(--c-text-inverse);
         }
 
         .showroom-action-secondary {
-          border: 1px solid rgba(202, 169, 106, 0.48);
-          background: rgba(255, 250, 240, 0.78);
-          color: #5b4a36;
-          box-shadow: 0 12px 28px rgba(102, 75, 33, 0.08);
+          border: 1px solid var(--c-border);
+          background: var(--c-surface);
+          color: var(--c-text);
         }
 
         .showroom-action-quiet {
           border: 1px solid transparent;
           background: transparent;
-          color: #8d6426;
+          color: var(--c-accent-text);
         }
 
         .showroom-final-secondary {
-          border: 1px solid rgba(216, 183, 106, 0.52);
-          background: rgba(244, 239, 229, 0.08);
-          color: #f4efe5;
+          border: 1px solid var(--c-border);
+          background: transparent;
+          color: var(--c-text-inverse);
         }
 
         .showroom-action-primary:hover,
@@ -1547,7 +1568,9 @@ export function OracleShowroomHome({
         .showroom-action-quiet:hover,
         .showroom-final-primary:hover,
         .showroom-final-secondary:hover {
-          transform: translateY(-6px) scale(1.015);
+          border-color: var(--c-accent-hover);
+          background: var(--c-accent-wash);
+          transform: translateY(-1px);
         }
 
         @media (prefers-reduced-motion: reduce) {
