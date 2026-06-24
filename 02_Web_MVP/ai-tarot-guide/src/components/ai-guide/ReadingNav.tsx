@@ -23,7 +23,7 @@ export function ReadingNav({ lang }: ReadingNavProps) {
   }
 
   return (
-    <nav className="mb-6 flex items-center justify-between gap-3 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--c-accent-text)]">
+    <nav className="mb-6 flex items-center justify-between gap-3 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--c-text-soft)]">
       <button
         type="button"
         onClick={goBack}

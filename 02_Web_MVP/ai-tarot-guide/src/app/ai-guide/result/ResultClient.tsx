@@ -901,7 +901,7 @@ export function ResultClient({
         </LuminousPanel>
 
         <LuminousPanel className="p-5 sm:p-6">
-          <h1 className="font-serif text-3xl leading-tight text-[#34271b] sm:text-4xl">
+          <h1 className="t-h2">
             {copy.yourThreeCards}
           </h1>
           <div className="mt-6 grid gap-4 sm:grid-cols-3">
@@ -910,10 +910,10 @@ export function ResultClient({
 
               return (
                 <article
-                  className="rounded-[1.45rem] border border-[#d8bd82]/42 bg-[#fffaf0]/72 p-4 shadow-[0_16px_40px_rgba(116,83,36,0.09)]"
+                className="well p-4"
                   key={`${positions[index]}-${threeCard.id}`}
                 >
-                  <p className="text-[0.62rem] font-semibold uppercase tracking-[0.2em] text-[#a77f3c]">
+                  <p className="micro">
                     {index + 1}. {positions[index]}
                   </p>
                   <div className="mt-4 flex items-center gap-3">
@@ -931,10 +931,10 @@ export function ResultClient({
                       )}
                     </div>
                     <div>
-                      <h2 className="font-serif text-xl leading-tight text-[#34271b]">
+                      <h2 className="t-h3">
                         {cardTitle}
                       </h2>
-                      <p className="mt-1 text-xs leading-5 text-[#8b765a]">
+                      <p className="caption mt-1">
                         {getTarotCardLabel(threeCard, initialLang)}
                       </p>
                     </div>
@@ -953,8 +953,8 @@ export function ResultClient({
         ) : null}
 
         {aiReadingStatus === "error" ? (
-          <div className="rounded-[1.75rem] border border-[#c48a73]/42 bg-[#fff5ed]/82 p-5 shadow-[0_20px_54px_rgba(137,83,54,0.10)] backdrop-blur-md sm:p-6">
-            <p className="text-sm leading-7 text-[#8a4634]">
+          <div className="well p-5 sm:p-6">
+            <p className="caption text-[var(--c-danger)]">
               {aiReadingErrorMessage || copy.aiReadingUnavailable}
             </p>
             {aiReadingErrorMessage ===
@@ -964,7 +964,7 @@ export function ResultClient({
               </div>
             ) : null}
             <button
-              className="mt-4 min-h-12 w-full touch-manipulation select-none rounded-full border border-[#c89d4f]/70 bg-[linear-gradient(180deg,rgba(246,225,174,0.98),rgba(197,151,72,0.98))] px-5 text-xs font-semibold uppercase tracking-[0.2em] text-[#3a2a18] shadow-[0_18px_38px_rgba(148,105,39,0.20),inset_0_1px_0_rgba(255,255,255,0.58)] transition hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-[#c89d4f]/45 focus:ring-offset-2 focus:ring-offset-[#f6f0e5] sm:w-auto"
+              className="btn btn--primary mt-4 w-full sm:w-auto"
               type="button"
               onClick={() => {
                 if (question && mode) {
@@ -988,29 +988,29 @@ export function ResultClient({
         ) : null}
 
         {isFallbackDisplay ? (
-          <div className="rounded-[1.35rem] border border-[#d8bd82]/42 bg-[#fffaf1]/76 p-4 text-sm leading-6 text-[#6f624f]">
-            <p className="text-[0.64rem] font-semibold uppercase tracking-[0.2em] text-[#9d7b3f]">
+          <div className="well p-4">
+            <p className="micro">
               {copy.aiFallbackNoticeTitle}
             </p>
-            <p className="mt-2">{copy.aiFallbackNoticeBody}</p>
+            <p className="caption mt-2">{copy.aiFallbackNoticeBody}</p>
           </div>
         ) : null}
 
         {aiReadingStatus === "ready" && aiDisplay && !isFallbackDisplay ? (
-          <article className="rounded-[2.2rem] border border-[#cfad6d]/52 bg-[linear-gradient(180deg,rgba(255,253,247,0.96),rgba(250,244,233,0.92))] px-5 py-7 shadow-[0_30px_86px_rgba(111,78,31,0.13),inset_0_1px_0_rgba(255,255,255,0.76)] backdrop-blur-md sm:px-8 sm:py-9">
-            <p className="text-[0.68rem] font-semibold uppercase tracking-[0.28em] text-[#a77f3c]">
+          <article className="card px-5 py-7 sm:px-8 sm:py-9">
+            <p className="eyebrow">
               {copy.aiPersonalizedReading}
             </p>
-            <h2 className="mt-3 font-serif text-3xl leading-tight text-[#34271b] sm:text-4xl">
+            <h2 className="t-h2 mt-3">
               {copy.aiReadingTitle}
             </h2>
 
             {aiDisplay.summary ? (
-              <section className="mt-6 border-l border-[#c89d4f]/55 bg-[#fffaf1]/72 py-2 pl-4">
-                <h3 className="text-[0.64rem] font-semibold uppercase tracking-[0.22em] text-[#a77f3c]">
+              <section className="mt-6 border-l border-[var(--c-border-strong)] py-2 pl-4">
+                <h3 className="micro">
                   {copy.overallMessage}
                 </h3>
-                <p className="mt-2 font-serif text-[1.15rem] leading-8 text-[#4a3827] sm:text-[1.35rem] sm:leading-9">
+                <p className="mt-2 font-serif text-[1.08rem] leading-8 text-[var(--c-text)] sm:text-[1.18rem] sm:leading-9">
                   {aiDisplay.summary}
                 </p>
               </section>
@@ -1033,13 +1033,13 @@ export function ResultClient({
               ].map((item) =>
                 item.body ? (
                   <section
-                    className="rounded-[1.45rem] border border-[#d8bd82]/42 bg-[#fffaf1]/76 p-4"
+                    className="well p-4"
                     key={item.title}
                   >
-                    <h3 className="text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-[#a77f3c]">
+                    <h3 className="micro">
                       {item.title}
                     </h3>
-                    <p className="mt-3 text-sm leading-7 text-[#4f4334]">
+                    <p className="caption mt-3">
                       {item.body}
                     </p>
                   </section>
@@ -1063,13 +1063,13 @@ export function ResultClient({
               ].map((item) =>
                 item.body ? (
                   <section
-                    className="border-t border-[#d8bd82]/38 pt-5"
+                    className="border-t border-[var(--c-border)] pt-5"
                     key={item.title}
                   >
-                    <h3 className="text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-[#a77f3c]">
+                    <h3 className="micro">
                       {item.title}
                     </h3>
-                    <p className="mt-3 text-sm leading-7 text-[#4f4334] sm:text-base">
+                    <p className="caption mt-3 sm:text-base">
                       {item.body}
                     </p>
                   </section>
@@ -1096,20 +1096,20 @@ export function ResultClient({
         ) : null}
 
         {shouldShowLocalFallback ? (
-        <article className="rounded-[2.2rem] border border-[#cfad6d]/52 bg-[linear-gradient(180deg,rgba(255,253,247,0.96),rgba(250,244,233,0.92))] px-5 py-7 shadow-[0_30px_86px_rgba(111,78,31,0.13),inset_0_1px_0_rgba(255,255,255,0.76)] backdrop-blur-md sm:px-8 sm:py-9">
-          <p className="text-[0.68rem] font-semibold uppercase tracking-[0.28em] text-[#a77f3c]">
+        <article className="card px-5 py-7 sm:px-8 sm:py-9">
+          <p className="eyebrow">
             {copy.cardByCardMeaning}
           </p>
           <div className="mt-6 space-y-6">
           {threeCardItems.map((threeCard, index) => (
               <section
-                className="border-t border-[#d8bd82]/38 pt-5"
+                className="border-t border-[var(--c-border)] pt-5"
                 key={`meaning-${threeCard.id}`}
               >
-                <h2 className="font-serif text-2xl leading-tight text-[#34271b]">
+                <h2 className="t-h3">
                   {positions[index]}: {getTarotCardTitle(threeCard, initialLang)}
                 </h2>
-                <p className="mt-3 text-sm leading-7 text-[#4f4334] sm:text-base">
+                <p className="caption mt-3 sm:text-base">
                   {initialLang === "zh"
                     ? buildThreeCardFallbackParagraph({
                         cardTitle: getTarotCardTitle(threeCard, initialLang),
@@ -1129,19 +1129,19 @@ export function ResultClient({
           </div>
 
           <div className="mt-8 grid gap-4 md:grid-cols-2">
-            <section className="rounded-[1.45rem] border border-[#d8bd82]/42 bg-[#fffaf1]/76 p-4">
-              <h2 className="text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-[#a77f3c]">
+            <section className="well p-4">
+              <h2 className="micro">
                 {copy.overallMessage}
               </h2>
-              <p className="mt-3 text-sm leading-7 text-[#4f4334]">
+              <p className="caption mt-3">
                 {copy.threeCardOverallFallback}
               </p>
             </section>
-            <section className="rounded-[1.45rem] border border-[#d8bd82]/42 bg-[#fffaf1]/76 p-4">
-              <h2 className="text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-[#a77f3c]">
+            <section className="well p-4">
+              <h2 className="micro">
                 {copy.practicalGuidance}
               </h2>
-              <p className="mt-3 text-sm leading-7 text-[#4f4334]">
+              <p className="caption mt-3">
                 {copy.threeCardPracticalFallback}
               </p>
             </section>
@@ -1149,27 +1149,27 @@ export function ResultClient({
         </article>
         ) : null}
 
-        <div className="grid gap-3 sm:grid-cols-2">
-          <button
-            className="flex min-h-12 touch-manipulation select-none items-center justify-center rounded-full border border-[#c89d4f]/42 bg-white/50 px-5 text-center text-xs font-semibold uppercase tracking-[0.2em] text-[#6f552b] opacity-70 shadow-[0_14px_32px_rgba(148,105,39,0.10)]"
-            disabled
-            type="button"
-          >
-            {copy.saveToJournal}
-          </button>
+      <div className="grid gap-3 sm:grid-cols-2">
+        <button
+            className="btn btn--surface opacity-70"
+          disabled
+          type="button"
+        >
+          {copy.saveToJournal}
+        </button>
           <LuminousActionLink href={homeHref} variant="ghost">
             {copy.startAnotherReading}
           </LuminousActionLink>
         </div>
 
-        <section className="rounded-[1.75rem] border border-[#d8bd82]/32 bg-white/34 p-5 backdrop-blur-md">
-          <h2 className="text-xs font-semibold uppercase tracking-[0.26em] text-[#a77f3c]">
+        <section className="well p-5">
+          <h2 className="micro">
             {copy.closingNote}
           </h2>
-          <p className="mt-3 text-sm leading-6 text-[#6f624f]">
+          <p className="caption mt-3">
             {copy.closingReflection}
           </p>
-          <p className="mt-4 text-xs leading-5 text-[#8b7a61]">
+          <p className="caption mt-4 text-xs">
             {copy.disclaimer}
           </p>
         </section>

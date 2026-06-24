@@ -166,7 +166,7 @@ export default async function MyReadingsPage({
           <p className="eyebrow mb-3 flex items-center justify-center gap-3">
             {t.readingsEyebrow}
           </p>
-          <h1 className="t-h1">
+          <h1 className="t-h2 max-w-2xl mx-auto">
             {t.readingsTitle}
           </h1>
           <p className="caption mx-auto mt-4 max-w-xl sm:text-base">
@@ -176,15 +176,15 @@ export default async function MyReadingsPage({
 
         <section className="mx-auto mt-8 w-full max-w-3xl">
           {!user || authError ? (
-            <div className="relative overflow-hidden rounded-[1.75rem] border border-[#d8bd82]/42 bg-[linear-gradient(180deg,rgba(255,250,241,0.92),rgba(248,241,229,0.86))] p-5 shadow-[0_22px_64px_rgba(116,83,36,0.10),inset_0_1px_0_rgba(255,255,255,0.72)] backdrop-blur-md sm:p-6">
-              <div className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-[#d2b06d]/58 to-transparent" />
-              <h2 className="font-serif text-2xl text-[#4f4235]">
+            <div className="well relative p-5 sm:p-6">
+              <div className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-[var(--c-border-strong)] to-transparent" />
+              <h2 className="t-h3">
                 {t.readingsAuthTitle}
               </h2>
-              <p className="mt-3 text-sm leading-7 text-[#6f624f]">
+              <p className="caption mt-3">
                 {t.readingsAuthBody}
               </p>
-              <p className="mt-2 text-sm leading-7 text-[#8b7a61]">
+              <p className="caption mt-2">
                 {t.readingsAuthNote}
               </p>
               <Link
@@ -195,12 +195,12 @@ export default async function MyReadingsPage({
               </Link>
             </div>
           ) : loadError ? (
-            <div className="relative overflow-hidden rounded-[1.75rem] border border-[#c48a73]/32 bg-[#fff5ed]/78 p-5 shadow-[0_20px_54px_rgba(137,83,54,0.09)] backdrop-blur-md sm:p-6">
-              <div className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-[#d4a088]/48 to-transparent" />
-              <h2 className="font-serif text-2xl text-[#5b3b2f]">
+            <div className="well relative p-5 sm:p-6">
+              <div className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-[var(--c-border-strong)] to-transparent" />
+              <h2 className="t-h3">
                 {loadError}
               </h2>
-              <p className="mt-3 text-sm leading-7 text-[#7b5f52]">
+              <p className="caption mt-3">
                 {t.readingsErrorBody}
               </p>
               <Link
@@ -211,26 +211,26 @@ export default async function MyReadingsPage({
               </Link>
             </div>
           ) : readings.length === 0 ? (
-            <div className="relative overflow-hidden rounded-[1.85rem] border border-[#d8bd82]/42 bg-[linear-gradient(180deg,rgba(255,253,247,0.94),rgba(250,244,233,0.88))] p-5 shadow-[0_24px_68px_rgba(116,83,36,0.10),inset_0_1px_0_rgba(255,255,255,0.78)] backdrop-blur-md sm:p-7">
-              <div className="pointer-events-none absolute inset-x-10 top-0 h-px bg-gradient-to-r from-transparent via-[#d2b06d]/58 to-transparent" />
+            <div className="card relative p-5 sm:p-7">
+              <div className="pointer-events-none absolute inset-x-10 top-0 h-px bg-gradient-to-r from-transparent via-[var(--c-border-strong)] to-transparent" />
               <div
                 aria-hidden="true"
-                className="mb-5 flex h-28 items-center justify-center rounded-[1.35rem] border border-[#d8bd82]/34 bg-[#fffaf1]/62"
+                className="mb-5 flex h-24 items-center justify-center rounded-[1rem] border border-[var(--c-border)] bg-[var(--c-surface-2)]"
               >
-                <div className="relative h-20 w-14 rounded-[0.8rem] border border-[#d8bd82]/48 bg-[linear-gradient(180deg,rgba(255,253,248,0.98),rgba(242,231,211,0.88))] shadow-[0_12px_30px_rgba(116,83,36,0.10)]">
-                  <div className="absolute inset-2 rounded-[0.55rem] border border-[#d8bd82]/42" />
-                  <div className="absolute inset-x-3 top-4 h-px bg-gradient-to-r from-transparent via-[#caa664]/42 to-transparent" />
-                  <div className="absolute inset-x-3 bottom-4 h-px bg-gradient-to-r from-transparent via-[#caa664]/32 to-transparent" />
+                <div className="relative h-16 w-12 rounded-[0.7rem] border border-[var(--c-border-strong)] bg-[var(--c-surface)]">
+                  <div className="absolute inset-2 rounded-[0.5rem] border border-[var(--c-border)]" />
+                  <div className="absolute inset-x-3 top-4 h-px bg-[var(--c-border-strong)]" />
+                  <div className="absolute inset-x-3 bottom-4 h-px bg-[var(--c-border)]" />
                 </div>
               </div>
-              <h2 className="font-serif text-2xl text-[#4f4235]">
+              <h2 className="t-h3">
                 {t.readingsEmptyTitle}
               </h2>
-              <p className="mt-3 text-sm leading-7 text-[#6f624f]">
+              <p className="caption mt-3">
                 {t.readingsEmptyBody}
               </p>
               <Link
-                className="mt-5 inline-flex min-h-11 items-center justify-center rounded-full border border-[#c89d4f]/72 bg-[linear-gradient(180deg,rgba(246,225,174,0.98),rgba(197,151,72,0.98))] px-5 text-xs font-semibold uppercase tracking-[0.18em] text-[#3a2a18] shadow-[0_16px_34px_rgba(148,105,39,0.18),inset_0_1px_0_rgba(255,255,255,0.58)] transition hover:-translate-y-0.5"
+                className="btn btn--primary mt-5"
                 href={backHref}
               >
                 {t.readingsEmptyCta}
@@ -238,7 +238,7 @@ export default async function MyReadingsPage({
             </div>
           ) : (
             <div className="grid gap-4">
-              <p className="text-center text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-[#9d7b3f]">
+              <p className="text-center text-[0.66rem] font-semibold uppercase tracking-[0.2em] text-[var(--c-text-soft)]">
                 {t.readingsLatest}
               </p>
               {readings.map((reading) => {
@@ -246,16 +246,16 @@ export default async function MyReadingsPage({
 
                 return (
                   <article
-                    className="relative overflow-hidden rounded-[1.6rem] border border-[#d8bd82]/42 bg-[linear-gradient(180deg,rgba(255,253,247,0.94),rgba(250,244,233,0.88))] p-4 shadow-[0_18px_52px_rgba(116,83,36,0.10),inset_0_1px_0_rgba(255,255,255,0.74)] backdrop-blur-md sm:p-5"
+                    className="card p-4 sm:p-5"
                     key={reading.id}
                   >
-                    <div className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-[#d2b06d]/56 to-transparent" />
-                    <div className="flex flex-col gap-3 border-b border-[#d8bd82]/32 pb-4 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-[var(--c-border-strong)] to-transparent" />
+                    <div className="flex flex-col gap-3 border-b border-[var(--c-border)] pb-4 sm:flex-row sm:items-start sm:justify-between">
                       <div>
-                        <p className="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-[#9d7b3f]">
+                        <p className="micro">
                           {formatDate(reading.created_at, lang)}
                         </p>
-                        <h2 className="mt-2 font-serif text-2xl leading-tight text-[#4f4235]">
+                        <h2 className="t-h3 mt-2">
                           {reading.card_title ||
                             reading.card_id ||
                             t.readingsSavedCard}
@@ -263,17 +263,17 @@ export default async function MyReadingsPage({
                       </div>
                       <div className="flex flex-wrap gap-2 sm:justify-end">
                         {isFallback ? (
-                          <span className="inline-flex rounded-full border border-[#c48a73]/36 bg-[#fff5ed]/72 px-3 py-1 text-[0.62rem] font-semibold uppercase tracking-[0.14em] text-[#8a4634]">
+                          <span className="inline-flex rounded-full border border-[var(--c-border)] bg-[var(--c-surface-2)] px-3 py-1 text-[0.62rem] font-semibold uppercase tracking-[0.14em] text-[var(--c-text-soft)]">
                             {t.readingsFallbackBadge}
                           </span>
                         ) : null}
-                        <span className="inline-flex rounded-full border border-[#d8bd82]/46 bg-[#fffaf1]/76 px-3 py-1 text-[0.62rem] font-semibold uppercase tracking-[0.14em] text-[#8d6426]">
+                        <span className="inline-flex rounded-full border border-[var(--c-border)] bg-[var(--c-surface-2)] px-3 py-1 text-[0.62rem] font-semibold uppercase tracking-[0.14em] text-[var(--c-text-soft)]">
                           {getModeLabel(reading.mode, t)}
                         </span>
-                        <span className="inline-flex rounded-full border border-[#d8bd82]/38 bg-white/48 px-3 py-1 text-[0.62rem] font-semibold uppercase tracking-[0.14em] text-[#7b6c58]">
+                        <span className="inline-flex rounded-full border border-[var(--c-border)] bg-[var(--c-surface)] px-3 py-1 text-[0.62rem] font-semibold uppercase tracking-[0.14em] text-[var(--c-text-soft)]">
                           {getSpreadLabel(reading.spread, t)}
                         </span>
-                        <span className="inline-flex rounded-full border border-[#d8bd82]/38 bg-white/48 px-3 py-1 text-[0.62rem] font-semibold uppercase tracking-[0.14em] text-[#7b6c58]">
+                        <span className="inline-flex rounded-full border border-[var(--c-border)] bg-[var(--c-surface)] px-3 py-1 text-[0.62rem] font-semibold uppercase tracking-[0.14em] text-[var(--c-text-soft)]">
                           {getOrientationLabel(reading.orientation, t)}
                         </span>
                       </div>
@@ -281,23 +281,23 @@ export default async function MyReadingsPage({
 
                     <div className="mt-4 grid gap-4">
                       {isFallback ? (
-                        <p className="rounded-[1.1rem] border border-[#c48a73]/28 bg-[#fff5ed]/58 px-4 py-3 text-xs leading-5 text-[#7b5f52]">
+                        <p className="well px-4 py-3 text-xs leading-5">
                           {t.readingsFallbackNote}
                         </p>
                       ) : null}
-                      <section className="rounded-[1.1rem] border border-[#d8bd82]/28 bg-white/42 p-4">
-                        <h3 className="text-[0.62rem] font-semibold uppercase tracking-[0.22em] text-[#9d7b3f]">
+                      <section className="well p-4">
+                        <h3 className="micro">
                           {t.readingsQuestionLabel}
                         </h3>
-                        <p className="mt-2 text-sm leading-7 text-[#4f4334]">
+                        <p className="caption mt-2">
                           {reading.question || t.readingsNoQuestion}
                         </p>
                       </section>
-                      <section className="rounded-[1.1rem] border border-[#d8bd82]/28 bg-[#fffaf1]/58 p-4">
-                        <h3 className="text-[0.62rem] font-semibold uppercase tracking-[0.22em] text-[#9d7b3f]">
+                      <section className="well p-4">
+                        <h3 className="micro">
                           {t.readingsInterpretationLabel}
                         </h3>
-                        <p className="mt-2 text-sm leading-7 text-[#6f624f]">
+                        <p className="caption mt-2">
                           {getReadingSummary(reading.reading_json, t)}
                         </p>
                       </section>
