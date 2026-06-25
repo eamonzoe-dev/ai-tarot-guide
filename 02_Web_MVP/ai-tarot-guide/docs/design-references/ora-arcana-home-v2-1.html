@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="day">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ora Arcana · 解读室</title>
+<script>
+(function(){try{var k='ora-theme',s=localStorage.getItem(k),
+sys=matchMedia('(prefers-color-scheme: dark)').matches?'night':'day';
+document.documentElement.setAttribute('data-theme',s||sys);}catch(e){
+document.documentElement.setAttribute('data-theme','day');}})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,400;1,500&family=Spectral:ital,wght@0,400;1,400&family=Noto+Serif+SC:wght@400;500;600&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --font-serif-cjk:"Noto Serif SC",serif;--font-sans-cjk:"Noto Sans SC",sans-serif;
+  --font-serif-lat:"Spectral",Georgia,serif;--font-display-lat:"Cormorant Garamond",Georgia,serif;
+  --sp-1:.25rem;--sp-2:.5rem;--sp-3:.75rem;--sp-4:1rem;--sp-5:1.25rem;--sp-6:1.5rem;--sp-8:2rem;--sp-10:2.5rem;--sp-12:3rem;--sp-16:4rem;
+  --container:1080px;--measure:680px;--gutter:clamp(20px,5vw,56px);
+  --radius-sm:8px;--radius-md:12px;--radius-lg:18px;--radius-pill:999px;
+  --c-bg:#F5EFE2;--c-surface:#FAF6EC;--c-surface-well:#ECE3D0;--c-border:#E2D7C2;--c-border-strong:#D6C9AE;
+  --c-text:#26221C;--c-text-soft:#6E6557;--c-text-dim:#8A8070;
+  --c-accent:#A07C36;--c-accent-hover:#B6924A;--c-accent-press:#876A2C;--c-accent-wash:#F0E7D0;--c-accent-text:#7E6224;--c-on-accent:#FAF6EC;
+  --c-green:#283A2E;--c-ritual-text:#F2ECDC;--c-halo:rgba(160,124,54,.14);
+  --card-face:#FBF3DF;--card-line:#C9A24A;
+}
+[data-theme="night"]{
+  --c-bg:#13161F;--c-surface:#1B1F2B;--c-surface-well:#0E1118;--c-border:#2A2F3D;--c-border-strong:#353B4B;
+  --c-text:#EFE9DB;--c-text-soft:#A29F90;--c-text-dim:#76746A;
+  --c-accent:#D8B25A;--c-accent-hover:#ECC97A;--c-accent-press:#9C7A30;--c-accent-wash:rgba(216,178,90,.10);--c-accent-text:#D8B25A;--c-on-accent:#241B08;
+  --c-green:#3C5547;--c-ritual-text:#EFE9DB;--c-halo:rgba(216,178,90,.16);
+  --card-face:#23262F;--card-line:#C9A24A;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--c-bg);color:var(--c-text);font-family:var(--font-sans-cjk);font-weight:300;line-height:1.75;
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;transition:background .4s,color .4s}
+::selection{background:var(--c-accent);color:var(--c-on-accent)}
+a{color:inherit;text-decoration:none}svg{display:block}
+.wrap{max-width:var(--container);margin:0 auto;padding:0 var(--gutter)}
+.eyebrow{font-family:var(--font-sans-cjk);font-weight:500;font-size:.8125rem;letter-spacing:.24em;text-transform:uppercase;color:var(--c-accent-text)}
+
+.btn{font-family:var(--font-sans-cjk);font-weight:500;font-size:.9375rem;letter-spacing:.06em;border-radius:var(--radius-pill);
+  padding:.875rem 2rem;cursor:pointer;border:1px solid transparent;display:inline-flex;align-items:center;gap:.5rem;
+  transition:background .18s,color .18s,border-color .18s,transform .08s}
+.btn:active{transform:translateY(1px)}
+.btn:focus-visible{outline:2px solid var(--c-accent);outline-offset:3px}
+.btn--primary{background:var(--c-accent);color:var(--c-on-accent)}
+.btn--primary:hover{background:var(--c-accent-hover)}
+.btn--primary:active{background:var(--c-accent-press)}
+.btn--ghost{background:transparent;color:var(--c-accent);border-color:var(--c-accent)}
+.btn--ghost:hover{background:var(--c-accent-wash)}
+.btn--text{background:none;border:0;color:var(--c-accent-text);font:inherit;font-weight:500;font-size:.9rem;letter-spacing:.04em;
+  cursor:pointer;display:inline-flex;align-items:center;gap:.4rem;padding:.25rem 0}
+.btn--text svg{width:15px;height:15px}
+.btn--text:hover{color:var(--c-accent)}
+
+/* nav */
+.nav{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;gap:var(--sp-6);
+  padding:16px var(--gutter);border-bottom:1px solid var(--c-border);
+  background:color-mix(in srgb,var(--c-bg) 88%,transparent);backdrop-filter:saturate(120%) blur(10px)}
+.brand{font-family:var(--font-display-lat);font-style:italic;font-weight:600;font-size:23px}
+.nav-links{display:flex;gap:var(--sp-6);font-size:.85rem;color:var(--c-text-soft)}
+.nav-links a:hover{color:var(--c-accent)}.nav-links a.active{color:var(--c-text);font-weight:400}
+.nav-right{display:flex;align-items:center;gap:var(--sp-3)}
+.pill{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--c-border);border-radius:var(--radius-pill);padding:6px 12px;font-size:.8rem;color:var(--c-text-soft)}
+.pill svg{width:13px;height:13px;color:var(--c-accent)}
+.theme-toggle{background:transparent;border:1px solid var(--c-border);border-radius:var(--radius-pill);width:38px;height:38px;
+  display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--c-text-soft)}
+.theme-toggle:hover{border-color:var(--c-accent);color:var(--c-accent)}.theme-toggle svg{width:18px;height:18px}
+.theme-toggle .i-moon{display:none}
+[data-theme="night"] .theme-toggle .i-sun{display:none}[data-theme="night"] .theme-toggle .i-moon{display:block}
+.avatar{width:34px;height:34px;border-radius:50%;border:1px solid var(--c-border-strong);background:var(--c-surface);
+  display:inline-flex;align-items:center;justify-content:center;font-family:var(--font-serif-lat);font-size:14px;color:var(--c-accent-text)}
+
+/* ===== HERO: the single core action ===== */
+.room{position:relative;overflow:hidden;padding:clamp(3rem,7vw,5.5rem) 0 clamp(2.5rem,5vw,4rem)}
+.room-halo{position:absolute;left:50%;top:30%;transform:translate(-50%,-50%);width:min(820px,96vw);aspect-ratio:1;
+  border-radius:50%;background:radial-gradient(circle,var(--c-halo),transparent 60%);pointer-events:none;z-index:0}
+.room .inner{position:relative;z-index:1;max-width:var(--measure);margin:0 auto;text-align:center}
+.greet{font-size:.95rem;color:var(--c-text-soft);margin-bottom:var(--sp-5);letter-spacing:.02em}
+.greet b{color:var(--c-text);font-weight:400}
+.ask-title{font-family:var(--font-serif-cjk);font-weight:500;font-size:clamp(2rem,5vw,3rem);line-height:1.2;
+  letter-spacing:.01em;margin-bottom:var(--sp-3)}
+.ask-reassure{font-family:var(--font-serif-lat);font-style:italic;color:var(--c-text-soft);font-size:1rem;margin-bottom:var(--sp-8)}
+.ask-reassure .cjk{font-family:var(--font-serif-cjk);font-style:normal}
+
+/* composer */
+.composer{background:var(--c-surface);border:1px solid var(--c-border);border-radius:var(--radius-lg);
+  padding:clamp(1.25rem,3vw,1.75rem);text-align:left;box-shadow:0 30px 60px -45px rgba(20,16,8,.4)}
+.composer-top{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-4);margin-bottom:var(--sp-4);flex-wrap:wrap}
+.segment{display:inline-flex;background:var(--c-surface-well);border:1px solid var(--c-border);border-radius:var(--radius-pill);padding:4px;gap:2px}
+.segment button{border:0;background:transparent;padding:.5rem 1rem;border-radius:var(--radius-pill);font:inherit;font-size:.82rem;
+  font-weight:500;color:var(--c-text-soft);cursor:pointer;transition:.18s;white-space:nowrap}
+.segment button[aria-selected="true"]{background:var(--c-surface);color:var(--c-text)}
+.segment button:disabled{opacity:.42;cursor:not-allowed}
+.segment button:not(:disabled):hover[aria-selected="false"]{color:var(--c-text)}
+.balance{font-size:.78rem;color:var(--c-text-dim);display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.balance svg{width:12px;height:12px;color:var(--c-accent)}
+.composer textarea{width:100%;background:var(--c-surface-well);border:1px solid var(--c-border-strong);border-radius:var(--radius-md);
+  color:var(--c-text);padding:var(--sp-4);font-family:var(--font-serif-cjk);font-weight:400;font-size:1.05rem;line-height:1.7;
+  resize:vertical;min-height:96px}
+.composer textarea::placeholder{color:var(--c-text-dim);font-family:var(--font-sans-cjk);font-weight:300}
+.composer textarea:focus{outline:none;border-color:var(--c-accent)}
+.chips{display:flex;gap:var(--sp-2);flex-wrap:wrap;margin:var(--sp-4) 0 var(--sp-5)}
+.chip{border:1px solid var(--c-border-strong);border-radius:var(--radius-pill);padding:5px 14px;font-size:.8rem;
+  color:var(--c-text-soft);cursor:pointer;background:transparent;transition:.18s}
+.chip:hover{border-color:var(--c-accent);color:var(--c-accent)}
+.composer-bottom{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-4);flex-wrap:wrap}
+.helper{font-size:.8rem;color:var(--c-text-soft);line-height:1.6}
+.helper .cost{color:var(--c-text-dim)}
+
+/* ===== RECENT (journal as living content) ===== */
+.section{padding:clamp(2.5rem,5vw,4rem) 0}
+.sec-head{display:flex;align-items:baseline;justify-content:space-between;gap:var(--sp-4);margin-bottom:var(--sp-6);flex-wrap:wrap}
+.sec-head h2{font-family:var(--font-serif-cjk);font-weight:500;font-size:1.4rem}
+.recent{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--sp-4)}
+.r-card{border:1px solid var(--c-border);border-radius:var(--radius-md);background:var(--c-surface);padding:var(--sp-5);
+  display:flex;flex-direction:column;gap:var(--sp-3);cursor:pointer;transition:border-color .2s,transform .2s}
+.r-card:hover{border-color:var(--c-border-strong);transform:translateY(-2px)}
+.r-top{display:flex;align-items:center;gap:var(--sp-3)}
+.r-ic{width:34px;height:34px;flex:none;border:1px solid var(--c-border);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--c-accent)}
+.r-ic svg{width:20px;height:20px}
+.r-name{font-family:var(--font-serif-cjk);font-weight:500;font-size:1rem}
+.r-name span{display:block;font-family:var(--font-sans-cjk);font-weight:400;font-size:.72rem;color:var(--c-accent-text);letter-spacing:.04em}
+.r-q{font-family:var(--font-serif-cjk);font-size:.95rem;color:var(--c-text-soft);line-height:1.5}
+.r-meta{font-size:.72rem;color:var(--c-text-dim);letter-spacing:.04em;margin-top:auto;display:flex;gap:var(--sp-3)}
+
+/* ===== UTILITIES ===== */
+.utils{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-4)}
+.util{display:flex;align-items:center;gap:var(--sp-5);border:1px solid var(--c-border);border-radius:var(--radius-lg);
+  background:var(--c-surface);padding:var(--sp-6);cursor:pointer;transition:border-color .2s}
+.util:hover{border-color:var(--c-border-strong)}
+.util .u-ic{width:46px;height:46px;flex:none;border-radius:10px;background:var(--c-surface-well);display:flex;align-items:center;justify-content:center;color:var(--c-accent)}
+.util .u-ic svg{width:26px;height:26px}
+.util .u-t{font-family:var(--font-serif-cjk);font-weight:500;font-size:1.1rem;margin-bottom:2px}
+.util .u-d{font-size:.82rem;color:var(--c-text-soft)}
+.util .u-go{margin-left:auto;color:var(--c-accent)}
+.util .u-go svg{width:18px;height:18px}
+
+/* footer */
+.foot{border-top:1px solid var(--c-border);padding:var(--sp-12) 0 var(--sp-16);margin-top:var(--sp-8)}
+.foot-row{display:flex;justify-content:space-between;align-items:center;gap:var(--sp-6);flex-wrap:wrap;margin-bottom:var(--sp-6)}
+.foot-brand{display:flex;align-items:center;gap:var(--sp-3)}
+.foot-brand svg{width:26px;height:26px;color:var(--c-accent)}
+.foot-brand b{font-family:var(--font-display-lat);font-style:italic;font-weight:600;font-size:18px}
+.foot-links{display:flex;gap:var(--sp-5);font-size:.82rem;color:var(--c-text-soft)}
+.foot-links a:hover{color:var(--c-accent)}
+.foot-legal{font-size:.74rem;color:var(--c-text-dim);line-height:1.7}
+
+.fade{opacity:0;transform:translateY(10px);animation:fin .7s cubic-bezier(.2,.7,.2,1) forwards}
+@keyframes fin{to{opacity:1;transform:none}}
+
+@media (max-width:880px){.nav-links{display:none}.recent{grid-template-columns:1fr}.utils{grid-template-columns:1fr}}
+@media (max-width:520px){.pill{display:none}.composer-top{align-items:flex-start}.segment{flex-wrap:wrap}}
+@media (prefers-reduced-motion:reduce){.fade{animation:none;opacity:1;transform:none}.r-card,.util{transition:none}}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <g id="ora-mark"><circle cx="24" cy="24" r="13" fill="none" stroke="currentColor" stroke-width="1.25"/><line x1="24" y1="7" x2="24" y2="41" stroke="currentColor" stroke-width="1.25"/><line x1="7" y1="24" x2="41" y2="24" stroke="currentColor" stroke-width="1.25"/><rect x="20" y="20" width="8" height="8" transform="rotate(45 24 24)" fill="var(--c-bg)" stroke="currentColor" stroke-width="1.25"/></g>
+  <g id="ora-sun"><circle cx="24" cy="24" r="12" fill="none" stroke="currentColor" stroke-width="1.25"/><circle cx="24" cy="24" r="2" fill="currentColor"/><line x1="24" y1="5" x2="24" y2="11" stroke="currentColor" stroke-width="1.25"/><line x1="24" y1="37" x2="24" y2="43" stroke="currentColor" stroke-width="1.25"/><line x1="5" y1="24" x2="11" y2="24" stroke="currentColor" stroke-width="1.25"/><line x1="37" y1="24" x2="43" y2="24" stroke="currentColor" stroke-width="1.25"/><line x1="11" y1="11" x2="15" y2="15" stroke="currentColor" stroke-width="1.25"/><line x1="33" y1="33" x2="37" y2="37" stroke="currentColor" stroke-width="1.25"/><line x1="37" y1="11" x2="33" y2="15" stroke="currentColor" stroke-width="1.25"/><line x1="15" y1="33" x2="11" y2="37" stroke="currentColor" stroke-width="1.25"/></g>
+  <g id="ora-moon"><path d="M30 9a16 16 0 1 0 0 30A13 13 0 0 1 30 9Z" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linejoin="round"/></g>
+  <g id="ora-star"><path d="M24 6c1.6 8.5 9 15.9 17.5 18C33 26 25.6 33.5 24 42c-1.6-8.5-9-15.9-17.5-18C15 22 22.4 14.5 24 6Z" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linejoin="round"/></g>
+  <g id="ora-pair"><rect x="8" y="6" width="20" height="30" rx="3" fill="none" stroke="currentColor" stroke-width="1.25"/><rect x="20" y="12" width="20" height="30" rx="3" fill="none" stroke="currentColor" stroke-width="1.25"/></g>
+  <g id="ora-spark"><path d="M24 6c1 9 8 16 17 18-9 2-16 9-17 18-1-9-8-16-17-18 9-2 16-9 17-18Z" fill="currentColor"/></g>
+  <g id="ora-arrow"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></g>
+  <g id="ora-cup"><path d="M14 10h20l-2 12a8 8 0 0 1-16 0Z" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linejoin="round"/><line x1="24" y1="30" x2="24" y2="38" stroke="currentColor" stroke-width="1.25"/><line x1="17" y1="40" x2="31" y2="40" stroke="currentColor" stroke-width="1.25"/></g>
+</defs></svg>
+
+<header class="nav">
+  <a href="#" class="brand">Ora Arcana</a>
+  <nav class="nav-links">
+    <a href="#" class="active">解读室</a>
+    <a href="#">卡组</a>
+    <a href="#">解读日志</a>
+    <a href="#">实体卡组</a>
+    <a href="#">说明</a>
+  </nav>
+  <div class="nav-right">
+    <span class="pill"><svg viewBox="0 0 48 48"><use href="#ora-spark"/></svg>7,480</span>
+    <button type="button" class="theme-toggle" data-theme-toggle aria-label="切换日间 / 夜间">
+      <svg class="i-sun" viewBox="0 0 48 48"><use href="#ora-sun"/></svg>
+      <svg class="i-moon" viewBox="0 0 48 48"><use href="#ora-moon"/></svg>
+    </button>
+    <span class="avatar">E</span>
+  </div>
+</header>
+
+<!-- THE ROOM: one focal action -->
+<section class="room">
+  <span class="room-halo" aria-hidden="true"></span>
+  <div class="wrap">
+    <div class="inner fade">
+      <p class="greet"><span id="greet">晚上好</span>，<b>Eamon</b>。阅读室已经安静下来。</p>
+      <h1 class="ask-title">此刻，你想问什么？</h1>
+      <p class="ask-reassure">A mirror, not a forecast. <span class="cjk">一面镜子，不是预言。</span></p>
+
+      <div class="composer">
+        <div class="composer-top">
+          <div class="segment" role="group" aria-label="选择解读模式">
+            <button type="button" data-spread="single" data-cost="100" aria-selected="true">单牌解读</button>
+            <button type="button" data-spread="three" data-cost="240" aria-selected="false">三牌阵</button>
+            <button type="button" disabled aria-selected="false">关系解读 · 将至</button>
+          </div>
+          <span class="balance"><svg viewBox="0 0 48 48"><use href="#ora-spark"/></svg>余 7,480 星尘</span>
+        </div>
+
+        <label for="q" class="eyebrow" style="display:block;margin-bottom:var(--sp-3)">向 Ora 提问</label>
+        <textarea id="q" placeholder="诚实地写下此刻想问的一句话…"></textarea>
+
+        <div class="chips" aria-label="提问起点">
+          <button class="chip" data-seed="关系">关系</button>
+          <button class="chip" data-seed="工作">工作</button>
+          <button class="chip" data-seed="自我">自我</button>
+          <button class="chip" data-seed="一个选择">选择</button>
+          <button class="chip" data-seed="身体状态">身体</button>
+          <button class="chip" data-seed="未来">未来</button>
+        </div>
+
+        <div class="composer-bottom">
+          <p class="helper">Ora 会先帮你把问题放稳，再抽牌。<br><span class="cost" id="cost">本次单牌解读消耗 100 星尘</span></p>
+          <button class="btn btn--primary">开始解读<svg viewBox="0 0 24 24" width="16" height="16"><use href="#ora-arrow"/></svg></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- RECENT readings -->
+<section class="section">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2>继续 · 最近的解读</h2>
+      <button class="btn--text">打开解读日志<svg viewBox="0 0 24 24"><use href="#ora-arrow"/></svg></button>
+    </div>
+    <div class="recent">
+      <div class="r-card">
+        <div class="r-top"><span class="r-ic"><svg viewBox="0 0 48 48"><use href="#ora-mark"/></svg></span><span class="r-name">星币侍从<span>正位 · 单牌</span></span></div>
+        <p class="r-q">"我今天身体会舒服吗"</p>
+        <div class="r-meta"><span>今天</span><span>·</span><span>留意精神与基础体感</span></div>
+      </div>
+      <div class="r-card">
+        <div class="r-top"><span class="r-ic"><svg viewBox="0 0 48 48"><use href="#ora-star"/></svg></span><span class="r-name">星星<span>正位 · 三牌</span></span></div>
+        <p class="r-q">"我该先稳住，还是先推进"</p>
+        <div class="r-meta"><span>昨天</span><span>·</span><span>更柔和的答案浮现</span></div>
+      </div>
+      <div class="r-card">
+        <div class="r-top"><span class="r-ic"><svg viewBox="0 0 48 48"><use href="#ora-moon"/></svg></span><span class="r-name">隐者<span>正位 · 单牌</span></span></div>
+        <p class="r-q">"这个选择我还能回头吗"</p>
+        <div class="r-meta"><span>3 天前</span><span>·</span><span>回到仍可选择的地方</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- UTILITIES -->
+<section class="section" style="padding-top:0">
+  <div class="wrap">
+    <div class="utils">
+      <div class="util">
+        <span class="u-ic"><svg viewBox="0 0 48 48"><use href="#ora-pair"/></svg></span>
+        <div><div class="u-t">浏览整副卡组</div><div class="u-d">轻触翻看每张牌的正位含义与象征。</div></div>
+        <span class="u-go"><svg viewBox="0 0 24 24"><use href="#ora-arrow"/></svg></span>
+      </div>
+      <div class="util">
+        <span class="u-ic"><svg viewBox="0 0 48 48"><use href="#ora-cup"/></svg></span>
+        <div><div class="u-t">实体卡组 · 兑换</div><div class="u-d">为手心而作。兑换卡组码，解锁线上陪伴。</div></div>
+        <span class="u-go"><svg viewBox="0 0 24 24"><use href="#ora-arrow"/></svg></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot-row">
+      <div class="foot-brand"><svg viewBox="0 0 48 48"><use href="#ora-mark"/></svg><b>Ora Arcana</b></div>
+      <nav class="foot-links"><a href="#">隐私</a><a href="#">条款</a><a href="#">免责声明</a><a href="#">联系</a></nav>
+    </div>
+    <p class="foot-legal">Ora 用于个人洞察与反思，不构成医疗、法律、财务或心理建议，也不能替代专业支持。若你正处在困难或危机中，请联系当地的专业求助资源。</p>
+  </div>
+</footer>
+
+<script>
+(function(){var k='ora-theme',root=document.documentElement;
+function set(t){root.setAttribute('data-theme',t);try{localStorage.setItem(k,t);}catch(e){}}
+document.addEventListener('click',function(e){var b=e.target.closest('[data-theme-toggle]');
+if(b)set(root.getAttribute('data-theme')==='night'?'day':'night');});})();
+
+/* time-based greeting */
+(function(){var h=new Date().getHours(),g=h<5?'夜深了':h<11?'早上好':h<14?'中午好':h<18?'下午好':h<23?'晚上好':'夜深了';
+var el=document.getElementById('greet');if(el)el.textContent=g;})();
+
+/* spread selection + transparent cost */
+(function(){var seg=document.querySelector('.segment'),cost=document.getElementById('cost'),
+names={single:'单牌解读',three:'三牌阵'};
+seg.addEventListener('click',function(e){var b=e.target.closest('button');if(!b||b.disabled)return;
+seg.querySelectorAll('button').forEach(function(x){x.setAttribute('aria-selected','false')});
+b.setAttribute('aria-selected','true');
+cost.textContent='本次'+names[b.dataset.spread]+'消耗 '+b.dataset.cost+' 星尘';});})();
+
+/* prompt chips seed the textarea */
+(function(){var ta=document.getElementById('q');
+document.querySelectorAll('.chip').forEach(function(c){c.addEventListener('click',function(){
+ta.value='关于'+c.dataset.seed+'，此刻我想问的是…';ta.focus();
+var n=ta.value.length;ta.setSelectionRange(n,n);});});})();
+</script>
+</body>
+</html>

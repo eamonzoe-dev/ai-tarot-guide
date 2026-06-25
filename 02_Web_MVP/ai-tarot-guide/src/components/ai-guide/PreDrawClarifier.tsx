@@ -262,10 +262,10 @@ export function PreDrawClarifier({
   }
 
   return (
-    <main className="relative min-h-svh overflow-hidden bg-[#f6f0e5] px-0 py-0 text-[#2f261d] sm:px-6 sm:py-6 lg:px-8">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.96),rgba(246,240,229,0.86)_42%,rgba(226,213,188,0.44)_100%)]" />
-      <div className="pointer-events-none absolute left-1/2 top-20 h-[24rem] w-[24rem] -translate-x-1/2 rounded-full border border-[#c9a86a]/18 opacity-70" />
-      <div className="pointer-events-none absolute left-1/2 top-28 h-[18rem] w-[18rem] -translate-x-1/2 rounded-full border border-[#d8bd82]/22 opacity-70" />
+    <main className="ora-page-shell ora-flow-page ora-lens-page relative min-h-svh overflow-hidden bg-[var(--c-bg)] px-0 py-0 text-[var(--c-text)] sm:px-6 sm:py-6 lg:px-8">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,color-mix(in_srgb,var(--c-surface)_88%,transparent),color-mix(in_srgb,var(--c-bg)_72%,transparent)_42%,transparent_100%)]" />
+      <div className="pointer-events-none absolute left-1/2 top-20 h-[24rem] w-[24rem] -translate-x-1/2 rounded-full border border-[color-mix(in_srgb,var(--c-accent)_18%,transparent)] opacity-70" />
+      <div className="pointer-events-none absolute left-1/2 top-28 h-[18rem] w-[18rem] -translate-x-1/2 rounded-full border border-[color-mix(in_srgb,var(--c-accent)_24%,transparent)] opacity-70" />
       <ActivationCodePanel lang={lang} />
 
       <div
@@ -273,7 +273,7 @@ export function PreDrawClarifier({
           settled ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"
         }`}
       >
-        <div className="rounded-[2rem] border border-[#d7bd82]/40 bg-white/42 px-4 py-3 shadow-[0_18px_60px_rgba(123,93,45,0.08)] backdrop-blur-md">
+        <div className="ora-lens-panel rounded-[2rem] border border-[var(--c-border)] bg-[var(--c-surface)] px-4 py-3 shadow-none backdrop-blur-0">
           <ReadingNav lang={lang} />
         </div>
 
@@ -285,22 +285,22 @@ export function PreDrawClarifier({
             </span>
             <span className="h-px w-10 bg-[#d2b06d]/55" />
           </div>
-          <h1 className="mx-auto max-w-[24rem] font-serif text-[1.85rem] leading-[1.2] text-[#34271b] sm:max-w-none sm:text-[2.3rem]">
+          <h1 className="mx-auto max-w-[24rem] font-serif text-[1.85rem] leading-[1.2] text-[var(--c-text)] sm:max-w-none sm:text-[2.3rem]">
             {ui.title}
           </h1>
-          <p className="mx-auto max-w-[31rem] text-sm leading-6 text-[#7b6c58]">
+          <p className="mx-auto max-w-[31rem] text-sm leading-6 text-[var(--c-text-soft)]">
             {ui.description}
           </p>
         </header>
 
         {questionEditing ? (
-          <section className="relative overflow-hidden rounded-[1.6rem] border border-[#d8bd82]/45 bg-[#fffaf1]/74 p-4 shadow-[0_18px_50px_rgba(116,83,36,0.08)] backdrop-blur-md">
+          <section className="ora-lens-panel relative overflow-hidden rounded-[1.6rem] border border-[var(--c-border)] bg-[var(--c-surface)] p-4 shadow-none backdrop-blur-0">
             <textarea
               id="pre-draw-clarify-question"
               value={question}
               onChange={(event) => setQuestion(event.target.value)}
               rows={3}
-              className="w-full resize-none rounded-[1.2rem] border border-[#d7bd82]/48 bg-[#fbf4e7]/78 p-3 text-sm leading-6 text-[#33281d] outline-none placeholder:text-[#9d8f78] transition focus:border-[#c49a4f] focus:bg-[#fffaf0] focus:ring-2 focus:ring-[#d6b36d]/22"
+              className="w-full resize-none rounded-[1.2rem] border border-[var(--c-border-strong)] bg-[var(--c-surface-2)] p-3 text-sm leading-6 text-[var(--c-text)] outline-none placeholder:text-[var(--c-text-muted)] transition focus:border-[var(--c-accent)] focus:bg-[var(--c-surface)] focus:ring-2 focus:ring-[color-mix(in_srgb,var(--c-accent)_20%,transparent)]"
             />
             <button
               type="button"
@@ -309,21 +309,21 @@ export function PreDrawClarifier({
                 fetchClarify(question.trim());
               }}
               disabled={loadingClarify}
-              className="mt-3 min-h-9 touch-manipulation select-none rounded-full border border-[#c9a86a]/55 bg-white/55 px-4 text-[0.66rem] font-semibold uppercase tracking-[0.16em] text-[#8d6426] transition hover:border-[#c49a4f] hover:bg-white/80 disabled:opacity-60"
+              className="btn btn--surface mt-3 min-h-9 px-4 text-[0.66rem]"
             >
               {ui.refreshButton}
             </button>
           </section>
         ) : (
-          <section className="flex items-start justify-between gap-3 rounded-[1.4rem] border border-[#d8bd82]/35 bg-white/40 px-4 py-3">
-            <p className="text-sm leading-6 text-[#4f4334]">
-              <span className="text-[#a77f3c]">{ui.questionLabel}</span>{" "}
+          <section className="ora-lens-panel flex items-start justify-between gap-3 rounded-[1.4rem] border border-[var(--c-border)] bg-[var(--c-surface)] px-4 py-3 shadow-none">
+            <p className="text-sm leading-6 text-[var(--c-text)]">
+              <span className="text-[var(--c-accent-text)]">{ui.questionLabel}</span>{" "}
               <span className="font-medium">&ldquo;{trimmedQuestion}&rdquo;</span>
             </p>
             <button
               type="button"
               onClick={() => setQuestionEditing(true)}
-              className="min-h-8 shrink-0 touch-manipulation select-none rounded-full border border-[#d8bd82]/45 bg-white/50 px-3 text-[0.62rem] font-semibold uppercase tracking-[0.12em] text-[#8d6426] transition hover:border-[#c49a4f]"
+              className="btn btn--surface min-h-8 shrink-0 px-3 text-[0.62rem]"
             >
               {ui.editButton}
             </button>
@@ -331,21 +331,21 @@ export function PreDrawClarifier({
         )}
 
         {loadingClarify ? (
-          <p className="text-sm leading-6 text-[#7b6c58]">{ui.loading}</p>
+          <p className="text-sm leading-6 text-[var(--c-text-soft)]">{ui.loading}</p>
         ) : (
           <>
             <div>
-              <p className="text-[0.6rem] font-semibold uppercase tracking-[0.14em] text-[#a77f3c]">
+              <p className="text-[0.6rem] font-semibold uppercase tracking-[0.14em] text-[var(--c-accent-text)]">
                 {ui.guidanceLabel}
               </p>
-              <p className="mt-1.5 text-sm leading-6 text-[#5c4d38]">
+              <p className="mt-1.5 text-sm leading-6 text-[var(--c-text)]">
                 {guidanceText}
               </p>
             </div>
 
             {clarify && clarify.options.length > 0 && (
               <div className="space-y-2">
-                <p className="text-[0.6rem] font-semibold uppercase tracking-[0.14em] text-[#a99a80]">
+                <p className="text-[0.6rem] font-semibold uppercase tracking-[0.14em] text-[var(--c-text-muted)]">
                   {ui.optionsLeadIn}
                 </p>
                 <div className="grid gap-2">
@@ -357,25 +357,18 @@ export function PreDrawClarifier({
                         key={option.id}
                         type="button"
                         onClick={() => setSelectedId(option.id)}
-                        className={`flex min-h-11 items-start gap-2.5 rounded-[1.1rem] border px-3.5 py-2.5 text-left transition ${
-                          selected
-                            ? "border-[#c49a4f] bg-[#fffaf0] shadow-[0_10px_26px_rgba(148,105,39,0.14)]"
-                            : "border-[#d7bd82]/40 bg-white/50 hover:border-[#c49a4f]/55 hover:bg-[#fffaf0]/60"
-                        }`}
+                        data-selected={selected ? "true" : "false"}
+                        className="ora-lens-option flex w-full min-h-11 items-start gap-2.5 rounded-[1.1rem] border border-[var(--c-border)] px-3.5 py-2.5 text-left transition"
                       >
                         <span
-                          className={`mt-1.5 h-2 w-2 flex-shrink-0 rounded-full border ${
-                            selected
-                              ? "border-[#c49a4f] bg-[#c49a4f]"
-                              : "border-[#c9a86a]/50 bg-transparent"
-                          }`}
+                          className="mt-1.5 h-2 w-2 flex-shrink-0 rounded-full border border-[var(--c-border-strong)] bg-transparent"
                         />
                         <span className="flex-1">
-                          <span className="block text-sm leading-6 text-[#4f4334]">
+                          <span className="block text-sm leading-6 text-[var(--c-text)]">
                             {option.label}
                           </span>
                           {option.focus && (
-                            <span className="mt-0.5 block text-xs leading-5 text-[#9d8f78]">
+                            <span className="mt-0.5 block text-xs leading-5 text-[var(--c-text-soft)]">
                               {option.focus}
                             </span>
                           )}
@@ -391,7 +384,7 @@ export function PreDrawClarifier({
               <button
                 type="button"
                 onClick={() => setSelectedId("direct")}
-                className="min-h-8 touch-manipulation select-none self-start rounded-full border border-transparent px-1 text-xs leading-6 text-[#a99a80] underline-offset-2 transition hover:text-[#8b7c64] hover:underline"
+                className="btn btn--text min-h-8 self-start px-1 text-xs leading-6"
               >
                 {ui.skipDirectLabel}
               </button>
@@ -401,16 +394,16 @@ export function PreDrawClarifier({
               <button
                 type="button"
                 onClick={() => setNoteExpanded(true)}
-                className="min-h-8 touch-manipulation select-none self-start rounded-full border border-[#d8bd82]/40 bg-white/35 px-4 text-[0.62rem] font-semibold uppercase tracking-[0.12em] text-[#8b7c64] transition hover:border-[#c9a86a]/55 hover:text-[#5c4d38]"
+                className="btn btn--surface min-h-8 self-start px-4 text-[0.62rem]"
               >
                 {ui.noteToggleLabel}
               </button>
             ) : (
-              <div className="rounded-[1.2rem] border border-[#d8bd82]/40 bg-white/45 p-3.5">
-                <p className="text-sm font-semibold text-[#4f4334]">
+              <div className="ora-lens-panel rounded-[1.2rem] border border-[var(--c-border)] bg-[var(--c-surface)] p-3.5 shadow-none">
+                <p className="text-sm font-semibold text-[var(--c-text)]">
                   {ui.noteTitle}
                 </p>
-                <p className="mt-1 text-xs leading-5 text-[#8b7c64]">
+                <p className="mt-1 text-xs leading-5 text-[var(--c-text-soft)]">
                   {ui.noteDescription}
                 </p>
                 <textarea
@@ -421,7 +414,7 @@ export function PreDrawClarifier({
                   placeholder={ui.notePlaceholder}
                   rows={2}
                   maxLength={NOTE_MAX_LENGTH}
-                  className="mt-2 w-full resize-none rounded-xl border border-[#d7bd82]/45 bg-[#fbf4e7]/70 p-2.5 text-sm leading-6 text-[#33281d] outline-none placeholder:text-[#a99a80] transition focus:border-[#c49a4f] focus:bg-[#fffaf0] focus:ring-2 focus:ring-[#d6b36d]/20"
+                  className="mt-2 w-full resize-none rounded-xl border border-[var(--c-border-strong)] bg-[var(--c-surface-2)] p-2.5 text-sm leading-6 text-[var(--c-text)] outline-none placeholder:text-[var(--c-text-muted)] transition focus:border-[var(--c-accent)] focus:bg-[var(--c-surface)] focus:ring-2 focus:ring-[color-mix(in_srgb,var(--c-accent)_18%,transparent)]"
                 />
               </div>
             )}
@@ -430,7 +423,7 @@ export function PreDrawClarifier({
 
         <div className="space-y-2">
           {!loadingClarify && (
-            <p className="text-center text-xs leading-5 text-[#a99a80]">
+            <p className="text-center text-xs leading-5 text-[var(--c-text-soft)]">
               {continueHint}
             </p>
           )}
@@ -438,7 +431,7 @@ export function PreDrawClarifier({
             type="button"
             onClick={handleContinue}
             disabled={transitioning || loadingClarify}
-            className="min-h-12 w-full touch-manipulation select-none rounded-full border border-[#c89d4f]/70 bg-[linear-gradient(180deg,rgba(246,225,174,0.98),rgba(197,151,72,0.98))] px-5 text-xs font-semibold uppercase tracking-[0.2em] text-[#3a2a18] shadow-[0_18px_38px_rgba(148,105,39,0.22),inset_0_1px_0_rgba(255,255,255,0.55)] transition hover:-translate-y-0.5 hover:shadow-[0_22px_44px_rgba(148,105,39,0.26),inset_0_1px_0_rgba(255,255,255,0.62)] disabled:translate-y-0 disabled:opacity-70"
+            className="btn btn--primary ora-lens-cta min-h-12 w-full px-5 text-xs"
           >
             {transitioning ? ui.transitionMessage : ctaLabel}
           </button>

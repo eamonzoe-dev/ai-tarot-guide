@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Image from "next/image";
 import Link from "next/link";
@@ -231,7 +231,7 @@ function LuminousShell({
   lang: Language;
 }) {
   return (
-    <main className="ora-page-shell relative min-h-svh overflow-hidden px-0 py-0 sm:px-6 sm:py-6 lg:px-8">
+    <main className="ora-page-shell ora-flow-page relative min-h-svh overflow-hidden px-0 py-0 sm:px-6 sm:py-6 lg:px-8">
       <ActivationCodePanel lang={lang} />
 
       <div className="relative z-10 mx-auto flex min-h-svh w-full max-w-[900px] flex-col gap-5 px-5 py-7 sm:min-h-0 sm:px-6 sm:py-9">
@@ -250,7 +250,7 @@ function LuminousPanel({
 }) {
   return (
     <section
-      className={`card relative overflow-hidden ${className}`}
+      className={`result-surface card relative overflow-hidden ${className}`}
     >
       {children}
     </section>
@@ -891,7 +891,7 @@ export function ResultClient({
 
         <ReadingBoundaryNotice lang={initialLang} />
 
-        <LuminousPanel className="p-5 sm:p-6">
+        <LuminousPanel className="ora-result-panel p-5 sm:p-6">
           <p className="eyebrow">
             {copy.yourQuestion}
           </p>
@@ -910,7 +910,7 @@ export function ResultClient({
 
               return (
                 <article
-                className="well p-4"
+                className="well ora-result-card p-4"
                   key={`${positions[index]}-${threeCard.id}`}
                 >
                   <p className="micro">
@@ -924,10 +924,10 @@ export function ResultClient({
                           alt={`${cardTitle} tarot card`}
                           width={120}
                           height={213}
-                          className="block h-auto w-full rounded-[0.55rem] border border-[#d8bd82]/50 object-cover shadow-[0_12px_26px_rgba(116,83,36,0.14)]"
+                          className="block h-auto w-full rounded-[0.55rem] border border-[var(--c-border-strong)] object-cover shadow-none"
                         />
                       ) : (
-                        <div className="aspect-[9/16] rounded-[0.55rem] border border-[#d8bd82]/50 bg-[#fffaf0]/86" />
+                        <div className="aspect-[9/16] rounded-[0.55rem] border border-[var(--c-border-strong)] bg-[var(--c-surface-2)]" />
                       )}
                     </div>
                     <div>
@@ -953,7 +953,7 @@ export function ResultClient({
         ) : null}
 
         {aiReadingStatus === "error" ? (
-          <div className="well p-5 sm:p-6">
+          <div className="well ora-result-error p-5 sm:p-6">
             <p className="caption text-[var(--c-danger)]">
               {aiReadingErrorMessage || copy.aiReadingUnavailable}
             </p>
@@ -1293,7 +1293,7 @@ export function ResultClient({
         </span>
       </header>
 
-      <div className="card px-4 py-3">
+      <div className="result-nav card px-4 py-3">
         <ReadingNav lang={initialLang} />
       </div>
 
@@ -1428,17 +1428,17 @@ export function ResultClient({
         ) : null}
 
         {aiReadingStatus === "ready" && aiDisplay ? (
-          <article className="mt-6 rounded-[2.2rem] border border-[#cfad6d]/52 bg-[linear-gradient(180deg,rgba(255,253,247,0.96),rgba(250,244,233,0.92))] px-5 py-7 shadow-[0_30px_86px_rgba(111,78,31,0.13),inset_0_1px_0_rgba(255,255,255,0.76)] backdrop-blur-md sm:px-8 sm:py-9 lg:px-10 lg:py-10">
+          <article className="ora-result-reading mt-6 rounded-[2.2rem] border border-[var(--c-border)] bg-[var(--c-surface)] px-5 py-7 shadow-none backdrop-blur-0 sm:px-8 sm:py-9 lg:px-10 lg:py-10">
             <div className="pointer-events-none absolute inset-x-10 top-0 h-px bg-gradient-to-r from-transparent via-[#d2b06d]/60 to-transparent" />
             <p className="text-[0.68rem] font-semibold uppercase tracking-[0.28em] text-[#a77f3c]">
               {copy.aiPersonalizedReading}
             </p>
-            <h2 className="mt-3 font-serif text-3xl leading-tight text-[#34271b] sm:text-4xl">
+            <h2 className="mt-3 font-serif text-3xl leading-tight text-[var(--c-text)] sm:text-4xl">
               {copy.aiReadingTitle}
             </h2>
 
             {isFallbackDisplay ? (
-              <div className="mt-5 rounded-[1.35rem] border border-[#d8bd82]/42 bg-[#fffaf1]/76 p-4 text-sm leading-6 text-[#6f624f]">
+              <div className="mt-5 rounded-[1.35rem] border border-[var(--c-border)] bg-[var(--c-surface-2)] p-4 text-sm leading-6 text-[var(--c-text-soft)]">
                 <p className="text-[0.64rem] font-semibold uppercase tracking-[0.2em] text-[#9d7b3f]">
                   {copy.aiFallbackNoticeTitle}
                 </p>
@@ -1447,12 +1447,12 @@ export function ResultClient({
             ) : null}
 
             {aiDisplay.summary ? (
-              <p className="mt-6 border-l border-[#c89d4f]/55 bg-[#fffaf1]/72 py-2 pl-4 font-serif text-[1.15rem] leading-8 text-[#4a3827] sm:text-[1.35rem] sm:leading-9">
+              <p className="mt-6 border-l border-[var(--c-border-strong)] bg-[var(--c-surface-2)] py-2 pl-4 font-serif text-[1.15rem] leading-8 text-[var(--c-text)] sm:text-[1.35rem] sm:leading-9">
                 {aiDisplay.summary}
               </p>
             ) : null}
 
-            <div className="mt-7 space-y-6 text-[15px] leading-8 text-[#4f4334] sm:text-base sm:leading-9">
+            <div className="mt-7 space-y-6 text-[15px] leading-8 text-[var(--c-text)] sm:text-base sm:leading-9">
               {readingParagraphs.map((paragraph, index) => (
                 <p key={`${index}-${paragraph.slice(0, 16)}`}>
                   {paragraph}
@@ -1461,11 +1461,11 @@ export function ResultClient({
             </div>
 
             {aiDisplay.reflectionQuestion ? (
-              <div className="mt-8 border-t border-[#d8bd82]/42 pt-5">
+              <div className="mt-8 border-t border-[var(--c-border)] pt-5">
                 <p className="text-[0.68rem] font-semibold uppercase tracking-[0.26em] text-[#a77f3c]">
                   {copy.aiReflectionQuestion}
                 </p>
-                <p className="mt-3 text-sm leading-7 text-[#4f4334] sm:text-base">
+                <p className="mt-3 text-sm leading-7 text-[var(--c-text)] sm:text-base">
                   {aiDisplay.reflectionQuestion}
                 </p>
               </div>
@@ -1487,12 +1487,12 @@ export function ResultClient({
         ) : null}
       </section>
 
-      <details className="relative mt-1 overflow-hidden rounded-[1.85rem] border border-[#d8bd82]/42 bg-[#fffaf1]/72 p-5 shadow-[0_20px_58px_rgba(116,83,36,0.09)] backdrop-blur-md">
+      <details className="ora-result-reference relative mt-1 overflow-hidden rounded-[1.85rem] border border-[var(--c-border)] bg-[var(--c-surface)] p-5 shadow-none backdrop-blur-0">
         <summary className="cursor-pointer select-none list-none">
           <span className="block text-xs font-semibold uppercase tracking-[0.26em] text-[#a77f3c]">
             {copy.cardReference}
           </span>
-          <span className="mt-2 block text-sm leading-6 text-[#7b6c58]">
+          <span className="mt-2 block text-sm leading-6 text-[var(--c-text-soft)]">
             {copy.showCardReference}
           </span>
         </summary>
@@ -1500,12 +1500,12 @@ export function ResultClient({
           {referenceItems.map((item) => (
             <section
               key={item.title}
-              className="border-t border-[#d8bd82]/38 pt-4"
+              className="border-t border-[var(--c-border)] pt-4"
             >
               <h3 className="text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-[#a77f3c]">
                 {item.title}
               </h3>
-              <p className="mt-2 text-sm leading-6 text-[#6f624f]">
+              <p className="mt-2 text-sm leading-6 text-[var(--c-text-soft)]">
                 {item.body}
               </p>
             </section>
@@ -1526,14 +1526,14 @@ export function ResultClient({
         </LuminousActionLink>
       </div>
 
-      <section className="rounded-[1.75rem] border border-[#d8bd82]/32 bg-white/34 p-5 backdrop-blur-md">
+      <section className="result-footer ora-result-footer rounded-[1.75rem] border border-[var(--c-border)] bg-[var(--c-surface)] p-5 backdrop-blur-0">
         <h2 className="text-xs font-semibold uppercase tracking-[0.26em] text-[#a77f3c]">
           {copy.closingNote}
         </h2>
-        <p className="mt-3 text-sm leading-6 text-[#6f624f]">
+        <p className="mt-3 text-sm leading-6 text-[var(--c-text-soft)]">
           {copy.closingReflection}
         </p>
-        <p className="mt-4 text-xs leading-5 text-[#8b7a61]">
+        <p className="mt-4 text-xs leading-5 text-[var(--c-text-muted)]">
           {copy.disclaimer}
         </p>
       </section>

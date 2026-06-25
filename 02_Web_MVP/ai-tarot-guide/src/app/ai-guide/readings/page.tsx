@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 
 import { ThemeToggle } from "@/components/ai-guide/ThemeToggle";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
@@ -147,7 +147,7 @@ export default async function MyReadingsPage({
   }
 
   return (
-    <main className="ora-page-shell relative flex min-h-svh flex-1 overflow-hidden px-0 py-0 sm:px-6 sm:py-6 lg:px-8">
+    <main className="ora-page-shell ora-flow-page relative flex min-h-svh flex-1 overflow-hidden px-0 py-0 sm:px-6 sm:py-6 lg:px-8">
       <section className="relative z-10 mx-auto flex min-h-svh w-full max-w-5xl flex-col px-5 py-6 sm:min-h-0 sm:px-6 sm:py-8">
         <header className="flex items-center justify-between gap-4">
           <Link

@@ -1,4 +1,4 @@
-import { ActivationCodePanel } from "@/components/ai-guide/ActivationCodePanel";
+﻿import { ActivationCodePanel } from "@/components/ai-guide/ActivationCodePanel";
 import { ReadingNav } from "@/components/ai-guide/ReadingNav";
 import { normalizeLanguage, text } from "@/lib/ai-guide/i18n";
 import { PrepareRitualStepClient } from "./PrepareRitualStepClient";
@@ -87,7 +87,7 @@ export default async function PreparePage({
           };
 
   return (
-    <main className="ora-page-shell relative flex min-h-svh flex-1 overflow-hidden px-0 py-0 sm:px-6 sm:py-6 lg:px-8">
+    <main className="ora-page-shell ora-flow-page relative flex min-h-svh flex-1 overflow-hidden px-0 py-0 sm:px-6 sm:py-6 lg:px-8">
       <ActivationCodePanel lang={lang} hasLangParam={Boolean(langParam)} />
 
       <section className="relative mx-auto flex min-h-svh w-full max-w-[540px] flex-col px-5 py-6 sm:min-h-0 sm:px-6">

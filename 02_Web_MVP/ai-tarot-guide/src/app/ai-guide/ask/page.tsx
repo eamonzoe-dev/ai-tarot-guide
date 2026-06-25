@@ -1,4 +1,4 @@
-import { AskForm } from "./AskForm";
+﻿import { AskForm } from "./AskForm";
 import { normalizeLanguage } from "@/lib/ai-guide/i18n";
 
 type ReadingMode = "physical" | "online";
