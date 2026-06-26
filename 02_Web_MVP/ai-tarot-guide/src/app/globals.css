@@ -408,10 +408,11 @@ input {
 
 [data-theme="night"] .oracle-home-backdrop {
   background: radial-gradient(
-    ellipse 72% 55% at 68% 38%,
-    rgba(216,178,90,.08),
-    transparent 65%
-  ), var(--c-bg);
+    ellipse 65% 60% at 62% 40%,
+    rgba(216,178,90,.14),
+    rgba(60,85,71,.05) 55%,
+    transparent 75%
+  ), #13161F;
 }
 
 .oracle-home-center {

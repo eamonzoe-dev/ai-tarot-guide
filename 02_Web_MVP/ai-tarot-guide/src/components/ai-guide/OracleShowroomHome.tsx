@@ -751,10 +751,19 @@ export function OracleShowroomHome({
               style={revealStyle(1)}
             >
               <div
-                className="absolute flex aspect-[0.66] w-[clamp(150px,17vw,196px)] flex-col items-center rounded-2xl border border-[#caa96a]/55 bg-[#fbf3df] p-4 shadow-[0_24px_50px_-28px_rgba(20,16,8,0.5)]"
-                style={{ left: "2%", top: "14%", transform: "rotate(-13deg)" }}
+                className="absolute flex aspect-[0.66] w-[clamp(150px,17vw,196px)] flex-col items-center rounded-2xl border p-4 shadow-[0_24px_50px_-28px_rgba(20,16,8,0.5)]"
+                style={{
+                  left: "2%",
+                  top: "14%",
+                  transform: "rotate(-13deg)",
+                  background: theme === "night" ? "#23262F" : "#fbf3df",
+                  borderColor: theme === "night" ? "#353B4B" : "rgba(202,169,106,.55)",
+                }}
               >
-                <span className="font-serif text-sm tracking-[0.1em]" style={{ color: "var(--c-accent-text)" }}>
+                <span
+                  className="font-serif text-sm tracking-[0.1em]"
+                  style={{ color: theme === "night" ? "#C9B89A" : "var(--c-accent-text)" }}
+                >
                   XVII
                 </span>
                 <svg
@@ -769,7 +778,10 @@ export function OracleShowroomHome({
                     strokeLinejoin="round"
                   />
                 </svg>
-                <span className="text-center font-serif text-[13px] text-[#766955]">
+                <span
+                  className="text-center font-serif text-[13px]"
+                  style={{ color: theme === "night" ? "#C9B89A" : "#766955" }}
+                >
                   {isZh ? "星星" : "The Star"}
                   <small className="mt-0.5 block font-sans text-[10px] text-[#8a8070]">
                     {isZh ? "希望" : "Hope"}
@@ -778,10 +790,21 @@ export function OracleShowroomHome({
               </div>
 
               <div
-                className="absolute flex aspect-[0.66] w-[clamp(150px,17vw,196px)] flex-col items-center rounded-2xl border border-[#3a3d33] bg-[#23261f] p-4 shadow-[0_24px_50px_-28px_rgba(20,16,8,0.5)]"
-                style={{ right: "6%", top: "6%", transform: "rotate(11deg)" }}
+                className="absolute flex aspect-[0.66] w-[clamp(150px,17vw,196px)] flex-col items-center rounded-2xl border p-4 shadow-[0_24px_50px_-28px_rgba(20,16,8,0.5)]"
+                style={{
+                  right: "6%",
+                  top: "6%",
+                  transform: "rotate(11deg)",
+                  background: theme === "night" ? "#0C0E13" : "#23261f",
+                  borderColor: theme === "night" ? "#1a1d25" : "#3a3d33",
+                }}
               >
-                <span className="font-serif text-sm tracking-[0.1em] text-[#bdb6a3]">IX</span>
+                <span
+                  className="font-serif text-sm tracking-[0.1em]"
+                  style={{ color: theme === "night" ? "#C9B89A" : "#bdb6a3" }}
+                >
+                  IX
+                </span>
                 <svg
                   className="m-auto h-[46%] w-[46%] text-[#7c6a3a] opacity-70"
                   fill="none"
@@ -791,7 +814,10 @@ export function OracleShowroomHome({
                 >
                   <path d="M30 9a16 16 0 1 0 0 30A13 13 0 0 1 30 9Z" strokeLinejoin="round" />
                 </svg>
-                <span className="text-center font-serif text-[13px] text-[#bdb6a3]">
+                <span
+                  className="text-center font-serif text-[13px]"
+                  style={{ color: theme === "night" ? "#C9B89A" : "#bdb6a3" }}
+                >
                   {isZh ? "隐者" : "The Hermit"}
                   <small className="mt-0.5 block font-sans text-[10px] text-[#8a8070]">
                     {isZh ? "内在之光" : "Inner light"}
@@ -800,10 +826,19 @@ export function OracleShowroomHome({
               </div>
 
               <div
-                className="absolute z-[3] flex aspect-[0.66] w-[clamp(150px,17vw,196px)] flex-col items-center rounded-2xl border border-[#caa96a]/55 bg-[#fbf3df] p-4 shadow-[0_24px_50px_-28px_rgba(20,16,8,0.5)] transition-transform duration-300 hover:-translate-y-2"
-                style={{ left: "50%", top: "0%", transform: "translateX(-50%) rotate(-1deg)" }}
+                className="absolute z-[3] flex aspect-[0.66] w-[clamp(150px,17vw,196px)] flex-col items-center rounded-2xl border p-4 shadow-[0_24px_50px_-28px_rgba(20,16,8,0.5)] transition-transform duration-300 hover:-translate-y-2"
+                style={{
+                  left: "50%",
+                  top: "0%",
+                  transform: "translateX(-50%) rotate(-1deg)",
+                  background: theme === "night" ? "#23262F" : "#fbf3df",
+                  borderColor: theme === "night" ? "#353B4B" : "rgba(202,169,106,.55)",
+                }}
               >
-                <span className="font-serif text-sm tracking-[0.1em]" style={{ color: "var(--c-accent-text)" }}>
+                <span
+                  className="font-serif text-sm tracking-[0.1em]"
+                  style={{ color: theme === "night" ? "#C9B89A" : "var(--c-accent-text)" }}
+                >
                   0
                 </span>
                 <svg
@@ -817,7 +852,10 @@ export function OracleShowroomHome({
                   <line x1="24" x2="24" y1="7" y2="41" />
                   <line x1="7" x2="41" y1="24" y2="24" />
                 </svg>
-                <span className="text-center font-serif text-[13px] text-[#766955]">
+                <span
+                  className="text-center font-serif text-[13px]"
+                  style={{ color: theme === "night" ? "#C9B89A" : "#766955" }}
+                >
                   {isZh ? "愚者" : "The Fool"}
                   <small className="mt-0.5 block font-sans text-[10px] text-[#8a8070]">
                     {isZh ? "开始" : "Beginnings"}
@@ -826,8 +864,12 @@ export function OracleShowroomHome({
               </div>
 
               <div
-                className="absolute right-0 bottom-[-4%] z-[4] w-[clamp(220px,26vw,290px)] rounded-2xl border border-[#d8b76a]/40 bg-[#fffaf0] p-5 shadow-[0_20px_40px_-26px_rgba(20,16,8,0.5)]"
-                style={{ transform: "rotate(2deg)" }}
+                className="absolute right-0 bottom-[-4%] z-[4] w-[clamp(220px,26vw,290px)] rounded-2xl border p-5 shadow-[0_20px_40px_-26px_rgba(20,16,8,0.5)]"
+                style={{
+                  transform: "rotate(2deg)",
+                  background: theme === "night" ? "#1B1F2B" : "var(--c-surface)",
+                  borderColor: theme === "night" ? "#2A2F3D" : "var(--c-border)",
+                }}
               >
                 <span
                   className="absolute -top-[9px] left-6 h-[18px] w-[54px] border border-[#d8b76a]/40 bg-[#f0e7d0]/90"
@@ -835,11 +877,14 @@ export function OracleShowroomHome({
                 />
                 <p
                   className="mb-2 text-[11px] font-medium uppercase tracking-[0.16em]"
-                  style={{ color: "var(--c-accent-text)" }}
+                  style={{ color: theme === "night" ? "#D8B25A" : "var(--c-accent-text)" }}
                 >
                   {copy.questionSlip}
                 </p>
-                <p className="font-serif text-[1.05rem] leading-snug text-[#3f352b]">
+                <p
+                  className="font-serif text-[1.05rem] leading-snug"
+                  style={{ color: theme === "night" ? "#EFE9DB" : "var(--c-text)" }}
+                >
                   {copy.waitingQuestion}
                 </p>
               </div>
