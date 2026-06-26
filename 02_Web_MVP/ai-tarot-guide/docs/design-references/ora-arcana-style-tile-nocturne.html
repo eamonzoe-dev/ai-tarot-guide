@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ora Arcana — 视觉风格 · 方向二 · 星夜</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Spectral:ital,wght@0,400;0,500;1,400&family=Noto+Serif+SC:wght@300;400;500;600&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* ---- night base (warm-cool deep indigo, never pure black) ---- */
+    --base:#13161F;
+    --raised:#1B1F2B;
+    --well:#0E1118;
+    --hairline:#2A2F3D;
+    --hairline-soft:#222634;
+    /* ---- light on dark ---- */
+    --moon:#EFE9DB;      /* primary text — warm ivory, softer than white */
+    --moon-soft:#A29F90; /* secondary text */
+    --moon-dim:#76746A;  /* captions / micro */
+    /* ---- accents ---- */
+    --gold:#D8B25A;      /* luminous brass, brighter for dark */
+    --gold-lit:#ECC97A;  /* hover / highlight */
+    --gold-deep:#9C7A30; /* pressed / borders */
+    --pine:#3C5547;      /* the one secondary — brand green, kept alive */
+    --pine-soft:#2A3A31;
+    --gold-wash:rgba(216,178,90,.10);
+
+    --maxw:980px;
+    --gutter:clamp(20px,5vw,64px);
+
+    --serif-cjk:"Noto Serif SC",serif;
+    --sans-cjk:"Noto Sans SC",sans-serif;
+    --serif-lat:"Spectral",Georgia,serif;
+    --display-lat:"Cormorant Garamond",Georgia,serif;
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    background:var(--base);
+    color:var(--moon);
+    font-family:var(--sans-cjk);font-weight:300;line-height:1.75;
+    -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+  }
+  ::selection{background:var(--gold);color:var(--base)}
+
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 var(--gutter)}
+
+  /* faint starfield, applied to atmospheric blocks */
+  .starfield{position:absolute;inset:0;pointer-events:none;z-index:0;
+    background-image:
+      radial-gradient(1px 1px at 12% 22%, rgba(239,233,219,.7), transparent),
+      radial-gradient(1px 1px at 28% 64%, rgba(239,233,219,.5), transparent),
+      radial-gradient(1.4px 1.4px at 46% 14%, rgba(216,178,90,.8), transparent),
+      radial-gradient(1px 1px at 63% 48%, rgba(239,233,219,.55), transparent),
+      radial-gradient(1px 1px at 78% 28%, rgba(239,233,219,.5), transparent),
+      radial-gradient(1.2px 1.2px at 88% 62%, rgba(216,178,90,.6), transparent),
+      radial-gradient(1px 1px at 38% 84%, rgba(239,233,219,.45), transparent),
+      radial-gradient(1px 1px at 70% 80%, rgba(239,233,219,.4), transparent);
+  }
+  .twinkle{position:absolute;width:2px;height:2px;border-radius:50%;background:var(--moon);opacity:.5;z-index:0;
+    animation:tw 4s ease-in-out infinite}
+  @keyframes tw{0%,100%{opacity:.15}50%{opacity:.85}}
+
+  /* ---------- top bar ---------- */
+  .topbar{display:flex;justify-content:space-between;align-items:baseline;
+    padding:26px var(--gutter);border-bottom:1px solid var(--hairline);
+    position:sticky;top:0;z-index:30;background:rgba(19,22,31,.82);backdrop-filter:saturate(120%) blur(10px)}
+  .wordmark{font-family:var(--display-lat);font-style:italic;font-weight:500;font-size:26px;letter-spacing:.01em;color:var(--moon)}
+  .topmeta{font-family:var(--sans-cjk);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--moon-soft)}
+  .topmeta b{color:var(--gold);font-weight:500}
+
+  /* ---------- shared bits ---------- */
+  .eyebrow{font-family:var(--sans-cjk);font-weight:500;font-size:12px;letter-spacing:.26em;text-transform:uppercase;
+    color:var(--gold);display:flex;align-items:center;gap:10px}
+  .eyebrow .zh{letter-spacing:.18em}
+  .specimen{padding:74px 0;position:relative;z-index:1}
+  .spec-head{max-width:46ch}
+  .spec-title{font-family:var(--serif-cjk);font-weight:500;font-size:28px;line-height:1.3;margin:16px 0 10px;letter-spacing:.01em;color:var(--moon)}
+  .spec-note{color:var(--moon-soft);font-size:15px;max-width:54ch}
+
+  .rule{display:flex;align-items:center;gap:22px}
+  .rule::before,.rule::after{content:"";height:1px;background:var(--hairline);flex:1}
+  .rule svg{width:26px;height:26px;color:var(--gold);filter:drop-shadow(0 0 6px rgba(216,178,90,.35))}
+
+  /* ================= HERO ================= */
+  .hero{position:relative;overflow:hidden;text-align:center;padding:104px 0 92px}
+  .halo{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+    width:min(720px,94vw);aspect-ratio:1;border-radius:50%;
+    background:radial-gradient(circle, rgba(216,178,90,.16), rgba(60,85,71,.06) 42%, rgba(216,178,90,0) 66%);
+    pointer-events:none;z-index:0}
+  .hero .wrap{position:relative;z-index:2}
+  .hero .eyebrow{justify-content:center;margin-bottom:28px}
+  .hero-mark{width:66px;height:66px;color:var(--gold);margin:0 auto 32px;display:block;
+    filter:drop-shadow(0 0 14px rgba(216,178,90,.4))}
+  .hero h1{font-family:var(--serif-cjk);font-weight:500;font-size:clamp(40px,7vw,64px);line-height:1.08;
+    letter-spacing:.02em;margin-bottom:24px;color:var(--moon)}
+  .hero .lede{font-family:var(--serif-lat);font-style:italic;color:var(--moon-soft);
+    font-size:clamp(16px,2.4vw,20px);max-width:32ch;margin:0 auto;line-height:1.7}
+  .hero .lede .cjk{font-family:var(--serif-cjk);font-style:normal;color:var(--moon)}
+
+  /* ================= PALETTE ================= */
+  .swatches{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;margin-top:36px}
+  .swatch{display:flex;flex-direction:column}
+  .chip{height:96px;border-radius:10px;border:1px solid var(--hairline)}
+  .swatch .name{font-size:13px;margin-top:11px;color:var(--moon)}
+  .swatch .hex{font-family:var(--serif-lat);font-size:12px;color:var(--moon-soft);letter-spacing:.04em;margin-top:1px}
+  .swatch .use{font-size:11px;color:var(--moon-dim);margin-top:5px;line-height:1.5}
+  .row-label{grid-column:1/-1;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--moon-soft);margin:30px 0 -6px;font-weight:500}
+  .row-label:first-child{margin-top:0}
+
+  /* ================= TYPE ================= */
+  .pairing{display:flex;flex-wrap:wrap;gap:30px;align-items:flex-end;margin:36px 0 6px;padding:34px var(--gutter);
+    background:var(--raised);border:1px solid var(--hairline);border-radius:14px;
+    margin-left:calc(var(--gutter)*-1);margin-right:calc(var(--gutter)*-1)}
+  .pairing .col{flex:1;min-width:220px}
+  .pairing .ptag{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;font-weight:500}
+  .pf-display{font-family:var(--display-lat);font-style:italic;font-weight:500;font-size:52px;line-height:1;color:var(--moon)}
+  .pf-cjk{font-family:var(--serif-cjk);font-weight:500;font-size:40px;line-height:1.1;color:var(--moon)}
+  .pf-sub{font-family:var(--serif-lat);font-size:15px;color:var(--moon-soft);margin-top:8px}
+  .pf-meta{font-size:12px;color:var(--moon-soft);margin-top:14px;line-height:1.7}
+  .pf-meta b{color:var(--moon);font-weight:500}
+
+  .ladder{margin-top:38px;border-top:1px solid var(--hairline)}
+  .step{display:grid;grid-template-columns:128px 1fr;gap:26px;align-items:baseline;padding:20px 0;border-bottom:1px solid var(--hairline)}
+  .step .meta{font-size:11px;color:var(--moon-soft);line-height:1.6}
+  .step .meta b{display:block;color:var(--gold);font-weight:500;letter-spacing:.16em;text-transform:uppercase;font-size:10px;margin-bottom:5px}
+  .t-display{font-family:var(--serif-cjk);font-weight:500;font-size:52px;line-height:1.05;color:var(--moon)}
+  .t-h1{font-family:var(--serif-cjk);font-weight:500;font-size:38px;line-height:1.15;color:var(--moon)}
+  .t-h2{font-family:var(--serif-cjk);font-weight:500;font-size:27px;line-height:1.3;color:var(--moon)}
+  .t-h3{font-family:var(--serif-cjk);font-weight:600;font-size:20px;line-height:1.5;color:var(--moon)}
+  .t-bodyL{font-family:var(--serif-cjk);font-weight:400;font-size:18px;line-height:1.85;color:#DCD6C7}
+  .t-body{font-family:var(--sans-cjk);font-weight:300;font-size:16px;line-height:1.75;color:#DCD6C7}
+  .t-label{font-family:var(--sans-cjk);font-weight:500;font-size:13px;letter-spacing:.24em;text-transform:uppercase;color:var(--gold)}
+  .t-caption{font-family:var(--sans-cjk);font-weight:300;font-size:13px;color:var(--moon-soft)}
+  .t-micro{font-family:var(--sans-cjk);font-weight:400;font-size:11px;letter-spacing:.06em;color:var(--moon-dim)}
+
+  /* ================= BUTTONS ================= */
+  .btn-compare{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:36px}
+  .compare-cell{border:1px solid var(--hairline);border-radius:14px;padding:30px 26px 24px;background:var(--raised);
+    display:flex;flex-direction:column;align-items:flex-start;gap:18px}
+  .compare-cell .tag{font-size:11px;letter-spacing:.2em;text-transform:uppercase;font-weight:500}
+  .compare-cell.bad .tag{color:#C77E6A}
+  .compare-cell.good .tag{color:var(--gold)}
+  .compare-cell .why{font-size:12px;color:var(--moon-soft);line-height:1.65}
+
+  /* rejected glossy button (replica of current site) */
+  .btn-glossy{position:relative;font-family:var(--sans-cjk);font-weight:500;font-size:15px;letter-spacing:.04em;
+    color:#4a3a14;border:none;border-radius:999px;padding:15px 34px;cursor:not-allowed;
+    background:linear-gradient(180deg,#f3dd95 0%,#d8b75a 48%,#c79e3e 100%);
+    box-shadow:0 10px 20px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.65),inset 0 -3px 6px rgba(120,90,20,.25)}
+  .btn-glossy::after{content:"";position:absolute;inset:0;border-radius:999px;
+    background:linear-gradient(125deg,transparent 46%,rgba(199,126,106,.9) 48%,rgba(199,126,106,.9) 52%,transparent 54%)}
+
+  .btn{font-family:var(--sans-cjk);font-weight:500;font-size:15px;letter-spacing:.06em;border-radius:999px;
+    padding:14px 32px;cursor:pointer;border:1px solid transparent;
+    transition:background .18s ease,color .18s ease,border-color .18s ease,box-shadow .2s ease,transform .08s ease;
+    display:inline-flex;align-items:center;gap:9px}
+  .btn:active{transform:translateY(1px)}
+  .btn:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+  /* primary: solid matte gold, no gloss, no glow */
+  .btn-primary{background:var(--gold);color:#241B08}
+  .btn-primary:hover{background:var(--gold-lit)}
+  .btn-ghost{background:transparent;color:var(--moon);border-color:rgba(239,233,219,.32)}
+  .btn-ghost:hover{border-color:rgba(239,233,219,.7)}
+  .btn-surface{background:var(--raised);color:var(--moon);border-color:var(--hairline)}
+  .btn-surface:hover{border-color:var(--gold);color:var(--gold)}
+  .btn-text{background:none;border:none;color:var(--gold);font-weight:500;font-size:14px;letter-spacing:.06em;
+    cursor:pointer;padding:6px 0;display:inline-flex;align-items:center;gap:8px}
+  .btn-text svg{width:15px;height:15px}
+  .btn-text:hover{color:var(--gold-lit)}
+  .btn-text:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+  .btn-set{display:flex;flex-wrap:wrap;align-items:center;gap:16px;margin-top:30px}
+
+  /* ================= SURFACES ================= */
+  .surfaces{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;margin-top:36px}
+  .surf{border-radius:16px;padding:26px 24px;min-height:188px;display:flex;flex-direction:column;position:relative;overflow:hidden}
+  .surf .stag{font-size:11px;letter-spacing:.2em;text-transform:uppercase;font-weight:500;margin-bottom:14px;position:relative;z-index:1}
+  .surf .sttl{font-family:var(--serif-cjk);font-weight:500;font-size:23px;margin-bottom:8px;position:relative;z-index:1;color:var(--moon)}
+  .surf .sdesc{font-size:13px;color:var(--moon-soft);line-height:1.7;margin-top:auto;position:relative;z-index:1}
+  .surf-raised{background:var(--raised);border:1px solid var(--hairline)}
+  .surf-raised .stag{color:var(--gold)}
+  .surf-well{background:var(--well);border:1px solid var(--hairline-soft)}
+  .surf-well .stag{color:var(--moon-soft)}
+  .surf-moonlit{background:var(--raised);border:1px solid rgba(216,178,90,.4)}
+  .surf-moonlit::before{content:"";position:absolute;right:-30%;top:-40%;width:80%;height:120%;
+    background:radial-gradient(circle, rgba(216,178,90,.18), transparent 60%)}
+  .surf-moonlit .stag{color:var(--gold-lit)}
+
+  /* ================= SIGILS ================= */
+  .sigils{display:grid;grid-template-columns:repeat(6,1fr);gap:16px;margin-top:36px}
+  .sigil{aspect-ratio:1;border:1px solid var(--hairline);border-radius:14px;background:var(--raised);
+    display:flex;align-items:center;justify-content:center;color:var(--moon);transition:color .2s ease,border-color .2s ease,box-shadow .2s ease}
+  .sigil:hover{color:var(--gold);border-color:rgba(216,178,90,.4);box-shadow:0 0 20px rgba(216,178,90,.14)}
+  .sigil svg{width:46px;height:46px}
+  .sig-cap{display:grid;grid-template-columns:repeat(6,1fr);gap:16px;margin-top:12px}
+  .sig-cap span{font-size:11px;color:var(--moon-soft);text-align:center;line-height:1.5}
+
+  /* ================= IN CONTEXT ================= */
+  .context{margin-top:38px;background:var(--raised);border:1px solid var(--hairline);border-radius:18px;overflow:hidden}
+  .ctx-spreads{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;padding:30px;border-bottom:1px solid var(--hairline)}
+  .sp-card{border-radius:14px;padding:22px 20px;min-height:172px;display:flex;flex-direction:column;justify-content:flex-end;border:1px solid var(--hairline);background:var(--well);position:relative;overflow:hidden}
+  .sp-card .num{font-family:var(--serif-lat);font-size:13px;color:var(--moon-soft);margin-bottom:auto;position:relative;z-index:1}
+  .sp-card .sp-title{font-family:var(--serif-cjk);font-weight:500;font-size:21px;margin-bottom:6px;position:relative;z-index:1;color:var(--moon)}
+  .sp-card .sp-sub{font-size:12px;color:var(--moon-soft);line-height:1.6;position:relative;z-index:1}
+  .sp-card.is-active{border-color:rgba(216,178,90,.45);background:var(--raised)}
+  .sp-card.is-active::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 60% 30%, rgba(216,178,90,.16), transparent 62%)}
+  .sp-card.is-active .sp-title{color:var(--gold-lit)}
+  .sp-card.is-soon .sp-title,.sp-card.is-soon .num,.sp-card.is-soon .sp-sub{opacity:.42}
+
+  .ctx-read{padding:34px 36px 30px;max-width:720px}
+  .ctx-read .eyebrow{margin-bottom:16px}
+  .ctx-read .pull{font-family:var(--serif-cjk);font-weight:500;font-size:22px;line-height:1.6;
+    border-left:2px solid var(--gold);padding-left:20px;margin-bottom:22px;color:var(--moon)}
+  .ctx-read p{font-family:var(--serif-cjk);font-weight:400;font-size:17px;line-height:1.95;color:#DCD6C7;margin-bottom:18px}
+  .ctx-divider{display:flex;align-items:center;gap:18px;margin:8px 0 22px}
+  .ctx-divider::before,.ctx-divider::after{content:"";height:1px;background:var(--hairline);flex:1}
+  .ctx-divider svg{width:18px;height:18px;color:var(--gold);filter:drop-shadow(0 0 5px rgba(216,178,90,.4))}
+  .ctx-reflect{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);font-weight:500;margin-bottom:8px}
+  .ctx-q{font-family:var(--serif-cjk);font-size:18px;color:var(--moon);margin-bottom:26px}
+  .ctx-actions{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+
+  /* ================= DAY (increment teaser) ================= */
+  .day{background:#F5EFE2;color:#26221C;border-radius:20px;padding:54px var(--gutter);position:relative;overflow:hidden}
+  .day .halo-day{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);width:min(620px,90vw);aspect-ratio:1;border-radius:50%;background:radial-gradient(circle, rgba(160,124,54,.12), transparent 62%)}
+  .day-inner{position:relative;z-index:1;max-width:760px}
+  .day .eyebrow{color:#A07C36}
+  .day h3{font-family:var(--serif-cjk);font-weight:500;font-size:30px;line-height:1.3;margin:16px 0 12px;color:#26221C}
+  .day p{font-size:15px;color:#6E6557;max-width:48ch;line-height:1.8}
+  .day-swatches{display:flex;gap:12px;flex-wrap:wrap;margin:30px 0 28px}
+  .dchip{width:84px}
+  .dchip .c{height:54px;border-radius:9px;border:1px solid #E2D7C2}
+  .dchip .n{font-size:11px;margin-top:8px;color:#26221C}
+  .dchip .h{font-family:var(--serif-lat);font-size:11px;color:#6E6557;margin-top:1px}
+  .btn-day{background:#A07C36;color:#FAF6EC;border:1px solid transparent}
+  .btn-day:hover{background:#B6924A}
+
+  /* ================= FOOTER ================= */
+  .foot{padding:60px var(--gutter) 80px;border-top:1px solid var(--hairline);text-align:center;color:var(--moon-soft);position:relative;z-index:1}
+  .foot .fmark{width:34px;height:34px;color:var(--gold);margin:0 auto 18px;display:block;filter:drop-shadow(0 0 8px rgba(216,178,90,.35))}
+  .foot .fwm{font-family:var(--display-lat);font-style:italic;font-size:20px;color:var(--moon);margin-bottom:8px}
+  .foot p{font-size:12px;line-height:1.8;max-width:42ch;margin:0 auto}
+
+  /* ---------- load animation ---------- */
+  @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+  .rise{animation:rise .8s cubic-bezier(.2,.7,.2,1) both}
+  .draw [data-draw]{stroke-dasharray:var(--len,200);stroke-dashoffset:var(--len,200);animation:drawIn 1.7s cubic-bezier(.4,.6,.2,1) .2s forwards}
+  @keyframes drawIn{to{stroke-dashoffset:0}}
+
+  @media (max-width:880px){
+    .swatches{grid-template-columns:repeat(3,1fr)}
+    .sigils,.sig-cap{grid-template-columns:repeat(3,1fr)}
+    .surfaces{grid-template-columns:1fr}
+    .btn-compare{grid-template-columns:1fr}
+    .ctx-spreads{grid-template-columns:1fr 1fr}
+    .step{grid-template-columns:96px 1fr;gap:18px}
+    .t-display{font-size:40px}.t-h1{font-size:30px}
+  }
+  @media (max-width:520px){
+    .swatches{grid-template-columns:repeat(2,1fr)}
+    .ctx-spreads{grid-template-columns:1fr}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .rise{animation:none}
+    .draw [data-draw]{animation:none;stroke-dashoffset:0}
+    .twinkle{animation:none}
+  }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <g id="s-mark">
+      <circle cx="24" cy="24" r="13" fill="none" stroke="currentColor" stroke-width="1.25"/>
+      <line x1="24" y1="7" x2="24" y2="41" stroke="currentColor" stroke-width="1.25"/>
+      <line x1="7" y1="24" x2="41" y2="24" stroke="currentColor" stroke-width="1.25"/>
+      <rect x="20" y="20" width="8" height="8" transform="rotate(45 24 24)" fill="var(--base)" stroke="currentColor" stroke-width="1.25"/>
+    </g>
+  </defs>
+</svg>
+
+<header class="topbar">
+  <span class="wordmark">Ora Arcana</span>
+  <span class="topmeta">Style Tile · <b>方向二 星夜</b></span>
+</header>
+
+<!-- ===================== HERO ===================== -->
+<section class="hero">
+  <span class="halo" aria-hidden="true"></span>
+  <span class="starfield" aria-hidden="true"></span>
+  <span class="twinkle" style="left:18%;top:30%;animation-delay:.4s"></span>
+  <span class="twinkle" style="left:74%;top:24%;animation-delay:1.6s"></span>
+  <span class="twinkle" style="left:62%;top:66%;animation-delay:2.4s;background:var(--gold)"></span>
+  <span class="twinkle" style="left:30%;top:72%;animation-delay:3.1s"></span>
+  <div class="wrap">
+    <svg class="hero-mark draw" viewBox="0 0 48 48" aria-hidden="true">
+      <circle cx="24" cy="24" r="13" fill="none" stroke="currentColor" stroke-width="1.25" data-draw style="--len:82"/>
+      <line x1="24" y1="7" x2="24" y2="41" stroke="currentColor" stroke-width="1.25" data-draw style="--len:34"/>
+      <line x1="7" y1="24" x2="41" y2="24" stroke="currentColor" stroke-width="1.25" data-draw style="--len:34"/>
+      <rect x="20" y="20" width="8" height="8" transform="rotate(45 24 24)" fill="none" stroke="currentColor" stroke-width="1.25" data-draw style="--len:32"/>
+    </svg>
+    <p class="eyebrow rise" style="animation-delay:.05s"><span class="en">Direction 02</span> · <span class="zh">星夜 · 夜间模式</span></p>
+    <h1 class="rise" style="animation-delay:.12s">深夜里，<br>牌才真正醒来。</h1>
+    <p class="lede rise" style="animation-delay:.2s">A reading room after dark. <span class="cjk">同一个品牌，换上夜色。</span></p>
+  </div>
+</section>
+
+<div class="wrap"><div class="rule"><svg viewBox="0 0 48 48"><use href="#s-mark"/></svg></div></div>
+
+<!-- ===================== PALETTE ===================== -->
+<section class="specimen"><div class="wrap">
+  <div class="spec-head">
+    <p class="eyebrow"><span class="en">Palette</span> · <span class="zh">色彩</span></p>
+    <h2 class="spec-title">底色是暖调午夜，不是纯黑；文字是月光象牙，不是纯白。</h2>
+    <p class="spec-note">纯黑配纯白在屏幕上发硬、刺眼。这里底用带一点冷的深靛，正文用偏暖的象牙白，长时间阅读更舒服。金在深底上自然更亮、更显贵——它就是这一版的主角。</p>
+  </div>
+
+  <div class="swatches">
+    <div class="row-label">夜底 · Night</div>
+    <div class="swatch"><div class="chip" style="background:#13161F"></div><span class="name">Base</span><span class="hex">#13161F</span><span class="use">页面底色</span></div>
+    <div class="swatch"><div class="chip" style="background:#1B1F2B"></div><span class="name">Raised</span><span class="hex">#1B1F2B</span><span class="use">卡片 / 抬起面</span></div>
+    <div class="swatch"><div class="chip" style="background:#0E1118"></div><span class="name">Well</span><span class="hex">#0E1118</span><span class="use">凹陷 / 输入框</span></div>
+    <div class="swatch"><div class="chip" style="background:#2A2F3D"></div><span class="name">Hairline</span><span class="hex">#2A2F3D</span><span class="use">细描边</span></div>
+    <div class="swatch"><div class="chip" style="background:#A29F90"></div><span class="name">Moon Soft</span><span class="hex">#A29F90</span><span class="use">次要文字</span></div>
+    <div class="swatch"><div class="chip" style="background:#EFE9DB"></div><span class="name">Moon</span><span class="hex">#EFE9DB</span><span class="use">正文 / 标题</span></div>
+
+    <div class="row-label">点缀 · Accents</div>
+    <div class="swatch"><div class="chip" style="background:#D8B25A"></div><span class="name">Gold</span><span class="hex">#D8B25A</span><span class="use">主角 · 重点操作</span></div>
+    <div class="swatch"><div class="chip" style="background:#ECC97A"></div><span class="name">Gold Lit</span><span class="hex">#ECC97A</span><span class="use">悬停 / 高亮 / 辉光</span></div>
+    <div class="swatch"><div class="chip" style="background:#9C7A30"></div><span class="name">Gold Deep</span><span class="hex">#9C7A30</span><span class="use">按下 / 金描边</span></div>
+    <div class="swatch"><div class="chip" style="background:#3C5547"></div><span class="name">Pine</span><span class="hex">#3C5547</span><span class="use">唯一辅助绿</span></div>
+    <div class="swatch"><div class="chip" style="background:#76746A"></div><span class="name">Moon Dim</span><span class="hex">#76746A</span><span class="use">注释 / 占位</span></div>
+    <div class="swatch"><div class="chip" style="background:#2A3A31"></div><span class="name">Pine Soft</span><span class="hex">#2A3A31</span><span class="use">绿色凹陷面</span></div>
+  </div>
+</div></section>
+
+<div class="wrap"><div class="rule"><svg viewBox="0 0 48 48"><use href="#s-mark"/></svg></div></div>
+
+<!-- ===================== TYPE ===================== -->
+<section class="specimen"><div class="wrap">
+  <div class="spec-head">
+    <p class="eyebrow"><span class="en">Typeface</span> · <span class="zh">字体</span></p>
+    <h2 class="spec-title">字体与方向一完全一致——只换皮肤，不换骨架。</h2>
+    <p class="spec-note">同一套 Cormorant ＋ 思源宋体 ＋ 思源黑体，同一套字号层级。这样白天版和夜间版能共用一份代码，只切一组颜色变量。</p>
+  </div>
+
+  <div class="pairing">
+    <div class="col">
+      <p class="ptag">Display / Latin</p>
+      <div class="pf-display">Ora Arcana</div>
+      <div class="pf-sub">A reading room after dark.</div>
+      <p class="pf-meta"><b>Cormorant Garamond</b> · 大字与罗马数字<br><b>Spectral</b> · 拉丁正文 / 斜体引语</p>
+    </div>
+    <div class="col">
+      <p class="ptag">Display / 中文</p>
+      <div class="pf-cjk">向卡牌提问</div>
+      <div class="pf-sub" style="font-family:var(--serif-cjk)">为现代问题准备的一间安静阅读室。</div>
+      <p class="pf-meta"><b>思源宋体 Noto Serif SC</b> · 标题与阅读正文<br><b>思源黑体 Noto Sans SC</b> · 界面 / 标签 / 按钮</p>
+    </div>
+  </div>
+
+  <div class="ladder">
+    <div class="step"><div class="meta"><b>Display</b>64 / 1.05<br>Serif SC 500</div><div class="t-display">向卡牌提问</div></div>
+    <div class="step"><div class="meta"><b>H1</b>38 / 1.15<br>Serif SC 500</div><div class="t-h1">深夜里，牌才真正醒来。</div></div>
+    <div class="step"><div class="meta"><b>H2</b>27 / 1.3<br>Serif SC 500</div><div class="t-h2">选择最适合此刻的解读</div></div>
+    <div class="step"><div class="meta"><b>H3</b>20 / 1.5<br>Serif SC 600</div><div class="t-h3">单牌解读</div></div>
+    <div class="step"><div class="meta"><b>Body L</b>18 / 1.85<br>Serif SC 400</div><div class="t-bodyL">这张牌并不在给"肯定舒服"或"肯定不舒服"的答案，它更像是把重点放回当下的照料与观察。</div></div>
+    <div class="step"><div class="meta"><b>Body</b>16 / 1.75<br>Sans SC 300</div><div class="t-body">写下你现在想问的一句话，Ora 会带你抽一张牌。</div></div>
+    <div class="step"><div class="meta"><b>Label</b>13 · .24em<br>Sans SC 500</div><div class="t-label">Reading Room · 阅读室</div></div>
+    <div class="step"><div class="meta"><b>Caption</b>13 / 1.6<br>Sans SC 300</div><div class="t-caption">尽量提出一个真实、具体、当下的问题。</div></div>
+    <div class="step"><div class="meta"><b>Micro</b>11 · .06em<br>Sans SC 400</div><div class="t-micro">成功回应后消耗 20 星尘</div></div>
+  </div>
+</div></section>
+
+<div class="wrap"><div class="rule"><svg viewBox="0 0 48 48"><use href="#s-mark"/></svg></div></div>
+
+<!-- ===================== BUTTONS ===================== -->
+<section class="specimen"><div class="wrap">
+  <div class="spec-head">
+    <p class="eyebrow"><span class="en">Buttons</span> · <span class="zh">按钮</span></p>
+    <h2 class="spec-title">深底上同样去掉所有高光——纯哑光金。</h2>
+    <p class="spec-note">和白天版完全一致：实心金、无渐变、无投影、无发光。氛围交给底色与符号，按钮只负责"好按、好认"。</p>
+  </div>
+
+  <div class="btn-compare">
+    <div class="compare-cell bad">
+      <span class="tag">现在 · 弃用</span>
+      <button class="btn-glossy" disabled>开始解读</button>
+      <p class="why">渐变 + 内高光 + 投影。在深底上更刺眼，和夜色的安静相冲。</p>
+    </div>
+    <div class="compare-cell good">
+      <span class="tag">改后 · 哑光</span>
+      <button class="btn btn-primary">开始解读</button>
+      <p class="why">实心亮金，无渐变无投影无发光，按下时轻微下沉。干净、克制。</p>
+    </div>
+  </div>
+
+  <div class="btn-set">
+    <button class="btn btn-primary">开始解读</button>
+    <button class="btn btn-ghost">使用实体卡组</button>
+    <button class="btn btn-surface">兑换卡组码</button>
+    <button class="btn-text">浏览卡牌
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+</div></section>
+
+<div class="wrap"><div class="rule"><svg viewBox="0 0 48 48"><use href="#s-mark"/></svg></div></div>
+
+<!-- ===================== SURFACES ===================== -->
+<section class="specimen"><div class="wrap">
+  <div class="spec-head">
+    <p class="eyebrow"><span class="en">Surfaces</span> · <span class="zh">卡片</span></p>
+    <h2 class="spec-title">深色里靠"亮度差 + 细描边"分层，必要时加一点内辉光。</h2>
+    <p class="spec-note">抬起面比底色亮一档，凹陷面比底色更暗；仪式面用一圈金描边和淡淡金光，留给被选中、被强调的时刻。</p>
+  </div>
+  <div class="surfaces">
+    <div class="surf surf-raised">
+      <span class="stag">抬起 · Raised</span>
+      <span class="sttl">单牌解读</span>
+      <span class="sdesc">比底色亮一档 + 1px 细描边。安静浮起。</span>
+    </div>
+    <div class="surf surf-well">
+      <span class="stag">凹陷 · Well</span>
+      <span class="sttl">解读便笺</span>
+      <span class="sdesc">比底色更暗。用于输入框、引述、嵌套区。</span>
+    </div>
+    <div class="surf surf-moonlit">
+      <span class="stag">仪式 · Moonlit</span>
+      <span class="sttl">三牌阵</span>
+      <span class="sdesc">金描边 + 一缕金光。留给被选中、进入仪式的时刻。</span>
+    </div>
+  </div>
+</div></section>
+
+<div class="wrap"><div class="rule"><svg viewBox="0 0 48 48"><use href="#s-mark"/></svg></div></div>
+
+<!-- ===================== SIGILS ===================== -->
+<section class="specimen"><div class="wrap">
+  <div class="spec-head">
+    <p class="eyebrow"><span class="en">Sigils</span> · <span class="zh">符号</span></p>
+    <h2 class="spec-title">同一组线描，在夜里会微微发光。</h2>
+    <p class="spec-note">和方向一是同一套符号系统，只是悬停时点亮一圈金光——天然贴合星夜的氛围。</p>
+  </div>
+  <div class="sigils">
+    <div class="sigil"><svg viewBox="0 0 48 48"><use href="#s-mark"/></svg></div>
+    <div class="sigil"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.25">
+      <circle cx="24" cy="24" r="13"/><circle cx="24" cy="24" r="2" fill="currentColor"/>
+      <line x1="24" y1="4" x2="24" y2="11"/><line x1="24" y1="37" x2="24" y2="44"/>
+      <line x1="4" y1="24" x2="11" y2="24"/><line x1="37" y1="24" x2="44" y2="24"/>
+      <line x1="10" y1="10" x2="14" y2="14"/><line x1="34" y1="34" x2="38" y2="38"/>
+      <line x1="38" y1="10" x2="34" y2="14"/><line x1="14" y1="34" x2="10" y2="38"/></svg></div>
+    <div class="sigil"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.25">
+      <path d="M30 9a16 16 0 1 0 0 30A13 13 0 0 1 30 9Z" stroke-linejoin="round"/></svg></div>
+    <div class="sigil"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linejoin="round">
+      <path d="M24 6c1.6 8.5 9 15.9 17.5 18C33 26 25.6 33.5 24 42c-1.6-8.5-9-15.9-17.5-18C15 22 22.4 14.5 24 6Z"/></svg></div>
+    <div class="sigil"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="19" cy="19" r="8"/><line x1="24.6" y1="24.6" x2="40" y2="40"/><line x1="33" y1="36" x2="38" y2="31"/></svg></div>
+    <div class="sigil"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linejoin="round">
+      <path d="M6 24c5-9 13-13 18-13s13 4 18 13c-5 9-13 13-18 13S11 33 6 24Z"/><circle cx="24" cy="24" r="5"/></svg></div>
+  </div>
+  <div class="sig-cap">
+    <span>品牌标记</span><span>太阳 · 当下</span><span>月相 · 夜间</span><span>星 · 指引</span><span>探寻 · 搜索</span><span>觉察 · 空状态</span>
+  </div>
+</div></section>
+
+<div class="wrap"><div class="rule"><svg viewBox="0 0 48 48"><use href="#s-mark"/></svg></div></div>
+
+<!-- ===================== IN CONTEXT ===================== -->
+<section class="specimen"><div class="wrap">
+  <div class="spec-head">
+    <p class="eyebrow"><span class="en">In Context</span> · <span class="zh">在情境中</span></p>
+    <h2 class="spec-title">把所有 token 放进夜色页面看一眼。</h2>
+    <p class="spec-note">重点看两件事：象牙白宋体在午夜底上读起来够不够舒服，被选中的牌发光是否到位。</p>
+  </div>
+
+  <div class="context">
+    <div class="ctx-spreads">
+      <div class="sp-card"><span class="num">I</span><div class="sp-title">单牌解读</div><div class="sp-sub">一个清晰问题的快速提示。</div></div>
+      <div class="sp-card is-active"><span class="num">II</span><div class="sp-title">三牌阵</div><div class="sp-sub">围绕处境、挑战与指引展开。</div></div>
+      <div class="sp-card"><span class="num">III</span><div class="sp-title">关系解读</div><div class="sp-sub">用于爱、连接与情感清晰度。</div></div>
+      <div class="sp-card is-soon"><span class="num">IV</span><div class="sp-title">事业解读</div><div class="sp-sub">即将开放。</div></div>
+    </div>
+
+    <div class="ctx-read">
+      <p class="eyebrow"><span class="en">AI Reading</span> · <span class="zh">本次解读</span></p>
+      <p class="pull">你今天的身体状态，更适合从"稳不稳、有没有被好好照顾"来判断。星币侍从提示你留意精神与基础体感。</p>
+      <p>它的核心不是夸张的好转或坏转，而是很朴素的星币能量：身体、作息、饮食、休息这些实际层面，和一种带着学习心态去观察自身的态度。</p>
+      <p>所以这张牌更像是在说：今天的状态有机会被你用很实际的方法照看住，但前提是别忽略身体发出的低声提示。</p>
+
+      <div class="ctx-divider"><svg viewBox="0 0 48 48"><use href="#s-mark"/></svg></div>
+      <p class="ctx-reflect">反思问题</p>
+      <p class="ctx-q">今天最先显现出来的，是身体的疲惫，还是精神上的耗散？</p>
+      <div class="ctx-actions">
+        <button class="btn btn-primary">继续和 Ora 聊聊</button>
+        <button class="btn-text">展开牌面资料
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<!-- ===================== DAY (increment teaser) ===================== -->
+<section class="specimen" style="padding-bottom:40px"><div class="wrap">
+  <div class="day">
+    <span class="halo-day" aria-hidden="true"></span>
+    <div class="day-inner">
+      <p class="eyebrow"><span class="en">Toggle</span> · <span class="zh">白天模式</span></p>
+      <h3>一个开关，两种时间。<br>白天回到象牙纸上。</h3>
+      <p>星夜是默认的沉浸态；点一下开关，同一套字体与符号切回方向一的奶白纸面，用于白天、用于阅读长文。两版共用骨架，只切一组颜色。</p>
+      <div class="day-swatches">
+        <div class="dchip"><div class="c" style="background:#F5EFE2"></div><div class="n">Paper</div><div class="h">#F5EFE2</div></div>
+        <div class="dchip"><div class="c" style="background:#FAF6EC"></div><div class="n">Vellum</div><div class="h">#FAF6EC</div></div>
+        <div class="dchip"><div class="c" style="background:#A07C36"></div><div class="n">Brass</div><div class="h">#A07C36</div></div>
+        <div class="dchip"><div class="c" style="background:#26221C"></div><div class="n">Ink</div><div class="h">#26221C</div></div>
+      </div>
+      <button class="btn btn-day">切到白天模式</button>
+    </div>
+  </div>
+</div></section>
+
+<!-- ===================== FOOTER ===================== -->
+<footer class="foot">
+  <svg class="fmark" viewBox="0 0 48 48"><use href="#s-mark"/></svg>
+  <div class="fwm">Ora Arcana</div>
+  <p>视觉风格样板 · 方向二（星夜）。与方向一共用字体、字号与符号，仅切换一组颜色变量。</p>
+</footer>
+
+</body>
+</html>
