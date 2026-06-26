@@ -605,7 +605,7 @@ export function OracleShowroomHome({
             ? "border-[#d8b76a]/30 shadow-[0_10px_30px_rgba(88,64,31,0.08)] backdrop-blur"
             : "border-transparent backdrop-blur-sm",
         )}
-        style={{ background: "var(--c-bg)" }}
+        style={{ background: theme === "night" ? "rgba(19,22,31,.88)" : "var(--c-bg)" }}
       >
         <div className="pointer-events-auto mx-auto grid w-full max-w-7xl grid-cols-1 items-start gap-3 px-4 py-4 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:gap-4 sm:px-6 lg:px-8 sm:items-center">
           <Link
@@ -1084,7 +1084,9 @@ export function OracleShowroomHome({
                 <p className="mb-2 text-[11px] uppercase tracking-[0.18em]" style={{ color: "var(--c-accent-text)" }}>
                   {mode.status}
                 </p>
-                <p className="mb-2 font-serif text-[1.5rem] text-[#3f352b]">{mode.title}</p>
+                <p className="mb-2 font-serif text-[1.5rem]" style={{ color: "var(--c-text)" }}>
+                  {mode.title}
+                </p>
                 <p className="mb-4 text-sm leading-relaxed text-[#766955]">{mode.body}</p>
                 <p className="mb-4 text-xs text-[#8a8070]">
                   {copy.cardsLabel}: {mode.cards}
