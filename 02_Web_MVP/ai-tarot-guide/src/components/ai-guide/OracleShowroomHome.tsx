@@ -14,13 +14,6 @@ type OracleShowroomHomeProps = {
   onlineHref: string;
   threeCardHref: string;
   readingsHref: string;
-  askOnlineHref: string;
-  trustHrefs: {
-    privacy: string;
-    terms: string;
-    disclaimer: string;
-    contact: string;
-  };
 };
 
 const revealTiming = {
@@ -38,22 +31,6 @@ const questions = [
   "What is within my control?",
   "Where is my energy best spent?",
   "What lesson keeps returning?",
-];
-
-type DeckCard = {
-  name: string;
-  numeral: string;
-  keyword: string;
-  face: boolean;
-};
-
-const deckCards: DeckCard[] = [
-  { name: "The Fool", numeral: "0", keyword: "Beginnings", face: true },
-  { name: "The Star", numeral: "XVII", keyword: "Hope", face: true },
-  { name: "Ace of Cups", numeral: "A", keyword: "Feeling", face: false },
-  { name: "Two of Wands", numeral: "II", keyword: "Choice", face: false },
-  { name: "The Hermit", numeral: "IX", keyword: "Inner light", face: true },
-  { name: "The High Priestess", numeral: "II", keyword: "Intuition", face: false },
 ];
 
 const journalNotes = [
@@ -83,63 +60,6 @@ function cx(...classes: Array<string | false | null | undefined>) {
   return classes.filter(Boolean).join(" ");
 }
 
-function CardBack({ className = "" }: { className?: string }) {
-  return (
-    <div
-      aria-hidden="true"
-      className={cx(
-        "relative aspect-[9/16] overflow-hidden rounded-[1.35rem] border border-[#d8b76a]/48 bg-[linear-gradient(160deg,#17110d,#050504)] shadow-[0_24px_58px_rgba(18,13,8,0.32),0_0_32px_rgba(216,183,106,0.14),inset_0_0_0_9px_rgba(0,0,0,0.18),inset_0_0_0_10px_rgba(234,215,166,0.13)]",
-        className,
-      )}
-    >
-      <div className="absolute inset-4 rounded-[0.9rem] border border-[#ead7a6]/22" />
-      <div className="absolute inset-8 rounded-full border border-[#d8b76a]/22" />
-      <div className="absolute left-1/2 top-1/2 h-16 w-16 -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#ead7a6]/36" />
-      <div className="absolute left-1/2 top-1/2 h-px w-24 -translate-x-1/2 bg-gradient-to-r from-transparent via-[#d8b76a]/54 to-transparent" />
-      <div className="absolute left-1/2 top-[21%] h-px w-20 -translate-x-1/2 bg-gradient-to-r from-transparent via-[#ead7a6]/42 to-transparent" />
-      <div className="absolute bottom-[21%] left-1/2 h-px w-20 -translate-x-1/2 bg-gradient-to-r from-transparent via-[#ead7a6]/42 to-transparent" />
-    </div>
-  );
-}
-
-function CardFace({
-  numeral,
-  name,
-  keyword,
-  className = "",
-}: {
-  numeral: string;
-  name: string;
-  keyword: string;
-  className?: string;
-}) {
-  return (
-    <div
-      className={cx(
-        "relative aspect-[9/16] overflow-hidden rounded-[1.35rem] border border-[#caa96a]/55 bg-[linear-gradient(165deg,#fdf7ea,#efddb6)] shadow-[0_24px_60px_rgba(102,75,33,0.24),0_0_30px_rgba(255,255,255,0.6),inset_0_0_0_9px_rgba(255,255,255,0.34),inset_0_0_0_10px_rgba(202,169,106,0.42)]",
-        className,
-      )}
-    >
-      <div className="absolute inset-[14px] rounded-[0.85rem] border border-[#a9823f]/40" />
-      <div className="absolute left-1/2 top-[14%] -translate-x-1/2 font-serif text-base tracking-[0.32em] text-[#8d6426]">
-        {numeral}
-      </div>
-      <div className="absolute left-1/2 top-1/2 h-20 w-20 -translate-x-1/2 -translate-y-[60%] rounded-full border border-[#a9823f]/45" />
-      <div className="absolute left-1/2 top-1/2 h-px w-24 -translate-x-1/2 -translate-y-[60%] bg-gradient-to-r from-transparent via-[#a9823f]/55 to-transparent" />
-      <div className="absolute left-1/2 top-1/2 h-24 w-px -translate-x-1/2 -translate-y-[60%] bg-gradient-to-b from-transparent via-[#a9823f]/45 to-transparent" />
-      <div className="absolute left-1/2 top-[40%] h-2 w-2 -translate-x-1/2 rotate-45 border border-[#8d6426]/55" />
-      <div className="absolute inset-x-3 bottom-4 text-center">
-        <p className="font-serif text-[0.78rem] leading-tight text-[#5b4a36]">
-          {name}
-        </p>
-        <p className="mt-1 text-[0.52rem] font-semibold uppercase tracking-[0.22em] text-[#a9823f]">
-          {keyword}
-        </p>
-      </div>
-    </div>
-  );
-}
-
 export function OracleShowroomHome({
   lang,
   hasLangParam,
@@ -148,13 +68,9 @@ export function OracleShowroomHome({
   onlineHref,
   threeCardHref,
   readingsHref,
-  askOnlineHref,
-  trustHrefs,
 }: OracleShowroomHomeProps) {
   const [visible, setVisible] = useState<Set<string>>(() => new Set());
   const [compactHeader, setCompactHeader] = useState(false);
-  const [parallax, setParallax] = useState(0);
-  const [activeCard, setActiveCard] = useState(0);
 
   const isZh = lang === "zh";
   const copy = useMemo(
@@ -320,7 +236,14 @@ export function OracleShowroomHome({
             { name: "隐者", numeral: "IX", keyword: "内在之光", face: true },
             { name: "女祭司", numeral: "II", keyword: "直觉", face: false },
           ]
-        : deckCards,
+        : [
+            { name: "The Fool", numeral: "0", keyword: "Beginnings", face: true },
+            { name: "The Star", numeral: "XVII", keyword: "Hope", face: true },
+            { name: "Ace of Cups", numeral: "A", keyword: "Feeling", face: false },
+            { name: "Two of Wands", numeral: "II", keyword: "Choice", face: false },
+            { name: "The Hermit", numeral: "IX", keyword: "Inner light", face: true },
+            { name: "The High Priestess", numeral: "II", keyword: "Intuition", face: false },
+          ],
       modesKicker: isZh ? "解读模式" : "Reading Modes",
       modesNote: isZh ? "选择最适合你问题的解读。" : "Choose the reading that fits your question.",
       modes: isZh
@@ -459,7 +382,6 @@ export function OracleShowroomHome({
     [isZh, onlineHref, threeCardHref],
   );
   const sectionNavItems = copy.sectionNavItems;
-  const localizedDeckCards = copy.deckCards;
 
   useEffect(() => {
     const reduceMotion = window.matchMedia(
@@ -499,17 +421,12 @@ export function OracleShowroomHome({
   }, []);
 
   useEffect(() => {
-    const reduceMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
-    const smallViewport = window.matchMedia("(max-width: 640px)").matches;
     let frame = 0;
 
     function updateMotion() {
       frame = 0;
       const scrollY = window.scrollY;
       setCompactHeader(scrollY > 42);
-      setParallax(reduceMotion || smallViewport ? 0 : Math.min(80, scrollY * 0.05));
     }
 
     function handleScroll() {
@@ -543,31 +460,6 @@ export function OracleShowroomHome({
       ...revealTiming,
       transitionDelay: staggerDelays[delayIndex % staggerDelays.length],
     };
-  }
-
-  function openAccountMenu() {
-    const accountArea = document.getElementById("reading-account-panel");
-    const accountButton =
-      accountArea?.querySelector<HTMLButtonElement>(
-        "button[aria-expanded].pointer-events-auto",
-      );
-
-    accountButton?.click();
-  }
-
-  function setNextCard(direction: number) {
-    setActiveCard((current) => {
-      const next = current + direction;
-      if (next < 0) {
-        return localizedDeckCards.length - 1;
-      }
-
-      if (next >= localizedDeckCards.length) {
-        return 0;
-      }
-
-      return next;
-    });
   }
 
   return (
@@ -610,878 +502,73 @@ export function OracleShowroomHome({
         </div>
       </header>
 
-      <main className="relative scroll-smooth overflow-x-hidden">
+      <main className="oracle-home-main relative scroll-smooth overflow-x-hidden">
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_-4%,rgba(255,255,255,0.96),rgba(244,239,229,0.76)_30%,transparent_58%),radial-gradient(circle_at_12%_10%,rgba(234,215,166,0.28),transparent_28%),radial-gradient(circle_at_90%_18%,rgba(49,72,63,0.13),transparent_30%),linear-gradient(180deg,#f8f4ec_0%,#efe5d4_42%,#eadfc9_66%,#f4efe5_100%)]"
+          className="oracle-home-backdrop pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_-4%,rgba(255,255,255,0.96),rgba(244,239,229,0.76)_30%,transparent_58%),radial-gradient(circle_at_12%_10%,rgba(234,215,166,0.18),transparent_28%),radial-gradient(circle_at_90%_18%,rgba(49,72,63,0.08),transparent_30%),linear-gradient(180deg,#f8f4ec_0%,#efe5d4_42%,#eadfc9_66%,#f4efe5_100%)]"
         />
 
-        <section className="relative mx-auto grid min-h-[calc(100svh-5.75rem)] w-full max-w-7xl items-center gap-8 px-5 pb-4 pt-6 sm:px-6 lg:grid-cols-[0.98fr_1.02fr] lg:gap-10 lg:px-8 lg:pb-6 lg:pt-8 xl:gap-14">
-          <div
-            className={cx(revealClass("hero-copy"), "min-w-0")}
-            data-reveal-id="hero-copy"
-            data-showroom-reveal
-            style={revealStyle(0)}
-          >
-            <p className="mb-5 text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-[#9d7b3f]">
-              {copy.room}
-            </p>
-            <h1 className="font-serif text-[clamp(4.5rem,20vw,12.5rem)] leading-[0.74] text-[#3f352b]">
-              {copy.heroTitle.map((line) => (
-                <span className="block" key={line}>
-                  {line}
-                </span>
-              ))}
-            </h1>
-            <p className="mt-5 max-w-xl font-serif text-xl leading-8 text-[#5b4a36] sm:text-2xl">
-              {copy.subtitle}
-            </p>
-            <p className="mt-4 max-w-xl text-base leading-8 text-[#766955] sm:text-lg">
-              {copy.heroBody}
-            </p>
-            <div className="mt-8 grid gap-3 sm:flex sm:flex-wrap">
-              <Link className="showroom-action-primary" href={onlineHref}>
-                {copy.begin}
-              </Link>
-              <Link className="showroom-action-secondary" href={physicalHref}>
-                {copy.physical}
-              </Link>
-              <Link className="showroom-action-quiet" href="#deck-carousel">
-                {copy.explore}
-              </Link>
+        <section className="oracle-home-center relative mx-auto flex min-h-[calc(100svh-5.75rem)] w-full max-w-5xl items-center px-5 py-8 sm:px-6 lg:px-8">
+          <div className="grid w-full gap-8 lg:grid-cols-[1.08fr_0.92fr] lg:gap-10">
+            <div
+              className={cx(revealClass("hero-copy"), "min-w-0")}
+              data-reveal-id="hero-copy"
+              data-showroom-reveal
+              style={revealStyle(0)}
+            >
+              <p className="mb-4 text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-[#9d7b3f]">
+                {copy.room}
+              </p>
+              <p className="font-serif text-[clamp(2.15rem,4vw,3.25rem)] leading-tight text-[#3f352b]">
+                {copy.subtitle}
+              </p>
+              <p className="mt-4 max-w-lg text-sm leading-7 text-[#766955]">
+                {copy.heroBody}
+              </p>
+              <div className="mt-6 flex flex-wrap gap-3">
+                <Link className="showroom-action-primary" href={onlineHref}>
+                  {copy.begin}
+                </Link>
+                <Link className="showroom-action-secondary" href={physicalHref}>
+                  {copy.physical}
+                </Link>
+                <Link className="showroom-action-quiet" href={readingsHref}>
+                  {copy.journal}
+                </Link>
+              </div>
             </div>
-          </div>
 
-          <div
-            className="relative min-h-[34rem] sm:min-h-[42rem] lg:min-h-[44rem]"
-            style={{ transform: `translateY(${parallax * 0.35}px)` }}
-          >
             <div
               className={cx(
-                revealClass("hero-stage"),
-                "relative mx-auto h-[34rem] w-full max-w-[31rem] sm:h-[42rem] sm:max-w-[38rem] lg:h-[44rem] lg:max-w-[42rem]",
+                revealClass("composer-panel"),
+                "oracle-home-composer-panel rounded-[1.35rem] border border-[#d8b76a]/30 bg-[#fffaf0]/88 p-5 shadow-[0_20px_52px_rgba(102,75,33,0.1)] sm:p-6",
               )}
-              data-reveal-id="hero-stage"
+              data-reveal-id="composer-panel"
               data-showroom-reveal
               style={revealStyle(1)}
             >
-              {/* gold star compass */}
-              <div className="absolute inset-x-1 bottom-7 h-44 rounded-[2rem] border border-[#d8b76a]/22 bg-[linear-gradient(180deg,rgba(255,250,240,0.36),rgba(202,169,106,0.18)),repeating-linear-gradient(90deg,rgba(79,66,53,0.045)_0_1px,transparent_1px_18px)] shadow-[0_26px_70px_rgba(102,75,33,0.13),inset_0_1px_0_rgba(255,255,255,0.5)]" />
-              <div className="absolute left-1/2 top-4 h-[19rem] w-[19rem] -translate-x-1/2 rounded-full border border-[#d8b76a]/28 bg-[radial-gradient(circle,rgba(255,255,255,0.58),rgba(234,215,166,0.14)_46%,transparent_72%)] sm:h-[29rem] sm:w-[29rem]" />
-              <div className="absolute left-1/2 top-12 h-56 w-56 -translate-x-1/2 rounded-full border border-[#caa96a]/20 sm:h-[22rem] sm:w-[22rem]" />
-              <div className="absolute left-1/2 top-11 h-px w-[min(36rem,90vw)] -translate-x-1/2 bg-gradient-to-r from-transparent via-[#caa96a]/58 to-transparent" />
-              <div className="absolute left-1/2 top-28 h-px w-[min(30rem,82vw)] -translate-x-1/2 rotate-[30deg] bg-gradient-to-r from-transparent via-[#caa96a]/40 to-transparent" />
-              <div className="absolute left-1/2 top-28 h-px w-[min(30rem,82vw)] -translate-x-1/2 -rotate-[30deg] bg-gradient-to-r from-transparent via-[#caa96a]/40 to-transparent" />
-              <div className="absolute left-1/2 top-28 h-px w-[min(24rem,72vw)] -translate-x-1/2 rotate-90 bg-gradient-to-r from-transparent via-[#caa96a]/30 to-transparent" />
-              <div className="absolute left-1/2 top-[14%] h-2.5 w-2.5 -translate-x-1/2 rotate-45 border border-[#caa96a]/60" />
-              <div className="absolute left-[9%] top-[8%] h-24 w-20 -rotate-[10deg] rounded-[0.45rem] border border-[#caa96a]/32 bg-[#fffaf0]/72 shadow-[0_12px_28px_rgba(102,75,33,0.12)] sm:left-[12%]" />
-              <div className="absolute right-[7%] top-[19%] h-16 w-28 rotate-[8deg] rounded-[0.55rem] border border-[#caa96a]/28 bg-[#fff5e4]/72 shadow-[0_12px_28px_rgba(102,75,33,0.1)] sm:right-[10%]" />
-
-              {/* fanned deck - depth via stacked offsets */}
-              <div className="absolute left-1/2 top-20 w-32 -translate-x-1/2 translate-x-[-4.4rem] -rotate-[22deg] sm:top-24 sm:w-44">
-                <CardBack className="shadow-[0_18px_44px_rgba(18,13,8,0.3)]" />
-              </div>
-              <div className="absolute left-1/2 top-20 w-32 -translate-x-1/2 translate-x-[4.4rem] rotate-[22deg] sm:top-24 sm:w-44">
-                <CardBack className="shadow-[0_18px_44px_rgba(18,13,8,0.3)]" />
-              </div>
-              <div className="absolute left-[6%] top-30 w-30 -rotate-[13deg] sm:left-[5%] sm:w-44">
-                <CardBack />
-              </div>
-              <div className="absolute right-[6%] top-30 w-30 rotate-[13deg] sm:right-[5%] sm:w-44">
-                <CardFace keyword={copy.deckCards[1].keyword} name={copy.deckCards[1].name} numeral="XVII" />
-              </div>
-              {/* center hero card - thick, raised */}
-              <div className="absolute left-1/2 top-8 w-48 -translate-x-1/2 sm:w-64 lg:w-72">
-                <div className="absolute inset-0 translate-x-2 translate-y-5 rounded-[1.35rem] border border-[#caa96a]/28 bg-[#3b2c1a]/18" />
-                <div className="absolute inset-0 translate-x-1 translate-y-3 rounded-[1.35rem] border border-[#caa96a]/36 bg-[#ead7a6]/30" />
-                <div className="absolute inset-0 translate-y-2 rounded-[1.35rem] bg-[#2c2016]/24 blur-[3px]" />
-                <CardFace
-                  keyword={copy.deckCards[0].keyword}
-                  name={copy.deckCards[0].name}
-                  numeral="0"
-                  className="relative shadow-[0_34px_82px_rgba(102,75,33,0.3),0_0_56px_rgba(255,255,255,0.7),inset_0_0_0_10px_rgba(255,255,255,0.34)]"
+              <form action="/ai-guide/ask" method="get" className="space-y-4">
+                <input name="lang" type="hidden" value={lang} />
+                <input name="mode" type="hidden" value="online" />
+                <input name="spread" type="hidden" value="single" />
+                <input name="orientation" type="hidden" value="upright" />
+                <label
+                  className="block text-[0.64rem] font-semibold uppercase tracking-[0.2em] text-[#9d7b3f]"
+                  htmlFor="homepage-ask-ora-question"
+                >
+                  {copy.askOraTitle}
+                </label>
+                <textarea
+                  className="oracle-home-textarea w-full resize-none rounded-[1rem] border border-[#caa96a]/36 bg-white/78 p-4 text-base leading-7 text-[#3f352b] outline-none placeholder:text-[#a9967a] focus:border-[#b9934f]/70 focus:bg-white/94 focus:ring-2 focus:ring-[#d6b36d]/18"
+                  id="homepage-ask-ora-question"
+                  name="question"
+                  placeholder={copy.askOraDescription}
+                  rows={3}
                 />
-              </div>
-
-              {/* tiny paper mark */}
-              <div className="absolute right-[14%] top-[6%] h-12 w-9 rotate-[16deg] rounded-sm border border-[#caa96a]/40 bg-[#fffaf0]/80 shadow-[0_8px_20px_rgba(102,75,33,0.14)] sm:right-[16%]" />
-              <div className="absolute bottom-26 left-[5%] h-16 w-24 -rotate-[8deg] rounded-[0.5rem] border border-[#caa96a]/28 bg-[#fff7e8]/72 shadow-[0_12px_28px_rgba(102,75,33,0.1)] sm:left-[9%]" />
-
-              {/* question slip with tape */}
-              <div className="absolute bottom-4 left-1/2 w-[min(26rem,92vw)] -translate-x-1/2 rotate-[-3deg] rounded-[1.1rem] border border-[#caa96a]/40 bg-[#fffaf0]/94 p-5 shadow-[0_24px_62px_rgba(111,84,43,0.2),inset_0_1px_0_rgba(255,255,255,0.78)]">
-                <span className="absolute -top-3 left-1/2 h-6 w-20 -translate-x-1/2 rotate-[-2deg] rounded-[2px] bg-[#e9d6a8]/70 shadow-sm" />
-                <p className="text-[0.62rem] font-semibold uppercase tracking-[0.2em] text-[#9d7b3f]">
-                  {copy.questionSlip}
-                </p>
-                <p className="mt-3 font-serif text-2xl leading-tight text-[#4f4235]">
-                  {copy.waitingQuestion}
-                </p>
-                <div className="mt-4 h-px bg-gradient-to-r from-[#caa96a]/0 via-[#caa96a]/44 to-[#caa96a]/0" />
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="relative mx-auto w-full max-w-7xl px-5 pb-14 pt-8 sm:px-6 lg:px-8 lg:pt-10">
-          <p
-            className={cx(
-              revealClass("path-kicker"),
-              "text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-[#9d7b3f]",
-            )}
-            data-reveal-id="path-kicker"
-            data-showroom-reveal
-            style={revealStyle(0)}
-          >
-            {copy.choosePath}
-          </p>
-          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {copy.paths.map((item, index) => {
-              const className = cx(
-                revealClass(`path-${item.id}`),
-                "group relative flex min-h-[24rem] flex-col justify-between overflow-hidden rounded-[1.8rem] border p-6 shadow-[0_22px_58px_rgba(102,75,33,0.14)] transition duration-[260ms] motion-reduce:transform-none sm:p-7",
-                item.disabled
-                  ? "cursor-not-allowed opacity-68"
-                  : "hover:-translate-y-1.5 hover:scale-[1.015]",
-                item.tone === "green" &&
-                  "border-[#31483f]/30 bg-[linear-gradient(155deg,#29443b,#172a23)] text-[#f4efe5] hover:shadow-[0_30px_72px_rgba(33,54,47,0.3)]",
-                item.tone === "light" &&
-                  "border-[#d8b76a]/36 bg-[radial-gradient(circle_at_82%_12%,rgba(255,255,255,0.9),transparent_30%),linear-gradient(170deg,#fffaf0,#f1e4cb)] text-[#3f352b] hover:border-[#b9934f]/62",
-                item.tone === "product" &&
-                  "border-[#d8b76a]/30 bg-[linear-gradient(170deg,#fbf3e4,#ead8ba)] text-[#3f352b] hover:border-[#b9934f]/55",
-              );
-              const content = (
-                <>
-                {/* object visual layer per tone */}
-                {item.tone === "light" && (
-                  <span aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-48">
-                    <span className="absolute right-4 top-5 w-28 rotate-[10deg] opacity-95 sm:w-32">
-                      <CardFace
-                        keyword={copy.deckCards[0].keyword}
-                        name={copy.deckCards[0].name}
-                        numeral="0"
-                      />
-                    </span>
-                    <span className="absolute right-24 top-10 h-px w-40 rotate-[-24deg] bg-gradient-to-r from-transparent via-[#caa96a]/52 to-transparent" />
-                    <span className="absolute left-5 top-8 h-20 w-16 -rotate-[8deg] rounded-[0.45rem] border border-[#caa96a]/28 bg-[#fffaf0]/70" />
-                  </span>
-                )}
-                {item.tone === "green" && (
-                  <span aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-52">
-                    <span className="absolute right-5 top-8 block h-36 w-24 rotate-[8deg] rounded-md border border-[#d8b76a]/45 bg-[#1a2a24] shadow-[0_18px_44px_rgba(0,0,0,0.34),inset_0_0_0_7px_rgba(216,183,106,0.18)]" />
-                    <span className="absolute right-16 top-12 h-36 w-24 rotate-[-6deg] rounded-md border border-[#d8b76a]/30 bg-[#22382f]" />
-                    <span className="absolute left-6 top-10 h-px w-36 bg-gradient-to-r from-transparent via-[#d8b76a]/54 to-transparent" />
-                    <span className="absolute left-8 top-20 h-px w-28 rotate-90 bg-gradient-to-r from-transparent via-[#d8b76a]/34 to-transparent" />
-                  </span>
-                )}
-                {item.tone === "product" && (
-                  <span aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-52">
-                    <span className="absolute right-7 top-8 h-28 w-20 rotate-[6deg] rounded-[7px] border border-[#caa96a]/45 bg-[#fffaf0] shadow-[0_14px_34px_rgba(102,75,33,0.16)]" />
-                    <span className="absolute right-20 top-5 h-28 w-20 rotate-[-5deg] rounded-[7px] border border-[#caa96a]/35 bg-[#f6ecd6]" />
-                    <span className="absolute left-6 top-12 h-24 w-36 -rotate-[3deg] rounded-[0.65rem] border border-[#caa96a]/28 bg-[#fff8e9]/70 shadow-[0_10px_26px_rgba(102,75,33,0.08)]" />
-                    <span className="absolute left-10 top-20 h-px w-28 bg-[#caa96a]/34" />
-                    <span className="absolute left-10 top-28 h-px w-20 bg-[#caa96a]/24" />
-                  </span>
-                )}
-                <span
-                  aria-hidden="true"
-                  className={cx(
-                    "pointer-events-none absolute inset-x-6 bottom-5 h-px bg-gradient-to-r from-transparent to-transparent",
-                    item.tone === "green" ? "via-[#d8b76a]/30" : "via-[#caa96a]/34",
-                  )}
-                />
-                <span
-                  className={cx(
-                    "text-[0.62rem] font-semibold uppercase tracking-[0.24em]",
-                    item.tone === "green" ? "text-[#d8b76a]" : "text-[#9d7b3f]",
-                  )}
-                >
-                  0{index + 1}
-                </span>
-                <div className="relative mt-auto pt-24">
-                  <h2 className="max-w-[13rem] font-serif text-4xl leading-[0.92] sm:text-5xl">
-                    {item.title}
-                  </h2>
-                  <p
-                    className={cx(
-                      "mt-4 max-w-[14rem] text-sm leading-7",
-                      item.tone === "green" ? "text-[#cdbfa6]" : "text-[#766955]",
-                    )}
-                  >
-                    {item.body}
-                  </p>
-                </div>
-                </>
-              );
-
-              return item.disabled ? (
-              <div
-                className={cx(
-                  className,
-                  "hover:translate-y-0 hover:scale-100",
-                )}
-                data-reveal-id={`path-${item.id}`}
-                data-showroom-reveal
-                key={item.id}
-                style={revealStyle(index)}
-                aria-disabled="true"
-              >
-                {content}
-              </div>
-              ) : (
-              <Link
-                className={className}
-                data-reveal-id={`path-${item.id}`}
-                data-showroom-reveal
-                href={item.href}
-                key={item.id}
-                style={revealStyle(index)}
-              >
-                {content}
-              </Link>
-              );
-            })}
-          </div>
-        </section>
-
-        <section className="relative mx-auto w-full max-w-7xl px-5 py-14 sm:px-6 lg:px-8">
-          <div
-            className={revealClass("question-wall")}
-            data-reveal-id="question-wall"
-            data-showroom-reveal
-            style={revealStyle(0)}
-          >
-            <h2 className="font-serif text-[clamp(2.6rem,10vw,7rem)] leading-[0.9] text-[#3f352b]">
-              {copy.wonderingTitle}
-            </h2>
-            <div className="mt-6 flex flex-wrap gap-2">
-              {copy.chips.map((chip) => (
-                <span
-                  className="rounded-full border border-[#caa96a]/36 bg-[#fffaf0]/72 px-4 py-2 text-[0.66rem] font-semibold uppercase tracking-[0.18em] text-[#8d6426]"
-                  key={chip}
-                >
-                  {chip}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          <form
-            action="/ai-guide/ask"
-            method="get"
-            className="mt-10 max-w-2xl rounded-[1.6rem] border border-[#caa96a]/40 bg-[#fffaf0]/82 p-5 shadow-[0_22px_58px_rgba(102,75,33,0.12),inset_0_1px_0_rgba(255,255,255,0.7)] backdrop-blur-md sm:p-6"
-          >
-            <input name="lang" type="hidden" value={lang} />
-            <input name="mode" type="hidden" value="online" />
-            <input name="spread" type="hidden" value="single" />
-            <input name="orientation" type="hidden" value="upright" />
-
-            <label
-              className="block text-[0.66rem] font-semibold uppercase tracking-[0.2em] text-[#9d7b3f]"
-              htmlFor="homepage-ask-ora-question"
-            >
-              {copy.askOraTitle}
-            </label>
-            <p className="mt-2 text-sm leading-6 text-[#766955]">
-              {copy.askOraDescription}
-            </p>
-            <textarea
-              className="mt-4 w-full resize-none rounded-[1.1rem] border border-[#caa96a]/40 bg-white/70 p-3.5 text-base leading-7 text-[#3f352b] outline-none placeholder:text-[#a9967a] transition focus:border-[#b9934f]/70 focus:bg-white/90 focus:ring-2 focus:ring-[#d6b36d]/22"
-              id="homepage-ask-ora-question"
-              name="question"
-              placeholder={copy.askOraDescription}
-              rows={2}
-            />
-            <button className="showroom-action-primary mt-4" type="submit">
-              {copy.askOraButton}
-            </button>
-          </form>
-
-          <p className="mt-10 text-[0.66rem] font-semibold uppercase tracking-[0.18em] text-[#9d7b3f]">
-            {copy.examplesLabel}
-          </p>
-          <div className="mt-4 grid gap-x-4 gap-y-6 sm:grid-cols-2 lg:grid-cols-4">
-            {copy.questions.map((question, index) => {
-              const paper = [
-                "bg-[#fffbf4]/90",
-                "bg-[#fdf6e7]/90",
-                "bg-[#fbf3e2]/90",
-              ][index % 3];
-              const pin = index % 3;
-              return (
-                <Link
-                  className={cx(
-                    revealClass(`question-${index}`),
-                    "group relative block min-h-[9rem] rounded-[0.9rem] border border-[#d8b76a]/34 p-4 pt-6 shadow-[0_14px_34px_rgba(102,75,33,0.12),inset_0_1px_0_rgba(255,255,255,0.78)] transition duration-[260ms] hover:z-30 hover:-translate-y-1.5 hover:scale-[1.02] hover:border-[#b9934f]/62 motion-reduce:transform-none",
-                    paper,
-                    // gentle scatter on mobile (small, overflow-safe), stronger on desktop
-                    index % 4 === 0 && "rotate-[-2deg] lg:translate-y-8 lg:rotate-[-2.4deg]",
-                    index % 4 === 1 && "rotate-[1.6deg] lg:-translate-y-3 lg:rotate-[1.8deg]",
-                    index % 4 === 2 && "rotate-[-1deg] lg:translate-y-12 lg:rotate-[-1.2deg]",
-                    index % 4 === 3 && "rotate-[2deg] lg:translate-y-2 lg:rotate-[2.2deg]",
-                    index === 6 && "lg:col-start-2",
-                  )}
-                  data-reveal-id={`question-${index}`}
-                  data-showroom-reveal
-                  href={askOnlineHref}
-                  key={question}
-                  style={{
-                    ...revealStyle(index),
-                    zIndex: 10 + (index % 3),
-                  }}
-                >
-                  {/* pin or tape */}
-                  {pin === 0 && (
-                    <span
-                      aria-hidden="true"
-                      className="absolute left-1/2 top-2 h-3 w-3 -translate-x-1/2 rounded-full bg-[#b9934f] shadow-[0_2px_5px_rgba(102,75,33,0.4),inset_0_1px_0_rgba(255,255,255,0.6)]"
-                    />
-                  )}
-                  {pin === 1 && (
-                    <span
-                      aria-hidden="true"
-                      className="absolute -top-2 left-5 h-5 w-12 rotate-[-8deg] rounded-[2px] bg-[#e9d6a8]/65 shadow-sm"
-                    />
-                  )}
-                  {pin === 2 && (
-                    <span
-                      aria-hidden="true"
-                      className="absolute right-3 top-3 h-2 w-2 rotate-45 border border-[#caa96a]/60"
-                    />
-                  )}
-                  <span className="block h-px w-12 bg-[#caa96a]/44" />
-                  <p className="mt-4 font-serif text-lg leading-snug text-[#4f4235] sm:text-xl">
-                    {question}
-                  </p>
-                </Link>
-              );
-            })}
-          </div>
-        </section>
-
-        <section
-          className="relative scroll-mt-24 overflow-hidden bg-[linear-gradient(180deg,#21362f,#1a2b25)] py-18 text-[#f4efe5] sm:py-20"
-          id="how-it-works"
-        >
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_18%,rgba(216,183,106,0.16),transparent_34%),radial-gradient(circle_at_88%_82%,rgba(216,183,106,0.1),transparent_36%)]"
-          />
-          <div className="relative mx-auto w-full max-w-7xl px-5 sm:px-6 lg:px-8">
-            <p
-              className={cx(
-                revealClass("unfolds-title"),
-                "text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-[#d8b76a]",
-              )}
-              data-reveal-id="unfolds-title"
-              data-showroom-reveal
-              style={revealStyle(0)}
-            >
-              {copy.unfoldsKicker}
-            </p>
-            <h2
-              className={cx(
-                revealClass("unfolds-head"),
-                "mt-4 max-w-2xl font-serif text-4xl leading-tight text-[#f4efe5] sm:text-5xl",
-              )}
-              data-reveal-id="unfolds-head"
-              data-showroom-reveal
-              style={revealStyle(1)}
-            >
-              {copy.unfoldsTitle}
-            </h2>
-            <div className="mt-10 grid gap-x-6 gap-y-8 md:grid-cols-5">
-              {copy.unfolds.map(({ step, note }, index) => (
-                <div
-                  className={cx(
-                    revealClass(`unfold-${step}`),
-                    "relative border-t border-[#d8b76a]/40 pt-6 md:pt-8",
-                    index % 2 === 1 && "md:translate-y-8",
-                  )}
-                  data-reveal-id={`unfold-${step}`}
-                  data-showroom-reveal
-                  key={step}
-                  style={revealStyle(index)}
-                >
-                  <p className="font-serif text-6xl leading-none text-[#d8b76a]/85 sm:text-7xl">
-                    {String(index + 1).padStart(2, "0")}
-                  </p>
-                  <h3 className="mt-4 font-serif text-3xl text-[#f4efe5]">{step}</h3>
-                  <p className="mt-3 text-sm leading-7 text-[#bccabf]">{note}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section
-          className="relative scroll-mt-24 mx-auto w-full max-w-7xl px-5 py-16 sm:px-6 lg:px-8"
-          id="deck"
-        >
-          <div aria-hidden="true" className="h-0" id="deck-carousel" />
-          <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <p
-                className={cx(
-                  revealClass("deck-kicker"),
-                  "mb-3 text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-[#9d7b3f]",
-                )}
-                data-reveal-id="deck-kicker"
-                data-showroom-reveal
-                style={revealStyle(0)}
-              >
-                {copy.deckKicker}
-              </p>
-              <h2
-                className={cx(
-                  revealClass("deck-title"),
-                  "font-serif text-[clamp(3.4rem,13vw,8rem)] leading-[0.82] text-[#3f352b]",
-                )}
-                data-reveal-id="deck-title"
-                data-showroom-reveal
-                style={revealStyle(1)}
-              >
-                {copy.deckTitle.map((line) => (
-                  <span className="block" key={line}>
-                    {line}
-                  </span>
-                ))}
-              </h2>
-              <p className="mt-4 max-w-2xl text-sm leading-7 text-[#766955]">
-                {copy.deckDescription}
-              </p>
-            </div>
-            <div className="flex flex-wrap items-center gap-3">
-              <span className="rounded-full border border-[#d8b76a]/36 bg-[#fffaf0]/78 px-3 py-2 text-[0.62rem] font-semibold uppercase tracking-[0.18em] text-[#8d6426]">
-                {copy.deckAction}
-              </span>
-              <span className="rounded-full border border-[#caa96a]/28 bg-[#fffaf0]/70 px-3 py-2 text-[0.62rem] font-semibold uppercase tracking-[0.18em] text-[#9b8a73]">
-                {String(activeCard + 1).padStart(2, "0")} / {String(localizedDeckCards.length).padStart(2, "0")}
-              </span>
-              <button
-                aria-label={copy.previousCardLabel}
-                className="flex min-h-12 items-center justify-center rounded-full border border-[#caa96a]/45 bg-[#fffaf0]/82 px-4 text-xs font-semibold uppercase tracking-[0.16em] text-[#6f614d] shadow-[0_10px_26px_rgba(102,75,33,0.12)] transition duration-[260ms] hover:-translate-y-1 hover:border-[#9d7b3f] hover:text-[#3f352b] motion-reduce:transform-none"
-                onClick={() => setNextCard(-1)}
-                type="button"
-              >
-                {copy.previousCard}
-              </button>
-              <button
-                aria-label={copy.nextCardLabel}
-                className="flex min-h-12 items-center justify-center rounded-full border border-[#9d7b3f]/55 bg-[linear-gradient(180deg,#f6e1ae,#c59748)] px-4 text-xs font-semibold uppercase tracking-[0.16em] text-[#352513] shadow-[0_12px_30px_rgba(148,105,39,0.22)] transition duration-[260ms] hover:-translate-y-1 hover:scale-[1.03] motion-reduce:transform-none"
-                onClick={() => setNextCard(1)}
-                type="button"
-              >
-                {copy.nextCard}
-              </button>
-            </div>
-          </div>
-
-          <div className="mt-10 flex snap-x snap-mandatory gap-5 overflow-x-auto px-1 pb-8 pt-4 [scrollbar-width:thin] md:relative md:h-[31rem] md:block md:overflow-hidden md:px-0">
-            {localizedDeckCards.map((card, index) => {
-              const active = activeCard === index;
-              const offset = index - activeCard;
-              let layeredOffset = offset;
-              const halfDeck = localizedDeckCards.length / 2;
-
-              if (layeredOffset > halfDeck) {
-                layeredOffset -= localizedDeckCards.length;
-              }
-
-              if (layeredOffset < -halfDeck) {
-                layeredOffset += localizedDeckCards.length;
-              }
-
-              const distance = Math.abs(layeredOffset);
-              const deckX = layeredOffset * 14.5;
-              const deckY =
-                distance === 0 ? -6 : distance === 1 ? 18 : distance === 2 ? 42 : 60;
-              const deckScale =
-                distance === 0 ? 1.18 : distance === 1 ? 0.93 : distance === 2 ? 0.8 : 0.68;
-              const deckRotate = distance === 0 ? 0 : layeredOffset * 7;
-              const deckOpacity =
-                distance === 0 ? 1 : distance === 1 ? 0.82 : distance === 2 ? 0.56 : 0.32;
-              const deckZ = distance === 0 ? 50 : 40 - distance * 8;
-              return (
-                <Link
-                  className={cx(
-                    revealClass(`deck-${card.name}`),
-                    "group relative block min-w-[min(18rem,78vw)] shrink-0 snap-center rounded-[1.45rem] border p-3 transition duration-[380ms] ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transform-none md:absolute md:left-1/2 md:top-0 md:min-w-0 md:w-[15rem] md:snap-none md:origin-top-center md:opacity-[var(--deck-opacity)] md:[transform:translateX(calc(-50%+var(--deck-x)))_translateY(var(--deck-y))_scale(var(--deck-scale))_rotate(var(--deck-rotate))]",
-                    active
-                      ? "border-[#9d7b3f]/70 bg-[#fffaf0]/94 shadow-[0_34px_76px_rgba(102,75,33,0.24)]"
-                      : "border-[#d8b76a]/28 bg-[#fbf3e4]/74 shadow-[0_18px_44px_rgba(102,75,33,0.12)] hover:-translate-y-1.5",
-                  )}
-                  data-reveal-id={`deck-${card.name}`}
-                  data-showroom-reveal
-                  href={askOnlineHref}
-                  key={card.name}
-                  onFocus={() => setActiveCard(index)}
-                  onMouseEnter={() => setActiveCard(index)}
-                  style={
-                    {
-                      ...revealStyle(index),
-                      "--deck-x": `${deckX}rem`,
-                      "--deck-y": `${deckY}px`,
-                      "--deck-scale": deckScale,
-                      "--deck-rotate": `${deckRotate}deg`,
-                      "--deck-opacity": deckOpacity,
-                      zIndex: deckZ,
-                    } as CSSProperties
-                  }
-                >
-                  <div className="relative">
-                    {card.face || active ? (
-                      <CardFace
-                        keyword={card.keyword}
-                        name={card.name}
-                        numeral={card.numeral}
-                        className="rounded-[1rem]"
-                      />
-                    ) : (
-                      <CardBack className="rounded-[1rem]" />
-                    )}
-                    {active ? (
-                      <div className="absolute inset-x-3 bottom-3 rounded-[0.9rem] border border-[#d8b76a]/26 bg-[#fffaf0]/78 px-3 py-2 shadow-[0_8px_22px_rgba(102,75,33,0.1)] backdrop-blur">
-                        <p className="font-serif text-lg leading-tight text-[#4f4235]">
-                          {card.name}
-                        </p>
-                        <p className="mt-1 text-[0.58rem] font-semibold uppercase tracking-[0.18em] text-[#9d7b3f]">
-                          {card.keyword}
-                        </p>
-                      </div>
-                    ) : null}
-                  </div>
-                  <div className="mt-4 flex min-h-12 items-center justify-between gap-2 px-1">
-                    <div>
-                      <p className="font-serif text-lg leading-tight text-[#4f4235]">
-                        {card.name}
-                      </p>
-                      <p className="mt-1 text-[0.58rem] font-semibold uppercase tracking-[0.18em] text-[#9d7b3f]">
-                        {active ? copy.innerGuidance : card.keyword}
-                      </p>
-                    </div>
-                    {active ? (
-                      <span className="rounded-full border border-[#d8b76a]/36 bg-[#fffaf0]/82 px-2 py-1 text-[0.5rem] font-semibold uppercase tracking-[0.16em] text-[#8d6426]">
-                        {copy.active}
-                      </span>
-                    ) : null}
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
-        </section>
-
-        <section
-          className="relative scroll-mt-24 mx-auto w-full max-w-7xl px-5 py-16 sm:px-6 lg:px-8"
-          id="reading-modes"
-        >
-          <p
-            className={cx(
-              revealClass("modes-kicker"),
-              "text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-[#9d7b3f]",
-            )}
-            data-reveal-id="modes-kicker"
-            data-showroom-reveal
-            style={revealStyle(0)}
-          >
-            {copy.modesKicker}
-          </p>
-          <p
-            className={cx(
-              revealClass("modes-note"),
-              "mt-3 font-serif text-2xl text-[#4f4235] sm:text-3xl",
-            )}
-            data-reveal-id="modes-note"
-            data-showroom-reveal
-            style={revealStyle(1)}
-          >
-            {copy.modesNote}
-          </p>
-          <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-            {copy.modes.map((mode, index) => {
-              const isDark = mode.theme === "mirror";
-              const cardClassName = cx(
-                revealClass(`mode-${index}`),
-                "group relative flex min-h-[27rem] flex-col justify-end overflow-hidden rounded-[1.5rem] border p-7 shadow-[0_22px_60px_rgba(102,75,33,0.16)] transition duration-[260ms] motion-reduce:transform-none",
-                !mode.disabled && "hover:-translate-y-1.5 hover:scale-[1.015]",
-                mode.disabled && "cursor-not-allowed opacity-70 saturate-[0.82]",
-                mode.theme === "clarity" && "border-[#d8b76a]/40 bg-[linear-gradient(180deg,#fff7e6,#f0deb4)] text-[#3f352b] xl:translate-y-4",
-                mode.theme === "mirror" && "border-[#31483f]/40 bg-[linear-gradient(180deg,#2b3f38,#1b2a24)] text-[#f4efe5]",
-                mode.theme === "next" && "border-[#caa96a]/40 bg-[linear-gradient(180deg,#fbf3e4,#e7d6b6)] text-[#3f352b] xl:translate-y-4",
-                mode.theme === "product" && "border-[#d8b76a]/32 bg-[linear-gradient(180deg,#fffaf0,#eadfc9)] text-[#3f352b]",
-              );
-              const cardContent = (
-                <>
-                  {mode.theme === "clarity" && (
-                    <span aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-2/3">
-                      <span className="absolute left-1/2 top-8 h-40 w-28 -translate-x-1/2 rounded-t-full border border-[#caa96a]/55 bg-[radial-gradient(circle_at_50%_30%,rgba(255,247,224,0.95),rgba(216,183,106,0.25))] shadow-[0_0_50px_rgba(216,183,106,0.45)]" />
-                      <span className="absolute left-1/2 top-2 h-px w-44 -translate-x-1/2 bg-gradient-to-r from-transparent via-[#caa96a]/70 to-transparent" />
-                    </span>
-                  )}
-                  {mode.theme === "mirror" && (
-                    <span aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-2/3">
-                      <span className="absolute left-1/2 top-8 h-44 w-32 -translate-x-1/2 rounded-[999px] border border-[#d8b76a]/55 bg-[linear-gradient(160deg,rgba(216,183,106,0.34),rgba(20,32,27,0.5)_55%,rgba(216,183,106,0.18))] shadow-[inset_0_0_30px_rgba(0,0,0,0.5),0_0_40px_rgba(216,183,106,0.22)]" />
-                      <span className="absolute left-1/2 top-[5.5rem] h-28 w-1 -translate-x-1/2 -rotate-[18deg] bg-gradient-to-b from-[#f4efe5]/70 to-transparent" />
-                    </span>
-                  )}
-                  {mode.theme === "next" && (
-                    <span aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-10 flex flex-col items-center gap-1.5">
-                      <span className="h-2.5 w-24 rounded-sm bg-[#caa96a]/45" />
-                      <span className="h-2.5 w-32 rounded-sm bg-[#caa96a]/35" />
-                      <span className="h-2.5 w-40 rounded-sm bg-[#caa96a]/28" />
-                      <span className="mt-2 text-2xl text-[#9d7b3f]">-&gt;</span>
-                    </span>
-                  )}
-                  {mode.theme === "product" && (
-                    <span aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-8 flex items-center justify-center">
-                      <span className="relative h-36 w-28 rounded-[0.75rem] border border-[#caa96a]/42 bg-[#fff7e6]/72 shadow-[0_20px_44px_rgba(102,75,33,0.14)]">
-                        <span className="absolute inset-4 rounded-full border border-[#d8b76a]/28" />
-                        <span className="absolute left-1/2 top-1/2 h-px w-16 -translate-x-1/2 bg-gradient-to-r from-transparent via-[#9d7b3f]/54 to-transparent" />
-                      </span>
-                    </span>
-                  )}
-                  <div className="relative">
-                    <div
-                      className={cx(
-                        "mb-5 flex flex-wrap items-center gap-2 text-[0.62rem] font-semibold uppercase tracking-[0.18em]",
-                        isDark ? "text-[#d8b76a]" : "text-[#9d7b3f]",
-                      )}
-                    >
-                      <span>{copy.cardsLabel}: {mode.cards}</span>
-                      <span aria-hidden="true" className={cx("h-1 w-1 rounded-full", isDark ? "bg-[#d8b76a]" : "bg-[#9d7b3f]")} />
-                      <span>{copy.statusLabel}: {mode.status}</span>
-                    </div>
-                    <h2 className="font-serif text-3xl leading-none sm:text-4xl">
-                      {mode.title}
-                    </h2>
-                    <p
-                      className={cx(
-                        "mt-4 text-sm leading-7",
-                        isDark ? "text-[#cdbfa6]" : "text-[#766955]",
-                      )}
-                    >
-                      {mode.body}
-                    </p>
-                    <span
-                      className={cx(
-                        "mt-5 inline-block text-[0.62rem] font-semibold uppercase tracking-[0.2em]",
-                        isDark ? "text-[#d8b76a]" : "text-[#9d7b3f]",
-                      )}
-                    >
-                      {mode.cta}{mode.disabled ? "" : " ->"}
-                    </span>
-                  </div>
-                </>
-              );
-
-              if (mode.disabled) {
-                return (
-                  <article
-                    aria-disabled="true"
-                    className={cardClassName}
-                    data-reveal-id={`mode-${index}`}
-                    data-showroom-reveal
-                    key={mode.title}
-                    style={revealStyle(index)}
-                  >
-                    {cardContent}
-                  </article>
-                );
-              }
-
-              return (
-                <Link
-                  className={cardClassName}
-                  data-reveal-id={`mode-${index}`}
-                  data-showroom-reveal
-                  href={mode.href}
-                  key={mode.title}
-                  style={revealStyle(index)}
-                >
-                  {cardContent}
-                </Link>
-              );
-            })}
-          </div>
-        </section>
-
-        <section
-          className="relative scroll-mt-24 mx-auto w-full max-w-7xl px-5 py-14 sm:px-6 lg:px-8"
-          id="journal"
-        >
-          <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
-            <h2
-              className={cx(
-                revealClass("journal-title"),
-                "font-serif text-[clamp(3.6rem,12vw,8rem)] leading-[0.82] text-[#3f352b]",
-              )}
-              data-reveal-id="journal-title"
-              data-showroom-reveal
-              style={revealStyle(0)}
-            >
-              {copy.journalTitle.map((line) => (
-                <span className="block" key={line}>
-                  {line}
-                </span>
-              ))}
-            </h2>
-            <div className="grid gap-4 sm:grid-cols-2">
-              {copy.journalNotes.map((note, index) => (
-                <article
-                  className={cx(
-                    revealClass(`journal-${index}`),
-                    "rounded-[1.1rem] border border-[#d8b76a]/32 bg-[#fffbf4]/84 p-5 shadow-[0_16px_42px_rgba(102,75,33,0.09)]",
-                  )}
-                  data-reveal-id={`journal-${index}`}
-                  data-showroom-reveal
-                  key={note.title}
-                  style={revealStyle(index)}
-                >
-                  <p className="text-[0.62rem] font-semibold uppercase tracking-[0.2em] text-[#9d7b3f]">
-                    {note.title}
-                  </p>
-                  <h3 className="mt-4 font-serif text-3xl text-[#4f4235]">
-                    {note.card}
-                  </h3>
-                  <p className="mt-4 text-sm leading-7 text-[#766955]">
-                    {note.note}
-                  </p>
-                </article>
-              ))}
-              <div className="flex flex-col gap-3 sm:col-span-2 sm:flex-row">
-                <Link className="showroom-action-primary" href={readingsHref}>
-                  {copy.openJournal}
-                </Link>
-                <Link className="showroom-action-secondary" href={readingsHref}>
-                  {copy.viewAll}
-                </Link>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section
-          className="relative scroll-mt-24 mx-auto w-full max-w-7xl px-5 py-14 sm:px-6 lg:px-8"
-          id="physical-deck"
-        >
-          <div className="grid gap-4 lg:grid-cols-2">
-            <div
-              className={cx(
-                revealClass("physical-deck"),
-                "rounded-[1.5rem] border border-[#d8b76a]/32 bg-[#fff9ee]/78 p-6 shadow-[0_18px_48px_rgba(102,75,33,0.1)]",
-              )}
-              data-reveal-id="physical-deck"
-              data-showroom-reveal
-              style={revealStyle(0)}
-            >
-              <p className="text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-[#9d7b3f]">
-                {copy.physicalDeckKicker}
-              </p>
-              <h2 className="mt-8 font-serif text-5xl leading-none text-[#3f352b]">
-                {copy.physicalDeckTitle[0]}
-                <br />
-                {copy.physicalDeckTitle[1]}
-              </h2>
-              <Link className="showroom-action-primary mt-8" href={physicalHref}>
-                {copy.physical}
-              </Link>
-            </div>
-            <div
-              className={cx(
-                revealClass("redeem-deck"),
-                "rounded-[1.5rem] border border-[#31483f]/24 bg-[#21362f] p-6 text-[#f4efe5] shadow-[0_18px_48px_rgba(33,54,47,0.16)]",
-              )}
-              data-reveal-id="redeem-deck"
-              data-showroom-reveal
-              style={revealStyle(1)}
-            >
-              <p className="text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-[#d8b76a]">
-                {copy.redeemDeckKicker}
-              </p>
-              <h2 className="mt-8 font-serif text-5xl leading-none">
-                {copy.redeemDeckTitle}
-              </h2>
-              <button
-                className="mt-8 inline-flex min-h-12 touch-manipulation items-center justify-center rounded-full border border-[#d8b76a]/56 bg-[#f4efe5] px-5 text-xs font-semibold uppercase tracking-[0.18em] text-[#21362f] shadow-[0_14px_34px_rgba(0,0,0,0.18)] transition duration-[260ms] hover:-translate-y-1.5 hover:scale-[1.015] motion-reduce:transform-none"
-                onClick={openAccountMenu}
-                type="button"
-              >
-                {copy.redeemDeckCode}
-              </button>
-            </div>
-          </div>
-        </section>
-
-        <section
-          className="relative scroll-mt-24 mx-auto w-full max-w-7xl px-5 py-14 sm:px-6 lg:px-8"
-          id="faq"
-        >
-          <h2
-            className={cx(
-              revealClass("trust-title"),
-              "max-w-3xl font-serif text-5xl leading-tight text-[#3f352b] sm:text-6xl",
-            )}
-            data-reveal-id="trust-title"
-            data-showroom-reveal
-            style={revealStyle(0)}
-          >
-            {copy.trustTitle}
-          </h2>
-          <div className="mt-8 grid gap-4 lg:grid-cols-3">
-            {copy.trustItems.map((item, index) => (
-              <div
-                className={cx(
-                  revealClass(`trust-${index}`),
-                  "rounded-[1rem] border border-[#d8b76a]/28 bg-[#fffaf0]/72 p-5 shadow-[0_12px_32px_rgba(102,75,33,0.07)]",
-                )}
-                data-reveal-id={`trust-${index}`}
-                data-showroom-reveal
-                key={item}
-                style={revealStyle(index)}
-              >
-                <h3 className="font-serif text-2xl text-[#4f4235]">{item}</h3>
-                <p className="mt-3 text-sm leading-7 text-[#766955]">
-                  {copy.trustBody}
-                </p>
-              </div>
-            ))}
-          </div>
-          <div className="mt-8 flex flex-wrap gap-4 text-sm font-semibold uppercase tracking-[0.16em] text-[#7a6b56]">
-            <Link className="transition hover:text-[#9d7b3f]" href={trustHrefs.privacy}>
-              {copy.trustLinks.privacy}
-            </Link>
-            <Link className="transition hover:text-[#9d7b3f]" href={trustHrefs.terms}>
-              {copy.trustLinks.terms}
-            </Link>
-            <Link
-              className="transition hover:text-[#9d7b3f]"
-              href={trustHrefs.disclaimer}
-            >
-              {copy.trustLinks.disclaimer}
-            </Link>
-            <Link className="transition hover:text-[#9d7b3f]" href={trustHrefs.contact}>
-              {copy.trustLinks.contact}
-            </Link>
-          </div>
-        </section>
-
-        <section className="relative bg-[#21362f] px-5 py-16 text-center text-[#f4efe5] sm:px-6 lg:px-8">
-          <div
-            className={cx(revealClass("final-cta"), "mx-auto max-w-4xl")}
-            data-reveal-id="final-cta"
-            data-showroom-reveal
-            style={revealStyle(0)}
-          >
-            <h2 className="font-serif text-[clamp(3.4rem,12vw,8rem)] leading-[0.85]">
-              {copy.finalTitle}
-            </h2>
-            <div className="mt-8 grid gap-3 sm:flex sm:justify-center">
-              <Link className="showroom-final-primary" href={onlineHref}>
-                {copy.begin}
-              </Link>
-              <Link className="showroom-final-secondary" href={physicalHref}>
-                {copy.physical}
-              </Link>
+                <button className="showroom-action-primary w-full sm:w-auto" type="submit">
+                  {copy.askOraButton}
+                </button>
+              </form>
             </div>
           </div>
         </section>

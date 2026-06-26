@@ -358,6 +358,40 @@ input {
   background: linear-gradient(90deg, transparent, rgba(169, 133, 82, 0.44), transparent);
 }
 
+.oracle-home-main {
+  background:
+    radial-gradient(ellipse at 50% -6%, rgba(255, 255, 255, 0.98), rgba(244, 239, 229, 0.8) 30%, transparent 60%),
+    linear-gradient(180deg, #f8f4ec 0%, #efe5d4 52%, #f4efe5 100%);
+}
+
+.oracle-home-backdrop {
+  opacity: 0.9;
+}
+
+.oracle-home-center {
+  z-index: 1;
+}
+
+.oracle-home-composer-panel {
+  backdrop-filter: blur(10px);
+}
+
+.oracle-home-textarea {
+  min-height: 9rem;
+}
+
+@media (max-width: 639px) {
+  .oracle-home-main {
+    background:
+      radial-gradient(ellipse at 50% -4%, rgba(255, 255, 255, 0.98), rgba(244, 239, 229, 0.84) 28%, transparent 58%),
+      linear-gradient(180deg, #f8f4ec 0%, #efe5d4 46%, #f4efe5 100%);
+  }
+
+  .oracle-home-composer-panel {
+    padding: 1rem;
+  }
+}
+
 .ritual-field {
   pointer-events: none;
   position: absolute;
