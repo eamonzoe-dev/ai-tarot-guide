@@ -1,6 +1,41 @@
 @import "tailwindcss";
 
 :root {
+  --c-bg: #F5EFE2;
+  --c-surface: #FAF6EC;
+  --c-surface-well: #ECE3D0;
+  --c-border: #E2D7C2;
+  --c-border-strong: #D6C9AE;
+  --c-text: #26221C;
+  --c-text-soft: #6E6557;
+  --c-text-dim: #8A8070;
+  --c-accent: #A07C36;
+  --c-accent-hover: #B6924A;
+  --c-accent-wash: #F0E7D0;
+  --c-accent-text: #7E6224;
+  --c-on-accent: #FAF6EC;
+  --c-green: #283A2E;
+  --c-ritual-text: #F2ECDC;
+}
+[data-theme="night"] {
+  --c-bg: #13161F;
+  --c-surface: #1B1F2B;
+  --c-surface-well: #0E1118;
+  --c-border: #2A2F3D;
+  --c-border-strong: #353B4B;
+  --c-text: #EFE9DB;
+  --c-text-soft: #A29F90;
+  --c-text-dim: #76746A;
+  --c-accent: #D8B25A;
+  --c-accent-hover: #ECC97A;
+  --c-accent-wash: rgba(216,178,90,.10);
+  --c-accent-text: #D8B25A;
+  --c-on-accent: #241B08;
+  --c-green: #3C5547;
+  --c-ritual-text: #EFE9DB;
+}
+
+:root {
   --background: #030303;
   --foreground: #eee8dd;
   --atelier-ink: #050506;
@@ -38,8 +73,8 @@
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--c-bg);
+  color: var(--c-text);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
 }
 
@@ -359,13 +394,24 @@ input {
 }
 
 .oracle-home-main {
-  background:
-    radial-gradient(ellipse at 50% -6%, rgba(255, 255, 255, 0.98), rgba(244, 239, 229, 0.8) 30%, transparent 60%),
-    linear-gradient(180deg, #f8f4ec 0%, #efe5d4 52%, #f4efe5 100%);
+  background: var(--c-bg);
 }
 
 .oracle-home-backdrop {
-  opacity: 0.9;
+  opacity: 1;
+  background: radial-gradient(
+    ellipse 72% 55% at 68% 38%,
+    var(--c-halo, rgba(160,124,54,.10)),
+    transparent 65%
+  ), var(--c-bg);
+}
+
+[data-theme="night"] .oracle-home-backdrop {
+  background: radial-gradient(
+    ellipse 72% 55% at 68% 38%,
+    rgba(216,178,90,.08),
+    transparent 65%
+  ), var(--c-bg);
 }
 
 .oracle-home-center {
@@ -381,12 +427,6 @@ input {
 }
 
 @media (max-width: 639px) {
-  .oracle-home-main {
-    background:
-      radial-gradient(ellipse at 50% -4%, rgba(255, 255, 255, 0.98), rgba(244, 239, 229, 0.84) 28%, transparent 58%),
-      linear-gradient(180deg, #f8f4ec 0%, #efe5d4 46%, #f4efe5 100%);
-  }
-
   .oracle-home-composer-panel {
     padding: 1rem;
   }
