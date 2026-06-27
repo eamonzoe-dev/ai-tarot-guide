@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { type CSSProperties, useEffect, useMemo, useState } from "react";
+import { type CSSProperties, useMemo } from "react";
 
 import { ActivationCodePanel } from "@/components/ai-guide/ActivationCodePanel";
 import { type Language } from "@/lib/ai-guide/i18n";
@@ -16,50 +16,6 @@ type OracleShowroomHomeProps = {
   readingsHref: string;
 };
 
-const revealTiming = {
-  transitionDuration: "700ms",
-  transitionTimingFunction: "cubic-bezier(0.22, 1, 0.36, 1)",
-};
-
-const staggerDelays = ["80ms", "140ms", "200ms", "260ms"];
-
-const questions = [
-  "What am I not seeing clearly?",
-  "What needs my attention?",
-  "What is the next step?",
-  "What is ready to be released?",
-  "What is within my control?",
-  "Where is my energy best spent?",
-  "What lesson keeps returning?",
-];
-
-const journalNotes = [
-  {
-    title: "Quiet Pattern",
-    card: "The Star",
-    note: "A softer answer appeared after the question stopped trying to win.",
-  },
-  {
-    title: "Decision Thread",
-    card: "Two of Wands",
-    note: "The next step asked for a boundary before it asked for speed.",
-  },
-  {
-    title: "Mirror Note",
-    card: "The Hermit",
-    note: "The reading returned attention to the one thing that could be chosen.",
-  },
-  {
-    title: "Release Mark",
-    card: "Ace of Cups",
-    note: "The card named feeling as information, not interruption.",
-  },
-];
-
-function cx(...classes: Array<string | false | null | undefined>) {
-  return classes.filter(Boolean).join(" ");
-}
-
 type IconProps = { className?: string; style?: CSSProperties };
 
 function OraMarkIcon({ className, style }: IconProps) {
@@ -68,7 +24,40 @@ function OraMarkIcon({ className, style }: IconProps) {
       <circle cx="24" cy="24" r="13" />
       <line x1="24" x2="24" y1="7" y2="41" />
       <line x1="7" x2="41" y1="24" y2="24" />
-      <rect fill="#f4efe5" height="8" stroke="currentColor" transform="rotate(45 24 24)" width="8" x="20" y="20" />
+      <rect className="ora-mark-core" height="8" stroke="currentColor" transform="rotate(45 24 24)" width="8" x="20" y="20" />
+    </svg>
+  );
+}
+
+function OraStarIcon({ className, style }: IconProps) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" strokeWidth="1.25" style={style} viewBox="0 0 48 48">
+      <path d="M24 6c1.6 8.5 9 15.9 17.5 18C33 26 25.6 33.5 24 42c-1.6-8.5-9-15.9-17.5-18C15 22 22.4 14.5 24 6Z" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function OraMoonIcon({ className, style }: IconProps) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" strokeWidth="1.25" style={style} viewBox="0 0 48 48">
+      <path d="M30 9a16 16 0 1 0 0 30A13 13 0 0 1 30 9Z" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function OraSunIcon({ className, style }: IconProps) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" strokeWidth="1.25" style={style} viewBox="0 0 48 48">
+      <circle cx="24" cy="24" r="12" />
+      <circle cx="24" cy="24" fill="currentColor" r="2" />
+      <line x1="24" x2="24" y1="5" y2="11" />
+      <line x1="24" x2="24" y1="37" y2="43" />
+      <line x1="5" x2="11" y1="24" y2="24" />
+      <line x1="37" x2="43" y1="24" y2="24" />
+      <line x1="11" x2="15" y1="11" y2="15" />
+      <line x1="33" x2="37" y1="33" y2="37" />
+      <line x1="37" x2="33" y1="11" y2="15" />
+      <line x1="15" x2="11" y1="33" y2="37" />
     </svg>
   );
 }
@@ -119,29 +108,16 @@ function OraLeafIcon({ className, style }: IconProps) {
   );
 }
 
-function OraSunIcon({ className, style }: IconProps) {
+function ArrowIcon({ className }: { className?: string }) {
   return (
-    <svg className={className} fill="none" stroke="currentColor" strokeWidth="1.25" style={style} viewBox="0 0 48 48">
-      <circle cx="24" cy="24" r="12" />
-      <circle cx="24" cy="24" fill="currentColor" r="2" />
-      <line x1="24" x2="24" y1="5" y2="11" />
-      <line x1="24" x2="24" y1="37" y2="43" />
-      <line x1="5" x2="11" y1="24" y2="24" />
-      <line x1="37" x2="43" y1="24" y2="24" />
-      <line x1="11" x2="15" y1="11" y2="15" />
-      <line x1="33" x2="37" y1="33" y2="37" />
-      <line x1="37" x2="33" y1="11" y2="15" />
-      <line x1="15" x2="11" y1="33" y2="37" />
+    <svg className={className} fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" viewBox="0 0 24 24">
+      <path d="M5 12h14M13 6l6 6-6 6" />
     </svg>
   );
 }
 
-function OraMoonIcon({ className, style }: IconProps) {
-  return (
-    <svg className={className} fill="none" stroke="currentColor" strokeWidth="1.25" style={style} viewBox="0 0 48 48">
-      <path d="M30 9a16 16 0 1 0 0 30A13 13 0 0 1 30 9Z" strokeLinejoin="round" />
-    </svg>
-  );
+function cx(...classes: Array<string | false | null | undefined>) {
+  return classes.filter(Boolean).join(" ");
 }
 
 export function OracleShowroomHome({
@@ -153,83 +129,79 @@ export function OracleShowroomHome({
   threeCardHref,
   readingsHref,
 }: OracleShowroomHomeProps) {
-  const [visible, setVisible] = useState<Set<string>>(() => new Set());
-  const [compactHeader, setCompactHeader] = useState(false);
-  const [theme, setTheme] = useState<"day" | "night">(() => {
-    if (typeof document === "undefined") {
-      return "day";
-    }
-    return document.documentElement.getAttribute("data-theme") === "night" ? "night" : "day";
-  });
-
   const isZh = lang === "zh";
+
   const copy = useMemo(
     () => ({
-      sectionNavItems: isZh
+      room: isZh ? "Ora Arcana · 阅读室" : "Ora Arcana · Reading Room",
+      sectionNavigationLabel: isZh ? "页面分区导航" : "Section navigation",
+      nav: isZh
         ? [
-            { label: "如何开始", href: "#how-it-works" },
-            { label: "卡组", href: "#deck" },
-            { label: "解读模式", href: "#reading-modes" },
-            { label: "解读日志", href: "#journal" },
-            { label: "实体卡组", href: "#physical-deck" },
-            { label: "说明", href: "#faq" },
+            ["如何开始", "#reading-modes"],
+            ["卡组", "#deck"],
+            ["解读日志", "#journal"],
+            ["实体卡组", "#physical"],
+            ["说明", "#trust"],
           ]
         : [
-            { label: "How it works", href: "#how-it-works" },
-            { label: "Deck", href: "#deck" },
-            { label: "Reading Modes", href: "#reading-modes" },
-            { label: "Journal", href: "#journal" },
-            { label: "Physical Deck", href: "#physical-deck" },
-            { label: "FAQ", href: "#faq" },
+            ["Start", "#reading-modes"],
+            ["Deck", "#deck"],
+            ["Journal", "#journal"],
+            ["Physical Deck", "#physical"],
+            ["Trust", "#trust"],
           ],
-      room: isZh ? "Ora Arcana 阅读室" : "Ora Arcana Reading Room",
-      sectionNavigationLabel: isZh ? "页面分区导航" : "Section navigation",
       heroTitle: isZh ? { r1: "向卡牌", r2: "提问" } : { r1: "ASK THE", r2: "CARD" },
-      subtitle: isZh
-        ? "为现代问题准备的一间安静阅读室。"
-        : "A quiet reading room for modern questions.",
+      subtitle: isZh ? "为现代问题准备的一间安静阅读室。" : "A quiet reading room for modern questions.",
       heroBody: isZh
         ? "在阅读室中选择路径，让一张正位牌安放此刻的问题。"
-        : "Move through the room, choose your path, and let one card hold the question.",
+        : "Move through the room, choose your path, and let one upright card hold the question.",
       begin: isZh ? "开始解读" : "Begin a Reading",
       physical: isZh ? "使用实体卡组" : "Use Physical Deck",
       explore: isZh ? "浏览卡牌" : "Explore the Cards",
-      journal: isZh ? "解读日志" : "Reading Journal",
       questionSlip: isZh ? "问题纸条" : "Question slip",
       waitingQuestion: isZh ? "此刻等待被问出的是什么？" : "What is waiting to be asked?",
       choosePath: isZh ? "选择你的解读" : "Choose Your Reading",
-      paths: isZh
+      wonderingTitle: isZh ? "你正在想什么？" : "What are you wondering?",
+      spreads: isZh
         ? [
             {
               id: "single",
               title: "单牌解读",
               body: "一个清晰问题的快速提示。",
+              meta: "1 张牌 · 可用",
               href: onlineHref,
-              tone: "light" as const,
+              icon: OraMarkIcon,
+              active: false,
               disabled: false,
             },
             {
               id: "three-card",
               title: "三牌阵",
               body: "围绕处境、挑战与指引展开更深入的解读。",
+              meta: "3 张牌 · 可用",
               href: threeCardHref,
-              tone: "green" as const,
+              icon: OraPairIcon,
+              active: true,
               disabled: false,
             },
             {
               id: "relationship",
               title: "关系解读",
-              body: "即将开放",
+              body: "用于爱、连接与情感清晰度。",
+              meta: "3 张牌 · 即将开放",
               href: "",
-              tone: "product" as const,
+              icon: OraLinkIcon,
+              active: false,
               disabled: true,
             },
             {
               id: "career",
               title: "事业解读",
-              body: "即将开放",
+              body: "用于工作、方向与下一次机会。",
+              meta: "3 张牌 · 即将开放",
               href: "",
-              tone: "product" as const,
+              icon: OraPathIcon,
+              active: false,
               disabled: true,
             },
           ]
@@ -238,759 +210,274 @@ export function OracleShowroomHome({
               id: "single",
               title: "Single Card Reading",
               body: "A quick message for one clear question.",
+              meta: "1 card · Available",
               href: onlineHref,
-              tone: "light" as const,
+              icon: OraMarkIcon,
+              active: false,
               disabled: false,
             },
             {
               id: "three-card",
               title: "Three Card Spread",
               body: "A deeper reading for situation, challenge, and guidance.",
+              meta: "3 cards · Available",
               href: threeCardHref,
-              tone: "green" as const,
+              icon: OraPairIcon,
+              active: true,
               disabled: false,
             },
             {
               id: "relationship",
               title: "Relationship Reading",
-              body: "Coming Soon",
+              body: "For love, connection, and emotional clarity.",
+              meta: "3 cards · Coming Soon",
               href: "",
-              tone: "product" as const,
+              icon: OraLinkIcon,
+              active: false,
               disabled: true,
             },
             {
               id: "career",
               title: "Career Reading",
-              body: "Coming Soon",
+              body: "For work, direction, and next opportunities.",
+              meta: "3 cards · Coming Soon",
               href: "",
-              tone: "product" as const,
+              icon: OraPathIcon,
+              active: false,
               disabled: true,
             },
           ],
-      wonderingTitle: isZh ? "你正在想什么？" : "What are you wondering?",
-      chips: isZh
-        ? ["关系", "工作", "自我", "选择", "未来"]
-        : ["Love", "Work", "Self", "Decision", "Future"],
       askOraTitle: isZh ? "向 Ora 提问" : "Ask Ora",
       askOraDescription: isZh
         ? "写下你现在想问的一句话，Ora 会带你抽一张牌。"
         : "Write the one thing you want to ask. Ora will guide you through a draw.",
       askOraButton: isZh ? "开始这次解读" : "Begin this reading",
-      examplesLabel: isZh ? "也可以从这些问题开始" : "Or start from one of these",
-      questions: isZh
-        ? [
-            "我还没有看清什么？",
-            "什么正在请求我的注意？",
-            "下一步该放在哪里？",
-            "什么已经可以放下？",
-            "什么仍在我的掌控之中？",
-            "我的能量最值得投向哪里？",
-            "哪个课题正在反复回来？",
-          ]
-        : questions,
+      chips: isZh ? ["关系", "工作", "自我", "选择", "未来"] : ["Love", "Work", "Self", "Decision", "Future"],
+      questionPlaceholder: isZh ? "写下此刻想问的一句话..." : "Write the one thing you want to ask...",
       unfoldsKicker: isZh ? "解读如何展开" : "The Reading Unfolds",
       unfoldsTitle: isZh ? "五个安静动作，一张正位牌。" : "Five quiet movements, one upright card.",
       unfolds: isZh
         ? [
-            { step: "安顿", note: "抵达这里，让问题周围的杂音慢慢变轻。" },
-            { step: "提问", note: "把真正的问题放进一句清楚的话里。" },
-            { step: "抽牌", note: "为此刻抽取一张正位牌。" },
-            { step: "揭示", note: "让卡牌与它的象征逐渐显现。" },
-            { step: "回看", note: "把解读当作镜子，再带走一个诚实的下一步。" },
+            ["安顿", "抵达这里，让问题周围的杂音慢慢变轻。"],
+            ["提问", "把真正的问题放进一句清楚的话里。"],
+            ["抽牌", "为此刻抽取一张正位牌。"],
+            ["揭示", "让卡牌与它的象征逐渐显现。"],
+            ["回看", "把解读当作镜子，再带走一个诚实的下一步。"],
           ]
         : [
-            { step: "Settle", note: "Arrive and let the noise around the question soften." },
-            { step: "Ask", note: "Put the real question into a single clear line." },
-            { step: "Draw", note: "One upright card is drawn for this moment." },
-            { step: "Reveal", note: "The card and its symbolism come into view." },
-            { step: "Reflect", note: "Read it as a mirror, then carry one honest step." },
+            ["Settle", "Arrive and let the noise around the question soften."],
+            ["Ask", "Put the real question into a single clear line."],
+            ["Draw", "One upright card is drawn for this moment."],
+            ["Reveal", "The card and its symbolism come into view."],
+            ["Reflect", "Read it as a mirror, then carry one honest step."],
           ],
       deckKicker: isZh ? "卡组" : "The Deck",
-      deckTitle: isZh ? ["轻触浏览", "整副卡组"] : ["DRAG THROUGH", "THE DECK"],
+      deckTitle: isZh ? "轻触浏览整副卡组。" : "Drag through the deck.",
       deckDescription: isZh
-        ? "拖动卡组，或用按钮一步步翻看。"
-        : "Drag across the deck or step through it with the controls.",
-      deckAction: isZh ? "拖动 / 浏览" : "Drag / Explore",
-      previousCard: isZh ? "上一张" : "Prev",
-      nextCard: isZh ? "下一张" : "Next",
-      previousCardLabel: isZh ? "上一张牌" : "Previous card",
-      nextCardLabel: isZh ? "下一张牌" : "Next card",
-      innerGuidance: isZh ? "内在指引" : "Inner guidance",
-      active: isZh ? "当前" : "Active",
+        ? "拖动卡组，或用按钮一步步翻看。每张牌都带着它的正位含义与象征。"
+        : "Drag across the deck or step through it with the controls. Each card carries its upright meaning and symbol.",
       deckCards: isZh
         ? [
-            { name: "愚者", numeral: "0", keyword: "开始", face: true },
-            { name: "星星", numeral: "XVII", keyword: "希望", face: true },
-            { name: "圣杯王牌", numeral: "A", keyword: "感受", face: false },
-            { name: "权杖二", numeral: "II", keyword: "选择", face: false },
-            { name: "隐者", numeral: "IX", keyword: "内在之光", face: true },
-            { name: "女祭司", numeral: "II", keyword: "直觉", face: false },
+            ["0", "愚者", "开始", true],
+            ["XVII", "星星", "希望", true],
+            ["A", "圣杯王牌", "感受", true],
+            ["IX", "隐者", "内在之光", false],
           ]
         : [
-            { name: "The Fool", numeral: "0", keyword: "Beginnings", face: true },
-            { name: "The Star", numeral: "XVII", keyword: "Hope", face: true },
-            { name: "Ace of Cups", numeral: "A", keyword: "Feeling", face: false },
-            { name: "Two of Wands", numeral: "II", keyword: "Choice", face: false },
-            { name: "The Hermit", numeral: "IX", keyword: "Inner light", face: true },
-            { name: "The High Priestess", numeral: "II", keyword: "Intuition", face: false },
+            ["0", "The Fool", "Beginnings", true],
+            ["XVII", "The Star", "Hope", true],
+            ["A", "Ace of Cups", "Feeling", true],
+            ["IX", "The Hermit", "Inner light", false],
           ],
-      modesKicker: isZh ? "解读模式" : "Reading Modes",
-      modesNote: isZh ? "选择最适合你问题的解读。" : "Choose the reading that fits your question.",
-      modes: isZh
-        ? [
-            {
-              theme: "clarity" as const,
-              title: "单牌解读",
-              body: "一个清晰问题的快速提示。",
-              cards: "1 张牌",
-              status: "可用",
-              cta: "开始单牌解读",
-              href: onlineHref,
-              disabled: false,
-            },
-            {
-              theme: "mirror" as const,
-              title: "三牌阵",
-              body: "围绕处境、挑战与指引展开更深入的解读。",
-              cards: "3 张牌",
-              status: "可用",
-              cta: "开始三牌解读",
-              href: threeCardHref,
-              disabled: false,
-            },
-            {
-              theme: "next" as const,
-              title: "关系解读",
-              body: "用于爱、连接与情感清晰度。",
-              cards: "3 张牌",
-              status: "即将开放",
-              cta: "即将开放",
-              href: "",
-              disabled: true,
-            },
-            {
-              theme: "product" as const,
-              title: "事业解读",
-              body: "用于工作、方向与下一次机会。",
-              cards: "3 张牌",
-              status: "即将开放",
-              cta: "即将开放",
-              href: "",
-              disabled: true,
-            },
-          ]
-        : [
-            {
-              theme: "clarity" as const,
-              title: "Single Card Reading",
-              body: "A quick message for one clear question.",
-              cards: "1 card",
-              status: "Available",
-              cta: "Start Single Card",
-              href: onlineHref,
-              disabled: false,
-            },
-            {
-              theme: "mirror" as const,
-              title: "Three Card Spread",
-              body: "A deeper reading for situation, challenge, and guidance.",
-              cards: "3 cards",
-              status: "Available",
-              cta: "Start Three Card",
-              href: threeCardHref,
-              disabled: false,
-            },
-            {
-              theme: "next" as const,
-              title: "Relationship Reading",
-              body: "For love, connection, and emotional clarity.",
-              cards: "3 cards",
-              status: "Coming Soon",
-              cta: "Coming Soon",
-              href: "",
-              disabled: true,
-            },
-            {
-              theme: "product" as const,
-              title: "Career Reading",
-              body: "For work, direction, and next opportunities.",
-              cards: "3 cards",
-              status: "Coming Soon",
-              cta: "Coming Soon",
-              href: "",
-              disabled: true,
-            },
-          ],
-      cardsLabel: isZh ? "牌数" : "Cards",
-      statusLabel: isZh ? "状态" : "Status",
-      journalTitle: isZh ? ["你的", "解读", "日志"] : ["YOUR", "READING", "JOURNAL"],
+      journalKicker: isZh ? "解读日志" : "Reading Journal",
+      journalTitle: isZh ? "你的解读，留成一段可回看的日志。" : "Your readings become a journal you can return to.",
       journalNotes: isZh
         ? [
-            {
-              title: "安静的模式",
-              card: "星星",
-              note: "当问题不再急着取胜，一个更柔和的答案浮现出来。",
-            },
-            {
-              title: "选择的线索",
-              card: "权杖二",
-              note: "下一步先请求边界，然后才请求速度。",
-            },
-            {
-              title: "镜中札记",
-              card: "隐者",
-              note: "这次解读把注意力带回那个仍然可以选择的地方。",
-            },
-            {
-              title: "释放标记",
-              card: "圣杯王牌",
-              note: "卡牌把感受命名为信息，而不是干扰。",
-            },
-          ]
-        : journalNotes,
-      openJournal: isZh ? "打开解读日志" : "Open Journal",
-      viewAll: isZh ? "查看全部" : "View All",
-      physicalDeckKicker: isZh ? "实体卡组" : "PHYSICAL DECK",
-      physicalDeckTitle: isZh ? ["为手心而作。", "为感受而作。"] : ["Made to be held.", "Made to be felt."],
-      redeemDeckKicker: isZh ? "兑换你的卡组" : "REDEEM YOUR DECK",
-      redeemDeckTitle: isZh
-        ? "解锁实体卡组的线上陪伴体验。"
-        : "Unlock your deck's companion experience.",
-      redeemDeckCode: isZh ? "兑换卡组码" : "Redeem Deck Code",
-      trustTitle: isZh ? "这是一件反思工具，不是一台预言机器。" : "A reflective tool, not a prediction machine.",
-      trustItems: isZh
-        ? [
-            {
-              title: "以隐私为先",
-              description: "你的提问与解读默认只属于你。Ora 不用于训练，也不会公开展示。",
-            },
-            {
-              title: "AI 辅助象征解读",
-              description: "抽牌后，Ora 会结合你的问题与牌面，给出一段贴合当下的象征解读。",
-            },
-            {
-              title: "用于反思与娱乐",
-              description: "Ora 用于自我观察与放松，不构成医疗、法律、财务或心理建议。",
-            },
+            ["安静的模式", "星星", "当问题不再急着取胜，一个更柔和的答案浮现出来。"],
+            ["选择的线索", "权杖二", "下一步先请求边界，然后才请求速度。"],
+            ["镜中札记", "隐者", "这次解读把注意力带回那个仍然可以选择的地方。"],
+            ["释放标记", "圣杯王牌", "卡牌把感受命名为信息，而不是干扰。"],
           ]
         : [
-            {
-              title: "Private by design",
-              description:
-                "Your questions and readings are yours by default. Ora is never used for training and never shown publicly.",
-            },
-            {
-              title: "AI-guided symbolism",
-              description:
-                "After a draw, Ora blends your question with the card to offer symbolism that fits the moment.",
-            },
-            {
-              title: "For reflection and entertainment",
-              description:
-                "Ora is for self-observation and reflection. It is not medical, legal, financial, or psychological advice.",
-            },
+            ["Quiet Pattern", "The Star", "A softer answer appeared after the question stopped trying to win."],
+            ["Decision Thread", "Two of Wands", "The next step asked for a boundary before it asked for speed."],
+            ["Mirror Note", "The Hermit", "The reading returned attention to the one thing that could be chosen."],
+            ["Release Mark", "Ace of Cups", "The card named feeling as information, not interruption."],
           ],
+      openJournal: isZh ? "打开解读日志" : "Open Journal",
+      viewAll: isZh ? "查看全部" : "View All",
+      physicalDeckKicker: isZh ? "实体卡组" : "Physical Deck",
+      physicalDeckTitle: isZh ? "为手心而作。\n为感受而作。" : "Made to be held.\nMade to be felt.",
+      redeemDeckKicker: isZh ? "兑换你的卡组" : "Redeem Your Deck",
+      redeemDeckTitle: isZh ? "解锁实体卡组的线上陪伴体验。" : "Unlock your deck's companion experience.",
+      redeemDeckCode: isZh ? "兑换卡组码" : "Redeem Deck Code",
+      trustTitle: isZh ? "这是一件反思工具，不是一台预言机器。" : "A reflective tool, not a prediction machine.",
       trustBody: isZh
         ? "Ora 支持象征性的自我反思与有结构的注意力整理。它不是医疗、法律、财务或心理建议。"
         : "Ora supports symbolic reflection and structured attention. It is not medical, legal, financial, or psychological advice.",
-      trustLinks: isZh
-        ? { privacy: "隐私", terms: "条款", disclaimer: "免责声明", contact: "联系" }
-        : { privacy: "Privacy", terms: "Terms", disclaimer: "Disclaimer", contact: "Contact" },
+      trustItems: isZh
+        ? [
+            ["以隐私为先", "你的提问与解读默认只属于你。Ora 不用于训练，也不会公开展示。"],
+            ["AI 辅助象征解读", "抽牌后，Ora 会结合你的问题与牌面，给出一段贴合当下的象征解读。"],
+            ["用于反思与娱乐", "Ora 用于自我观察与放松，不构成医疗、法律、财务或心理建议。"],
+          ]
+        : [
+            ["Private by design", "Your questions and readings are yours by default. Ora is never used for training and never shown publicly."],
+            ["AI-guided symbolism", "After a draw, Ora blends your question with the card to offer symbolism that fits the moment."],
+            ["For reflection and entertainment", "Ora is for self-observation and reflection. It is not medical, legal, financial, or psychological advice."],
+          ],
       finalTitle: isZh ? "你的问题正在等待。" : "Your question is waiting.",
+      footerLinks: isZh
+        ? [
+            ["隐私", "/privacy"],
+            ["条款", "/terms"],
+            ["免责声明", "/disclaimer"],
+            ["联系", "/contact"],
+          ]
+        : [
+            ["Privacy", "/privacy"],
+            ["Terms", "/terms"],
+            ["Disclaimer", "/disclaimer"],
+            ["Contact", "/contact"],
+          ],
     }),
     [isZh, onlineHref, threeCardHref],
   );
-  const sectionNavItems = copy.sectionNavItems;
-
-  useEffect(() => {
-    const reduceMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
-    const revealNodes = Array.from(
-      document.querySelectorAll<HTMLElement>("[data-showroom-reveal]"),
-    );
-
-    if (reduceMotion) {
-      queueMicrotask(() => {
-        setVisible(
-          new Set(revealNodes.map((node) => node.dataset.revealId ?? "")),
-        );
-      });
-      return;
-    }
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting) {
-            return;
-          }
-
-          const id = (entry.target as HTMLElement).dataset.revealId;
-          if (id) {
-            setVisible((current) => new Set(current).add(id));
-          }
-        });
-      },
-      { threshold: 0.16, rootMargin: "0px 0px -10% 0px" },
-    );
-
-    revealNodes.forEach((node) => observer.observe(node));
-    return () => observer.disconnect();
-  }, []);
-
-  useEffect(() => {
-    let frame = 0;
-
-    function updateMotion() {
-      frame = 0;
-      const scrollY = window.scrollY;
-      setCompactHeader(scrollY > 42);
-    }
-
-    function handleScroll() {
-      if (frame) {
-        return;
-      }
-
-      frame = window.requestAnimationFrame(updateMotion);
-    }
-
-    updateMotion();
-    window.addEventListener("scroll", handleScroll, { passive: true });
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-      if (frame) {
-        window.cancelAnimationFrame(frame);
-      }
-    };
-  }, []);
 
   function toggleTheme() {
-    const next = theme === "night" ? "day" : "night";
-    setTheme(next);
+    const currentTheme = document.documentElement.getAttribute("data-theme") === "night" ? "night" : "day";
+    const next = currentTheme === "night" ? "day" : "night";
     document.documentElement.setAttribute("data-theme", next);
     try {
       localStorage.setItem("ora-theme", next);
     } catch {
-      // localStorage may be unavailable (private mode, disabled storage)
+      // Storage can be unavailable in restricted browsing modes.
     }
   }
 
-  function revealClass(id: string) {
-    return cx(
-      "translate-y-0 opacity-100 transition-all motion-reduce:translate-y-0 motion-reduce:opacity-100",
-      visible.has(id) && "will-change-transform",
-    );
-  }
-
-  function revealStyle(delayIndex = 0): CSSProperties {
-    return {
-      ...revealTiming,
-      transitionDelay: staggerDelays[delayIndex % staggerDelays.length],
-    };
-  }
-
   return (
-    <div className="min-h-svh text-[#33291f]" style={{ background: "var(--c-bg)" }}>
+    <div className="ora-home">
       <div id="reading-account-panel">
         <ActivationCodePanel lang={lang} hasLangParam={hasLangParam} />
       </div>
 
-      <header
-        className={cx(
-          "sticky top-0 isolate z-[240] border-b transition duration-300",
-          compactHeader
-            ? "border-[#d8b76a]/30 shadow-[0_10px_30px_rgba(88,64,31,0.08)] backdrop-blur"
-            : "border-transparent backdrop-blur-sm",
-        )}
-        style={{ background: theme === "night" ? "rgba(19,22,31,.88)" : "var(--c-bg)" }}
-      >
-        <div className="pointer-events-auto mx-auto grid w-full max-w-7xl grid-cols-1 items-start gap-3 px-4 py-4 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:gap-4 sm:px-6 lg:px-8 sm:items-center">
-          <Link
-            className="inline-flex min-h-9 shrink-0 items-center justify-self-start pt-0 leading-none text-[#4f4235] transition hover:text-[#9d7b3f] sm:min-w-0"
-            href={homeHref}
-            style={{
-              fontFamily: "'Cormorant Garamond', serif",
-              fontStyle: "italic",
-              fontWeight: 600,
-              fontSize: "24px",
-            }}
-          >
-            Ora Arcana
-          </Link>
-          <nav
-            aria-label={copy.sectionNavigationLabel}
-            className="hidden items-center justify-center gap-4 text-[0.68rem] font-medium text-[#7a6b56] xl:flex xl:gap-5"
-          >
-            {sectionNavItems.map((item) => (
-              <Link
-                className="group relative whitespace-nowrap transition hover:text-[#4f4235]"
-                href={item.href}
-                key={item.label}
-              >
-                {item.label}
-                <span className="absolute inset-x-0 -bottom-1 h-px scale-x-0 bg-[#9d7b3f] transition group-hover:scale-x-100" />
-              </Link>
-            ))}
-          </nav>
-          <div className="hidden min-h-9 items-center justify-end gap-3 sm:flex">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-[#d8c9ae] px-3 py-1.5 text-[0.8rem] text-[#7a6b56]">
-              <svg
-                className="h-[13px] w-[13px]"
-                fill="currentColor"
-                style={{ color: "var(--c-accent-text)" }}
-                viewBox="0 0 48 48"
-              >
-                <path d="M24 6c1 9 8 16 17 18-9 2-16 9-17 18-1-9-8-16-17-18 9-2 16-9 17-18Z" />
-              </svg>
-              7,480
-            </span>
-            <button
-              aria-label={isZh ? "切换日间 / 夜间" : "Toggle day / night"}
-              className="inline-flex h-[34px] w-[34px] items-center justify-center rounded-full border border-[#d6c9ae] text-[#7a6b56] transition hover:border-[#9d7b3f] hover:text-[#9d7b3f]"
-              onClick={toggleTheme}
-              type="button"
-            >
-              {theme === "night" ? (
-                <OraMoonIcon className="h-[18px] w-[18px]" />
-              ) : (
-                <OraSunIcon className="h-[18px] w-[18px]" />
-              )}
-            </button>
-            <span
-              className="inline-flex h-[34px] w-[34px] items-center justify-center rounded-full border border-[#d6c9ae] text-sm"
-              style={{
-                fontFamily: "'Spectral', Georgia, serif",
-                background: "var(--c-surface)",
-                color: "var(--c-accent-text)",
-              }}
-            >
-              E
-            </span>
-          </div>
-        </div>
+      <header className="ora-nav">
+        <Link className="ora-brand" href={homeHref}>
+          Ora Arcana
+        </Link>
+        <nav aria-label={copy.sectionNavigationLabel} className="ora-nav-links">
+          {copy.nav.map(([label, href]) => (
+            <Link href={href} key={href}>
+              {label}
+            </Link>
+          ))}
+        </nav>
+        <button aria-label={isZh ? "切换日间 / 夜间" : "Toggle day / nocturne"} className="ora-theme-toggle" onClick={toggleTheme} type="button">
+          <OraSunIcon className="ora-theme-sun" />
+          <OraMoonIcon className="ora-theme-moon" />
+        </button>
       </header>
 
-      <main className="oracle-home-main relative scroll-smooth overflow-x-hidden">
-        <div
-          aria-hidden="true"
-          className="oracle-home-backdrop pointer-events-none absolute inset-0"
-        />
+      <main className="ora-home-main">
+        <span aria-hidden="true" className="ora-starfield" />
 
-        <section className="oracle-home-center relative mx-auto flex min-h-[calc(100svh-5.75rem)] w-full max-w-5xl items-start px-5 pt-[14vh] pb-8 sm:px-6 lg:px-8">
-          <div className="grid w-full gap-8 lg:grid-cols-[1.08fr_0.92fr] lg:gap-10">
-            <div
-              className={cx(revealClass("hero-copy"), "min-w-0")}
-              data-reveal-id="hero-copy"
-              data-showroom-reveal
-              style={revealStyle(0)}
-            >
-              <p
-                className="mb-4 text-[0.68rem] font-semibold uppercase tracking-[0.24em]"
-                style={{ color: "var(--c-accent-text)" }}
-              >
-                {copy.room}
-              </p>
-              <h1
-                className="mb-6"
-                style={{
-                  fontFamily: '"Noto Serif SC", serif',
-                  fontWeight: 600,
-                  fontSize: "clamp(3.2rem, 9.5vw, 7rem)",
-                  lineHeight: 0.92,
-                  letterSpacing: "-0.01em",
-                  color: "var(--c-text)",
-                }}
-              >
-                <span className="block">{copy.heroTitle.r1}</span>
-                <span className="-mt-[0.06em] block pl-[0.9em]">{copy.heroTitle.r2}</span>
+        <section className="ora-hero" id="start">
+          <span aria-hidden="true" className="ora-hero-halo" />
+          <div className="ora-wrap ora-hero-grid">
+            <div className="ora-hero-copy">
+              <p className="ora-eyebrow ora-hero-eyebrow">{copy.room}</p>
+              <h1 className="ora-hero-title">
+                <span>{copy.heroTitle.r1}</span>
+                <span>{copy.heroTitle.r2}</span>
               </h1>
-              <p
-                className="font-serif text-[clamp(1.1rem,2.4vw,1.5rem)]"
-                style={{ color: "var(--c-text)" }}
-              >
-                {copy.subtitle}
-              </p>
-              <p className="mt-3 max-w-lg text-sm leading-7 text-[#766955]">
-                {copy.heroBody}
-              </p>
-              <div className="mt-6 flex flex-wrap items-center gap-4">
-                <Link className="showroom-action-primary" href={onlineHref}>
+              <p className="ora-hero-sub">{copy.subtitle}</p>
+              <p className="ora-hero-note">{copy.heroBody}</p>
+              <div className="ora-actions">
+                <Link className="ora-btn ora-btn-primary" href={onlineHref}>
                   {copy.begin}
                 </Link>
-                <Link className="showroom-action-secondary" href={physicalHref}>
+                <Link className="ora-btn ora-btn-ghost" href={physicalHref}>
                   {copy.physical}
                 </Link>
-                <Link
-                  className="inline-flex items-center gap-2 px-1 py-2 text-sm font-medium tracking-[0.04em] text-[#8d6426] transition hover:text-[#9d7b3f]"
-                  href="#deck"
-                >
+                <Link className="ora-btn-text" href="#deck">
                   {copy.explore}
-                  <svg
-                    className="h-[15px] w-[15px]"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="1.5"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M5 12h14M13 6l6 6-6 6" />
-                  </svg>
+                  <ArrowIcon />
                 </Link>
               </div>
             </div>
 
-            <div
-              aria-hidden="true"
-              className={cx(revealClass("hero-deck"), "relative mx-auto h-[clamp(360px,42vw,460px)] w-full max-w-md lg:mx-0")}
-              data-reveal-id="hero-deck"
-              data-showroom-reveal
-              style={revealStyle(1)}
-            >
-              <div
-                className="absolute flex aspect-[0.66] w-[clamp(150px,17vw,196px)] flex-col items-center rounded-2xl border p-4 shadow-[0_24px_50px_-28px_rgba(20,16,8,0.5)]"
-                style={{
-                  left: "2%",
-                  top: "14%",
-                  transform: "rotate(-13deg)",
-                  background: theme === "night" ? "#23262F" : "#fbf3df",
-                  borderColor: theme === "night" ? "#353B4B" : "rgba(202,169,106,.55)",
-                }}
-              >
-                <span
-                  className="font-serif text-sm tracking-[0.1em]"
-                  style={{ color: theme === "night" ? "#C9B89A" : "var(--c-accent-text)" }}
-                >
-                  XVII
-                </span>
-                <svg
-                  className="m-auto h-[46%] w-[46%] text-[#c9a24a]"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.25"
-                  viewBox="0 0 48 48"
-                >
-                  <path
-                    d="M24 6c1.6 8.5 9 15.9 17.5 18C33 26 25.6 33.5 24 42c-1.6-8.5-9-15.9-17.5-18C15 22 22.4 14.5 24 6Z"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-                <span
-                  className="text-center font-serif text-[13px]"
-                  style={{ color: theme === "night" ? "#C9B89A" : "#766955" }}
-                >
-                  {isZh ? "星星" : "The Star"}
-                  <small className="mt-0.5 block font-sans text-[10px] text-[#8a8070]">
-                    {isZh ? "希望" : "Hope"}
-                  </small>
-                </span>
+            <div aria-hidden="true" className="ora-deck-cluster">
+              <div className="ora-tcard ora-tcard-one">
+                <span className="ora-card-num">XVII</span>
+                <OraStarIcon className="ora-card-sigil" />
+                <span className="ora-card-name">{isZh ? "星星" : "The Star"}<small>{isZh ? "希望" : "Hope"}</small></span>
               </div>
-
-              <div
-                className="absolute flex aspect-[0.66] w-[clamp(150px,17vw,196px)] flex-col items-center rounded-2xl border p-4 shadow-[0_24px_50px_-28px_rgba(20,16,8,0.5)]"
-                style={{
-                  right: "6%",
-                  top: "6%",
-                  transform: "rotate(11deg)",
-                  background: theme === "night" ? "#0C0E13" : "#23261f",
-                  borderColor: theme === "night" ? "#1a1d25" : "#3a3d33",
-                }}
-              >
-                <span
-                  className="font-serif text-sm tracking-[0.1em]"
-                  style={{ color: theme === "night" ? "#C9B89A" : "#bdb6a3" }}
-                >
-                  IX
-                </span>
-                <svg
-                  className="m-auto h-[46%] w-[46%] text-[#7c6a3a] opacity-70"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.25"
-                  viewBox="0 0 48 48"
-                >
-                  <path d="M30 9a16 16 0 1 0 0 30A13 13 0 0 1 30 9Z" strokeLinejoin="round" />
-                </svg>
-                <span
-                  className="text-center font-serif text-[13px]"
-                  style={{ color: theme === "night" ? "#C9B89A" : "#bdb6a3" }}
-                >
-                  {isZh ? "隐者" : "The Hermit"}
-                  <small className="mt-0.5 block font-sans text-[10px] text-[#8a8070]">
-                    {isZh ? "内在之光" : "Inner light"}
-                  </small>
-                </span>
+              <div className="ora-tcard ora-tcard-dark ora-tcard-two">
+                <span className="ora-card-num">IX</span>
+                <OraMoonIcon className="ora-card-sigil" />
+                <span className="ora-card-name">{isZh ? "隐者" : "The Hermit"}<small>{isZh ? "内在之光" : "Inner light"}</small></span>
               </div>
-
-              <div
-                className="absolute z-[3] flex aspect-[0.66] w-[clamp(150px,17vw,196px)] flex-col items-center rounded-2xl border p-4 shadow-[0_24px_50px_-28px_rgba(20,16,8,0.5)] transition-transform duration-300 hover:-translate-y-2"
-                style={{
-                  left: "50%",
-                  top: "0%",
-                  transform: "translateX(-50%) rotate(-1deg)",
-                  background: theme === "night" ? "#23262F" : "#fbf3df",
-                  borderColor: theme === "night" ? "#353B4B" : "rgba(202,169,106,.55)",
-                }}
-              >
-                <span
-                  className="font-serif text-sm tracking-[0.1em]"
-                  style={{ color: theme === "night" ? "#C9B89A" : "var(--c-accent-text)" }}
-                >
-                  0
-                </span>
-                <svg
-                  className="m-auto h-[46%] w-[46%] text-[#c9a24a]"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.25"
-                  viewBox="0 0 48 48"
-                >
-                  <circle cx="24" cy="24" r="13" />
-                  <line x1="24" x2="24" y1="7" y2="41" />
-                  <line x1="7" x2="41" y1="24" y2="24" />
-                </svg>
-                <span
-                  className="text-center font-serif text-[13px]"
-                  style={{ color: theme === "night" ? "#C9B89A" : "#766955" }}
-                >
-                  {isZh ? "愚者" : "The Fool"}
-                  <small className="mt-0.5 block font-sans text-[10px] text-[#8a8070]">
-                    {isZh ? "开始" : "Beginnings"}
-                  </small>
-                </span>
+              <div className="ora-tcard ora-tcard-three">
+                <span className="ora-card-num">0</span>
+                <OraMarkIcon className="ora-card-sigil" />
+                <span className="ora-card-name">{isZh ? "愚者" : "The Fool"}<small>{isZh ? "开始" : "Beginnings"}</small></span>
               </div>
-
-              <div
-                className="absolute right-0 bottom-[-4%] z-[4] w-[clamp(220px,26vw,290px)] rounded-2xl border p-5 shadow-[0_20px_40px_-26px_rgba(20,16,8,0.5)]"
-                style={{
-                  transform: "rotate(2deg)",
-                  background: theme === "night" ? "#1B1F2B" : "var(--c-surface)",
-                  borderColor: theme === "night" ? "#2A2F3D" : "var(--c-border)",
-                }}
-              >
-                <span
-                  className="absolute -top-[9px] left-6 h-[18px] w-[54px] border border-[#d8b76a]/40 bg-[#f0e7d0]/90"
-                  style={{ transform: "rotate(-4deg)" }}
-                />
-                <p
-                  className="mb-2 text-[11px] font-medium uppercase tracking-[0.16em]"
-                  style={{ color: theme === "night" ? "#D8B25A" : "var(--c-accent-text)" }}
-                >
-                  {copy.questionSlip}
-                </p>
-                <p
-                  className="font-serif text-[1.05rem] leading-snug"
-                  style={{ color: theme === "night" ? "#EFE9DB" : "var(--c-text)" }}
-                >
-                  {copy.waitingQuestion}
-                </p>
+              <div className="ora-question-slip">
+                <span className="ora-slip-tape" />
+                <p>{copy.questionSlip}</p>
+                <strong>{copy.waitingQuestion}</strong>
               </div>
             </div>
           </div>
         </section>
 
-        {/* RULE DIVIDER */}
-        <div className="mx-auto flex max-w-7xl items-center gap-6 px-5 py-2 sm:px-6 lg:px-8">
-          <span className="h-px flex-1 bg-[#e2d7c2]" />
-          <OraMarkIcon className="h-6 w-6" style={{ color: "var(--c-accent-text)" }} />
-          <span className="h-px flex-1 bg-[#e2d7c2]" />
-        </div>
+        <SigilRule />
 
-        {/* SPREADS GRID */}
-        <section className="relative mx-auto max-w-7xl px-5 py-16 sm:px-6 lg:px-8" id="reading-modes">
-          <div className="mb-10 max-w-xl">
-            <p
-              className="mb-3 text-[0.68rem] font-semibold uppercase tracking-[0.24em]"
-              style={{ color: "var(--c-accent-text)" }}
-            >
-              {copy.choosePath}
-            </p>
-            <h2 className="font-serif text-[clamp(1.5rem,3vw,1.75rem)] text-[#3f352b]">{copy.wonderingTitle}</h2>
-          </div>
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {copy.paths.map((path) => {
-              const isGreen = path.tone === "green";
-              const Icon =
-                path.id === "three-card"
-                  ? OraPairIcon
-                  : path.id === "relationship"
-                    ? OraLinkIcon
-                    : path.id === "career"
-                      ? OraPathIcon
-                      : OraMarkIcon;
-              const cardEl = (
-                <div
-                  className={cx(
-                    "flex min-h-[230px] flex-col rounded-[18px] border p-6 transition hover:-translate-y-1",
-                    isGreen ? "border-[#283a2e]" : "border-[#d8c9ae] hover:border-[#b58a48]",
-                    path.disabled && "opacity-45",
-                  )}
-                  style={{ background: isGreen ? "var(--c-green)" : "var(--c-surface)" }}
-                >
-                  <Icon className="mb-auto h-10 w-10" style={{ color: "var(--c-accent-text)" }} />
-                  <p
-                    className="mb-2 text-[11px] uppercase tracking-[0.14em]"
-                    style={{ color: "var(--c-accent-text)" }}
-                  >
-                    {path.disabled ? (isZh ? "即将开放" : "Coming Soon") : isZh ? "可用" : "Available"}
-                  </p>
-                  <p
-                    className="mb-1.5 font-serif text-[1.4rem]"
-                    style={{ color: isGreen ? "var(--c-ritual-text)" : "var(--c-text)" }}
-                  >
-                    {path.title}
-                  </p>
-                  <p className={cx("text-sm leading-relaxed", isGreen ? "text-[#c4cdbe]" : "text-[#766955]")}>
-                    {path.body}
-                  </p>
-                </div>
-              );
-              return path.disabled || !path.href ? (
-                <div key={path.id}>{cardEl}</div>
-              ) : (
-                <Link className="block" href={path.href} key={path.id}>
-                  {cardEl}
-                </Link>
-              );
-            })}
-          </div>
+        <section className="ora-section ora-section-spreads" id="reading-modes">
+          <div className="ora-wrap">
+            <div className="ora-section-head">
+              <p className="ora-eyebrow">{copy.choosePath}</p>
+              <h2>{copy.wonderingTitle}</h2>
+            </div>
+            <div className="ora-spreads">
+              {copy.spreads.map((spread) => {
+                const Icon = spread.icon;
+                const card = (
+                  <article className={cx("ora-spread", spread.active && "is-active", spread.disabled && "is-soon")}>
+                    <Icon className="ora-spread-icon" />
+                    <span className="ora-spread-meta">{spread.meta}</span>
+                    <h3>{spread.title}</h3>
+                    <p>{spread.body}</p>
+                  </article>
+                );
 
-          {/* ASK ORA BOX */}
-          <div className="mx-auto mt-12 max-w-2xl">
-            <div className="rounded-[18px] border border-[#d8c9ae] p-8" style={{ background: "var(--c-surface)" }}>
-              <p
-                className="mb-1.5 text-[11px] font-medium uppercase tracking-[0.2em]"
-                style={{ color: "var(--c-accent-text)" }}
-              >
-                {copy.askOraTitle}
-              </p>
-              <p className="mb-5 text-sm text-[#766955]">{copy.askOraDescription}</p>
-              <div className="mb-6 flex flex-wrap gap-2">
+                return spread.disabled || !spread.href ? (
+                  <div aria-disabled="true" key={spread.id}>
+                    {card}
+                  </div>
+                ) : (
+                  <Link className="ora-spread-link" href={spread.href} key={spread.id}>
+                    {card}
+                  </Link>
+                );
+              })}
+            </div>
+
+            <div className="ora-askbox" id="ask-ora">
+              <p className="ora-ask-label">{copy.askOraTitle}</p>
+              <p>{copy.askOraDescription}</p>
+              <div className="ora-chips">
                 {copy.chips.map((chip) => (
-                  <span
-                    className="cursor-pointer rounded-full border border-[#d6c9ae] px-4 py-1.5 text-[0.8rem] text-[#766955] transition hover:border-[#9d7b3f] hover:text-[#9d7b3f]"
-                    key={chip}
-                  >
-                    {chip}
-                  </span>
+                  <span key={chip}>{chip}</span>
                 ))}
               </div>
-              <form action="/ai-guide/ask" className="space-y-5" method="get">
+              <form action="/ai-guide/ask" method="get">
                 <input name="lang" type="hidden" value={lang} />
                 <input name="mode" type="hidden" value="online" />
                 <input name="spread" type="hidden" value="single" />
                 <input name="orientation" type="hidden" value="upright" />
-                <textarea
-                  className="w-full resize-y rounded-[12px] border border-[#d6c9ae] p-4 text-base leading-7 text-[#3f352b] outline-none placeholder:text-[#8a8070] focus:border-[#9d7b3f]"
-                  name="question"
-                  placeholder={isZh ? "写下此刻想问的一句话…" : "Write the one thing you want to ask…"}
-                  rows={3}
-                  style={{ background: "var(--c-surface-well)" }}
-                />
-                <button className="showroom-action-primary" type="submit">
+                <textarea name="question" placeholder={copy.questionPlaceholder} rows={3} />
+                <button className="ora-btn ora-btn-primary" type="submit">
                   {copy.askOraButton}
                 </button>
               </form>
@@ -998,238 +485,119 @@ export function OracleShowroomHome({
           </div>
         </section>
 
-        {/* PROCESS STEPS */}
-        <section
-          className="relative px-5 py-16 text-[#e9e1ce] sm:px-6 lg:px-8"
-          id="how-it-works"
-          style={{ background: "var(--c-green)" }}
-        >
-          <div className="mx-auto max-w-7xl">
-            <div className="max-w-xl">
-              <p
-                className="mb-3 text-[0.68rem] font-semibold uppercase tracking-[0.24em]"
-                style={{ color: "var(--c-accent-text)" }}
-              >
-                {copy.unfoldsKicker}
-              </p>
-              <h2
-                className="font-serif text-[clamp(1.5rem,3vw,1.75rem)]"
-                style={{ color: "var(--c-ritual-text)" }}
-              >
-                {copy.unfoldsTitle}
-              </h2>
+        <section className="ora-section ora-section-ink" id="how-it-works">
+          <div className="ora-wrap">
+            <div className="ora-section-head">
+              <p className="ora-eyebrow">{copy.unfoldsKicker}</p>
+              <h2>{copy.unfoldsTitle}</h2>
             </div>
-            <div className="mt-10 grid grid-cols-2 gap-6 border-t border-white/15 pt-8 sm:grid-cols-5">
-              {copy.unfolds.map((item, index) => (
-                <div key={item.step}>
-                  <div
-                    className="mb-3 font-serif text-[2.4rem] leading-none"
-                    style={{ color: "var(--c-accent-text)" }}
-                  >
-                    {String(index + 1).padStart(2, "0")}
-                  </div>
-                  <h4 className="mb-2 font-serif text-[1.15rem]" style={{ color: "var(--c-ritual-text)" }}>
-                    {item.step}
-                  </h4>
-                  <p className="text-sm leading-relaxed text-[#bcc4b3]">{item.note}</p>
+            <div className="ora-steps">
+              {copy.unfolds.map(([step, note], index) => (
+                <article className="ora-step" key={step}>
+                  <span>{String(index + 1).padStart(2, "0")}</span>
+                  <h3>{step}</h3>
+                  <p>{note}</p>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="ora-section ora-section-deck" id="deck">
+          <div className="ora-wrap ora-browse">
+            <div>
+              <p className="ora-eyebrow">{copy.deckKicker}</p>
+              <h2>{copy.deckTitle}</h2>
+              <p className="ora-lead">{copy.deckDescription}</p>
+              <Link className="ora-btn ora-btn-ghost" href="#deck">
+                {copy.explore}
+              </Link>
+            </div>
+            <div aria-hidden="true" className="ora-browse-strip">
+              {copy.deckCards.map(([num, name, keyword, isFace], index) => (
+                <div className={cx("ora-tcard", !isFace && "ora-tcard-dark", `ora-browse-card-${index}`)} key={String(name)}>
+                  <span className="ora-card-num">{num}</span>
+                  {index === 1 ? <OraStarIcon className="ora-card-sigil" /> : index === 3 ? <OraMoonIcon className="ora-card-sigil" /> : <OraMarkIcon className="ora-card-sigil" />}
+                  <span className="ora-card-name">{name}<small>{keyword}</small></span>
                 </div>
               ))}
             </div>
           </div>
         </section>
 
-        {/* RULE DIVIDER */}
-        <div className="mx-auto flex max-w-7xl items-center gap-6 px-5 py-2 sm:px-6 lg:px-8">
-          <span className="h-px flex-1 bg-[#e2d7c2]" />
-          <OraMarkIcon className="h-6 w-6" style={{ color: "var(--c-accent-text)" }} />
-          <span className="h-px flex-1 bg-[#e2d7c2]" />
-        </div>
+        <SigilRule />
 
-        {/* DECK BROWSE */}
-        <section className="relative mx-auto max-w-7xl px-5 py-16 sm:px-6 lg:px-8" id="deck">
-          <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-2">
-            <div>
-              <p
-                className="mb-4 text-[0.68rem] font-semibold uppercase tracking-[0.24em]"
-                style={{ color: "var(--c-accent-text)" }}
-              >
-                {copy.deckKicker}
-              </p>
-              <h2 className="mb-5 font-serif text-[clamp(1.5rem,3vw,1.75rem)] text-[#3f352b]">
-                {copy.deckTitle.map((line) => (
-                  <span className="block" key={line}>
-                    {line}
-                  </span>
-                ))}
-              </h2>
-              <p className="mb-8 max-w-md text-base leading-7 text-[#766955]">{copy.deckDescription}</p>
-              <Link className="showroom-action-secondary" href="#deck">
-                {copy.explore}
+        <section className="ora-section" id="journal">
+          <div className="ora-wrap">
+            <div className="ora-section-head">
+              <p className="ora-eyebrow">{copy.journalKicker}</p>
+              <h2>{copy.journalTitle}</h2>
+            </div>
+            <div className="ora-modes">
+              {copy.journalNotes.map(([label, card, note]) => (
+                <article className="ora-mode" key={label}>
+                  <span>{label}</span>
+                  <h3>{card}</h3>
+                  <p>{note}</p>
+                </article>
+              ))}
+            </div>
+            <div className="ora-actions ora-journal-actions">
+              <Link className="ora-btn ora-btn-primary" href={readingsHref}>
+                {copy.openJournal}
+              </Link>
+              <Link className="ora-btn ora-btn-surface" href={readingsHref}>
+                {copy.viewAll}
               </Link>
             </div>
-            <div aria-hidden="true" className="flex items-center justify-center gap-3">
-              {copy.deckCards.slice(0, 4).map((card, index) => {
-                const rotations = [
-                  "-rotate-[8deg] translate-y-2",
-                  "-rotate-3",
-                  "rotate-1 scale-[1.06] z-[2]",
-                  "rotate-[7deg] translate-y-1.5",
-                ];
+          </div>
+        </section>
+
+        <section className="ora-section ora-section-physical" id="physical">
+          <div className="ora-wrap ora-physical">
+            <article className="ora-panel ora-panel-paper">
+              <p>{copy.physicalDeckKicker}</p>
+              <h2>{copy.physicalDeckTitle.split("\n").map((line) => <span key={line}>{line}</span>)}</h2>
+              <Link className="ora-btn ora-btn-primary" href={physicalHref}>
+                {copy.physical}
+              </Link>
+            </article>
+            <article className="ora-panel ora-panel-ink">
+              <p>{copy.redeemDeckKicker}</p>
+              <h2>{copy.redeemDeckTitle}</h2>
+              <Link className="ora-btn ora-btn-on-ink" href={homeHref}>
+                {copy.redeemDeckCode}
+              </Link>
+            </article>
+          </div>
+        </section>
+
+        <section className="ora-section" id="trust">
+          <div className="ora-wrap">
+            <h2 className="ora-statement">{copy.trustTitle}</h2>
+            <div className="ora-features">
+              {copy.trustItems.map(([title, body], index) => {
+                const Icon = index === 0 ? OraShieldIcon : index === 1 ? OraMarkIcon : OraLeafIcon;
                 return (
-                  <div
-                    className={cx(
-                      "flex aspect-[0.66] w-[clamp(96px,12vw,128px)] flex-col items-center rounded-2xl border p-3 shadow-[0_16px_30px_-22px_rgba(20,16,8,0.5)]",
-                      card.face ? "border-[#caa96a]/55 bg-[#fbf3df]" : "border-[#3a3d33] bg-[#23261f]",
-                      rotations[index] ?? "",
-                    )}
-                    key={card.name}
-                  >
-                    <span
-                      className={cx("font-serif text-xs tracking-[0.1em]", !card.face && "text-[#bdb6a3]")}
-                      style={card.face ? { color: "var(--c-accent-text)" } : undefined}
-                    >
-                      {card.numeral}
-                    </span>
-                    <OraMarkIcon
-                      className={cx("m-auto h-[46%] w-[46%]", card.face ? "text-[#c9a24a]" : "text-[#7c6a3a] opacity-70")}
-                    />
-                    <span className={cx("text-center font-serif text-[11px]", card.face ? "text-[#766955]" : "text-[#bdb6a3]")}>
-                      {card.name}
-                    </span>
-                  </div>
+                  <article className="ora-feature" key={title}>
+                    <Icon className="ora-feature-icon" />
+                    <h3>{title}</h3>
+                    <p>{body}</p>
+                  </article>
                 );
               })}
             </div>
           </div>
         </section>
 
-        {/* READING LOG */}
-        <section className="relative mx-auto max-w-7xl px-5 py-16 sm:px-6 lg:px-8" id="journal">
-          <div className="mb-10 max-w-xl">
-            <p
-              className="mb-3 text-[0.68rem] font-semibold uppercase tracking-[0.24em]"
-              style={{ color: "var(--c-accent-text)" }}
-            >
-              {copy.modesKicker}
-            </p>
-            <h2 className="font-serif text-[clamp(1.5rem,3vw,1.75rem)] text-[#3f352b]">{copy.modesNote}</h2>
-          </div>
-          <div className="mb-6 flex justify-end">
-            <Link className="showroom-action-quiet" href={readingsHref}>
-              {copy.viewAll}
-            </Link>
-          </div>
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-            {copy.modes.map((mode) => (
-              <div
-                className={cx("rounded-[18px] border border-[#d8c9ae] p-6", mode.disabled && "opacity-60")}
-                key={mode.title}
-                style={{ background: "var(--c-surface)" }}
-              >
-                <p className="mb-2 text-[11px] uppercase tracking-[0.18em]" style={{ color: "var(--c-accent-text)" }}>
-                  {mode.status}
-                </p>
-                <p className="mb-2 font-serif text-[1.5rem]" style={{ color: "var(--c-text)" }}>
-                  {mode.title}
-                </p>
-                <p className="mb-4 text-sm leading-relaxed text-[#766955]">{mode.body}</p>
-                <p className="mb-4 text-xs text-[#8a8070]">
-                  {copy.cardsLabel}: {mode.cards}
-                </p>
-                {mode.disabled || !mode.href ? (
-                  <span className="showroom-action-quiet pointer-events-none opacity-60">{mode.cta}</span>
-                ) : (
-                  <Link className="showroom-action-secondary" href={mode.href}>
-                    {mode.cta}
-                  </Link>
-                )}
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* PHYSICAL DECK PANELS */}
-        <section className="relative mx-auto max-w-7xl px-5 py-16 sm:px-6 lg:px-8" id="physical-deck">
-          <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
-            <div className="rounded-[18px] border border-[#d8c9ae] p-10" style={{ background: "#FAF6EC" }}>
-              <p
-                className="mb-5 text-[11px] font-medium uppercase tracking-[0.2em]"
-                style={{ color: "#7E6224" }}
-              >
-                {copy.physicalDeckKicker}
-              </p>
-              <h3
-                className="mb-8 font-serif text-[clamp(1.6rem,3vw,2.1rem)] leading-tight"
-                style={{ color: "#26221C" }}
-              >
-                {copy.physicalDeckTitle.map((line) => (
-                  <span className="block" key={line}>
-                    {line}
-                  </span>
-                ))}
-              </h3>
-              <Link className="showroom-action-primary" href={physicalHref}>
-                {copy.physical}
-              </Link>
-            </div>
-            <div className="rounded-[18px] bg-[#283a2e] p-10 text-[#f2ecdc]">
-              <p className="mb-5 text-[11px] font-medium uppercase tracking-[0.2em] text-[#d8b25a]">
-                {copy.redeemDeckKicker}
-              </p>
-              <h3 className="mb-8 font-serif text-[clamp(1.6rem,3vw,2.1rem)] leading-tight">{copy.redeemDeckTitle}</h3>
-              <Link
-                className="inline-flex min-h-[3.15rem] items-center justify-center rounded-full bg-[#faf6ec] px-6 text-[0.75rem] font-bold uppercase tracking-[0.18em] text-[#283a2e] transition hover:bg-white"
-                href={homeHref}
-              >
-                {copy.redeemDeckCode}
-              </Link>
-            </div>
-          </div>
-        </section>
-
-        {/* TRUST STATEMENT */}
-        <section className="relative mx-auto max-w-7xl px-5 py-16 sm:px-6 lg:px-8" id="faq">
-          <h2 className="mb-4 max-w-[18ch] font-serif text-[clamp(1.8rem,4vw,2.6rem)] leading-snug text-[#3f352b]">
-            {copy.trustTitle}
-          </h2>
-          <p className="mb-10 max-w-xl text-sm leading-7 text-[#766955]">{copy.trustBody}</p>
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
-            <div className="rounded-[18px] border border-[#d8c9ae] p-6" style={{ background: "var(--c-surface)" }}>
-              <OraShieldIcon className="mb-4 h-[30px] w-[30px]" style={{ color: "var(--c-accent-text)" }} />
-              <h4 className="mb-3 font-serif text-[1.2rem]" style={{ color: "var(--c-text)" }}>
-                {copy.trustItems[0].title}
-              </h4>
-              <p className="text-sm leading-relaxed text-[#766955]">{copy.trustItems[0].description}</p>
-            </div>
-            <div className="rounded-[18px] border border-[#d8c9ae] p-6" style={{ background: "var(--c-surface)" }}>
-              <OraMarkIcon className="mb-4 h-[30px] w-[30px]" style={{ color: "var(--c-accent-text)" }} />
-              <h4 className="mb-3 font-serif text-[1.2rem]" style={{ color: "var(--c-text)" }}>
-                {copy.trustItems[1].title}
-              </h4>
-              <p className="text-sm leading-relaxed text-[#766955]">{copy.trustItems[1].description}</p>
-            </div>
-            <div className="rounded-[18px] border border-[#d8c9ae] p-6" style={{ background: "var(--c-surface)" }}>
-              <OraLeafIcon className="mb-4 h-[30px] w-[30px]" style={{ color: "var(--c-accent-text)" }} />
-              <h4 className="mb-3 font-serif text-[1.2rem]" style={{ color: "var(--c-text)" }}>
-                {copy.trustItems[2].title}
-              </h4>
-              <p className="text-sm leading-relaxed text-[#766955]">{copy.trustItems[2].description}</p>
-            </div>
-          </div>
-        </section>
-
-        {/* FINAL CTA */}
-        <section
-          className="relative px-5 py-20 text-center sm:px-6 lg:px-8"
-          style={{ background: "var(--c-green)", color: "var(--c-ritual-text)" }}
-        >
-          <div className="mx-auto max-w-7xl">
-            <h2 className="mb-8 font-serif text-[clamp(2.4rem,6vw,4.4rem)] text-[#f4eedd]">{copy.finalTitle}</h2>
-            <div className="flex flex-wrap justify-center gap-4">
-              <Link className="showroom-final-primary" href={onlineHref}>
+        <section className="ora-cta">
+          <div className="ora-wrap">
+            <h2>{copy.finalTitle}</h2>
+            <div className="ora-actions ora-cta-actions">
+              <Link className="ora-btn ora-btn-primary" href={onlineHref}>
                 {copy.begin}
               </Link>
-              <Link className="showroom-final-secondary" href={physicalHref}>
+              <Link className="ora-btn ora-btn-ghost-on-ink" href={physicalHref}>
                 {copy.physical}
               </Link>
             </div>
@@ -1237,118 +605,1010 @@ export function OracleShowroomHome({
         </section>
       </main>
 
-      {/* FOOTER */}
-      <footer
-        className="border-t border-[#e2d7c2] px-5 py-16 sm:px-6 lg:px-8"
-        style={{ background: "var(--c-bg)" }}
-      >
-        <div className="mx-auto max-w-7xl">
-          <div className="mb-10 flex flex-wrap items-start justify-between gap-8">
+      <footer className="ora-footer">
+        <div className="ora-wrap">
+          <div className="ora-footer-top">
             <div>
-              <OraMarkIcon className="mb-3 h-[30px] w-[30px]" style={{ color: "var(--c-accent-text)" }} />
-              <p
-                className="mb-2 text-lg text-[#4f4235]"
-                style={{ fontFamily: "'Cormorant Garamond', serif", fontStyle: "italic" }}
-              >
-                Ora Arcana
-              </p>
-              <p className="max-w-[30ch] text-sm leading-7 text-[#766955]">{copy.subtitle}</p>
+              <OraMarkIcon className="ora-footer-mark" />
+              <p className="ora-footer-brand">Ora Arcana</p>
+              <p className="ora-footer-tag">{copy.subtitle}</p>
             </div>
-            <nav className="flex flex-wrap gap-6 text-sm text-[#766955]">
-              <Link className="hover:text-[#9d7b3f]" href="#">
-                {copy.trustLinks.privacy}
-              </Link>
-              <Link className="hover:text-[#9d7b3f]" href="#">
-                {copy.trustLinks.terms}
-              </Link>
-              <Link className="hover:text-[#9d7b3f]" href="#">
-                {copy.trustLinks.disclaimer}
-              </Link>
-              <Link className="hover:text-[#9d7b3f]" href="#">
-                {copy.trustLinks.contact}
-              </Link>
+            <nav className="ora-footer-links">
+              {copy.footerLinks.map(([label, href]) => (
+                <Link href={href} key={href}>
+                  {label}
+                </Link>
+              ))}
             </nav>
           </div>
-          <p className="border-t border-[#e2d7c2] pt-6 text-xs leading-7 text-[#8a8070]">{copy.trustBody}</p>
+          <p className="ora-footer-legal">{copy.trustBody}</p>
         </div>
       </footer>
 
       <style jsx global>{`
-        .showroom-action-primary,
-        .showroom-action-secondary,
-        .showroom-action-quiet,
-        .showroom-final-primary,
-        .showroom-final-secondary {
+        .ora-home {
+          --ora-section-y: clamp(4rem, 9vw, 7rem);
+          --ora-container: 1120px;
+          --ora-measure: 42rem;
+          --ora-gutter: clamp(20px, 5vw, 64px);
+          --ora-radius: 18px;
+          min-height: 100svh;
+          background: var(--c-bg);
+          color: var(--c-text);
+          font-family: "Noto Sans SC", Arial, Helvetica, sans-serif;
+          font-weight: 300;
+          line-height: 1.75;
+        }
+
+        .ora-home a {
+          color: inherit;
+          text-decoration: none;
+        }
+
+        .ora-mark-core {
+          fill: var(--c-bg);
+        }
+
+        .ora-wrap {
+          max-width: var(--ora-container);
+          margin: 0 auto;
+          padding: 0 var(--ora-gutter);
+        }
+
+        .ora-eyebrow {
+          color: var(--c-accent-text);
+          font-size: 0.8125rem;
+          font-weight: 500;
+          letter-spacing: 0.24em;
+          text-transform: uppercase;
+        }
+
+        .ora-nav {
+          position: sticky;
+          top: 0;
+          z-index: 240;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 1.5rem;
+          padding: 18px var(--ora-gutter);
+          border-bottom: 1px solid var(--c-border);
+          background: color-mix(in srgb, var(--c-bg) 86%, transparent);
+          backdrop-filter: saturate(120%) blur(10px);
+        }
+
+        .ora-brand {
+          color: var(--c-text);
+          font-family: "Cormorant Garamond", Georgia, serif;
+          font-size: 24px;
+          font-style: italic;
+          font-weight: 600;
+          line-height: 1;
+        }
+
+        .ora-nav-links {
+          display: flex;
+          gap: 1.5rem;
+          color: var(--c-text-soft);
+          font-size: 0.85rem;
+          font-weight: 400;
+        }
+
+        .ora-nav-links a:hover,
+        .ora-footer-links a:hover {
+          color: var(--c-accent);
+        }
+
+        .ora-theme-toggle {
           display: inline-flex;
-          min-height: 3rem;
-          touch-action: manipulation;
+          width: 38px;
+          height: 38px;
           align-items: center;
           justify-content: center;
-          border-radius: 9999px;
-          padding: 0.875rem 1.75rem;
-          text-align: center;
+          border: 1px solid var(--c-border);
+          border-radius: 999px;
+          background: transparent;
+          color: var(--c-text-soft);
+          cursor: pointer;
+        }
+
+        .ora-theme-toggle:hover {
+          border-color: var(--c-accent);
+          color: var(--c-accent);
+        }
+
+        .ora-theme-toggle svg {
+          width: 18px;
+          height: 18px;
+        }
+
+        .ora-home-main {
+          position: relative;
+          overflow-x: hidden;
+          background: var(--c-bg);
+        }
+
+        .ora-starfield {
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+          opacity: 0;
+        }
+
+        [data-theme="night"] .ora-starfield {
+          opacity: 1;
+          background-image:
+            radial-gradient(1px 1px at 12% 22%, rgba(239,233,219,.52), transparent),
+            radial-gradient(1px 1px at 28% 64%, rgba(239,233,219,.36), transparent),
+            radial-gradient(1.4px 1.4px at 46% 14%, rgba(216,178,90,.62), transparent),
+            radial-gradient(1px 1px at 63% 48%, rgba(239,233,219,.42), transparent),
+            radial-gradient(1px 1px at 78% 28%, rgba(239,233,219,.34), transparent),
+            radial-gradient(1.2px 1.2px at 88% 62%, rgba(216,178,90,.48), transparent),
+            radial-gradient(1px 1px at 38% 84%, rgba(239,233,219,.3), transparent);
+          background-size: 100% 100%;
+        }
+
+        .ora-hero {
+          position: relative;
+          overflow: hidden;
+          padding: clamp(3rem, 7vw, 6rem) 0 clamp(3.5rem, 8vw, 6.5rem);
+        }
+
+        .ora-hero-halo {
+          position: absolute;
+          right: 6%;
+          top: 20%;
+          width: min(720px, 80vw);
+          aspect-ratio: 1;
+          border-radius: 50%;
+          background: radial-gradient(circle, var(--c-halo), transparent 62%);
+          pointer-events: none;
+        }
+
+        [data-theme="night"] .ora-hero-halo {
+          background: radial-gradient(circle, rgba(216,178,90,.16), rgba(60,85,71,.06) 42%, transparent 66%);
+        }
+
+        .ora-hero-grid {
+          position: relative;
+          z-index: 1;
+          display: grid;
+          grid-template-columns: 1.05fr 0.95fr;
+          gap: 3rem;
+          align-items: center;
+        }
+
+        .ora-hero-eyebrow {
+          margin-bottom: 1.5rem;
+        }
+
+        .ora-hero-title {
+          margin: 0 0 1.5rem;
+          color: var(--c-text);
+          font-family: "Noto Serif SC", Georgia, serif;
+          font-size: clamp(3.2rem, 9.5vw, 7rem);
+          font-weight: 600;
+          letter-spacing: -0.01em;
+          line-height: 0.92;
+        }
+
+        .ora-hero-title span {
+          display: block;
+        }
+
+        .ora-hero-title span + span {
+          margin-top: -0.06em;
+          padding-left: 0.9em;
+        }
+
+        .ora-hero-sub {
+          margin: 0 0 0.75rem;
+          color: var(--c-text);
+          font-family: "Noto Serif SC", Georgia, serif;
+          font-size: clamp(1.1rem, 2.4vw, 1.5rem);
+        }
+
+        .ora-hero-note {
+          max-width: 32ch;
+          margin: 0 0 2rem;
+          color: var(--c-text-soft);
+          line-height: 1.8;
+        }
+
+        .ora-actions {
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
+          gap: 1rem;
+        }
+
+        .ora-btn {
+          display: inline-flex;
+          min-height: 3rem;
+          align-items: center;
+          justify-content: center;
+          border: 1px solid transparent;
+          border-radius: 999px;
+          padding: 0.875rem 2rem;
+          cursor: pointer;
           font-size: 0.9375rem;
           font-weight: 500;
           letter-spacing: 0.06em;
           transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease, transform 0.08s ease;
         }
-        .showroom-action-primary:active,
-        .showroom-final-primary:active {
+
+        .ora-btn:active {
           transform: translateY(1px);
         }
 
-        /* 主按钮：哑光金色 */
-        .showroom-action-primary,
-        .showroom-final-primary {
+        .ora-btn-primary {
           background: var(--c-accent);
           color: var(--c-on-accent);
-          border: 1px solid transparent;
         }
-        .showroom-action-primary:hover,
-        .showroom-final-primary:hover {
+
+        .ora-btn-primary:hover {
           background: var(--c-accent-hover);
         }
 
-        /* 次要按钮：边框透明背景 */
-        .showroom-action-secondary {
+        .ora-btn-ghost {
+          border-color: var(--c-accent);
           background: transparent;
           color: var(--c-accent);
-          border: 1px solid var(--c-accent);
         }
-        .showroom-action-secondary:hover {
+
+        .ora-btn-ghost:hover {
           background: var(--c-accent-wash);
         }
 
-        /* 静默按钮：纯文字 */
-        .showroom-action-quiet {
-          background: transparent;
-          color: var(--c-accent-text);
-          border: 1px solid transparent;
+        [data-theme="night"] .ora-btn-ghost {
+          border-color: rgba(239,233,219,.32);
+          color: var(--c-text);
         }
-        .showroom-action-quiet:hover {
+
+        [data-theme="night"] .ora-btn-ghost:hover {
+          border-color: rgba(239,233,219,.7);
+          background: transparent;
+        }
+
+        .ora-btn-surface {
+          border-color: var(--c-border);
+          background: var(--c-surface);
+          color: var(--c-text);
+        }
+
+        .ora-btn-surface:hover {
+          border-color: var(--c-accent);
           color: var(--c-accent);
         }
 
-        /* 深绿区域次要按钮 */
-        .showroom-final-secondary {
-          background: transparent;
-          color: var(--c-ritual-text);
-          border: 1px solid rgba(237, 228, 206, 0.4);
+        .ora-btn-text {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.5rem;
+          padding: 0.375rem 0;
+          color: var(--c-accent-text);
+          font-size: 0.9rem;
+          font-weight: 500;
+          letter-spacing: 0.04em;
         }
-        .showroom-final-secondary:hover {
-          border-color: rgba(237, 228, 206, 0.85);
+
+        .ora-btn-text:hover {
+          color: var(--c-accent);
+        }
+
+        .ora-btn-text svg {
+          width: 15px;
+          height: 15px;
+        }
+
+        .ora-deck-cluster {
+          position: relative;
+          height: clamp(360px, 42vw, 460px);
+        }
+
+        .ora-tcard {
+          position: absolute;
+          display: flex;
+          width: clamp(150px, 17vw, 196px);
+          aspect-ratio: 0.66;
+          flex-direction: column;
+          align-items: center;
+          border: 1px solid var(--c-border-strong);
+          border-radius: 16px;
+          background: var(--card-face);
+          box-shadow: 0 24px 50px -28px rgba(20,16,8,.5);
+          padding: 18px 14px;
+        }
+
+        .ora-tcard-dark {
+          border-color: #3a3d33;
+          background: var(--card-dark);
+        }
+
+        .ora-card-num {
+          color: var(--c-accent-text);
+          font-family: "Spectral", Georgia, serif;
+          font-size: 15px;
+          letter-spacing: 0.1em;
+        }
+
+        .ora-tcard-dark .ora-card-num,
+        .ora-tcard-dark .ora-card-name {
+          color: #bdb6a3;
+        }
+
+        .ora-card-sigil {
+          width: 46%;
+          height: 46%;
+          margin: auto;
+          color: var(--card-line);
+          opacity: 0.85;
+        }
+
+        .ora-tcard-dark .ora-card-sigil {
+          color: #7c6a3a;
+          opacity: 0.7;
+        }
+
+        .ora-card-name {
+          color: var(--c-text-soft);
+          font-family: "Noto Serif SC", Georgia, serif;
+          font-size: 13px;
+          text-align: center;
+        }
+
+        .ora-card-name small {
+          display: block;
+          margin-top: 2px;
+          color: var(--c-text-dim);
+          font-family: "Noto Sans SC", Arial, sans-serif;
+          font-size: 10px;
+        }
+
+        .ora-tcard-one {
+          left: 2%;
+          top: 14%;
+          transform: rotate(-13deg);
+        }
+
+        .ora-tcard-two {
+          right: 6%;
+          top: 6%;
+          transform: rotate(11deg);
+        }
+
+        .ora-tcard-three {
+          left: 50%;
+          top: 0;
+          z-index: 3;
+          transform: translateX(-50%) rotate(-1deg);
+        }
+
+        .ora-question-slip {
+          position: absolute;
+          right: 0;
+          bottom: -4%;
+          z-index: 4;
+          width: clamp(220px, 26vw, 290px);
+          border: 1px solid var(--c-border);
+          border-radius: 14px;
+          background: var(--c-surface);
+          box-shadow: 0 20px 40px -26px rgba(20,16,8,.5);
+          padding: 18px 20px;
+          transform: rotate(2deg);
+        }
+
+        .ora-slip-tape {
+          position: absolute;
+          left: 24px;
+          top: -9px;
+          width: 54px;
+          height: 18px;
+          border: 1px solid var(--c-border);
+          background: var(--c-accent-wash);
+          opacity: 0.9;
+          transform: rotate(-4deg);
+        }
+
+        .ora-question-slip p {
+          margin: 0 0 8px;
+          color: var(--c-accent-text);
+          font-size: 11px;
+          font-weight: 500;
+          letter-spacing: 0.16em;
+          text-transform: uppercase;
+        }
+
+        .ora-question-slip strong {
+          color: var(--c-text);
+          font-family: "Noto Serif SC", Georgia, serif;
+          font-size: 1.05rem;
+          font-weight: 400;
+          line-height: 1.5;
+        }
+
+        .ora-rule {
+          display: flex;
+          max-width: var(--ora-container);
+          align-items: center;
+          gap: 1.5rem;
+          margin: 0 auto;
+          padding: 0 var(--ora-gutter);
+          color: var(--c-border-strong);
+        }
+
+        .ora-rule::before,
+        .ora-rule::after {
+          content: "";
+          height: 1px;
+          flex: 1;
+          background: var(--c-border);
+        }
+
+        .ora-rule svg {
+          width: 24px;
+          height: 24px;
+          color: var(--c-accent);
+        }
+
+        [data-theme="night"] .ora-rule svg,
+        [data-theme="night"] .ora-footer-mark {
+          filter: drop-shadow(0 0 6px rgba(216,178,90,.35));
+        }
+
+        .ora-section {
+          position: relative;
+          padding: var(--ora-section-y) 0;
+        }
+
+        .ora-section-spreads,
+        .ora-section-deck,
+        .ora-section-physical {
+          padding-bottom: clamp(3.25rem, 6.5vw, 5rem);
+        }
+
+        .ora-section-head {
+          max-width: 48ch;
+          margin-bottom: 3rem;
+        }
+
+        .ora-section-head .ora-eyebrow {
+          margin-bottom: 1rem;
+        }
+
+        .ora-section-head h2,
+        .ora-browse h2 {
+          margin: 0;
+          color: var(--c-text);
+          font-family: "Noto Serif SC", Georgia, serif;
+          font-size: clamp(1.5rem, 3vw, 1.75rem);
+          font-weight: 500;
+          line-height: 1.3;
+        }
+
+        .ora-spreads {
+          display: grid;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: 1.25rem;
+        }
+
+        .ora-spread {
+          display: flex;
+          min-height: 230px;
+          flex-direction: column;
+          border: 1px solid var(--c-border);
+          border-radius: var(--ora-radius);
+          background: var(--c-surface);
+          padding: 1.5rem;
+          transition: border-color 0.2s ease, transform 0.2s ease;
+        }
+
+        .ora-spread-link:hover .ora-spread {
+          border-color: var(--c-border-strong);
+          transform: translateY(-3px);
+        }
+
+        .ora-spread-icon {
+          width: 40px;
+          height: 40px;
+          margin-bottom: auto;
+          color: var(--c-accent);
+        }
+
+        .ora-spread-meta {
+          margin-bottom: 8px;
+          color: var(--c-accent-text);
+          font-size: 11px;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+        }
+
+        .ora-spread h3 {
+          margin: 0 0 6px;
+          color: var(--c-text);
+          font-family: "Noto Serif SC", Georgia, serif;
+          font-size: 1.4rem;
+          font-weight: 500;
+        }
+
+        .ora-spread p {
+          margin: 0;
+          color: var(--c-text-soft);
+          font-size: 0.85rem;
+          line-height: 1.65;
+        }
+
+        .ora-spread.is-active {
+          border-color: var(--c-green);
+          background: var(--c-green);
+        }
+
+        .ora-spread.is-active h3 {
+          color: var(--c-ritual-text);
+        }
+
+        .ora-spread.is-active p {
+          color: #c4cdbe;
+        }
+
+        .ora-spread.is-active .ora-spread-meta,
+        .ora-spread.is-active .ora-spread-icon {
+          color: #d8b25a;
+        }
+
+        .ora-spread.is-soon > * {
+          opacity: 0.45;
+        }
+
+        .ora-askbox {
+          max-width: var(--ora-measure);
+          margin-top: 3rem;
+          border: 1px solid var(--c-border);
+          border-radius: var(--ora-radius);
+          background: var(--c-surface);
+          padding: 2rem;
+        }
+
+        .ora-ask-label,
+        .ora-panel p {
+          margin: 0 0 6px;
+          color: var(--c-accent-text);
+          font-size: 11px;
+          font-weight: 500;
+          letter-spacing: 0.2em;
+          text-transform: uppercase;
+        }
+
+        .ora-askbox > p:not(.ora-ask-label) {
+          margin: 0 0 1.25rem;
+          color: var(--c-text-soft);
+          font-size: 0.95rem;
+        }
+
+        .ora-chips {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.5rem;
+          margin-bottom: 1.5rem;
+        }
+
+        .ora-chips span {
+          border: 1px solid var(--c-border-strong);
+          border-radius: 999px;
+          padding: 6px 16px;
+          color: var(--c-text-soft);
+          font-size: 0.8rem;
+        }
+
+        .ora-askbox form {
+          display: grid;
+          gap: 1.25rem;
+        }
+
+        .ora-askbox textarea {
+          min-height: 64px;
+          width: 100%;
+          resize: vertical;
+          border: 1px solid var(--c-border-strong);
+          border-radius: 12px;
+          background: var(--c-surface-well);
+          color: var(--c-text);
+          padding: 1rem;
+          font: inherit;
+          outline: none;
+        }
+
+        .ora-askbox textarea::placeholder {
+          color: var(--c-text-dim);
+        }
+
+        .ora-askbox textarea:focus {
+          border-color: var(--c-accent);
+        }
+
+        .ora-section-ink,
+        .ora-cta {
+          background: var(--c-green);
+          color: #e9e1ce;
+        }
+
+        .ora-section-ink .ora-eyebrow,
+        .ora-panel-ink p {
+          color: #d8b25a;
+        }
+
+        .ora-section-ink h2,
+        .ora-panel-ink h2 {
+          color: var(--c-ritual-text);
+        }
+
+        .ora-steps {
+          display: grid;
+          grid-template-columns: repeat(5, minmax(0, 1fr));
+          gap: 1.5rem;
+          margin-top: 3rem;
+          border-top: 1px solid rgba(255,255,255,.14);
+          padding-top: 2rem;
+        }
+
+        .ora-step span {
+          display: block;
+          margin-bottom: 0.75rem;
+          color: #d8b25a;
+          font-family: "Spectral", Georgia, serif;
+          font-size: 2.4rem;
+          line-height: 1;
+        }
+
+        .ora-step h3 {
+          margin: 0 0 0.5rem;
+          color: var(--c-ritual-text);
+          font-family: "Noto Serif SC", Georgia, serif;
+          font-size: 1.15rem;
+          font-weight: 500;
+        }
+
+        .ora-step p {
+          margin: 0;
+          color: #bcc4b3;
+          font-size: 0.85rem;
+          line-height: 1.7;
+        }
+
+        .ora-browse,
+        .ora-physical {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 3rem;
+          align-items: center;
+        }
+
+        .ora-browse .ora-eyebrow {
+          margin-bottom: 1rem;
+        }
+
+        .ora-lead {
+          max-width: 44ch;
+          margin: 1.25rem 0 2rem;
+          color: var(--c-text-soft);
+          font-size: 1.125rem;
+          line-height: 1.8;
+        }
+
+        .ora-browse-strip {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.75rem;
+          perspective: 1000px;
+        }
+
+        .ora-browse-strip .ora-tcard {
+          position: relative;
+          left: auto;
+          top: auto;
+          width: clamp(96px, 12vw, 128px);
+          box-shadow: 0 16px 30px -22px rgba(20,16,8,.5);
+        }
+
+        .ora-browse-card-0 {
+          transform: rotate(-8deg) translateY(8px);
+        }
+
+        .ora-browse-card-1 {
+          transform: rotate(-3deg);
+        }
+
+        .ora-browse-card-2 {
+          z-index: 2;
+          transform: rotate(2deg) scale(1.06);
+        }
+
+        .ora-browse-card-3 {
+          transform: rotate(7deg) translateY(6px);
+        }
+
+        .ora-modes {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 1.25rem;
+        }
+
+        .ora-mode,
+        .ora-feature {
+          border: 1px solid var(--c-border);
+          border-radius: var(--ora-radius);
+          background: var(--c-surface);
+          padding: 1.5rem;
+        }
+
+        .ora-mode span {
+          display: block;
+          margin-bottom: 8px;
+          color: var(--c-accent-text);
+          font-size: 11px;
+          font-weight: 500;
+          letter-spacing: 0.18em;
+          text-transform: uppercase;
+        }
+
+        .ora-mode h3,
+        .ora-feature h3 {
+          margin: 0 0 8px;
+          color: var(--c-text);
+          font-family: "Noto Serif SC", Georgia, serif;
+          font-size: 1.5rem;
+          font-weight: 500;
+        }
+
+        .ora-mode p,
+        .ora-feature p {
+          margin: 0;
+          color: var(--c-text-soft);
+          font-size: 0.9rem;
+          line-height: 1.7;
+        }
+
+        .ora-journal-actions {
+          margin-top: 2rem;
+        }
+
+        .ora-panel {
+          border-radius: var(--ora-radius);
+          padding: clamp(2rem, 4vw, 3rem);
+        }
+
+        .ora-panel-paper {
+          border: 1px solid var(--c-border);
+          background: var(--c-surface);
+        }
+
+        .ora-panel-ink {
+          background: var(--c-green);
+          color: var(--c-ritual-text);
+        }
+
+        .ora-panel h2 {
+          margin: 0 0 2rem;
+          color: var(--c-text);
+          font-family: "Noto Serif SC", Georgia, serif;
+          font-size: clamp(1.6rem, 3vw, 2.1rem);
+          font-weight: 500;
+          line-height: 1.3;
+        }
+
+        .ora-panel h2 span {
+          display: block;
+        }
+
+        .ora-btn-on-ink {
+          background: var(--c-surface);
+          color: var(--c-green);
+        }
+
+        .ora-btn-on-ink:hover {
+          background: #fff;
+        }
+
+        .ora-statement {
+          max-width: 18ch;
+          margin: 0 0 3rem;
+          color: var(--c-text);
+          font-family: "Noto Serif SC", Georgia, serif;
+          font-size: clamp(1.8rem, 4vw, 2.6rem);
+          font-weight: 500;
+          line-height: 1.35;
+        }
+
+        .ora-features {
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 1.25rem;
+        }
+
+        .ora-feature-icon {
+          width: 30px;
+          height: 30px;
+          margin-bottom: 1rem;
+          color: var(--c-accent);
+        }
+
+        .ora-feature h3 {
+          font-size: 1.2rem;
+        }
+
+        .ora-cta {
+          padding: clamp(4rem, 9vw, 7rem) 0;
+          text-align: center;
+        }
+
+        .ora-cta h2 {
+          margin: 0 0 2rem;
+          color: #f4eedd;
+          font-family: "Noto Serif SC", Georgia, serif;
+          font-size: clamp(2.4rem, 6vw, 4.4rem);
+          font-weight: 500;
+          line-height: 1.08;
+        }
+
+        .ora-cta-actions {
+          justify-content: center;
+        }
+
+        .ora-btn-ghost-on-ink {
+          border-color: rgba(237,228,206,.4);
+          background: transparent;
+          color: #ede4ce;
+        }
+
+        .ora-btn-ghost-on-ink:hover {
+          border-color: rgba(237,228,206,.85);
+        }
+
+        .ora-footer {
+          border-top: 1px solid var(--c-border);
+          background: var(--c-bg);
+          padding: 4rem 0 5rem;
+        }
+
+        .ora-footer-top {
+          display: flex;
+          flex-wrap: wrap;
+          align-items: flex-start;
+          justify-content: space-between;
+          gap: 2rem;
+          margin-bottom: 3rem;
+        }
+
+        .ora-footer-mark {
+          width: 30px;
+          height: 30px;
+          margin-bottom: 0.75rem;
+          color: var(--c-accent);
+        }
+
+        .ora-footer-brand {
+          margin: 0 0 0.5rem;
+          color: var(--c-text);
+          font-family: "Cormorant Garamond", Georgia, serif;
+          font-size: 20px;
+          font-style: italic;
+        }
+
+        .ora-footer-tag {
+          max-width: 30ch;
+          margin: 0;
+          color: var(--c-text-soft);
+          font-size: 0.85rem;
+          line-height: 1.7;
+        }
+
+        .ora-footer-links {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 1.5rem;
+          color: var(--c-text-soft);
+          font-size: 0.85rem;
+        }
+
+        .ora-footer-legal {
+          margin: 0;
+          border-top: 1px solid var(--c-border);
+          padding-top: 1.5rem;
+          color: var(--c-text-dim);
+          font-size: 0.75rem;
+          line-height: 1.7;
+        }
+
+        [data-theme="night"] .ora-spread.is-active {
+          border-color: rgba(216,178,90,.45);
+          background: radial-gradient(circle at 60% 30%, rgba(216,178,90,.16), transparent 62%), var(--c-surface);
+        }
+
+        [data-theme="night"] .ora-spread.is-active h3 {
+          color: var(--c-accent-hover);
+        }
+
+        [data-theme="night"] .ora-tcard {
+          border-color: var(--c-border-strong);
+          background: #23262f;
+        }
+
+        [data-theme="night"] .ora-tcard-dark {
+          border-color: #1a1d25;
+          background: #0c0e13;
+        }
+
+        @media (max-width: 920px) {
+          .ora-nav-links {
+            display: none;
+          }
+
+          .ora-hero-grid,
+          .ora-browse,
+          .ora-physical {
+            grid-template-columns: 1fr;
+          }
+
+          .ora-deck-cluster {
+            width: 100%;
+            max-width: 420px;
+            height: 380px;
+            margin: 0 auto;
+          }
+
+          .ora-spreads,
+          .ora-steps,
+          .ora-modes {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+
+          .ora-features {
+            grid-template-columns: 1fr;
+          }
+
+          .ora-browse-strip {
+            order: -1;
+          }
+        }
+
+        @media (max-width: 560px) {
+          .ora-nav {
+            padding-inline: 20px;
+          }
+
+          .ora-spreads,
+          .ora-steps,
+          .ora-modes {
+            grid-template-columns: 1fr;
+          }
+
+          .ora-hero-title {
+            font-size: clamp(3rem, 18vw, 4.9rem);
+          }
+
+          .ora-browse-strip {
+            justify-content: flex-start;
+            overflow: hidden;
+            padding: 1rem 0;
+          }
         }
 
         @media (prefers-reduced-motion: reduce) {
-          .showroom-action-primary,
-          .showroom-action-secondary,
-          .showroom-action-quiet,
-          .showroom-final-primary,
-          .showroom-final-secondary {
+          .ora-btn,
+          .ora-spread {
             transition: none;
           }
         }
       `}</style>
+    </div>
+  );
+}
+
+function SigilRule() {
+  return (
+    <div className="ora-rule">
+      <OraMarkIcon />
     </div>
   );
 }

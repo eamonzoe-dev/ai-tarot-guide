@@ -170,6 +170,7 @@ export function ActivationCodePanel({
       terms: isZh ? "条款" : "Terms",
       disclaimer: isZh ? "免责声明" : "Disclaimer",
       contact: isZh ? "联系" : "Contact",
+      toggleTheme: isZh ? "切换日间 / 夜间" : "Toggle day / nocturne",
     }),
     [isZh],
   );
@@ -490,21 +491,37 @@ export function ActivationCodePanel({
     setError(null);
   }
 
+  function toggleTheme() {
+    const currentTheme =
+      document.documentElement.getAttribute("data-theme") === "night"
+        ? "night"
+        : "day";
+    const nextTheme = currentTheme === "night" ? "day" : "night";
+
+    document.documentElement.setAttribute("data-theme", nextTheme);
+
+    try {
+      localStorage.setItem("ora-theme", nextTheme);
+    } catch {
+      // Storage can be unavailable in restricted browsing modes.
+    }
+  }
+
   const authModal = isMenuOpen && !user ? (
     <section
-      className="fixed inset-0 z-[999] flex items-center justify-center overflow-y-auto bg-[#2f271e]/18 p-4 backdrop-blur-[8px] sm:p-6"
+      className="ora-account-modal-backdrop fixed inset-0 z-[999] flex items-center justify-center overflow-y-auto bg-[#2f271e]/18 p-4 backdrop-blur-[8px] sm:p-6"
       onClick={closePanels}
     >
       <div
         aria-labelledby={authModalTitleId}
         aria-modal="true"
-        className="relative max-h-[min(90vh,44rem)] w-[min(calc(100vw-2rem),27rem)] overflow-y-auto rounded-3xl border border-[#d8b76a]/45 bg-[#fffaf0]/96 p-5 text-left text-[#4f4235] shadow-[0_28px_78px_rgba(35,27,18,0.3),inset_0_1px_0_rgba(255,255,255,0.82)] backdrop-blur-md sm:p-6"
+        className="ora-account-surface relative max-h-[min(90vh,44rem)] w-[min(calc(100vw-2rem),27rem)] overflow-y-auto rounded-3xl border border-[#d8b76a]/45 bg-[#fffaf0]/96 p-5 text-left text-[#4f4235] shadow-[0_28px_78px_rgba(35,27,18,0.3),inset_0_1px_0_rgba(255,255,255,0.82)] backdrop-blur-md sm:p-6"
         onClick={(event) => event.stopPropagation()}
         role="dialog"
       >
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_14%_8%,rgba(255,255,255,0.92),transparent_32%),radial-gradient(circle_at_92%_12%,rgba(216,183,106,0.18),transparent_30%),repeating-linear-gradient(90deg,rgba(91,74,54,0.035)_0_1px,transparent_1px_18px)]"
+          className="ora-account-sheen pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_14%_8%,rgba(255,255,255,0.92),transparent_32%),radial-gradient(circle_at_92%_12%,rgba(216,183,106,0.18),transparent_30%),repeating-linear-gradient(90deg,rgba(91,74,54,0.035)_0_1px,transparent_1px_18px)]"
         />
         <button
           aria-label={copy.closeAccountPanel}
@@ -516,7 +533,7 @@ export function ActivationCodePanel({
         </button>
         <div className="relative grid gap-4">
           <div className="grid justify-items-center border-b border-[#d8b76a]/30 pb-4 text-center">
-            <div className="flex size-11 shrink-0 items-center justify-center rounded-full border border-[#caa96a]/60 bg-[#f6e1ae]/80 font-serif text-lg text-[#5b3c16] shadow-[inset_0_1px_0_rgba(255,255,255,0.72)]">
+            <div className="ora-account-avatar flex size-11 shrink-0 items-center justify-center rounded-full border border-[#caa96a]/60 bg-[#f6e1ae]/80 font-serif text-lg text-[#5b3c16] shadow-[inset_0_1px_0_rgba(255,255,255,0.72)]">
               O
             </div>
             <p className="mt-3 text-[0.58rem] font-semibold uppercase tracking-[0.18em] text-[#9d7b3f]">
@@ -635,63 +652,78 @@ export function ActivationCodePanel({
 
   return (
     <>
-      <div className="fixed right-4 top-3 z-[360] sm:right-6 sm:top-4">
-      <div className="relative z-[290] flex min-w-0 items-center justify-end gap-1.5">
+      <div className="ora-account-dock fixed right-4 top-3 z-[360] sm:right-6 sm:top-4">
+      <div className="relative z-[290] flex min-w-0 flex-nowrap items-center justify-end gap-2.5 whitespace-nowrap">
+        <button
+          aria-label={copy.toggleTheme}
+          className="ora-account-control ora-account-theme-toggle ora-theme-toggle pointer-events-auto inline-flex size-10 items-center justify-center rounded-full border border-[#d8b76a]/55 bg-[#fffaf0]/88 p-0 text-[#5b4a36] shadow-[0_8px_20px_rgba(111,84,43,0.1),inset_0_1px_0_rgba(255,255,255,0.72)] backdrop-blur transition hover:-translate-y-0.5 hover:border-[#caa96a] hover:bg-[#fff7e8] hover:text-[#3f352b]"
+          onClick={toggleTheme}
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            className="ora-theme-sun size-4"
+            fill="none"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="1.8"
+            viewBox="0 0 24 24"
+          >
+            <circle cx="12" cy="12" r="4" />
+            <path d="M12 2v2" />
+            <path d="M12 20v2" />
+            <path d="m4.93 4.93 1.41 1.41" />
+            <path d="m17.66 17.66 1.41 1.41" />
+            <path d="M2 12h2" />
+            <path d="M20 12h2" />
+            <path d="m6.34 17.66-1.41 1.41" />
+            <path d="m19.07 4.93-1.41 1.41" />
+          </svg>
+          <svg
+            aria-hidden="true"
+            className="ora-theme-moon size-4"
+            fill="none"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="1.8"
+            viewBox="0 0 24 24"
+          >
+            <path d="M20 14.5A7.5 7.5 0 0 1 9.5 4 8.5 8.5 0 1 0 20 14.5Z" />
+          </svg>
+        </button>
         {user ? (
           <>
             <button
               aria-label={copy.getMoreStardust}
-              className="group relative hidden min-h-9 items-center rounded-full border border-[#d8b76a]/42 bg-[#fffaf0]/82 px-2.5 text-[0.68rem] font-semibold tracking-normal text-[#5b4a36] shadow-[0_7px_18px_rgba(111,84,43,0.08),inset_0_1px_0_rgba(255,255,255,0.72)] backdrop-blur transition hover:-translate-y-0.5 hover:border-[#caa96a] hover:bg-[#fff7e8] focus:outline-none focus:ring-2 focus:ring-[#d8b76a]/35 sm:inline-flex"
+              className="ora-account-control ora-account-stardust-pill group relative inline-flex min-h-9 items-center rounded-full border border-[#d8b76a]/42 bg-[#fffaf0]/82 px-2.5 text-[0.68rem] font-semibold tracking-normal text-[#5b4a36] shadow-[0_7px_18px_rgba(111,84,43,0.08),inset_0_1px_0_rgba(255,255,255,0.72)] backdrop-blur transition hover:-translate-y-0.5 hover:border-[#caa96a] hover:bg-[#fff7e8] focus:outline-none focus:ring-2 focus:ring-[#d8b76a]/35"
               onClick={openTopUpPreview}
               type="button"
             >
               {isLoadingCredits ? "⚡ ..." : copy.stardustCompact(stardustRemaining)}
-              <span className="pointer-events-none absolute right-0 top-[calc(100%+0.45rem)] z-20 w-max max-w-[12rem] rounded-full border border-[#d8b76a]/42 bg-[#fffaf0]/96 px-3 py-1.5 text-[0.62rem] font-semibold text-[#5b4a36] opacity-0 shadow-[0_10px_24px_rgba(111,84,43,0.12)] transition group-hover:opacity-100 group-focus-visible:opacity-100">
+              <span className="ora-account-tooltip pointer-events-none absolute right-0 top-[calc(100%+0.45rem)] z-20 w-max max-w-[12rem] rounded-full border border-[#d8b76a]/42 bg-[#fffaf0]/96 px-3 py-1.5 text-[0.62rem] font-semibold text-[#5b4a36] opacity-0 shadow-[0_10px_24px_rgba(111,84,43,0.12)] transition group-hover:opacity-100 group-focus-visible:opacity-100">
                 {copy.getMoreStardust}
               </span>
             </button>
             <button
-              aria-expanded={isNotificationsOpen}
-              aria-label={copy.notifications}
-              className="hidden size-8 items-center justify-center rounded-full border border-[#d8b76a]/42 bg-[#fffaf0]/86 text-[#6f4f20] shadow-[0_7px_18px_rgba(111,84,43,0.08),inset_0_1px_0_rgba(255,255,255,0.72)] transition hover:-translate-y-0.5 hover:border-[#caa96a] sm:inline-flex"
-              onClick={openNotificationsPreview}
-              type="button"
-            >
-              <svg
-                aria-hidden="true"
-                className="size-3.5"
-                fill="none"
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="1.8"
-                viewBox="0 0 24 24"
-              >
-                <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9" />
-                <path d="M13.7 21a2 2 0 0 1-3.4 0" />
-              </svg>
-            </button>
-            <button
               aria-expanded={isMenuOpen}
-              className="pointer-events-auto inline-flex min-h-8 items-center gap-1.5 rounded-full border border-[#d8b76a]/55 bg-[#fffaf0]/88 px-2 text-[0.72rem] font-semibold normal-case tracking-normal text-[#5b4a36] shadow-[0_8px_20px_rgba(111,84,43,0.1),inset_0_1px_0_rgba(255,255,255,0.72)] backdrop-blur transition hover:-translate-y-0.5 hover:border-[#caa96a] hover:bg-[#fff7e8] hover:text-[#3f352b] sm:px-2.5"
+              className="ora-account-control pointer-events-auto inline-flex size-10 items-center justify-center rounded-full border border-[#d8b76a]/55 bg-[#fffaf0]/88 p-0 text-[0.72rem] font-semibold normal-case tracking-normal text-[#5b4a36] shadow-[0_8px_20px_rgba(111,84,43,0.1),inset_0_1px_0_rgba(255,255,255,0.72)] backdrop-blur transition hover:-translate-y-0.5 hover:border-[#caa96a] hover:bg-[#fff7e8] hover:text-[#3f352b]"
               onClick={(event) => {
                 event.stopPropagation();
                 openAccountMenu();
               }}
               type="button"
             >
-              <span className="flex size-5 items-center justify-center rounded-full border border-[#caa96a]/65 bg-[#f6e1ae] font-serif text-[0.66rem] text-[#5b3c16]">
+              <span className="ora-account-avatar flex size-8 items-center justify-center rounded-full border border-[#caa96a]/65 bg-[#f6e1ae] font-serif text-[0.82rem] text-[#5b3c16]">
                 {userInitial}
-              </span>
-              <span className="hidden max-w-24 truncate sm:inline">
-                {accountName}
               </span>
             </button>
           </>
         ) : (
           <button
             aria-expanded={isMenuOpen}
-            className="pointer-events-auto inline-flex min-h-9 items-center gap-2 rounded-full border border-[#d8b76a]/55 bg-[#fffaf0]/88 px-3.5 text-[0.62rem] font-semibold uppercase tracking-[0.12em] text-[#5b4a36] shadow-[0_8px_20px_rgba(111,84,43,0.1),inset_0_1px_0_rgba(255,255,255,0.72)] backdrop-blur transition hover:-translate-y-0.5 hover:border-[#caa96a] hover:bg-[#fff7e8] hover:text-[#3f352b]"
+            className="ora-account-control pointer-events-auto inline-flex min-h-9 items-center gap-2 rounded-full border border-[#d8b76a]/55 bg-[#fffaf0]/88 px-3.5 text-[0.62rem] font-semibold uppercase tracking-[0.12em] text-[#5b4a36] shadow-[0_8px_20px_rgba(111,84,43,0.1),inset_0_1px_0_rgba(255,255,255,0.72)] backdrop-blur transition hover:-translate-y-0.5 hover:border-[#caa96a] hover:bg-[#fff7e8] hover:text-[#3f352b]"
             onClick={(event) => {
               event.stopPropagation();
               openAccountMenu();
@@ -707,17 +739,17 @@ export function ActivationCodePanel({
       {hasDismissOverlay ? (
         <button
           aria-label={copy.closeAccountPanel}
-          className="fixed inset-0 z-[270] cursor-default bg-[#1d1710]/30 backdrop-blur-[2px]"
+          className="ora-account-dismiss fixed inset-0 z-[270] cursor-default bg-[#1d1710]/30 backdrop-blur-[2px]"
           onClick={closePanels}
           type="button"
         />
       ) : null}
 
       {isTopUpOpen ? (
-        <section className="fixed right-4 top-[4.75rem] z-[300] w-[min(calc(100vw-2rem),19rem)] overflow-hidden rounded-2xl border border-[#d8b76a]/45 bg-[#fffaf0]/96 p-3.5 text-left text-[#4f4235] shadow-[0_18px_48px_rgba(102,75,33,0.17),inset_0_1px_0_rgba(255,255,255,0.82)] backdrop-blur-md sm:right-6">
+        <section className="ora-account-surface fixed right-4 top-[4.75rem] z-[300] w-[min(calc(100vw-2rem),19rem)] overflow-hidden rounded-2xl border border-[#d8b76a]/45 bg-[#fffaf0]/96 p-3.5 text-left text-[#4f4235] shadow-[0_18px_48px_rgba(102,75,33,0.17),inset_0_1px_0_rgba(255,255,255,0.82)] backdrop-blur-md sm:right-6">
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_14%_8%,rgba(255,255,255,0.92),transparent_32%),radial-gradient(circle_at_92%_12%,rgba(216,183,106,0.18),transparent_30%)]"
+            className="ora-account-sheen pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_14%_8%,rgba(255,255,255,0.92),transparent_32%),radial-gradient(circle_at_92%_12%,rgba(216,183,106,0.18),transparent_30%)]"
           />
           <div className="relative">
             <p className="text-[0.58rem] font-semibold uppercase tracking-[0.18em] text-[#9d7b3f]">
@@ -734,10 +766,10 @@ export function ActivationCodePanel({
       ) : null}
 
       {isNotificationsOpen ? (
-        <section className="fixed right-4 top-[4.75rem] z-[300] w-[min(calc(100vw-2rem),19rem)] overflow-hidden rounded-2xl border border-[#d8b76a]/45 bg-[#fffaf0]/96 p-3.5 text-left text-[#4f4235] shadow-[0_18px_48px_rgba(102,75,33,0.17),inset_0_1px_0_rgba(255,255,255,0.82)] backdrop-blur-md sm:right-6">
+        <section className="ora-account-surface fixed right-4 top-[4.75rem] z-[300] w-[min(calc(100vw-2rem),19rem)] overflow-hidden rounded-2xl border border-[#d8b76a]/45 bg-[#fffaf0]/96 p-3.5 text-left text-[#4f4235] shadow-[0_18px_48px_rgba(102,75,33,0.17),inset_0_1px_0_rgba(255,255,255,0.82)] backdrop-blur-md sm:right-6">
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_14%_8%,rgba(255,255,255,0.92),transparent_32%),radial-gradient(circle_at_92%_12%,rgba(216,183,106,0.18),transparent_30%)]"
+            className="ora-account-sheen pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_14%_8%,rgba(255,255,255,0.92),transparent_32%),radial-gradient(circle_at_92%_12%,rgba(216,183,106,0.18),transparent_30%)]"
           />
           <div className="relative">
             <p className="text-[0.58rem] font-semibold uppercase tracking-[0.18em] text-[#9d7b3f]">
@@ -756,14 +788,14 @@ export function ActivationCodePanel({
       {isMounted && authModal ? createPortal(authModal, document.body) : null}
 
       {isMenuOpen && user ? (
-        <section className="fixed right-4 top-[4.75rem] z-[300] max-h-[80vh] w-[min(calc(100vw-2rem),22.5rem)] overflow-y-auto overflow-x-hidden rounded-2xl border border-[#d8b76a]/45 bg-[#fffaf0]/96 p-3 text-left text-[#4f4235] shadow-[0_20px_56px_rgba(102,75,33,0.19),inset_0_1px_0_rgba(255,255,255,0.82)] backdrop-blur-md sm:right-6 sm:p-3.5">
+        <section className="ora-account-popover ora-account-surface fixed right-4 top-[4.75rem] z-[300] max-h-[80vh] w-[min(calc(100vw-2rem),22.5rem)] overflow-y-auto overflow-x-hidden rounded-2xl border border-[#d8b76a]/45 bg-[#fffaf0]/96 p-3 text-left text-[#4f4235] shadow-[0_20px_56px_rgba(102,75,33,0.19),inset_0_1px_0_rgba(255,255,255,0.82)] backdrop-blur-md sm:right-6 sm:p-3.5">
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_14%_8%,rgba(255,255,255,0.92),transparent_32%),radial-gradient(circle_at_92%_12%,rgba(216,183,106,0.18),transparent_30%),repeating-linear-gradient(90deg,rgba(91,74,54,0.035)_0_1px,transparent_1px_18px)]"
+            className="ora-account-sheen pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_14%_8%,rgba(255,255,255,0.92),transparent_32%),radial-gradient(circle_at_92%_12%,rgba(216,183,106,0.18),transparent_30%),repeating-linear-gradient(90deg,rgba(91,74,54,0.035)_0_1px,transparent_1px_18px)]"
           />
           <div className="relative grid gap-3">
             <div className="flex items-center gap-2.5 border-b border-[#d8b76a]/30 pb-2.5">
-              <div className="flex size-8 shrink-0 items-center justify-center rounded-full border border-[#caa96a]/60 bg-[#f6e1ae]/80 font-serif text-sm text-[#5b3c16] shadow-[inset_0_1px_0_rgba(255,255,255,0.72)]">
+              <div className="ora-account-avatar flex size-8 shrink-0 items-center justify-center rounded-full border border-[#caa96a]/60 bg-[#f6e1ae]/80 font-serif text-sm text-[#5b3c16] shadow-[inset_0_1px_0_rgba(255,255,255,0.72)]">
                 {userInitial}
               </div>
               <div className="min-w-0">
@@ -784,9 +816,9 @@ export function ActivationCodePanel({
               <span className="block">{copy.readerPricingNote}</span>
             </p>
 
-            <div className="grid grid-cols-2 gap-1.5">
+            <div className="ora-account-menu-grid grid grid-cols-2 gap-1.5">
               <Link
-                className="grid min-h-[4.5rem] place-items-center rounded-xl border border-transparent bg-transparent px-2 py-2 text-center transition hover:border-[#d8b76a]/26 hover:bg-[#fff7e8]/78"
+                className="ora-account-menu-item grid min-h-[4.5rem] place-items-center rounded-xl border border-transparent bg-transparent px-2 py-2 text-center transition hover:border-[#d8b76a]/26 hover:bg-[#fff7e8]/78"
                 href={withLang("/ai-guide", {}, lang)}
                 onClick={() => setIsMenuOpen(false)}
               >
@@ -798,7 +830,7 @@ export function ActivationCodePanel({
                 </span>
               </Link>
               <Link
-                className="grid min-h-[4.5rem] place-items-center rounded-xl border border-transparent bg-transparent px-2 py-2 text-center transition hover:border-[#d8b76a]/26 hover:bg-[#fff7e8]/78"
+                className="ora-account-menu-item grid min-h-[4.5rem] place-items-center rounded-xl border border-transparent bg-transparent px-2 py-2 text-center transition hover:border-[#d8b76a]/26 hover:bg-[#fff7e8]/78"
                 href={withLang("/ai-guide/readings", {}, lang)}
                 onClick={() => setIsMenuOpen(false)}
               >
@@ -810,7 +842,7 @@ export function ActivationCodePanel({
                 </span>
               </Link>
               <button
-                className="grid min-h-[4.5rem] place-items-center rounded-xl border border-transparent bg-transparent px-2 py-2 text-center transition hover:border-[#d8b76a]/26 hover:bg-[#fff7e8]/78"
+                className="ora-account-menu-item grid min-h-[4.5rem] place-items-center rounded-xl border border-transparent bg-transparent px-2 py-2 text-center transition hover:border-[#d8b76a]/26 hover:bg-[#fff7e8]/78"
                 onClick={() => {
                   setStatus(null);
                   setError(null);
@@ -826,7 +858,7 @@ export function ActivationCodePanel({
                 </span>
               </button>
               <button
-                className="grid min-h-[4.5rem] place-items-center rounded-xl border border-transparent bg-transparent px-2 py-2 text-center transition hover:border-[#d8b76a]/26 hover:bg-[#fff7e8]/78"
+                className="ora-account-menu-item grid min-h-[4.5rem] place-items-center rounded-xl border border-transparent bg-transparent px-2 py-2 text-center transition hover:border-[#d8b76a]/26 hover:bg-[#fff7e8]/78"
                 onClick={() => {
                   setStatus(copy.membershipPreviewSoon);
                   setError(null);
@@ -844,21 +876,18 @@ export function ActivationCodePanel({
                 </span>
               </button>
               <button
-                className="grid min-h-[4.5rem] place-items-center rounded-xl border border-transparent bg-transparent px-2 py-2 text-center transition hover:border-[#d8b76a]/26 hover:bg-[#fff7e8]/78"
-                onClick={() => setStatus(null)}
+                className="ora-account-menu-item grid min-h-[4.5rem] place-items-center rounded-xl border border-transparent bg-transparent px-2 py-2 text-center transition hover:border-[#d8b76a]/26 hover:bg-[#fff7e8]/78"
+                onClick={openNotificationsPreview}
                 type="button"
               >
                 <span className="flex size-7 items-center justify-center rounded-full border border-[#d8b76a]/35 bg-[#fffaf0] text-[0.62rem] font-semibold text-[#9d7b3f]">
-                  EN
+                  N
                 </span>
                 <span className="mt-1 block text-xs font-semibold text-[#3f352b]">
-                  {copy.language}
-                </span>
-                <span className="mt-0.5 block text-[0.6rem] text-[#8a765d]">
-                  EN / 中文
+                  {copy.notifications}
                 </span>
               </button>
-              <div className="grid min-h-[4.5rem] place-items-center rounded-xl border border-transparent bg-transparent px-2 py-2 text-center">
+              <div className="ora-account-menu-item grid min-h-[4.5rem] place-items-center rounded-xl border border-transparent bg-transparent px-2 py-2 text-center">
                 <span className="flex size-7 items-center justify-center rounded-full border border-[#d8b76a]/35 bg-[#fffaf0] text-[0.62rem] font-semibold text-[#9d7b3f]">
                   S
                 </span>
@@ -913,7 +942,7 @@ export function ActivationCodePanel({
                   </div>
             ) : null}
 
-            <div className="flex min-h-10 items-center justify-between gap-2.5 rounded-xl border border-[#d8b76a]/30 bg-[#fff7e8]/62 px-3 py-1.5 text-sm leading-6">
+            <div className="ora-account-language flex min-h-10 items-center justify-between gap-2.5 rounded-xl border border-[#d8b76a]/30 bg-[#fff7e8]/62 px-3 py-1.5 text-sm leading-6">
               <span className="text-xs text-[#5b4a36]">{copy.language}</span>
               <div className="inline-flex min-h-8 items-center rounded-full border border-[#d8b76a]/45 bg-[#fffaf0] p-0.5 text-[0.62rem] font-semibold uppercase tracking-[0.12em] text-[#8f826f]">
                 {(["en", "zh"] as const).map((nextLang) => (
@@ -933,7 +962,7 @@ export function ActivationCodePanel({
               </div>
             </div>
 
-            <div className="grid gap-2 border-t border-[#d8b76a]/30 pt-3">
+            <div className="ora-account-footer-links grid gap-2 border-t border-[#d8b76a]/30 pt-3">
               <div className="flex flex-wrap gap-x-2.5 gap-y-1 text-[0.62rem] uppercase tracking-[0.1em] text-[#8a765d]">
                 <Link
                   className="transition hover:text-[#9d7b3f]"

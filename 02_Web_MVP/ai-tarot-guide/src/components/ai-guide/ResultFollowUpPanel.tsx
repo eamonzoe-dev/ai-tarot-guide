@@ -191,7 +191,9 @@ export function ResultFollowUpPanel({
   storageKey,
 }: ResultFollowUpPanelProps) {
   const copy = text(lang);
-  const [messages, setMessages] = useState<FollowUpMessage[]>([]);
+  const [messages, setMessages] = useState<FollowUpMessage[]>(() =>
+    readStoredMessages(storageKey),
+  );
   const [followUpQuestion, setFollowUpQuestion] = useState("");
   const [pendingFollowUp, setPendingFollowUp] = useState<{
     text: string;
@@ -220,14 +222,6 @@ export function ResultFollowUpPanel({
     () => `${trimmedQuestion.length}/${MAX_FOLLOW_UP_LENGTH}`,
     [trimmedQuestion.length],
   );
-
-  useEffect(() => {
-    setMessages(readStoredMessages(storageKey));
-    setFollowUpQuestion("");
-    setPendingFollowUp(null);
-    setStatus("idle");
-    setErrorMessage("");
-  }, [storageKey]);
 
   useEffect(() => {
     sessionStorage.setItem(storageKey, JSON.stringify(messages));
