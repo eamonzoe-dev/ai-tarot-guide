@@ -72,7 +72,7 @@ export function PrepareRitualStepClient({
   }
 
   return (
-    <section className="ritual-prepare-section relative isolate z-10 flex min-h-[calc(100svh-12rem)] flex-col justify-center py-8 sm:min-h-[34rem]">
+    <section className="ritual-prepare-section ora-guide-panel relative isolate z-10 flex min-h-[28rem] flex-col justify-center overflow-hidden rounded-[1.75rem] px-4 py-7 sm:min-h-[30rem] sm:px-6">
       <RitualCoreV2 pulseCount={pulseCount} state={step} />
 
       <div
@@ -83,10 +83,10 @@ export function PrepareRitualStepClient({
         <p className="ritual-step-indicator mb-5">
           {readingRoom} / {count}
         </p>
-        <h1 className="font-serif text-4xl leading-tight text-[#f4efe5]">
+        <h1 className="font-serif text-4xl leading-tight text-[color:var(--c-text)]">
           {main}
         </h1>
-        <p className="mx-auto mt-5 max-w-xs text-sm leading-7 text-[#c8c0b4]">
+        <p className="mx-auto mt-5 max-w-xs text-sm leading-7 text-[color:var(--c-text-soft)]">
           {sub}
         </p>
       </div>

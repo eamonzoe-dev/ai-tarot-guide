@@ -231,19 +231,19 @@ function LuminousShell({
   lang: Language;
 }) {
   return (
-    <main className="relative min-h-svh overflow-hidden bg-[#f6f0e5] px-0 py-0 text-[#352a1f] sm:px-6 sm:py-6 lg:px-8">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.98),rgba(246,240,229,0.9)_42%,rgba(226,213,188,0.48)_100%)]" />
-      <div className="pointer-events-none absolute left-1/2 top-16 h-[32rem] w-[32rem] -translate-x-1/2 rounded-full border border-[#c9a86a]/16 opacity-80" />
-      <div className="pointer-events-none absolute left-1/2 top-28 h-[23rem] w-[23rem] -translate-x-1/2 rounded-full border border-[#d8bd82]/20 opacity-80" />
-      <div className="pointer-events-none absolute left-1/2 top-44 h-[13rem] w-[13rem] -translate-x-1/2 rounded-full border border-[#ead7aa]/34 opacity-80" />
-      <div className="pointer-events-none absolute left-1/2 top-1/2 h-px w-[44rem] -translate-x-1/2 bg-gradient-to-r from-transparent via-[#caa664]/20 to-transparent" />
-      <div className="pointer-events-none absolute left-6 top-28 h-24 w-px bg-gradient-to-b from-transparent via-[#c9a86a]/28 to-transparent sm:left-14" />
-      <div className="pointer-events-none absolute right-6 top-40 h-24 w-px bg-gradient-to-b from-transparent via-[#c9a86a]/28 to-transparent sm:right-14" />
-      <div className="pointer-events-none absolute -left-16 bottom-10 h-64 w-64 rounded-full bg-[#d7bd82]/10 blur-3xl" />
-      <div className="pointer-events-none absolute -right-20 top-40 h-72 w-72 rounded-full bg-white/42 blur-3xl" />
+    <main className="ora-guide-shell relative min-h-svh overflow-hidden px-0 py-0 sm:px-6 sm:py-6 lg:px-8">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,color-mix(in_srgb,var(--c-surface)_96%,transparent),color-mix(in_srgb,var(--c-bg)_92%,var(--c-surface)_8%)_42%,color-mix(in_srgb,var(--c-border)_54%,transparent)_100%)]" />
+      <div className="pointer-events-none absolute left-1/2 top-16 h-[32rem] w-[32rem] -translate-x-1/2 rounded-full border border-[color:var(--c-border)]/16 opacity-80" />
+      <div className="pointer-events-none absolute left-1/2 top-28 h-[23rem] w-[23rem] -translate-x-1/2 rounded-full border border-[color:var(--c-border)]/20 opacity-80" />
+      <div className="pointer-events-none absolute left-1/2 top-44 h-[13rem] w-[13rem] -translate-x-1/2 rounded-full border border-[color:var(--c-border)]/34 opacity-80" />
+      <div className="pointer-events-none absolute left-1/2 top-1/2 h-px w-[44rem] -translate-x-1/2 bg-gradient-to-r from-transparent via-[color:var(--c-accent)]/20 to-transparent" />
+      <div className="pointer-events-none absolute left-6 top-28 h-24 w-px bg-gradient-to-b from-transparent via-[color:var(--c-border)]/28 to-transparent sm:left-14" />
+      <div className="pointer-events-none absolute right-6 top-40 h-24 w-px bg-gradient-to-b from-transparent via-[color:var(--c-border)]/28 to-transparent sm:right-14" />
+      <div className="pointer-events-none absolute -left-16 bottom-10 h-64 w-64 rounded-full bg-[color:var(--c-accent)]/10 blur-3xl" />
+      <div className="pointer-events-none absolute -right-20 top-40 h-72 w-72 rounded-full bg-[color:var(--c-surface)]/42 blur-3xl" />
       <ActivationCodePanel lang={lang} />
 
-      <div className="relative z-10 mx-auto flex min-h-svh w-full max-w-[900px] flex-col gap-5 px-5 py-7 sm:min-h-0 sm:px-6 sm:py-9">
+      <div className="relative z-10 mx-auto flex min-h-svh w-full max-w-[900px] flex-col gap-4 px-5 py-7 sm:min-h-0 sm:px-6 sm:py-9">
         {children}
       </div>
     </main>
@@ -259,9 +259,8 @@ function LuminousPanel({
 }) {
   return (
     <section
-      className={`relative overflow-hidden rounded-[2rem] border border-[#d8bd82]/42 bg-[linear-gradient(180deg,rgba(255,250,241,0.92),rgba(248,241,229,0.86))] shadow-[0_24px_70px_rgba(116,83,36,0.10),inset_0_1px_0_rgba(255,255,255,0.72)] backdrop-blur-md ${className}`}
+      className={`ora-guide-panel overflow-hidden rounded-[1.5rem] backdrop-blur-md ${className}`}
     >
-      <div className="pointer-events-none absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-[#d2b06d]/60 to-transparent" />
       {children}
     </section>
   );
@@ -279,11 +278,9 @@ function LuminousActionLink({
   className?: string;
 }) {
   const base =
-    "flex min-h-12 touch-manipulation select-none items-center justify-center rounded-full px-5 text-center text-xs font-semibold uppercase tracking-[0.2em] transition focus:outline-none focus:ring-2 focus:ring-[#c89d4f]/45 focus:ring-offset-2 focus:ring-offset-[#f6f0e5]";
-  const primary =
-    "border border-[#c89d4f]/72 bg-[linear-gradient(180deg,rgba(246,225,174,0.98),rgba(197,151,72,0.98))] text-[#3a2a18] shadow-[0_18px_38px_rgba(148,105,39,0.22),inset_0_1px_0_rgba(255,255,255,0.58)] hover:-translate-y-0.5 hover:shadow-[0_22px_44px_rgba(148,105,39,0.26),inset_0_1px_0_rgba(255,255,255,0.65)]";
-  const ghost =
-    "border border-[#c89d4f]/42 bg-white/50 text-[#6f552b] shadow-[0_14px_32px_rgba(148,105,39,0.10)] hover:-translate-y-0.5 hover:bg-white/72";
+    "ora-guide-button touch-manipulation select-none";
+  const primary = "ora-guide-button-primary";
+  const ghost = "ora-guide-button-ghost";
 
   return (
     <Link
@@ -304,7 +301,7 @@ function LuminousTag({
 }) {
   return (
     <span
-      className={`inline-flex items-center rounded-full border border-[#d8bd82]/48 bg-[#fffaf1]/88 px-3 py-1 text-[0.66rem] font-semibold uppercase tracking-[0.16em] text-[#8d6426] ${className}`}
+      className={`inline-flex items-center rounded-full border border-[color:var(--c-border)]/48 bg-[color:var(--c-surface)]/88 px-3 py-1 text-[0.66rem] font-semibold uppercase tracking-[0.16em] text-[color:var(--c-accent)] ${className}`}
     >
       {children}
     </span>
@@ -323,18 +320,18 @@ function LuminousThinkingState({
       <div className="mx-auto flex max-w-md flex-col items-center text-center">
         <div
           aria-hidden="true"
-          className="relative h-28 w-20 rounded-[1rem] border border-[#d7bd82]/38 bg-[linear-gradient(180deg,rgba(255,250,241,0.98),rgba(242,231,211,0.88))] shadow-[0_0_36px_rgba(217,189,128,0.12)]"
+          className="relative h-28 w-20 rounded-[1rem] border border-[color:var(--c-border)] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--c-surface)_96%,var(--c-bg)_4%),color-mix(in_srgb,var(--c-surface-well)_84%,var(--c-bg)_16%))] shadow-[0_0_36px_color-mix(in_srgb,var(--c-accent)_14%,transparent)]"
         >
-          <div className="absolute inset-2 rounded-[0.75rem] border border-[#d8bd82]/44" />
-          <div className="absolute inset-x-2 top-4 h-px bg-gradient-to-r from-transparent via-[#caa664]/40 to-transparent" />
-          <div className="absolute inset-x-3 bottom-4 h-px bg-gradient-to-r from-transparent via-[#caa664]/30 to-transparent" />
-          <div className="absolute left-1/2 top-1/2 h-12 w-12 -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#d9bd80]/22" />
+          <div className="absolute inset-2 rounded-[0.75rem] border border-[color:var(--c-border)]/44" />
+          <div className="absolute inset-x-2 top-4 h-px bg-gradient-to-r from-transparent via-[color:var(--c-accent)]/40 to-transparent" />
+          <div className="absolute inset-x-3 bottom-4 h-px bg-gradient-to-r from-transparent via-[color:var(--c-accent)]/30 to-transparent" />
+          <div className="absolute left-1/2 top-1/2 h-12 w-12 -translate-x-1/2 -translate-y-1/2 rounded-full border border-[color:var(--c-border)]" />
         </div>
 
-        <p className="mt-5 text-xs uppercase tracking-[0.24em] text-[#a77f3c]">
+        <p className="mt-5 text-xs uppercase tracking-[0.24em] text-[color:var(--c-accent)]">
           {title}
         </p>
-        <p className="mt-3 max-w-sm text-sm leading-7 text-[#7b6c58]">
+        <p className="mt-3 max-w-sm text-sm leading-7 text-[color:var(--c-text-soft)]">
           {subtitle}
         </p>
       </div>
@@ -814,19 +811,19 @@ export function ResultClient({
     return (
       <LuminousShell lang={initialLang}>
         <LuminousPanel className="my-auto px-6 py-8 text-center">
-          <p className="text-[0.66rem] font-semibold uppercase tracking-[0.28em] text-[#a77f3c]">
+          <p className="text-[0.66rem] font-semibold uppercase tracking-[0.28em] text-[color:var(--c-accent)]">
             {copy.readingDossier}
           </p>
-          <h1 className="mt-4 font-serif text-4xl leading-tight text-[#34271b]">
+          <h1 className="mt-4 font-serif text-4xl leading-tight text-[color:var(--c-text)]">
             {copy.readingCard}
           </h1>
-          <p className="mt-4 text-sm leading-7 text-[#7b6c58]">
+          <p className="mt-4 text-sm leading-7 text-[color:var(--c-text-soft)]">
             {copy.gatheringReading}
           </p>
-          <div className="mt-6 rounded-[1.5rem] border border-[#d8bd82]/38 bg-white/46 px-4 py-3">
+          <div className="ora-guide-surface mt-6 rounded-[1.5rem] px-4 py-3">
             <ReadingNav lang={initialLang} />
           </div>
-          <p className="mt-5 text-sm text-[#80715d]">
+          <p className="mt-5 text-sm text-[color:var(--c-text-soft)]">
             {copy.preparingMessage}
           </p>
         </LuminousPanel>
@@ -861,13 +858,13 @@ export function ResultClient({
       return (
         <LuminousShell lang={initialLang}>
           <LuminousPanel className="my-auto px-6 py-8 text-center">
-            <p className="text-[0.66rem] font-semibold uppercase tracking-[0.28em] text-[#a77f3c]">
+            <p className="text-[0.66rem] font-semibold uppercase tracking-[0.28em] text-[color:var(--c-accent)]">
               {copy.readingDossier}
             </p>
-            <h1 className="mt-4 font-serif text-4xl leading-tight text-[#34271b]">
+            <h1 className="mt-4 font-serif text-4xl leading-tight text-[color:var(--c-text)]">
               {copy.invalidReadingTitle}
             </h1>
-            <p className="mt-4 text-sm leading-7 text-[#7b6c58]">
+            <p className="mt-4 text-sm leading-7 text-[color:var(--c-text-soft)]">
               {copy.invalidReadingDescription}
             </p>
             <LuminousActionLink className="mt-6" href={homeHref}>
@@ -880,26 +877,26 @@ export function ResultClient({
 
     return (
       <LuminousShell lang={initialLang}>
-        <header className="flex items-center justify-between gap-4 text-[0.66rem] font-semibold uppercase tracking-[0.28em] text-[#a77f3c]">
+        <header className="flex items-center justify-between gap-4 text-[0.66rem] font-semibold uppercase tracking-[0.28em] text-[color:var(--c-accent)]">
           <span>{copy.readingDossier}</span>
           <span className="text-right">{copy.threeCardSpread}</span>
         </header>
 
-        <div className="rounded-[2rem] border border-[#d7bd82]/40 bg-white/42 px-4 py-3 shadow-[0_18px_60px_rgba(123,93,45,0.08)] backdrop-blur-md">
+        <div className="ora-guide-surface rounded-[2rem] px-4 py-3 backdrop-blur-md">
           <ReadingNav lang={initialLang} />
         </div>
 
-        <LuminousPanel className="p-5 sm:p-6">
-          <p className="text-[0.62rem] font-semibold uppercase tracking-[0.26em] text-[#a77f3c]">
+        <LuminousPanel className="rounded-b-none p-5 sm:p-6">
+          <p className="text-[0.62rem] font-semibold uppercase tracking-[0.26em] text-[color:var(--c-accent)]">
             {copy.yourQuestion}
           </p>
-          <p className="mt-3 text-sm leading-7 text-[#4f4334] sm:text-base">
+          <p className="mt-3 text-sm leading-7 text-[color:var(--c-text)] sm:text-base">
             {questionText}
           </p>
         </LuminousPanel>
 
-        <LuminousPanel className="p-5 sm:p-6">
-          <h1 className="font-serif text-3xl leading-tight text-[#34271b] sm:text-4xl">
+        <LuminousPanel className="-mt-4 rounded-t-none border-t-0 p-5 sm:p-6">
+          <h1 className="font-serif text-3xl leading-tight text-[color:var(--c-text)] sm:text-4xl">
             {copy.yourThreeCards}
           </h1>
           <div className="mt-6 grid gap-4 sm:grid-cols-3">
@@ -908,10 +905,10 @@ export function ResultClient({
 
               return (
                 <article
-                  className="rounded-[1.45rem] border border-[#d8bd82]/42 bg-[#fffaf0]/72 p-4 shadow-[0_16px_40px_rgba(116,83,36,0.09)]"
+                  className="rounded-[1.15rem] border border-[color:var(--c-border)] bg-[color:var(--c-surface-well)]/44 p-4"
                   key={`${positions[index]}-${threeCard.id}`}
                 >
-                  <p className="text-[0.62rem] font-semibold uppercase tracking-[0.2em] text-[#a77f3c]">
+                  <p className="text-[0.62rem] font-semibold uppercase tracking-[0.2em] text-[color:var(--c-accent)]">
                     {index + 1}. {positions[index]}
                   </p>
                   <div className="mt-4 flex items-center gap-3">
@@ -922,17 +919,17 @@ export function ResultClient({
                           alt={`${cardTitle} tarot card`}
                           width={120}
                           height={213}
-                          className="block h-auto w-full rounded-[0.55rem] border border-[#d8bd82]/50 object-cover shadow-[0_12px_26px_rgba(116,83,36,0.14)]"
+                          className="block h-auto w-full rounded-[0.55rem] border border-[color:var(--c-border)]/50 object-cover shadow-[0_12px_26px_rgba(116,83,36,0.14)]"
                         />
                       ) : (
-                        <div className="aspect-[9/16] rounded-[0.55rem] border border-[#d8bd82]/50 bg-[#fffaf0]/86" />
+                        <div className="aspect-[9/16] rounded-[0.55rem] border border-[color:var(--c-border)]/50 bg-[color:var(--c-surface)]/86" />
                       )}
                     </div>
                     <div>
-                      <h2 className="font-serif text-xl leading-tight text-[#34271b]">
+                      <h2 className="font-serif text-xl leading-tight text-[color:var(--c-text)]">
                         {cardTitle}
                       </h2>
-                      <p className="mt-1 text-xs leading-5 text-[#8b765a]">
+                      <p className="mt-1 text-xs leading-5 text-[color:var(--c-text-soft)]">
                         {getTarotCardLabel(threeCard, initialLang)}
                       </p>
                     </div>
@@ -951,8 +948,8 @@ export function ResultClient({
         ) : null}
 
         {aiReadingStatus === "error" ? (
-          <div className="rounded-[1.75rem] border border-[#c48a73]/42 bg-[#fff5ed]/82 p-5 shadow-[0_20px_54px_rgba(137,83,54,0.10)] backdrop-blur-md sm:p-6">
-            <p className="text-sm leading-7 text-[#8a4634]">
+          <div className="ora-guide-panel rounded-[1.5rem] p-5 backdrop-blur-md sm:p-6">
+            <p className="text-sm leading-7 text-[color:var(--c-text-soft)]">
               {aiReadingErrorMessage || copy.aiReadingUnavailable}
             </p>
             {aiReadingErrorMessage ===
@@ -962,7 +959,7 @@ export function ResultClient({
               </div>
             ) : null}
             <button
-              className="mt-4 min-h-12 w-full touch-manipulation select-none rounded-full border border-[#c89d4f]/70 bg-[linear-gradient(180deg,rgba(246,225,174,0.98),rgba(197,151,72,0.98))] px-5 text-xs font-semibold uppercase tracking-[0.2em] text-[#3a2a18] shadow-[0_18px_38px_rgba(148,105,39,0.20),inset_0_1px_0_rgba(255,255,255,0.58)] transition hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-[#c89d4f]/45 focus:ring-offset-2 focus:ring-offset-[#f6f0e5] sm:w-auto"
+              className="ora-guide-button ora-guide-button-surface mt-4 w-full touch-manipulation select-none sm:w-auto"
               type="button"
               onClick={() => {
                 if (question && mode) {
@@ -986,8 +983,8 @@ export function ResultClient({
         ) : null}
 
         {isFallbackDisplay ? (
-          <div className="rounded-[1.35rem] border border-[#d8bd82]/42 bg-[#fffaf1]/76 p-4 text-sm leading-6 text-[#6f624f]">
-            <p className="text-[0.64rem] font-semibold uppercase tracking-[0.2em] text-[#9d7b3f]">
+          <div className="rounded-[1.35rem] border border-[color:var(--c-border)]/42 bg-[color:var(--c-surface)]/76 p-4 text-sm leading-6 text-[color:var(--c-text-soft)]">
+            <p className="text-[0.64rem] font-semibold uppercase tracking-[0.2em] text-[color:var(--c-accent)]">
               {copy.aiFallbackNoticeTitle}
             </p>
             <p className="mt-2">{copy.aiFallbackNoticeBody}</p>
@@ -995,20 +992,20 @@ export function ResultClient({
         ) : null}
 
         {aiReadingStatus === "ready" && aiDisplay && !isFallbackDisplay ? (
-          <article className="rounded-[2.2rem] border border-[#cfad6d]/52 bg-[linear-gradient(180deg,rgba(255,253,247,0.96),rgba(250,244,233,0.92))] px-5 py-7 shadow-[0_30px_86px_rgba(111,78,31,0.13),inset_0_1px_0_rgba(255,255,255,0.76)] backdrop-blur-md sm:px-8 sm:py-9">
-            <p className="text-[0.68rem] font-semibold uppercase tracking-[0.28em] text-[#a77f3c]">
+          <article className="ora-guide-dossier overflow-hidden rounded-[2rem] px-5 py-7 backdrop-blur-md sm:px-8 sm:py-9">
+            <p className="text-[0.68rem] font-semibold uppercase tracking-[0.28em] text-[color:var(--c-accent)]">
               {copy.aiPersonalizedReading}
             </p>
-            <h2 className="mt-3 font-serif text-3xl leading-tight text-[#34271b] sm:text-4xl">
+            <h2 className="mt-3 font-serif text-3xl leading-tight text-[color:var(--c-text)] sm:text-4xl">
               {copy.aiReadingTitle}
             </h2>
 
             {aiDisplay.summary ? (
-              <section className="mt-6 border-l border-[#c89d4f]/55 bg-[#fffaf1]/72 py-2 pl-4">
-                <h3 className="text-[0.64rem] font-semibold uppercase tracking-[0.22em] text-[#a77f3c]">
+              <section className="mt-6 border-l border-[color:var(--c-accent)]/55 bg-[color:var(--c-surface)]/72 py-2 pl-4">
+                <h3 className="text-[0.64rem] font-semibold uppercase tracking-[0.22em] text-[color:var(--c-accent)]">
                   {copy.overallMessage}
                 </h3>
-                <p className="mt-2 font-serif text-[1.15rem] leading-8 text-[#4a3827] sm:text-[1.35rem] sm:leading-9">
+                <p className="mt-2 font-serif text-[1.15rem] leading-8 text-[color:var(--c-text)] sm:text-[1.35rem] sm:leading-9">
                   {aiDisplay.summary}
                 </p>
               </section>
@@ -1031,13 +1028,13 @@ export function ResultClient({
               ].map((item) =>
                 item.body ? (
                   <section
-                    className="rounded-[1.45rem] border border-[#d8bd82]/42 bg-[#fffaf1]/76 p-4"
+                    className="rounded-[1.1rem] border border-[color:var(--c-border)] bg-[color:var(--c-surface-well)]/46 p-4"
                     key={item.title}
                   >
-                    <h3 className="text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-[#a77f3c]">
+                    <h3 className="text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-[color:var(--c-accent)]">
                       {item.title}
                     </h3>
-                    <p className="mt-3 text-sm leading-7 text-[#4f4334]">
+                    <p className="mt-3 text-sm leading-7 text-[color:var(--c-text)]">
                       {item.body}
                     </p>
                   </section>
@@ -1061,13 +1058,13 @@ export function ResultClient({
               ].map((item) =>
                 item.body ? (
                   <section
-                    className="border-t border-[#d8bd82]/38 pt-5"
+                    className="border-t border-[color:var(--c-border)]/38 pt-5"
                     key={item.title}
                   >
-                    <h3 className="text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-[#a77f3c]">
+                    <h3 className="text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-[color:var(--c-accent)]">
                       {item.title}
                     </h3>
-                    <p className="mt-3 text-sm leading-7 text-[#4f4334] sm:text-base">
+                    <p className="mt-3 text-sm leading-7 text-[color:var(--c-text)] sm:text-base">
                       {item.body}
                     </p>
                   </section>
@@ -1094,20 +1091,20 @@ export function ResultClient({
         ) : null}
 
         {shouldShowLocalFallback ? (
-        <article className="rounded-[2.2rem] border border-[#cfad6d]/52 bg-[linear-gradient(180deg,rgba(255,253,247,0.96),rgba(250,244,233,0.92))] px-5 py-7 shadow-[0_30px_86px_rgba(111,78,31,0.13),inset_0_1px_0_rgba(255,255,255,0.76)] backdrop-blur-md sm:px-8 sm:py-9">
-          <p className="text-[0.68rem] font-semibold uppercase tracking-[0.28em] text-[#a77f3c]">
+        <article className="ora-guide-dossier overflow-hidden rounded-[2rem] px-5 py-7 backdrop-blur-md sm:px-8 sm:py-9">
+          <p className="text-[0.68rem] font-semibold uppercase tracking-[0.28em] text-[color:var(--c-accent)]">
             {copy.cardByCardMeaning}
           </p>
           <div className="mt-6 space-y-6">
           {threeCardItems.map((threeCard, index) => (
               <section
-                className="border-t border-[#d8bd82]/38 pt-5"
+                className="border-t border-[color:var(--c-border)]/38 pt-5"
                 key={`meaning-${threeCard.id}`}
               >
-                <h2 className="font-serif text-2xl leading-tight text-[#34271b]">
+                <h2 className="font-serif text-2xl leading-tight text-[color:var(--c-text)]">
                   {positions[index]}: {getTarotCardTitle(threeCard, initialLang)}
                 </h2>
-                <p className="mt-3 text-sm leading-7 text-[#4f4334] sm:text-base">
+                <p className="mt-3 text-sm leading-7 text-[color:var(--c-text)] sm:text-base">
                   {initialLang === "zh"
                     ? buildThreeCardFallbackParagraph({
                         cardTitle: getTarotCardTitle(threeCard, initialLang),
@@ -1127,19 +1124,19 @@ export function ResultClient({
           </div>
 
           <div className="mt-8 grid gap-4 md:grid-cols-2">
-            <section className="rounded-[1.45rem] border border-[#d8bd82]/42 bg-[#fffaf1]/76 p-4">
-              <h2 className="text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-[#a77f3c]">
+            <section className="rounded-[1.1rem] border border-[color:var(--c-border)] bg-[color:var(--c-surface-well)]/46 p-4">
+              <h2 className="text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-[color:var(--c-accent)]">
                 {copy.overallMessage}
               </h2>
-              <p className="mt-3 text-sm leading-7 text-[#4f4334]">
+              <p className="mt-3 text-sm leading-7 text-[color:var(--c-text)]">
                 {copy.threeCardOverallFallback}
               </p>
             </section>
-            <section className="rounded-[1.45rem] border border-[#d8bd82]/42 bg-[#fffaf1]/76 p-4">
-              <h2 className="text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-[#a77f3c]">
+            <section className="rounded-[1.1rem] border border-[color:var(--c-border)] bg-[color:var(--c-surface-well)]/46 p-4">
+              <h2 className="text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-[color:var(--c-accent)]">
                 {copy.practicalGuidance}
               </h2>
-              <p className="mt-3 text-sm leading-7 text-[#4f4334]">
+              <p className="mt-3 text-sm leading-7 text-[color:var(--c-text)]">
                 {copy.threeCardPracticalFallback}
               </p>
             </section>
@@ -1149,7 +1146,7 @@ export function ResultClient({
 
         <div className="grid gap-3 sm:grid-cols-2">
           <button
-            className="flex min-h-12 touch-manipulation select-none items-center justify-center rounded-full border border-[#c89d4f]/42 bg-white/50 px-5 text-center text-xs font-semibold uppercase tracking-[0.2em] text-[#6f552b] opacity-70 shadow-[0_14px_32px_rgba(148,105,39,0.10)]"
+            className="ora-guide-button ora-guide-button-surface w-full touch-manipulation select-none opacity-70"
             disabled
             type="button"
           >
@@ -1160,14 +1157,14 @@ export function ResultClient({
           </LuminousActionLink>
         </div>
 
-        <section className="rounded-[1.75rem] border border-[#d8bd82]/32 bg-white/34 p-5 backdrop-blur-md">
-          <h2 className="text-xs font-semibold uppercase tracking-[0.26em] text-[#a77f3c]">
+        <section className="ora-guide-surface rounded-[1.75rem] p-5 backdrop-blur-md">
+          <h2 className="text-xs font-semibold uppercase tracking-[0.26em] text-[color:var(--c-accent)]">
             {copy.closingNote}
           </h2>
-          <p className="mt-3 text-sm leading-6 text-[#6f624f]">
+          <p className="mt-3 text-sm leading-6 text-[color:var(--c-text-soft)]">
             {copy.closingReflection}
           </p>
-          <p className="mt-4 text-xs leading-5 text-[#8b7a61]">
+          <p className="mt-4 text-xs leading-5 text-[color:var(--c-text-soft)]">
             {copy.disclaimer}
           </p>
         </section>
@@ -1179,16 +1176,16 @@ export function ResultClient({
     return (
       <LuminousShell lang={initialLang}>
         <LuminousPanel className="my-auto px-6 py-8 text-center">
-          <p className="text-[0.66rem] font-semibold uppercase tracking-[0.28em] text-[#a77f3c]">
+          <p className="text-[0.66rem] font-semibold uppercase tracking-[0.28em] text-[color:var(--c-accent)]">
             {copy.readingDossier}
           </p>
-          <h1 className="mt-4 font-serif text-4xl leading-tight text-[#34271b]">
+          <h1 className="mt-4 font-serif text-4xl leading-tight text-[color:var(--c-text)]">
             {copy.invalidReadingTitle}
           </h1>
-          <p className="mt-4 text-sm leading-7 text-[#7b6c58]">
+          <p className="mt-4 text-sm leading-7 text-[color:var(--c-text-soft)]">
             {copy.invalidReadingDescription}
           </p>
-          <div className="mt-6 rounded-[1.5rem] border border-[#d8bd82]/38 bg-white/46 px-4 py-3">
+          <div className="ora-guide-surface mt-6 rounded-[1.5rem] px-4 py-3">
             <ReadingNav lang={initialLang} />
           </div>
           <LuminousActionLink
@@ -1284,19 +1281,19 @@ export function ResultClient({
         ];
   return (
     <LuminousShell lang={initialLang}>
-      <header className="flex items-center justify-between gap-4 text-[0.66rem] font-semibold uppercase tracking-[0.28em] text-[#a77f3c]">
+      <header className="flex items-center justify-between gap-4 text-[0.66rem] font-semibold uppercase tracking-[0.28em] text-[color:var(--c-accent)]">
         <span>{copy.readingDossier}</span>
         <span className="text-right">
           {mode === "online" ? copy.onlineDrawMode : copy.physicalDeck}
         </span>
       </header>
 
-      <div className="rounded-[2rem] border border-[#d7bd82]/40 bg-white/42 px-4 py-3 shadow-[0_18px_60px_rgba(123,93,45,0.08)] backdrop-blur-md">
+      <div className="ora-guide-surface rounded-[2rem] px-4 py-3 backdrop-blur-md">
         <ReadingNav lang={initialLang} />
       </div>
 
-      <LuminousPanel className="p-5 sm:p-6">
-        <div className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full border border-[#d2b06d]/20" />
+      <LuminousPanel className="rounded-b-none p-5 sm:p-6">
+        <div className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full border border-[color:var(--c-accent)]/20" />
         <div className="grid gap-5 sm:grid-cols-[auto_1fr] sm:items-center">
           <div className="flex items-center gap-4">
             <div className="w-16 shrink-0 sm:w-20">
@@ -1307,12 +1304,12 @@ export function ResultClient({
                   width={320}
                   height={569}
                   priority
-                  className="block h-auto w-full rounded-[0.7rem] border border-[#d8bd82]/50 object-cover shadow-[0_18px_36px_rgba(116,83,36,0.16)]"
+                  className="block h-auto w-full rounded-[0.7rem] border border-[color:var(--c-border)]/50 object-cover shadow-[0_18px_36px_rgba(116,83,36,0.16)]"
                 />
               ) : (
-                <div className="flex aspect-[9/16] w-full items-center justify-center rounded-[0.7rem] border border-[#d8bd82]/50 bg-[#fffaf0]/86 p-1 shadow-[0_18px_36px_rgba(116,83,36,0.14)]">
-                  <div className="flex h-full w-full items-center justify-center rounded-[0.5rem] border border-[#d8bd82]/48 p-1 text-center">
-                    <span className="font-serif text-[0.68rem] leading-tight text-[#3f3021]">
+                <div className="flex aspect-[9/16] w-full items-center justify-center rounded-[0.7rem] border border-[color:var(--c-border)]/50 bg-[color:var(--c-surface)]/86 p-1 shadow-[0_18px_36px_rgba(116,83,36,0.14)]">
+                  <div className="flex h-full w-full items-center justify-center rounded-[0.5rem] border border-[color:var(--c-border)]/48 p-1 text-center">
+                    <span className="font-serif text-[0.68rem] leading-tight text-[color:var(--c-text)]">
                       {cardTitle}
                     </span>
                   </div>
@@ -1320,23 +1317,23 @@ export function ResultClient({
               )}
             </div>
             <div className="min-w-0">
-              <p className="text-[0.62rem] font-semibold uppercase tracking-[0.26em] text-[#a77f3c]">
+              <p className="text-[0.62rem] font-semibold uppercase tracking-[0.26em] text-[color:var(--c-accent)]">
                 {copy.theCard}
               </p>
-              <h1 className="mt-1 font-serif text-2xl leading-tight text-[#34271b] sm:text-3xl">
+              <h1 className="mt-1 font-serif text-2xl leading-tight text-[color:var(--c-text)] sm:text-3xl">
                 {cardTitle}
               </h1>
-              <p className="mt-1 text-xs leading-5 text-[#8b765a]">
+              <p className="mt-1 text-xs leading-5 text-[color:var(--c-text-soft)]">
                 {cardLabel}
               </p>
             </div>
           </div>
 
-          <div className="min-w-0 border-t border-[#d8bd82]/35 pt-4 sm:border-l sm:border-t-0 sm:pl-5 sm:pt-0">
-            <h2 className="text-[0.62rem] font-semibold uppercase tracking-[0.26em] text-[#a77f3c]">
+          <div className="min-w-0 border-t border-[color:var(--c-border)]/35 pt-4 sm:border-l sm:border-t-0 sm:pl-5 sm:pt-0">
+            <h2 className="text-[0.62rem] font-semibold uppercase tracking-[0.26em] text-[color:var(--c-accent)]">
               {copy.yourQuestion}
             </h2>
-            <p className="mt-2 text-sm leading-7 text-[#4f4334] sm:text-base">
+            <p className="mt-2 text-sm leading-7 text-[color:var(--c-text)] sm:text-base">
               {questionText}
             </p>
             <div className="mt-4 flex flex-wrap gap-2">
@@ -1344,7 +1341,7 @@ export function ResultClient({
               {displayKeywords.map((keyword) => (
                 <LuminousTag
                   key={keyword}
-                  className="bg-white/58 text-[#7b6c58]"
+                  className="bg-[color:var(--c-surface)]/82 text-[color:var(--c-text-soft)]"
                 >
                   {keyword}
                 </LuminousTag>
@@ -1355,7 +1352,7 @@ export function ResultClient({
       </LuminousPanel>
 
       {hasClarifyContext ? (
-        <div className="mx-auto w-full max-w-[820px] px-1 text-xs leading-5 text-[#8b7a61]">
+        <div className="mx-auto w-full max-w-[820px] px-1 text-xs leading-5 text-[color:var(--c-text-soft)]">
           {isCustomNoteOnly ? (
             <p>
               {clarifyUi.noteOnlyLabel} {clarifyFocus}
@@ -1386,8 +1383,8 @@ export function ResultClient({
         ) : null}
 
         {aiReadingStatus === "error" ? (
-          <div className="mt-6 rounded-[1.75rem] border border-[#c48a73]/42 bg-[#fff5ed]/82 p-5 shadow-[0_20px_54px_rgba(137,83,54,0.10)] backdrop-blur-md sm:p-6">
-            <p className="text-sm leading-7 text-[#8a4634]">
+          <div className="ora-guide-panel mt-6 rounded-[1.5rem] p-5 backdrop-blur-md sm:p-6">
+            <p className="text-sm leading-7 text-[color:var(--c-text-soft)]">
               {aiReadingErrorMessage || copy.aiReadingUnavailable}
             </p>
             {aiReadingErrorMessage ===
@@ -1397,7 +1394,7 @@ export function ResultClient({
               </div>
             ) : null}
             <button
-              className="mt-4 min-h-12 w-full touch-manipulation select-none rounded-full border border-[#c89d4f]/70 bg-[linear-gradient(180deg,rgba(246,225,174,0.98),rgba(197,151,72,0.98))] px-5 text-xs font-semibold uppercase tracking-[0.2em] text-[#3a2a18] shadow-[0_18px_38px_rgba(148,105,39,0.20),inset_0_1px_0_rgba(255,255,255,0.58)] transition hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-[#c89d4f]/45 focus:ring-offset-2 focus:ring-offset-[#f6f0e5] sm:w-auto"
+              className="ora-guide-button ora-guide-button-surface mt-4 w-full touch-manipulation select-none sm:w-auto"
               type="button"
               onClick={() => {
                 if (card && question && mode) {
@@ -1424,18 +1421,17 @@ export function ResultClient({
         ) : null}
 
         {aiReadingStatus === "ready" && aiDisplay ? (
-          <article className="mt-6 rounded-[2.2rem] border border-[#cfad6d]/52 bg-[linear-gradient(180deg,rgba(255,253,247,0.96),rgba(250,244,233,0.92))] px-5 py-7 shadow-[0_30px_86px_rgba(111,78,31,0.13),inset_0_1px_0_rgba(255,255,255,0.76)] backdrop-blur-md sm:px-8 sm:py-9 lg:px-10 lg:py-10">
-            <div className="pointer-events-none absolute inset-x-10 top-0 h-px bg-gradient-to-r from-transparent via-[#d2b06d]/60 to-transparent" />
-            <p className="text-[0.68rem] font-semibold uppercase tracking-[0.28em] text-[#a77f3c]">
+          <article className="ora-guide-dossier mt-6 overflow-hidden rounded-[2rem] px-5 py-7 backdrop-blur-md sm:px-8 sm:py-9 lg:px-10 lg:py-10">
+            <p className="text-[0.68rem] font-semibold uppercase tracking-[0.28em] text-[color:var(--c-accent)]">
               {copy.aiPersonalizedReading}
             </p>
-            <h2 className="mt-3 font-serif text-3xl leading-tight text-[#34271b] sm:text-4xl">
+            <h2 className="mt-3 font-serif text-3xl leading-tight text-[color:var(--c-text)] sm:text-4xl">
               {copy.aiReadingTitle}
             </h2>
 
             {isFallbackDisplay ? (
-              <div className="mt-5 rounded-[1.35rem] border border-[#d8bd82]/42 bg-[#fffaf1]/76 p-4 text-sm leading-6 text-[#6f624f]">
-                <p className="text-[0.64rem] font-semibold uppercase tracking-[0.2em] text-[#9d7b3f]">
+              <div className="mt-5 rounded-[1.35rem] border border-[color:var(--c-border)]/42 bg-[color:var(--c-surface)]/76 p-4 text-sm leading-6 text-[color:var(--c-text-soft)]">
+                <p className="text-[0.64rem] font-semibold uppercase tracking-[0.2em] text-[color:var(--c-accent)]">
                   {copy.aiFallbackNoticeTitle}
                 </p>
                 <p className="mt-2">{copy.aiFallbackNoticeBody}</p>
@@ -1443,12 +1439,12 @@ export function ResultClient({
             ) : null}
 
             {aiDisplay.summary ? (
-              <p className="mt-6 border-l border-[#c89d4f]/55 bg-[#fffaf1]/72 py-2 pl-4 font-serif text-[1.15rem] leading-8 text-[#4a3827] sm:text-[1.35rem] sm:leading-9">
+              <p className="mt-6 border-l border-[color:var(--c-accent)]/55 bg-[color:var(--c-surface)]/72 py-2 pl-4 font-serif text-[1.15rem] leading-8 text-[color:var(--c-text)] sm:text-[1.35rem] sm:leading-9">
                 {aiDisplay.summary}
               </p>
             ) : null}
 
-            <div className="mt-7 space-y-6 text-[15px] leading-8 text-[#4f4334] sm:text-base sm:leading-9">
+            <div className="mt-7 space-y-6 text-[15px] leading-8 text-[color:var(--c-text)] sm:text-base sm:leading-9">
               {readingParagraphs.map((paragraph, index) => (
                 <p key={`${index}-${paragraph.slice(0, 16)}`}>
                   {paragraph}
@@ -1457,11 +1453,11 @@ export function ResultClient({
             </div>
 
             {aiDisplay.reflectionQuestion ? (
-              <div className="mt-8 border-t border-[#d8bd82]/42 pt-5">
-                <p className="text-[0.68rem] font-semibold uppercase tracking-[0.26em] text-[#a77f3c]">
+              <div className="mt-8 border-t border-[color:var(--c-border)]/42 pt-5">
+                <p className="text-[0.68rem] font-semibold uppercase tracking-[0.26em] text-[color:var(--c-accent)]">
                   {copy.aiReflectionQuestion}
                 </p>
-                <p className="mt-3 text-sm leading-7 text-[#4f4334] sm:text-base">
+                <p className="mt-3 text-sm leading-7 text-[color:var(--c-text)] sm:text-base">
                   {aiDisplay.reflectionQuestion}
                 </p>
               </div>
@@ -1483,12 +1479,12 @@ export function ResultClient({
         ) : null}
       </section>
 
-      <details className="relative mt-1 overflow-hidden rounded-[1.85rem] border border-[#d8bd82]/42 bg-[#fffaf1]/72 p-5 shadow-[0_20px_58px_rgba(116,83,36,0.09)] backdrop-blur-md">
+      <details className="ora-guide-panel relative mt-1 overflow-hidden rounded-[1.5rem] p-5 backdrop-blur-md">
         <summary className="cursor-pointer select-none list-none">
-          <span className="block text-xs font-semibold uppercase tracking-[0.26em] text-[#a77f3c]">
+          <span className="block text-xs font-semibold uppercase tracking-[0.26em] text-[color:var(--c-accent)]">
             {copy.cardReference}
           </span>
-          <span className="mt-2 block text-sm leading-6 text-[#7b6c58]">
+          <span className="mt-2 block text-sm leading-6 text-[color:var(--c-text-soft)]">
             {copy.showCardReference}
           </span>
         </summary>
@@ -1496,12 +1492,12 @@ export function ResultClient({
           {referenceItems.map((item) => (
             <section
               key={item.title}
-              className="border-t border-[#d8bd82]/38 pt-4"
+              className="border-t border-[color:var(--c-border)]/38 pt-4"
             >
-              <h3 className="text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-[#a77f3c]">
+              <h3 className="text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-[color:var(--c-accent)]">
                 {item.title}
               </h3>
-              <p className="mt-2 text-sm leading-6 text-[#6f624f]">
+              <p className="mt-2 text-sm leading-6 text-[color:var(--c-text-soft)]">
                 {item.body}
               </p>
             </section>
@@ -1522,14 +1518,14 @@ export function ResultClient({
         </LuminousActionLink>
       </div>
 
-      <section className="rounded-[1.75rem] border border-[#d8bd82]/32 bg-white/34 p-5 backdrop-blur-md">
-        <h2 className="text-xs font-semibold uppercase tracking-[0.26em] text-[#a77f3c]">
+      <section className="ora-guide-surface rounded-[1.75rem] p-5 backdrop-blur-md">
+        <h2 className="text-xs font-semibold uppercase tracking-[0.26em] text-[color:var(--c-accent)]">
           {copy.closingNote}
         </h2>
-        <p className="mt-3 text-sm leading-6 text-[#6f624f]">
+        <p className="mt-3 text-sm leading-6 text-[color:var(--c-text-soft)]">
           {copy.closingReflection}
         </p>
-        <p className="mt-4 text-xs leading-5 text-[#8b7a61]">
+        <p className="mt-4 text-xs leading-5 text-[color:var(--c-text-soft)]">
           {copy.disclaimer}
         </p>
       </section>

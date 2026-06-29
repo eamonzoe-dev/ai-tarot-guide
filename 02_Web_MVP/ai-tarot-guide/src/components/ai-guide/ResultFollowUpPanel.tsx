@@ -136,11 +136,11 @@ function UserChatBubble({
   return (
     <div className="flex justify-end">
       <div className="ml-auto max-w-[90%] sm:max-w-[78%]">
-        <p className="mb-1 pr-2 text-right text-[0.66rem] font-semibold uppercase tracking-[0.14em] text-[#a77f3c]">
+        <p className="mb-1 pr-2 text-right text-[0.66rem] font-semibold uppercase tracking-[0.14em] text-[color:var(--c-accent)]">
           {label}
         </p>
-        <div className="ml-auto w-fit max-w-full rounded-[1.25rem] rounded-tr-sm border border-[#d6b16b]/30 bg-[#f3dfaa]/58 px-4 py-3 text-right shadow-[0_10px_24px_rgba(148,105,39,0.08)]">
-          <p className="whitespace-pre-wrap break-words text-right text-sm leading-7 text-[#4a3827]">
+        <div className="ml-auto w-fit max-w-full rounded-[1.25rem] rounded-tr-sm border border-[color:var(--c-border)] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--c-surface)_94%,var(--c-bg)_6%),color-mix(in_srgb,var(--c-surface-well)_84%,var(--c-bg)_16%))] px-4 py-3 text-right shadow-[0_10px_24px_color-mix(in_srgb,var(--c-text)_10%,transparent)]">
+          <p className="whitespace-pre-wrap break-words text-right text-sm leading-7 text-[color:var(--c-text)]">
             {message}
           </p>
         </div>
@@ -161,16 +161,16 @@ function OraChatBubble({
   return (
     <div className="flex justify-start">
       <div className="mr-auto max-w-[90%] sm:max-w-[78%]">
-        <p className="mb-1 pl-2 text-left text-[0.66rem] font-semibold uppercase tracking-[0.14em] text-[#9d7b3f]">
+        <p className="mb-1 pl-2 text-left text-[0.66rem] font-semibold uppercase tracking-[0.14em] text-[color:var(--c-accent)]">
           {label}
         </p>
-        <div className="mr-auto w-fit max-w-full rounded-[1.25rem] rounded-tl-sm border border-[#d8bd82]/30 bg-white/66 px-4 py-3 text-left shadow-[0_10px_24px_rgba(116,83,36,0.06)]">
+        <div className="mr-auto w-fit max-w-full rounded-[1.25rem] rounded-tl-sm border border-[color:var(--c-border)] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--c-surface)_96%,var(--c-bg)_4%),color-mix(in_srgb,var(--c-surface-well)_84%,var(--c-bg)_16%))] px-4 py-3 text-left shadow-[0_10px_24px_color-mix(in_srgb,var(--c-text)_8%,transparent)]">
           {fallbackNotice ? (
-            <p className="mb-2 whitespace-pre-wrap break-words text-left text-xs leading-5 text-[#8b7a61]">
+            <p className="mb-2 whitespace-pre-wrap break-words text-left text-xs leading-5 text-[color:var(--c-text-soft)]">
               {fallbackNotice}
             </p>
           ) : null}
-          <p className="whitespace-pre-wrap break-words text-left text-sm leading-7 text-[#4f4334]">
+          <p className="whitespace-pre-wrap break-words text-left text-sm leading-7 text-[color:var(--c-text)]">
             {message}
           </p>
         </div>
@@ -316,12 +316,12 @@ export function ResultFollowUpPanel({
   }
 
   return (
-    <section className="mt-7 rounded-[1.55rem] border border-[#d8bd82]/34 bg-[linear-gradient(180deg,rgba(255,250,241,0.72),rgba(255,255,255,0.46))] p-4 shadow-[0_18px_44px_rgba(116,83,36,0.07)]">
+    <section className="ora-guide-panel mt-7 rounded-[1.35rem] p-4">
       <div>
-        <p className="font-serif text-xl leading-tight text-[#4a3827]">
+        <p className="font-serif text-xl leading-tight text-[color:var(--c-text)]">
           {copy.aiFollowUpPrice(FOLLOW_UP_STARDUST_COST)}
         </p>
-        <p className="mt-2 text-sm leading-6 text-[#7b6c58]">
+        <p className="mt-2 text-sm leading-6 text-[color:var(--c-text-soft)]">
           {copy.aiFollowUpHelper}
         </p>
       </div>
@@ -358,16 +358,16 @@ export function ResultFollowUpPanel({
       </div>
 
       {hasReachedLimit ? (
-        <p className="mt-5 rounded-[1.1rem] border border-[#d8bd82]/26 bg-white/42 px-4 py-3 text-sm leading-6 text-[#7b6c58]">
+        <p className="mt-5 rounded-[1.1rem] border border-[color:var(--c-border)] bg-[color:var(--c-surface)]/82 px-4 py-3 text-sm leading-6 text-[color:var(--c-text-soft)]">
           {copy.aiFollowUpLimitReached}
         </p>
       ) : (
         <form className="mt-5" onSubmit={handleSubmit}>
-          <div className="rounded-[1.35rem] border border-[#d8bd82]/40 bg-white/54 p-2 shadow-[0_12px_28px_rgba(116,83,36,0.06)] sm:flex sm:items-end sm:gap-2">
+          <div className="rounded-[1.35rem] border border-[color:var(--c-border)] bg-[color:var(--c-surface)]/76 p-2 shadow-[0_12px_28px_color-mix(in_srgb,var(--c-text)_8%,transparent)] sm:flex sm:items-end sm:gap-2">
             <div className="min-w-0 flex-1">
               <textarea
                 aria-describedby={helperId}
-                className="min-h-14 w-full resize-none rounded-[1rem] border border-transparent bg-transparent px-3 py-2 text-sm leading-6 text-[#4f4334] outline-none placeholder:text-[#9d8f78] focus:border-[#d8bd82]/45 focus:bg-white/42"
+                className="min-h-14 w-full resize-none rounded-[1rem] border border-transparent bg-transparent px-3 py-2 text-sm leading-6 text-[color:var(--c-text)] outline-none placeholder:text-[color:var(--c-text-dim)] focus:border-[color:var(--c-accent)] focus:bg-[color:var(--c-surface)]/76"
                 disabled={status === "loading"}
                 maxLength={MAX_FOLLOW_UP_LENGTH + 1}
                 onChange={(event) => {
@@ -383,7 +383,7 @@ export function ResultFollowUpPanel({
                 value={followUpQuestion}
               />
               <div
-                className="flex items-center justify-between gap-3 px-3 pb-1 text-xs text-[#8b7a61]"
+                className="flex items-center justify-between gap-3 px-3 pb-1 text-xs text-[color:var(--c-text-soft)]"
                 id={helperId}
               >
                 <span>
@@ -399,7 +399,7 @@ export function ResultFollowUpPanel({
               </div>
             </div>
             <button
-              className="min-h-11 w-full rounded-full border border-[#c89d4f]/62 bg-[linear-gradient(180deg,rgba(246,225,174,0.96),rgba(197,151,72,0.96))] px-5 text-xs font-semibold uppercase tracking-[0.16em] text-[#3a2a18] shadow-[0_12px_26px_rgba(148,105,39,0.14),inset_0_1px_0_rgba(255,255,255,0.58)] transition hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-[#c89d4f]/45 focus:ring-offset-2 focus:ring-offset-[#fffaf0] disabled:cursor-not-allowed disabled:opacity-55 disabled:hover:translate-y-0 sm:w-auto"
+              className="ora-guide-button ora-guide-button-primary w-full touch-manipulation disabled:cursor-not-allowed disabled:opacity-55 sm:w-auto"
               disabled={!canSubmit}
               type="submit"
             >
@@ -410,7 +410,7 @@ export function ResultFollowUpPanel({
       )}
 
       {errorMessage ? (
-        <p className="mt-3 rounded-[1rem] border border-[#c48a73]/36 bg-[#fff5ed]/72 px-3 py-2 text-sm leading-6 text-[#8a4634]">
+        <p className="mt-3 rounded-[1rem] border border-[color:var(--c-border)] bg-[color:var(--c-surface)]/84 px-3 py-2 text-sm leading-6 text-[color:var(--c-text-soft)]">
           {errorMessage}
         </p>
       ) : null}

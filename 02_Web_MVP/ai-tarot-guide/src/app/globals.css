@@ -1659,17 +1659,17 @@ input {
 }
 
 .ritual-prepare-section .ritual-core-v2 {
-  top: 53%;
+  top: 58%;
   z-index: 0;
-  width: min(32rem, 106vw);
-  opacity: 0.58;
+  width: min(20rem, 78vw);
+  opacity: 0.24;
   pointer-events: none;
   mask-image: linear-gradient(
     180deg,
     transparent 0%,
-    rgba(0, 0, 0, 0.28) 14%,
-    black 28%,
-    black 82%,
+    rgba(0, 0, 0, 0.12) 18%,
+    black 36%,
+    black 76%,
     transparent 100%
   );
 }
@@ -1681,19 +1681,20 @@ input {
 }
 
 .ritual-prepare-section .ritual-core-v2-depth-a {
-  width: 76%;
-  height: 76%;
+  width: 62%;
+  height: 62%;
   background:
-    radial-gradient(circle, rgba(17, 14, 10, 0.32) 0 40%, rgba(23, 18, 13, 0.15) 58%, transparent 78%),
-    radial-gradient(circle, rgba(217, 189, 128, 0.032), transparent 70%);
-  opacity: 0.42;
+    radial-gradient(circle, color-mix(in srgb, var(--c-accent) 10%, transparent) 0 34%, color-mix(in srgb, var(--c-accent) 5%, transparent) 52%, transparent 76%),
+    radial-gradient(circle, color-mix(in srgb, var(--c-surface) 18%, transparent), transparent 70%);
+  opacity: 0.32;
 }
 
 .ritual-prepare-section .ritual-core-v2-depth-b {
-  width: 30%;
-  height: 30%;
-  background: radial-gradient(circle, rgba(238, 232, 221, 0.09), rgba(169, 133, 82, 0.032) 44%, transparent 74%);
-  opacity: 0.28;
+  width: 24%;
+  height: 24%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--c-surface) 36%, transparent), color-mix(in srgb, var(--c-accent) 5%, transparent) 44%, transparent 74%);
+  filter: blur(8px);
+  opacity: 0.18;
 }
 
 .ritual-prepare-section .ritual-core-v2-center {
@@ -1725,7 +1726,24 @@ input {
 }
 
 .ritual-prepare-section .ritual-core-v2-near {
-  opacity: 0.12;
+  opacity: 0.06;
+}
+
+[data-theme="night"] .ritual-prepare-section .ritual-core-v2 {
+  opacity: 0.36;
+}
+
+[data-theme="night"] .ritual-prepare-section .ritual-core-v2-depth-a {
+  background:
+    radial-gradient(circle, rgba(17, 14, 10, 0.24) 0 38%, rgba(23, 18, 13, 0.12) 58%, transparent 78%),
+    radial-gradient(circle, rgba(217, 189, 128, 0.04), transparent 70%);
+  opacity: 0.34;
+}
+
+[data-theme="night"] .ritual-prepare-section .ritual-core-v2-depth-b {
+  background: radial-gradient(circle, rgba(238, 232, 221, 0.08), rgba(169, 133, 82, 0.035) 44%, transparent 74%);
+  filter: blur(12px);
+  opacity: 0.22;
 }
 
 .ritual-prepare-section .ritual-core-v2-near-3,
@@ -1763,12 +1781,7 @@ input {
 }
 
 .ritual-prepare-copy::before {
-  content: "";
-  pointer-events: none;
-  position: absolute;
-  inset: -1rem -0.75rem;
-  z-index: -1;
-  background: radial-gradient(ellipse at 50% 45%, rgba(5, 5, 6, 0.82), rgba(5, 5, 6, 0.46) 58%, transparent 78%);
+  display: none;
 }
 
 .ritual-prepare-card {
@@ -1808,34 +1821,17 @@ input {
 }
 
 .ritual-prepare-action::before {
-  content: "";
-  pointer-events: none;
-  position: absolute;
-  inset: -1.25rem -0.75rem;
-  z-index: -1;
-  background: radial-gradient(ellipse at 50% 50%, rgba(5, 5, 6, 0.92), rgba(5, 5, 6, 0.7) 54%, transparent 76%);
+  display: none;
 }
 
 .ritual-prepare-button {
   position: relative;
   z-index: 1;
-  border-color: rgba(217, 189, 128, 0.72);
-  background: linear-gradient(180deg, rgba(13, 10, 8, 0.94), rgba(4, 4, 4, 0.94));
-  color: #f5ecda;
-  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.65);
-  box-shadow:
-    0 12px 28px rgba(0, 0, 0, 0.42),
-    inset 0 1px 0 rgba(255, 245, 224, 0.08),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.72);
+  text-shadow: none;
 }
 
 .ritual-prepare-button:hover {
-  border-color: rgba(240, 214, 158, 0.88);
-  background: linear-gradient(180deg, rgba(20, 15, 10, 0.96), rgba(7, 6, 5, 0.96));
-  box-shadow:
-    0 14px 30px rgba(0, 0, 0, 0.44),
-    0 0 18px rgba(217, 189, 128, 0.1),
-    inset 0 1px 0 rgba(255, 245, 224, 0.1);
+  text-shadow: none;
 }
 
 @keyframes ritual-center-breathe {
@@ -2142,6 +2138,177 @@ input {
   box-shadow:
     0 20px 58px rgba(0, 0, 0, 0.4),
     inset 0 1px 0 rgba(244, 239, 229, 0.055);
+}
+
+.ora-guide-shell {
+  background:
+    radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--c-surface) 86%, transparent), transparent 36rem),
+    radial-gradient(circle at 12% 84%, color-mix(in srgb, var(--c-accent) 9%, transparent), transparent 22rem),
+    linear-gradient(180deg, var(--c-bg), color-mix(in srgb, var(--c-bg) 86%, var(--c-surface-well)));
+  color: var(--c-text);
+}
+
+[data-theme="night"] .ora-guide-shell {
+  background:
+    radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--c-surface) 60%, transparent), transparent 34rem),
+    radial-gradient(circle at 50% 28%, color-mix(in srgb, var(--c-accent) 10%, transparent), transparent 30rem),
+    linear-gradient(180deg, var(--c-bg), var(--c-surface-well));
+}
+
+.ora-guide-surface,
+.ora-guide-panel,
+.ora-guide-dossier,
+.ora-guide-altar {
+  position: relative;
+  border: 1px solid var(--c-border);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--c-surface) 96%, var(--c-bg)), color-mix(in srgb, var(--c-surface-well) 84%, var(--c-bg)));
+  color: var(--c-text);
+  box-shadow:
+    0 18px 48px color-mix(in srgb, var(--c-text) 9%, transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--c-surface) 70%, transparent);
+}
+
+.ora-guide-dossier {
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--c-surface) 98%, var(--c-bg)), color-mix(in srgb, var(--c-surface-well) 88%, var(--c-bg))),
+    repeating-linear-gradient(0deg, transparent 0 2rem, color-mix(in srgb, var(--c-border) 24%, transparent) 2rem calc(2rem + 1px));
+  box-shadow:
+    0 26px 70px color-mix(in srgb, var(--c-text) 11%, transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--c-surface) 80%, transparent);
+}
+
+.ora-guide-dossier::before,
+.ora-guide-altar::before {
+  content: "";
+  position: absolute;
+  inset-inline: 1.5rem;
+  top: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--c-accent), transparent);
+  opacity: 0.5;
+}
+
+.ora-guide-altar {
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 30%, color-mix(in srgb, var(--c-accent) 14%, transparent), transparent 17rem),
+    linear-gradient(180deg, color-mix(in srgb, var(--c-surface) 96%, var(--c-bg)), color-mix(in srgb, var(--c-surface-well) 90%, var(--c-bg)));
+}
+
+[data-theme="night"] .ora-guide-surface,
+[data-theme="night"] .ora-guide-panel,
+[data-theme="night"] .ora-guide-dossier,
+[data-theme="night"] .ora-guide-altar {
+  box-shadow:
+    0 22px 58px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 color-mix(in srgb, var(--c-text) 5%, transparent);
+}
+
+.ora-guide-button {
+  display: inline-flex;
+  min-height: 3rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  padding: 0.78rem 1.35rem;
+  text-align: center;
+  color: var(--c-text);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease, transform 0.08s ease;
+}
+
+.ora-guide-button:active {
+  transform: translateY(1px);
+}
+
+.ora-guide-button:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--c-accent) 55%, transparent);
+  outline-offset: 3px;
+}
+
+.ora-guide-button:disabled,
+.ora-guide-button[aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.ora-guide-button-primary {
+  border-color: var(--c-accent);
+  background: var(--c-accent);
+  color: var(--c-on-accent);
+  box-shadow: none;
+}
+
+.ora-guide-button-primary:hover {
+  background: var(--c-accent-hover);
+}
+
+.ora-guide-button-ghost {
+  border-color: color-mix(in srgb, var(--c-accent) 42%, var(--c-border));
+  background: transparent;
+  color: var(--c-accent);
+}
+
+.ora-guide-button-ghost:hover {
+  background: var(--c-accent-wash);
+}
+
+[data-theme="night"] .ora-guide-button-ghost {
+  border-color: color-mix(in srgb, var(--c-text) 28%, var(--c-border));
+  color: var(--c-text);
+}
+
+[data-theme="night"] .ora-guide-button-ghost:hover {
+  border-color: color-mix(in srgb, var(--c-text) 62%, var(--c-border));
+  background: transparent;
+  color: var(--c-accent-hover);
+}
+
+.ora-guide-button-surface {
+  border-color: var(--c-border);
+  background: var(--c-surface);
+  color: var(--c-text-soft);
+}
+
+.ora-guide-button-surface:hover {
+  border-color: var(--c-accent);
+  color: var(--c-accent);
+}
+
+.ora-reading-nav {
+  margin: 0;
+  color: var(--c-text-soft);
+}
+
+.ora-reading-nav-control {
+  min-height: 2.5rem;
+  border-color: var(--c-border);
+  background: color-mix(in srgb, var(--c-surface) 82%, var(--c-surface-well));
+  color: var(--c-text-soft);
+  box-shadow: none;
+}
+
+.ora-reading-nav-control:hover {
+  border-color: color-mix(in srgb, var(--c-accent) 46%, var(--c-border));
+  background: var(--c-surface);
+  color: var(--c-text);
+}
+
+[data-theme="night"] .ora-reading-nav-control {
+  border-color: var(--c-border);
+  background: color-mix(in srgb, var(--c-surface) 78%, var(--c-surface-well));
+  color: var(--c-text-soft);
+}
+
+[data-theme="night"] .ora-reading-nav-control:hover {
+  border-color: color-mix(in srgb, var(--c-accent) 50%, var(--c-border));
+  background: var(--c-surface);
+  color: var(--c-accent-hover);
 }
 
 .ora-border-brass {

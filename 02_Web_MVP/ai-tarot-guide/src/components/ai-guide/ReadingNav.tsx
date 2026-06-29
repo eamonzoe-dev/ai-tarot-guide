@@ -22,17 +22,17 @@ export function ReadingNav({ lang }: ReadingNavProps) {
   }
 
   return (
-    <nav className="mb-6 flex items-center justify-between gap-3 text-xs font-semibold uppercase tracking-[0.16em] text-[#bca77f]">
+    <nav className="ora-reading-nav flex items-center justify-between gap-3 text-xs font-semibold uppercase tracking-[0.14em]">
       <button
         type="button"
         onClick={goBack}
-        className="min-h-10 touch-manipulation rounded-full border border-[#6d5a35]/55 bg-[#080706]/70 px-3 text-left transition hover:border-[#c7a463] hover:text-[#efe8d9]"
+        className="ora-reading-nav-control touch-manipulation rounded-full border px-3 text-left transition"
       >
         &larr; {copy.back}
       </button>
       <Link
         href={homeHref}
-        className="flex min-h-10 touch-manipulation items-center rounded-full border border-[#6d5a35]/55 bg-[#080706]/70 px-3 transition hover:border-[#c7a463] hover:text-[#efe8d9]"
+        className="ora-reading-nav-control flex touch-manipulation items-center rounded-full border px-3 transition"
       >
         {copy.home}
       </Link>
