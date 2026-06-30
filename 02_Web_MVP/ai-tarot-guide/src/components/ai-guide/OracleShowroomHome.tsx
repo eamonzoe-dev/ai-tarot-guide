@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { type CSSProperties, useMemo } from "react";
+import { type CSSProperties, type FormEvent, type MouseEvent, useMemo, useState } from "react";
 
 import { ActivationCodePanel } from "@/components/ai-guide/ActivationCodePanel";
 import { type Language } from "@/lib/ai-guide/i18n";
@@ -130,6 +130,7 @@ export function OracleShowroomHome({
   readingsHref,
 }: OracleShowroomHomeProps) {
   const isZh = lang === "zh";
+  const [ritualBySpread, setRitualBySpread] = useState<Record<string, boolean>>({});
 
   const copy = useMemo(
     () => ({
@@ -252,6 +253,7 @@ export function OracleShowroomHome({
         ? "写下你现在想问的一句话，Ora 会带你抽一张牌。"
         : "Write the one thing you want to ask. Ora will guide you through a draw.",
       askOraButton: isZh ? "开始这次解读" : "Begin this reading",
+      addRitual: isZh ? "加入准备仪式" : "Add preparation ritual",
       chips: isZh ? ["关系", "工作", "自我", "选择", "未来"] : ["Love", "Work", "Self", "Decision", "Future"],
       questionPlaceholder: isZh ? "写下此刻想问的一句话..." : "Write the one thing you want to ask...",
       unfoldsKicker: isZh ? "解读如何展开" : "The Reading Unfolds",
@@ -355,6 +357,26 @@ export function OracleShowroomHome({
     }
   }
 
+  function chooseReadingPath(event: FormEvent<HTMLFormElement>) {
+    const form = event.currentTarget;
+    const ritualInput = form.elements.namedItem("ritual");
+
+    form.action = "/ai-guide/ask";
+
+    if (ritualInput instanceof HTMLInputElement) {
+      ritualInput.value = form.dataset.ritualEnabled === "true" ? "1" : "0";
+    }
+  }
+
+  function toggleRitual(event: MouseEvent<HTMLButtonElement>, spreadId: string) {
+    event.preventDefault();
+    event.stopPropagation();
+    setRitualBySpread((current) => ({
+      ...current,
+      [spreadId]: !current[spreadId],
+    }));
+  }
+
   return (
     <div className="ora-home">
       <div id="reading-account-panel">
@@ -442,12 +464,30 @@ export function OracleShowroomHome({
             <div className="ora-spreads">
               {copy.spreads.map((spread) => {
                 const Icon = spread.icon;
+                const isRitualEnabled = Boolean(ritualBySpread[spread.id]);
                 const card = (
-                  <article className={cx("ora-spread", spread.active && "is-active", spread.disabled && "is-soon")}>
+                  <article className={cx("ora-spread", spread.active && "is-active", spread.disabled && "is-soon", isRitualEnabled && "is-ritual")}>
+                    {!spread.disabled && spread.href ? (
+                      <button aria-label={spread.title} className="ora-spread-hitarea" type="submit" />
+                    ) : null}
                     <Icon className="ora-spread-icon" />
                     <span className="ora-spread-meta">{spread.meta}</span>
                     <h3>{spread.title}</h3>
                     <p>{spread.body}</p>
+                    {!spread.disabled && spread.href ? (
+                      <div className="ora-ritual-footer">
+                        <span>{copy.addRitual}</span>
+                        <button
+                          aria-label={copy.addRitual}
+                          aria-pressed={isRitualEnabled}
+                          className="ora-ritual-switch"
+                          onClick={(event) => toggleRitual(event, spread.id)}
+                          type="button"
+                        >
+                          <span />
+                        </button>
+                      </div>
+                    ) : null}
                   </article>
                 );
 
@@ -456,9 +496,21 @@ export function OracleShowroomHome({
                     {card}
                   </div>
                 ) : (
-                  <Link className="ora-spread-link" href={spread.href} key={spread.id}>
+                  <form
+                    action="/ai-guide/ask"
+                    className="ora-spread-link"
+                    data-ritual-enabled={isRitualEnabled ? "true" : "false"}
+                    key={spread.id}
+                    method="get"
+                    onSubmit={chooseReadingPath}
+                  >
+                    <input name="lang" type="hidden" value={lang} />
+                    <input name="mode" type="hidden" value="online" />
+                    <input name="spread" type="hidden" value={spread.id} />
+                    <input name="orientation" type="hidden" value="upright" />
+                    <input name="ritual" type="hidden" value={isRitualEnabled ? "1" : "0"} />
                     {card}
-                  </Link>
+                  </form>
                 );
               })}
             </div>
@@ -1092,7 +1144,14 @@ export function OracleShowroomHome({
           gap: 1.25rem;
         }
 
+        .ora-spread-link {
+          display: block;
+          min-width: 0;
+          color: inherit;
+        }
+
         .ora-spread {
+          position: relative;
           display: flex;
           min-height: 230px;
           flex-direction: column;
@@ -1101,6 +1160,22 @@ export function OracleShowroomHome({
           background: var(--c-surface);
           padding: 1.5rem;
           transition: border-color 0.2s ease, transform 0.2s ease;
+        }
+
+        .ora-spread-hitarea {
+          position: absolute;
+          inset: 0;
+          z-index: 1;
+          border: 0;
+          border-radius: inherit;
+          background: transparent;
+          cursor: pointer;
+        }
+
+        .ora-spread > :not(.ora-spread-hitarea) {
+          position: relative;
+          z-index: 2;
+          pointer-events: none;
         }
 
         .ora-spread-link:hover .ora-spread {
@@ -1158,6 +1233,119 @@ export function OracleShowroomHome({
 
         .ora-spread.is-soon > * {
           opacity: 0.45;
+        }
+
+        .ora-ritual-footer {
+          display: flex;
+          min-height: 2rem;
+          align-items: center;
+          justify-content: space-between;
+          gap: 0.75rem;
+          margin-top: 1rem;
+          border-top: 1px solid color-mix(in srgb, var(--c-border) 78%, transparent);
+          padding-top: 0.85rem;
+          color: var(--c-text-soft);
+          font-size: 0.75rem;
+          font-weight: 400;
+          line-height: 1.35;
+          pointer-events: auto;
+          transition: border-color 0.18s ease, color 0.18s ease;
+        }
+
+        .ora-ritual-switch {
+          position: relative;
+          display: inline-flex;
+          width: 2.65rem;
+          height: 1.34rem;
+          flex: 0 0 auto;
+          align-items: center;
+          border: 1px solid color-mix(in srgb, var(--c-text-soft) 34%, var(--c-border));
+          border-radius: 999px;
+          background: transparent;
+          padding: 2px;
+          cursor: pointer;
+          pointer-events: auto;
+          transition: background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+        }
+
+        .ora-ritual-switch span {
+          display: block;
+          width: 0.78rem;
+          height: 0.78rem;
+          border: 1px solid color-mix(in srgb, var(--c-text-soft) 48%, transparent);
+          border-radius: 999px;
+          background: transparent;
+          box-shadow: none;
+          transform: translateX(0);
+          transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+        }
+
+        .ora-ritual-switch::after {
+          content: "";
+          position: absolute;
+          right: 0.38rem;
+          width: 0.34rem;
+          height: 0.34rem;
+          border-bottom: 1px solid transparent;
+          border-right: 1px solid transparent;
+          opacity: 0;
+          transform: rotate(45deg);
+          transition: opacity 0.18s ease;
+        }
+
+        .ora-spread.is-ritual .ora-ritual-footer {
+          border-top-color: color-mix(in srgb, var(--c-accent) 46%, var(--c-border));
+          color: var(--c-text);
+        }
+
+        .ora-spread.is-ritual .ora-ritual-switch {
+          border-color: var(--c-accent);
+          background: color-mix(in srgb, var(--c-accent) 34%, var(--c-surface));
+          box-shadow: 0 0 0 3px color-mix(in srgb, var(--c-accent) 13%, transparent);
+        }
+
+        .ora-spread.is-ritual .ora-ritual-switch span {
+          border-color: var(--c-accent);
+          background: var(--c-accent);
+          box-shadow: 0 0 10px color-mix(in srgb, var(--c-accent) 42%, transparent);
+          transform: translateX(1.28rem);
+        }
+
+        .ora-spread.is-ritual .ora-ritual-switch::after {
+          border-color: color-mix(in srgb, var(--c-on-accent) 86%, var(--c-text));
+          opacity: 1;
+        }
+
+        .ora-spread.is-active .ora-ritual-footer {
+          border-top-color: rgba(216, 178, 90, 0.28);
+          color: #d8d1bd;
+        }
+
+        .ora-spread.is-active .ora-ritual-switch {
+          border-color: rgba(239, 233, 219, 0.34);
+          background: transparent;
+        }
+
+        .ora-spread.is-active .ora-ritual-switch span {
+          border-color: rgba(239, 233, 219, 0.62);
+          background: transparent;
+        }
+
+        .ora-spread.is-active.is-ritual .ora-ritual-footer {
+          border-top-color: rgba(216, 178, 90, 0.46);
+          color: #efe7d1;
+        }
+
+        .ora-spread.is-active.is-ritual .ora-ritual-switch {
+          border-color: #d8b25a;
+          background: rgba(216, 178, 90, 0.28);
+          box-shadow: 0 0 0 3px rgba(216, 178, 90, 0.16);
+        }
+
+        .ora-spread.is-active.is-ritual .ora-ritual-switch span {
+          border-color: #d8b25a;
+          background: #d8b25a;
+          box-shadow: 0 0 12px rgba(216, 178, 90, 0.38);
         }
 
         .ora-askbox {
@@ -1596,6 +1784,8 @@ export function OracleShowroomHome({
 
         @media (prefers-reduced-motion: reduce) {
           .ora-btn,
+          .ora-ritual-switch,
+          .ora-ritual-switch span,
           .ora-spread {
             transition: none;
           }

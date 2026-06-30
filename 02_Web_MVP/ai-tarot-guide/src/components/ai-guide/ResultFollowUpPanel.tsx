@@ -48,6 +48,22 @@ type ResultFollowUpPanelProps = {
 const MAX_FOLLOW_UPS = 3;
 const MAX_FOLLOW_UP_LENGTH = 300;
 const CREDITS_UPDATED_EVENT = "ora-arcana:credits-updated";
+const followUpPrompts = {
+  en: [
+    "How can I apply this advice?",
+    "Which step should I handle first?",
+    "What is this card showing me that I missed?",
+  ],
+  zh: [
+    "这个建议具体怎么落地？",
+    "我应该先处理哪一步？",
+    "这张牌提醒我忽略了什么？",
+  ],
+} as const;
+const followUpContinuation = {
+  en: "If you want to go deeper, I can stay with this spread and help you look at one specific part of it.",
+  zh: "如果你想继续深入，我可以沿着这次牌面继续陪你看一个更具体的部分。",
+} as const;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
@@ -134,15 +150,13 @@ function UserChatBubble({
   message: string;
 }) {
   return (
-    <div className="flex justify-end">
-      <div className="ml-auto max-w-[90%] sm:max-w-[78%]">
-        <p className="mb-1 pr-2 text-right text-[0.66rem] font-semibold uppercase tracking-[0.14em] text-[color:var(--c-accent)]">
+    <div className="ora-result-message-row ora-result-message-row-user">
+      <div className="min-w-0">
+        <p className="mb-1 pr-2 text-right text-[0.62rem] font-semibold uppercase tracking-[0.18em] text-[color:var(--c-text-dim)]">
           {label}
         </p>
-        <div className="ml-auto w-fit max-w-full rounded-[1.25rem] rounded-tr-sm border border-[color:var(--c-border)] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--c-surface)_94%,var(--c-bg)_6%),color-mix(in_srgb,var(--c-surface-well)_84%,var(--c-bg)_16%))] px-4 py-3 text-right shadow-[0_10px_24px_color-mix(in_srgb,var(--c-text)_10%,transparent)]">
-          <p className="whitespace-pre-wrap break-words text-right text-sm leading-7 text-[color:var(--c-text)]">
-            {message}
-          </p>
+        <div className="ora-result-bubble ora-result-bubble-user whitespace-pre-wrap break-words text-right">
+          {message}
         </div>
       </div>
     </div>
@@ -159,20 +173,21 @@ function OraChatBubble({
   fallbackNotice?: string;
 }) {
   return (
-    <div className="flex justify-start">
-      <div className="mr-auto max-w-[90%] sm:max-w-[78%]">
-        <p className="mb-1 pl-2 text-left text-[0.66rem] font-semibold uppercase tracking-[0.14em] text-[color:var(--c-accent)]">
+    <div className="ora-result-message-row">
+      <div className="ora-result-avatar" aria-hidden="true">
+        {label.slice(0, 1)}
+      </div>
+      <div className="min-w-0">
+        <p className="mb-1 text-[0.62rem] font-semibold uppercase tracking-[0.18em] text-[color:var(--c-accent)]">
           {label}
         </p>
-        <div className="mr-auto w-fit max-w-full rounded-[1.25rem] rounded-tl-sm border border-[color:var(--c-border)] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--c-surface)_96%,var(--c-bg)_4%),color-mix(in_srgb,var(--c-surface-well)_84%,var(--c-bg)_16%))] px-4 py-3 text-left shadow-[0_10px_24px_color-mix(in_srgb,var(--c-text)_8%,transparent)]">
+        <div className="ora-result-bubble ora-result-bubble-ora whitespace-pre-wrap break-words text-left">
           {fallbackNotice ? (
             <p className="mb-2 whitespace-pre-wrap break-words text-left text-xs leading-5 text-[color:var(--c-text-soft)]">
               {fallbackNotice}
             </p>
           ) : null}
-          <p className="whitespace-pre-wrap break-words text-left text-sm leading-7 text-[color:var(--c-text)]">
-            {message}
-          </p>
+          {message}
         </div>
       </div>
     </div>
@@ -217,7 +232,6 @@ export function ResultFollowUpPanel({
     !isTooLong &&
     !hasReachedLimit &&
     status !== "loading";
-  const originalQuestion = question.trim();
   const characterCounter = useMemo(
     () => `${trimmedQuestion.length}/${MAX_FOLLOW_UP_LENGTH}`,
     [trimmedQuestion.length],
@@ -316,101 +330,119 @@ export function ResultFollowUpPanel({
   }
 
   return (
-    <section className="ora-guide-panel mt-7 rounded-[1.35rem] p-4">
-      <div>
-        <p className="font-serif text-xl leading-tight text-[color:var(--c-text)]">
-          {copy.aiFollowUpPrice(FOLLOW_UP_STARDUST_COST)}
-        </p>
-        <p className="mt-2 text-sm leading-6 text-[color:var(--c-text-soft)]">
-          {copy.aiFollowUpHelper}
-        </p>
-      </div>
-
-      <div className="mt-5 space-y-4">
-        <UserChatBubble label={copy.aiFollowUpUserLabel} message={originalQuestion} />
-        <OraChatBubble
-          label={copy.aiFollowUpOraLabel}
-          message={copy.aiFollowUpIntro}
-        />
-
-        {messages.length > 0
-          ? messages.map((message, index) => (
-              <div
-                className="space-y-3"
-                key={`${index}-${message.question.slice(0, 18)}`}
-              >
-                <UserChatBubble
-                  label={copy.aiFollowUpUserLabel}
-                  message={message.question}
-                />
-                <OraChatBubble
-                  fallbackNotice={
-                    message.fallback
-                      ? copy.aiFollowUpFallbackNotice
-                      : undefined
-                  }
-                  label={copy.aiFollowUpOraLabel}
-                  message={buildOraBubbleText(message)}
-                />
-              </div>
-            ))
-          : null}
-      </div>
-
-      {hasReachedLimit ? (
-        <p className="mt-5 rounded-[1.1rem] border border-[color:var(--c-border)] bg-[color:var(--c-surface)]/82 px-4 py-3 text-sm leading-6 text-[color:var(--c-text-soft)]">
-          {copy.aiFollowUpLimitReached}
-        </p>
-      ) : (
-        <form className="mt-5" onSubmit={handleSubmit}>
-          <div className="rounded-[1.35rem] border border-[color:var(--c-border)] bg-[color:var(--c-surface)]/76 p-2 shadow-[0_12px_28px_color-mix(in_srgb,var(--c-text)_8%,transparent)] sm:flex sm:items-end sm:gap-2">
-            <div className="min-w-0 flex-1">
-              <textarea
-                aria-describedby={helperId}
-                className="min-h-14 w-full resize-none rounded-[1rem] border border-transparent bg-transparent px-3 py-2 text-sm leading-6 text-[color:var(--c-text)] outline-none placeholder:text-[color:var(--c-text-dim)] focus:border-[color:var(--c-accent)] focus:bg-[color:var(--c-surface)]/76"
-                disabled={status === "loading"}
-                maxLength={MAX_FOLLOW_UP_LENGTH + 1}
-                onChange={(event) => {
-                  const nextValue = event.target.value;
-
-                  setFollowUpQuestion(nextValue);
-
-                  if (nextValue.trim().length === 0) {
-                    setPendingFollowUp(null);
-                  }
-                }}
-                placeholder={copy.aiFollowUpPlaceholder}
-                value={followUpQuestion}
-              />
-              <div
-                className="flex items-center justify-between gap-3 px-3 pb-1 text-xs text-[color:var(--c-text-soft)]"
-                id={helperId}
-              >
-                <span>
-                  {isTooLong
-                    ? copy.aiFollowUpTooLong
-                    : status === "loading"
-                      ? copy.aiFollowUpLoading
-                      : copy.aiFollowUpComposerHint}
-                </span>
-                <span aria-hidden="true" className="shrink-0">
-                  {characterCounter}
-                </span>
-              </div>
-            </div>
-            <button
-              className="ora-guide-button ora-guide-button-primary w-full touch-manipulation disabled:cursor-not-allowed disabled:opacity-55 sm:w-auto"
-              disabled={!canSubmit}
-              type="submit"
+    <section className="ora-result-follow-up mx-auto mt-8 w-full max-w-[820px] px-1 pb-1 sm:px-2">
+      {messages.length > 0 ? (
+        <div className="ora-result-follow-up-thread mt-5 space-y-4 opacity-90">
+          {messages.map((message, index) => (
+            <div
+              className="space-y-3"
+              key={`${index}-${message.question.slice(0, 18)}`}
             >
-              {status === "loading" ? copy.aiFollowUpLoading : copy.aiFollowUpButton}
-            </button>
+              <UserChatBubble
+                label={copy.aiFollowUpUserLabel}
+                message={message.question}
+              />
+              <OraChatBubble
+                fallbackNotice={
+                  message.fallback
+                    ? copy.aiFollowUpFallbackNotice
+                    : undefined
+                }
+                label={copy.aiFollowUpOraLabel}
+                message={buildOraBubbleText(message)}
+              />
+            </div>
+          ))}
+        </div>
+      ) : null}
+
+      <form className="ora-result-composer-shell mt-5" onSubmit={handleSubmit}>
+        <div className="ora-result-composer rounded-[1.35rem] border border-[color:var(--c-border)]/58 bg-[color:var(--c-surface)]/42 p-4 shadow-[0_8px_18px_color-mix(in_srgb,var(--c-text)_4%,transparent)] sm:p-5">
+          <p className="text-[0.58rem] font-semibold uppercase tracking-[0.18em] text-[color:var(--c-accent)]">
+            Ora
+          </p>
+          <p className="mt-1 font-serif text-xl leading-tight text-[color:var(--c-text)] sm:text-[1.45rem]">
+            {copy.aiFollowUpPrice(FOLLOW_UP_STARDUST_COST)}
+          </p>
+          <p className="mt-2 text-sm leading-6 text-[color:var(--c-text-soft)]">
+            {followUpContinuation[lang]}
+          </p>
+          <p className="mt-1 text-xs leading-5 text-[color:var(--c-text-dim)]">
+            {copy.aiFollowUpHelper}
+          </p>
+
+          <div className="mt-4 flex max-w-[46rem] flex-wrap gap-2">
+            {followUpPrompts[lang].map((prompt) => (
+              <button
+                className="rounded-full border border-[color:var(--c-border)]/68 bg-[color:var(--c-surface)]/42 px-3 py-2 text-left text-xs leading-5 text-[color:var(--c-text-soft)] transition hover:border-[color:var(--c-accent)] hover:bg-[color:var(--c-surface)]/70 hover:text-[color:var(--c-text)] disabled:cursor-not-allowed disabled:opacity-55"
+                disabled={status === "loading" || hasReachedLimit}
+                key={prompt}
+                onClick={() => setFollowUpQuestion(prompt)}
+                type="button"
+              >
+                {prompt}
+              </button>
+            ))}
           </div>
-        </form>
-      )}
+
+          {hasReachedLimit ? (
+            <p className="mt-4 rounded-[1.1rem] border border-[color:var(--c-border)] bg-[color:var(--c-surface)]/82 px-4 py-3 text-sm leading-6 text-[color:var(--c-text-soft)]">
+              {copy.aiFollowUpLimitReached}
+            </p>
+          ) : (
+            <div className="ora-result-composer-input mt-4 rounded-[1.15rem] border border-[color:var(--c-border)]/62 bg-[color:var(--c-bg)]/38 p-2 sm:flex sm:items-end sm:gap-2">
+              <div className="min-w-0 flex-1">
+                <textarea
+                  aria-describedby={helperId}
+                  className="min-h-32 w-full resize-none rounded-[1rem] border border-transparent bg-transparent px-3 py-3 text-sm leading-6 text-[color:var(--c-text)] outline-none placeholder:text-[color:var(--c-text-dim)] focus:border-[color:var(--c-accent)] focus:bg-[color:var(--c-surface)]/66"
+                  disabled={status === "loading"}
+                  maxLength={MAX_FOLLOW_UP_LENGTH + 1}
+                  onChange={(event) => {
+                    const nextValue = event.target.value;
+
+                    setFollowUpQuestion(nextValue);
+
+                    if (nextValue.trim().length === 0) {
+                      setPendingFollowUp(null);
+                    }
+                  }}
+                  placeholder={
+                    lang === "zh" ? "继续问 Ora…" : "Continue with Ora..."
+                  }
+                  value={followUpQuestion}
+                />
+                <div
+                  className="flex items-center justify-between gap-3 px-3 pb-1 text-xs text-[color:var(--c-text-soft)]"
+                  id={helperId}
+                >
+                  <span>
+                    {isTooLong
+                      ? copy.aiFollowUpTooLong
+                      : status === "loading"
+                        ? copy.aiFollowUpLoading
+                        : copy.aiFollowUpComposerHint}
+                  </span>
+                  <span aria-hidden="true" className="shrink-0">
+                    {characterCounter}
+                  </span>
+                </div>
+              </div>
+              <button
+                className="ora-guide-button ora-guide-button-primary min-h-12 w-full touch-manipulation px-5 py-2 text-[0.72rem] disabled:cursor-not-allowed disabled:opacity-55 sm:w-auto"
+                disabled={!canSubmit}
+                type="submit"
+              >
+                {status === "loading"
+                  ? copy.aiFollowUpLoading
+                  : copy.aiFollowUpButton}
+              </button>
+            </div>
+          )}
+          </div>
+      </form>
 
       {errorMessage ? (
-        <p className="mt-3 rounded-[1rem] border border-[color:var(--c-border)] bg-[color:var(--c-surface)]/84 px-3 py-2 text-sm leading-6 text-[color:var(--c-text-soft)]">
+        <p className="ora-result-composer-shell mt-3 rounded-[1rem] border border-[color:var(--c-border)] bg-[color:var(--c-surface)]/84 px-3 py-2 text-sm leading-6 text-[color:var(--c-text-soft)]">
           {errorMessage}
         </p>
       ) : null}

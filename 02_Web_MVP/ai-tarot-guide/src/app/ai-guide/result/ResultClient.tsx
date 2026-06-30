@@ -34,16 +34,68 @@ const CREDITS_UPDATED_EVENT = "ora-arcana:credits-updated";
 const CLARIFY_NOTE_MAX_LENGTH = 180;
 const activeAiReadingRequests = new Set<string>();
 
-const clarifyDisplayCopy = {
+const resultDisplayCopy = {
   en: {
-    focusLabel: "This reading will begin from:",
-    noteLabel: "Brought in with it:",
-    noteOnlyLabel: "This reading will begin with your note:",
+    readingSummary: "Reading Stage",
+    aiReading: "AI Reading",
+    oraLabel: "ORA",
+    userQuestion: "Your question",
+    blockIcons: {
+      overview: "I",
+      card: "II",
+      guidance: "III",
+      fallback: "!",
+    },
+    openingSingle: "I am reading this card through the question you brought here.",
+    openingThree:
+      "I am reading these three cards as a sequence: what is happening, what asks for attention, and what can guide you forward.",
+    coreMessage: "Core message",
+    cardAndQuestion: "Card Interpretation",
+    currentReminder: "Current reminder",
+    nextSuggestion: "Guidance",
+    overallReading: "Reading Overview",
+    combinedAdvice: "How these cards speak together",
+    context: "Context",
+    fallbackTitle: "Backup reflection",
+    fallbackBody:
+      "Ora is temporarily unable to connect to the live reading. The reflection below is based on the card and your question, and will not use Stardust.",
+    loadingStages: [
+      "Organizing the reading overview...",
+      "Connecting the card symbols...",
+      "Shaping guidance and next steps...",
+    ],
+    loadingPatience: "Your reading is still being shaped. Please wait a little longer.",
   },
   zh: {
-    focusLabel: "这次解读会先从这里进入：",
-    noteLabel: "一起带入：",
-    noteOnlyLabel: "这次解读会带着你的补充进入：",
+    readingSummary: "本次牌面舞台",
+    aiReading: "本次解读",
+    oraLabel: "ORA",
+    userQuestion: "你的问题",
+    blockIcons: {
+      overview: "I",
+      card: "II",
+      guidance: "III",
+      fallback: "!",
+    },
+    openingSingle: "我会把你带来的问题，放回这张牌里一起看。",
+    openingThree:
+      "我会把这三张牌读成一个顺序：正在发生什么、哪里需要被看见，以及接下来可以怎样往前走。",
+    coreMessage: "核心提示",
+    cardAndQuestion: "牌面解读",
+    currentReminder: "当前提醒",
+    nextSuggestion: "指引与建议",
+    overallReading: "解读概览",
+    combinedAdvice: "这组牌合在一起的建议",
+    context: "上下文",
+    fallbackTitle: "备用反思",
+    fallbackBody:
+      "Ora 暂时无法连接实时解读。以下是基于牌面与问题生成的备用反思，不会消耗 Stardust。",
+    loadingStages: [
+      "正在整理解读概览……",
+      "正在连接牌面象征……",
+      "正在生成指引建议……",
+    ],
+    loadingPatience: "解读仍在生成中，请稍等。",
   },
 } as const;
 
@@ -67,26 +119,6 @@ const READING_LABEL_PATTERN =
 
 function cleanParagraph(paragraph: string) {
   return paragraph.replace(READING_LABEL_PATTERN, "").trim();
-}
-
-function buildThreeCardFallbackParagraph({
-  cardTitle,
-  keywords,
-  lang,
-  position,
-}: {
-  cardTitle: string;
-  keywords: string[];
-  lang: Language;
-  position: string;
-}) {
-  const keywordText = keywords.slice(0, 4).join(lang === "zh" ? "、" : ", ");
-
-  if (lang === "zh") {
-    return `在${position}的位置上，${cardTitle}把注意力带向${keywordText}。先把这些线索当作这一部分牌阵的象征提示，再回到你的问题里看它照亮了什么。`;
-  }
-
-  return `In the ${position.toLowerCase()} position, ${cardTitle} points to ${keywordText}. Let those themes shape how you read this part of the spread.`;
 }
 
 type StoredRitual = {
@@ -309,31 +341,75 @@ function LuminousTag({
 }
 
 function LuminousThinkingState({
-  title,
-  subtitle,
+  cardImage,
+  cardTitle,
+  lang,
 }: {
-  title: string;
-  subtitle: string;
+  cardImage?: string;
+  cardTitle?: string;
+  lang: Language;
 }) {
+  const ritualCopy = resultDisplayCopy[lang];
+  const [stageIndex, setStageIndex] = useState(0);
+  const [isPatient, setIsPatient] = useState(false);
+
+  useEffect(() => {
+    const stageTimer = window.setInterval(() => {
+      setStageIndex((value) => (value + 1) % ritualCopy.loadingStages.length);
+    }, 4000);
+    const patienceTimer = window.setTimeout(() => {
+      setIsPatient(true);
+    }, 15000);
+
+    return () => {
+      window.clearInterval(stageTimer);
+      window.clearTimeout(patienceTimer);
+    };
+  }, [ritualCopy.loadingStages.length]);
+
   return (
-    <LuminousPanel className="mt-6 px-5 py-6 sm:px-7 sm:py-8">
+    <LuminousPanel className="ora-result-loading mt-6 px-5 py-7 sm:px-7 sm:py-9">
       <div className="mx-auto flex max-w-md flex-col items-center text-center">
         <div
           aria-hidden="true"
-          className="relative h-28 w-20 rounded-[1rem] border border-[color:var(--c-border)] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--c-surface)_96%,var(--c-bg)_4%),color-mix(in_srgb,var(--c-surface-well)_84%,var(--c-bg)_16%))] shadow-[0_0_36px_color-mix(in_srgb,var(--c-accent)_14%,transparent)]"
+          className="ora-result-loading-card relative h-32 w-[5.75rem] overflow-hidden rounded-[1rem] border border-[color:var(--c-border)] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--c-surface)_96%,var(--c-bg)_4%),color-mix(in_srgb,var(--c-surface-well)_84%,var(--c-bg)_16%))] shadow-[0_0_36px_color-mix(in_srgb,var(--c-accent)_14%,transparent)]"
         >
-          <div className="absolute inset-2 rounded-[0.75rem] border border-[color:var(--c-border)]/44" />
-          <div className="absolute inset-x-2 top-4 h-px bg-gradient-to-r from-transparent via-[color:var(--c-accent)]/40 to-transparent" />
-          <div className="absolute inset-x-3 bottom-4 h-px bg-gradient-to-r from-transparent via-[color:var(--c-accent)]/30 to-transparent" />
-          <div className="absolute left-1/2 top-1/2 h-12 w-12 -translate-x-1/2 -translate-y-1/2 rounded-full border border-[color:var(--c-border)]" />
+          {cardImage ? (
+            <Image
+              src={cardImage}
+              alt=""
+              fill
+              sizes="92px"
+              className="object-cover opacity-85"
+            />
+          ) : null}
+          <div className="absolute inset-2 rounded-[0.75rem] border border-[color:var(--c-border)]/54 bg-[color:var(--c-surface)]/20" />
+          <div className="absolute inset-x-2 top-4 h-px bg-gradient-to-r from-transparent via-[color:var(--c-accent)]/50 to-transparent" />
+          <div className="absolute inset-x-3 bottom-4 h-px bg-gradient-to-r from-transparent via-[color:var(--c-accent)]/35 to-transparent" />
+          <div className="absolute left-1/2 top-1/2 h-12 w-12 -translate-x-1/2 -translate-y-1/2 rounded-full border border-[color:var(--c-border)] bg-[color:var(--c-surface)]/30" />
         </div>
 
         <p className="mt-5 text-xs uppercase tracking-[0.24em] text-[color:var(--c-accent)]">
-          {title}
+          {resultDisplayCopy[lang].aiReading}
         </p>
-        <p className="mt-3 max-w-sm text-sm leading-7 text-[color:var(--c-text-soft)]">
-          {subtitle}
+        <p className="mt-3 max-w-sm text-sm leading-7 text-[color:var(--c-text)]">
+          {ritualCopy.loadingStages[stageIndex]}
         </p>
+        {cardTitle ? (
+          <p className="mt-2 text-xs leading-5 text-[color:var(--c-text-soft)]">
+            {cardTitle}
+          </p>
+        ) : null}
+        {isPatient ? (
+          <p className="mt-4 rounded-full border border-[color:var(--c-border)]/60 bg-[color:var(--c-surface)]/72 px-4 py-2 text-xs leading-5 text-[color:var(--c-text-soft)]">
+            {ritualCopy.loadingPatience}
+          </p>
+        ) : null}
+        <div className="mt-7 w-full space-y-3" aria-hidden="true">
+          <div className="ora-result-skeleton h-4 w-2/3 rounded-full" />
+          <div className="ora-result-skeleton h-4 w-full rounded-full" />
+          <div className="ora-result-skeleton h-4 w-5/6 rounded-full" />
+        </div>
       </div>
     </LuminousPanel>
   );
@@ -388,6 +464,444 @@ function splitReadingParagraphs(reading: string) {
     .split(/\n{2,}|\r?\n/)
     .map((paragraph) => paragraph.trim())
     .filter(Boolean);
+}
+
+function getHighlightText(display: ReturnType<typeof normalizeAiReadingForDisplay>) {
+  const source = firstText(
+    display.summary,
+    display.directAnswer,
+    display.cardMessage,
+    display.fullReading,
+    buildFallbackFullReading(display),
+  );
+  const firstParagraph = splitReadingParagraphs(source)[0] ?? source;
+  const firstSentence = firstParagraph.match(/^(.+?[.!?。！？])(\s|$)/)?.[1];
+
+  return (firstSentence || firstParagraph).trim();
+}
+
+function uniqueBodies(values: string[]) {
+  const seen = new Set<string>();
+
+  return values.filter((value) => {
+    const normalized = value.trim();
+
+    if (!normalized || seen.has(normalized)) {
+      return false;
+    }
+
+    seen.add(normalized);
+    return true;
+  });
+}
+
+function splitMessageText(textValue: string, maxLength = 360) {
+  const paragraphs = splitReadingParagraphs(textValue);
+  const messages: string[] = [];
+
+  paragraphs.forEach((paragraph) => {
+    if (paragraph.length <= maxLength) {
+      messages.push(paragraph);
+      return;
+    }
+
+    const sentences = paragraph
+      .split(/(?<=[.!?。！？])\s+/)
+      .map((sentence) => sentence.trim())
+      .filter(Boolean);
+    let current = "";
+
+    sentences.forEach((sentence) => {
+      if (`${current} ${sentence}`.trim().length > maxLength && current) {
+        messages.push(current);
+        current = sentence;
+      } else {
+        current = `${current} ${sentence}`.trim();
+      }
+    });
+
+    if (current) {
+      messages.push(current);
+    }
+  });
+
+  return messages;
+}
+
+function getGuidanceItems(display: ReturnType<typeof normalizeAiReadingForDisplay>) {
+  const source = uniqueBodies([display.advice, display.nextStep]).join("\n\n");
+  const paragraphs = splitReadingParagraphs(source);
+
+  if (paragraphs.length > 1) {
+    return paragraphs.slice(0, 3).map(cleanParagraph);
+  }
+
+  const sentences = (paragraphs[0] || "")
+    .split(/(?<=[.!?。！？])\s+/)
+    .map((sentence) => cleanParagraph(sentence))
+    .filter(Boolean);
+
+  return (sentences.length > 1 ? sentences : paragraphs.map(cleanParagraph))
+    .filter(Boolean)
+    .slice(0, 3);
+}
+
+function getTheoryLine({
+  arcana,
+  keywords,
+  lang,
+  position,
+  rank,
+  suit,
+  title,
+}: {
+  arcana: "major" | "minor";
+  keywords: string[];
+  lang: Language;
+  position?: string;
+  rank: string;
+  suit: string;
+  title: string;
+}) {
+  const keywordText = keywords.slice(0, 3).join(lang === "zh" ? "、" : ", ");
+  const positionText = position
+    ? lang === "zh"
+      ? `在「${position}」的位置上，`
+      : `In the ${position} position, `
+    : "";
+
+  if (lang === "zh") {
+    if (arcana === "major") {
+      return `${positionText}${title}属于大阿尔卡那，通常指向人生阶段、深层选择或意识转向；放在正位语境里，它会把注意力带向${keywordText}。`;
+    }
+
+    const rankText = rank ? `「${rank}」` : "这张牌";
+    return `${positionText}${title}来自小阿尔卡那的${suit}牌组，${rankText}更贴近日常经验中的具体选择；正位时，它把问题带向${keywordText}。`;
+  }
+
+  if (arcana === "major") {
+    return `${positionText}${title} is a Major Arcana card, so Ora reads it as a larger turning point or inner threshold. Upright, it draws attention to ${keywordText}.`;
+  }
+
+  const rankText = rank ? `the ${rank}` : "this card";
+  return `${positionText}${title} belongs to the ${suit} suit, so ${rankText} brings the reading into practical lived experience. Upright, it points toward ${keywordText}.`;
+}
+
+function ReadingStage({
+  cards,
+  chips,
+  lang,
+  question,
+  spreadLabel,
+}: {
+  cards: Array<{
+    id: string;
+    image?: string;
+    label: string;
+    title: string;
+    position?: string;
+  }>;
+  chips: string[];
+  lang: Language;
+  question: string;
+  spreadLabel: string;
+}) {
+  const ui = resultDisplayCopy[lang];
+  const isThreeCard = cards.length > 1;
+
+  return (
+    <LuminousPanel className="ora-result-stage p-4 sm:p-5">
+      <div
+        className={`grid gap-4 ${
+          isThreeCard
+            ? "lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]"
+            : "sm:grid-cols-[7rem_minmax(0,1fr)]"
+        } sm:items-center`}
+      >
+        <div
+          className={`ora-result-stage-cards ${
+            isThreeCard
+              ? "grid grid-cols-3 gap-2 sm:gap-3"
+              : "w-full max-w-[6.25rem]"
+          }`}
+        >
+          {cards.map((cardItem) => (
+            <article
+              className={`ora-result-stage-card ${
+                isThreeCard ? "p-2 sm:p-3" : "p-3"
+              }`}
+              key={cardItem.id}
+            >
+              <div className="relative aspect-[9/16] overflow-hidden rounded-[0.75rem] border border-[color:var(--c-border)]/54 bg-[color:var(--c-surface-well)]/70">
+                {cardItem.image ? (
+                  <Image
+                    src={cardItem.image}
+                    alt={`${cardItem.title} tarot card`}
+                    fill
+                    sizes={isThreeCard ? "160px" : "220px"}
+                    className="object-cover"
+                  />
+                ) : null}
+              </div>
+              <div className="mt-3 min-w-0 text-center">
+                {cardItem.position ? (
+                  <p className="text-[0.62rem] font-semibold uppercase tracking-[0.18em] text-[color:var(--c-accent)]">
+                    {cardItem.position}
+                  </p>
+                ) : null}
+                <h2 className="mt-1 font-serif text-base leading-tight text-[color:var(--c-text)] sm:text-xl">
+                  {cardItem.title}
+                </h2>
+                <p className="mt-1 text-xs leading-5 text-[color:var(--c-text-soft)]">
+                  {cardItem.label}
+                </p>
+              </div>
+            </article>
+          ))}
+        </div>
+
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-2">
+            <p className="text-[0.62rem] font-semibold uppercase tracking-[0.22em] text-[color:var(--c-accent)]">
+              {ui.readingSummary}
+            </p>
+            <span className="rounded-full border border-[color:var(--c-border)]/60 px-2.5 py-1 text-[0.6rem] font-semibold uppercase tracking-[0.14em] text-[color:var(--c-text-dim)]">
+              {spreadLabel}
+            </span>
+          </div>
+          <p className="mt-2 text-sm leading-6 text-[color:var(--c-text)] sm:text-[0.95rem]">
+            {question}
+          </p>
+          {chips.length > 0 ? (
+            <div className="mt-3">
+              <div className="flex flex-wrap gap-2">
+                {chips.map((chip) => (
+                  <LuminousTag
+                    className="px-2.5 py-0.5 text-[0.6rem] normal-case tracking-[0.02em] text-[color:var(--c-text-soft)]"
+                    key={chip}
+                  >
+                    {chip}
+                  </LuminousTag>
+                ))}
+              </div>
+            </div>
+          ) : null}
+        </div>
+      </div>
+    </LuminousPanel>
+  );
+}
+
+function OraAvatar({ label }: { label: string }) {
+  return (
+    <div className="ora-result-avatar" aria-hidden="true">
+      {label.slice(0, 1)}
+    </div>
+  );
+}
+
+function OraReadingBlock({
+  children,
+  icon,
+  label,
+  quote,
+  title,
+}: {
+  children: ReactNode;
+  icon: string;
+  label: string;
+  quote?: string;
+  title: string;
+}) {
+  return (
+    <section className="ora-result-block">
+      <div className="ora-result-block-rail">
+        <OraAvatar label={label} />
+      </div>
+      <div className="ora-result-block-body">
+        <div className="ora-result-block-header">
+          <div className="ora-result-block-title">
+            <span className="ora-result-block-icon" aria-hidden="true">
+              {icon}
+            </span>
+            <h2>{title}</h2>
+          </div>
+          <p className="text-[0.58rem] font-semibold uppercase tracking-[0.18em] text-[color:var(--c-accent)]">
+            {label}
+          </p>
+        </div>
+        {quote ? <blockquote>{quote}</blockquote> : null}
+        <div className="ora-result-block-content">{children}</div>
+      </div>
+    </section>
+  );
+}
+
+function UserQuestionBubble({
+  label,
+  question,
+}: {
+  label: string;
+  question: string;
+}) {
+  return (
+    <div className="ora-result-message-row ora-result-message-row-user">
+      <div className="min-w-0">
+        <p className="mb-1 pr-2 text-right text-[0.62rem] font-semibold uppercase tracking-[0.18em] text-[color:var(--c-text-dim)]">
+          {label}
+        </p>
+        <div className="ora-result-bubble ora-result-bubble-user">
+          {question}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function AiReadingBlocks({
+  display,
+  isFallback,
+  isThreeCard,
+  lang,
+  question,
+  stageCards,
+}: {
+  display: ReturnType<typeof normalizeAiReadingForDisplay>;
+  isFallback: boolean;
+  isThreeCard: boolean;
+  lang: Language;
+  question: string;
+  stageCards: Array<{
+    arcana: "major" | "minor";
+    keywords: string[];
+    position?: string;
+    rank: string;
+    suit: string;
+    title: string;
+  }>;
+}) {
+  const ui = resultDisplayCopy[lang];
+  const highlight = getHighlightText(display);
+  const fallbackParagraphs = splitReadingParagraphs(
+    firstText(display.fullReading, buildFallbackFullReading(display)),
+  );
+  const overviewBody = uniqueBodies([
+    isThreeCard ? ui.openingThree : ui.openingSingle,
+    firstText(display.summary, display.directAnswer, fallbackParagraphs[0]),
+  ]).join("\n\n");
+  const singleInterpretation = uniqueBodies([
+    stageCards[0]
+      ? getTheoryLine({ ...stageCards[0], lang })
+      : "",
+    display.cardMessage,
+    display.situationReading,
+    display.hiddenTension,
+    fallbackParagraphs[1] ?? "",
+  ]).join("\n\n");
+  const threeInterpretation = stageCards
+    .map((cardItem, index) => {
+      const body = [
+        getTheoryLine({ ...cardItem, lang }),
+        [
+          display.situationReading,
+          display.challengeReading,
+          display.guidanceReading,
+        ][index],
+      ]
+        .filter(Boolean)
+        .join("\n\n");
+
+      return body
+        ? {
+            body,
+            title: `${cardItem.position || ""} · ${cardItem.title}`,
+          }
+        : null;
+    })
+    .filter((item): item is { body: string; title: string } => Boolean(item));
+  const guidanceItems = getGuidanceItems(display);
+  const guidanceIntro = uniqueBodies([
+    isThreeCard ? display.cardRelationship : "",
+    display.hiddenTension,
+  ]).join("\n\n");
+  const guidanceReflection = firstText(display.reflectionQuestion);
+
+  function renderParagraphs(textValue: string) {
+    return splitMessageText(textValue, 520).map((paragraph, index) => (
+      <p key={`${paragraph.slice(0, 18)}-${index}`}>{cleanParagraph(paragraph)}</p>
+    ));
+  }
+
+  const hasGuidance = guidanceIntro || guidanceItems.length > 0;
+  const hasInterpretation =
+    (isThreeCard && threeInterpretation.length > 0) ||
+    (!isThreeCard && singleInterpretation);
+
+  return (
+    <article className="ora-result-conversation ora-result-reading mx-auto mt-6 w-full max-w-[820px]">
+      <UserQuestionBubble label={ui.userQuestion} question={question} />
+
+      {isFallback ? (
+        <OraReadingBlock
+          icon={ui.blockIcons.fallback}
+          label={ui.oraLabel}
+          title={ui.fallbackTitle}
+        >
+          <p>{ui.fallbackBody}</p>
+        </OraReadingBlock>
+      ) : null}
+
+      <OraReadingBlock
+        icon={ui.blockIcons.overview}
+        label={ui.oraLabel}
+        quote={highlight}
+        title={ui.overallReading}
+      >
+        {renderParagraphs(overviewBody)}
+      </OraReadingBlock>
+
+      {hasInterpretation ? (
+        <OraReadingBlock
+          icon={ui.blockIcons.card}
+          label={ui.oraLabel}
+          title={ui.cardAndQuestion}
+        >
+          {isThreeCard ? (
+            <div className="ora-result-position-list">
+              {threeInterpretation.map((item) => (
+                <section key={item.title}>
+                  <h3>{item.title}</h3>
+                  {renderParagraphs(item.body)}
+                </section>
+              ))}
+            </div>
+          ) : (
+            renderParagraphs(singleInterpretation)
+          )}
+        </OraReadingBlock>
+      ) : null}
+
+      {hasGuidance ? (
+        <OraReadingBlock
+          icon={ui.blockIcons.guidance}
+          label={ui.oraLabel}
+          title={ui.nextSuggestion}
+        >
+          {guidanceIntro ? renderParagraphs(guidanceIntro) : null}
+          {guidanceItems.length > 0 ? (
+            <ol className="ora-result-guidance-list">
+              {guidanceItems.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ol>
+          ) : null}
+          {guidanceReflection ? (
+            <p className="ora-result-guidance-reflection">{guidanceReflection}</p>
+          ) : null}
+        </OraReadingBlock>
+      ) : null}
+    </article>
+  );
 }
 
 function createClientRequestId() {
@@ -469,13 +983,10 @@ export function ResultClient({
 }: ResultClientProps) {
   const router = useRouter();
   const copy = text(initialLang);
-  const clarifyUi = clarifyDisplayCopy[initialLang];
   const clarifyId = initialClarifyId.trim();
   const clarifyLabel = initialClarifyLabel.trim();
   const clarifyFocus = initialClarifyFocus.trim();
   const clarifyNote = initialClarifyNote.trim().slice(0, CLARIFY_NOTE_MAX_LENGTH);
-  const hasClarifyContext = Boolean(clarifyFocus || clarifyNote);
-  const isCustomNoteOnly = clarifyId === "custom";
   const [mode, setMode] = useState<"physical" | "online" | undefined>(
     initialMode || undefined,
   );
@@ -844,8 +1355,6 @@ export function ResultClient({
       ? normalizeAiReadingForDisplay(aiReading)
       : undefined;
     const isFallbackDisplay = isFallbackAiReading(aiReading);
-    const shouldShowLocalFallback =
-      aiReadingStatus !== "ready" || !aiDisplay || isFallbackDisplay;
     const followUpStorageKey = `${buildAiReadingCacheKey({
       mode,
       orientation,
@@ -853,6 +1362,12 @@ export function ResultClient({
       cardIds: threeCardItems.map((item) => item.id).join(","),
       question: resultQuestion,
     })}:followUp:v1`;
+    const passportChips = [
+      mode === "online" ? copy.onlineDrawMode : copy.physicalCardMode,
+      orientation === "upright" ? copy.upright : copy.upright,
+      clarifyLabel || clarifyFocus,
+      clarifyNote,
+    ].filter(Boolean);
 
     if (threeCardItems.length !== 3) {
       return (
@@ -886,64 +1401,25 @@ export function ResultClient({
           <ReadingNav lang={initialLang} />
         </div>
 
-        <LuminousPanel className="rounded-b-none p-5 sm:p-6">
-          <p className="text-[0.62rem] font-semibold uppercase tracking-[0.26em] text-[color:var(--c-accent)]">
-            {copy.yourQuestion}
-          </p>
-          <p className="mt-3 text-sm leading-7 text-[color:var(--c-text)] sm:text-base">
-            {questionText}
-          </p>
-        </LuminousPanel>
-
-        <LuminousPanel className="-mt-4 rounded-t-none border-t-0 p-5 sm:p-6">
-          <h1 className="font-serif text-3xl leading-tight text-[color:var(--c-text)] sm:text-4xl">
-            {copy.yourThreeCards}
-          </h1>
-          <div className="mt-6 grid gap-4 sm:grid-cols-3">
-            {threeCardItems.map((threeCard, index) => {
-              const cardTitle = getTarotCardTitle(threeCard, initialLang);
-
-              return (
-                <article
-                  className="rounded-[1.15rem] border border-[color:var(--c-border)] bg-[color:var(--c-surface-well)]/44 p-4"
-                  key={`${positions[index]}-${threeCard.id}`}
-                >
-                  <p className="text-[0.62rem] font-semibold uppercase tracking-[0.2em] text-[color:var(--c-accent)]">
-                    {index + 1}. {positions[index]}
-                  </p>
-                  <div className="mt-4 flex items-center gap-3">
-                    <div className="w-14 shrink-0">
-                      {threeCard.image ? (
-                        <Image
-                          src={threeCard.image}
-                          alt={`${cardTitle} tarot card`}
-                          width={120}
-                          height={213}
-                          className="block h-auto w-full rounded-[0.55rem] border border-[color:var(--c-border)]/50 object-cover shadow-[0_12px_26px_rgba(116,83,36,0.14)]"
-                        />
-                      ) : (
-                        <div className="aspect-[9/16] rounded-[0.55rem] border border-[color:var(--c-border)]/50 bg-[color:var(--c-surface)]/86" />
-                      )}
-                    </div>
-                    <div>
-                      <h2 className="font-serif text-xl leading-tight text-[color:var(--c-text)]">
-                        {cardTitle}
-                      </h2>
-                      <p className="mt-1 text-xs leading-5 text-[color:var(--c-text-soft)]">
-                        {getTarotCardLabel(threeCard, initialLang)}
-                      </p>
-                    </div>
-                  </div>
-                </article>
-              );
-            })}
-          </div>
-        </LuminousPanel>
+        <ReadingStage
+          cards={threeCardItems.map((threeCard, index) => ({
+            id: threeCard.id,
+            image: threeCard.image,
+            label: getTarotCardLabel(threeCard, initialLang),
+            position: `${index + 1}. ${positions[index]}`,
+            title: getTarotCardTitle(threeCard, initialLang),
+          }))}
+          chips={passportChips}
+          lang={initialLang}
+          question={questionText}
+          spreadLabel={copy.threeCardSpread}
+        />
 
         {aiReadingStatus === "loading" ? (
           <LuminousThinkingState
-            subtitle={copy.aiReadingLoading}
-            title={copy.aiReadingTitle}
+            cardImage={threeCardItems[2]?.image || threeCardItems[0]?.image}
+            cardTitle={copy.threeCardSpread}
+            lang={initialLang}
           />
         ) : null}
 
@@ -982,192 +1458,43 @@ export function ResultClient({
           </div>
         ) : null}
 
-        {isFallbackDisplay ? (
-          <div className="rounded-[1.35rem] border border-[color:var(--c-border)]/42 bg-[color:var(--c-surface)]/76 p-4 text-sm leading-6 text-[color:var(--c-text-soft)]">
-            <p className="text-[0.64rem] font-semibold uppercase tracking-[0.2em] text-[color:var(--c-accent)]">
-              {copy.aiFallbackNoticeTitle}
-            </p>
-            <p className="mt-2">{copy.aiFallbackNoticeBody}</p>
-          </div>
-        ) : null}
-
-        {aiReadingStatus === "ready" && aiDisplay && !isFallbackDisplay ? (
-          <article className="ora-guide-dossier overflow-hidden rounded-[2rem] px-5 py-7 backdrop-blur-md sm:px-8 sm:py-9">
-            <p className="text-[0.68rem] font-semibold uppercase tracking-[0.28em] text-[color:var(--c-accent)]">
-              {copy.aiPersonalizedReading}
-            </p>
-            <h2 className="mt-3 font-serif text-3xl leading-tight text-[color:var(--c-text)] sm:text-4xl">
-              {copy.aiReadingTitle}
-            </h2>
-
-            {aiDisplay.summary ? (
-              <section className="mt-6 border-l border-[color:var(--c-accent)]/55 bg-[color:var(--c-surface)]/72 py-2 pl-4">
-                <h3 className="text-[0.64rem] font-semibold uppercase tracking-[0.22em] text-[color:var(--c-accent)]">
-                  {copy.overallMessage}
-                </h3>
-                <p className="mt-2 font-serif text-[1.15rem] leading-8 text-[color:var(--c-text)] sm:text-[1.35rem] sm:leading-9">
-                  {aiDisplay.summary}
-                </p>
-              </section>
-            ) : null}
-
-            <div className="mt-7 grid gap-4 md:grid-cols-3">
-              {[
-                {
-                  title: copy.threeCardSituation,
-                  body: aiDisplay.situationReading,
-                },
-                {
-                  title: copy.threeCardChallenge,
-                  body: aiDisplay.challengeReading,
-                },
-                {
-                  title: copy.threeCardGuidance,
-                  body: aiDisplay.guidanceReading,
-                },
-              ].map((item) =>
-                item.body ? (
-                  <section
-                    className="rounded-[1.1rem] border border-[color:var(--c-border)] bg-[color:var(--c-surface-well)]/46 p-4"
-                    key={item.title}
-                  >
-                    <h3 className="text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-[color:var(--c-accent)]">
-                      {item.title}
-                    </h3>
-                    <p className="mt-3 text-sm leading-7 text-[color:var(--c-text)]">
-                      {item.body}
-                    </p>
-                  </section>
-                ) : null,
-              )}
-            </div>
-
-            <div className="mt-7 space-y-5">
-              {[
-                {
-                  title: copy.howCardsConnect,
-                  body: aiDisplay.cardRelationship,
-                },
-                { title: copy.practicalGuidance, body: aiDisplay.advice },
-                { title: copy.aiNextStep, body: aiDisplay.nextStep },
-                {
-                  title: copy.aiReflectionQuestion,
-                  body: aiDisplay.reflectionQuestion,
-                },
-                { title: copy.closingNote, body: aiDisplay.closingNote },
-              ].map((item) =>
-                item.body ? (
-                  <section
-                    className="border-t border-[color:var(--c-border)]/38 pt-5"
-                    key={item.title}
-                  >
-                    <h3 className="text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-[color:var(--c-accent)]">
-                      {item.title}
-                    </h3>
-                    <p className="mt-3 text-sm leading-7 text-[color:var(--c-text)] sm:text-base">
-                      {item.body}
-                    </p>
-                  </section>
-                ) : null,
-              )}
-            </div>
-
-            <ResultFollowUpPanel
-              cards={threeCardItems.map((item, index) => ({
-                position: (["situation", "challenge", "guidance"] as const)[
-                  index
-                ],
-                cardId: item.id,
-              }))}
-              existingReading={aiReading}
+        {aiReadingStatus === "ready" && aiDisplay ? (
+          <>
+            <AiReadingBlocks
+              display={aiDisplay}
+              isFallback={isFallbackDisplay}
+              isThreeCard
               lang={initialLang}
-              mode={mode}
-              orientation="upright"
-              question={resultQuestion}
-              spread="three-card"
-              storageKey={followUpStorageKey}
+              question={questionText}
+              stageCards={threeCardItems.map((threeCard, index) => ({
+                arcana: threeCard.arcana,
+                keywords: getTarotCardKeywords(threeCard, initialLang),
+                position: positions[index],
+                rank: threeCard.rank,
+                suit: getTarotCardLabel(threeCard, initialLang),
+                title: getTarotCardTitle(threeCard, initialLang),
+              }))}
             />
-          </article>
+            {!isFallbackDisplay ? (
+              <ResultFollowUpPanel
+                cards={threeCardItems.map((item, index) => ({
+                  position: (["situation", "challenge", "guidance"] as const)[
+                    index
+                  ],
+                  cardId: item.id,
+                }))}
+                existingReading={aiReading}
+                lang={initialLang}
+                mode={mode}
+                orientation="upright"
+                question={resultQuestion}
+                spread="three-card"
+                storageKey={followUpStorageKey}
+              />
+            ) : null}
+          </>
         ) : null}
 
-        {shouldShowLocalFallback ? (
-        <article className="ora-guide-dossier overflow-hidden rounded-[2rem] px-5 py-7 backdrop-blur-md sm:px-8 sm:py-9">
-          <p className="text-[0.68rem] font-semibold uppercase tracking-[0.28em] text-[color:var(--c-accent)]">
-            {copy.cardByCardMeaning}
-          </p>
-          <div className="mt-6 space-y-6">
-          {threeCardItems.map((threeCard, index) => (
-              <section
-                className="border-t border-[color:var(--c-border)]/38 pt-5"
-                key={`meaning-${threeCard.id}`}
-              >
-                <h2 className="font-serif text-2xl leading-tight text-[color:var(--c-text)]">
-                  {positions[index]}: {getTarotCardTitle(threeCard, initialLang)}
-                </h2>
-                <p className="mt-3 text-sm leading-7 text-[color:var(--c-text)] sm:text-base">
-                  {initialLang === "zh"
-                    ? buildThreeCardFallbackParagraph({
-                        cardTitle: getTarotCardTitle(threeCard, initialLang),
-                        keywords: getTarotCardKeywords(threeCard, initialLang),
-                        lang: initialLang,
-                        position: positions[index],
-                      })
-                    : buildThreeCardFallbackParagraph({
-                        cardTitle: getTarotCardTitle(threeCard, initialLang),
-                        keywords: getTarotCardKeywords(threeCard, initialLang),
-                        lang: initialLang,
-                        position: positions[index],
-                      })}
-                </p>
-              </section>
-            ))}
-          </div>
-
-          <div className="mt-8 grid gap-4 md:grid-cols-2">
-            <section className="rounded-[1.1rem] border border-[color:var(--c-border)] bg-[color:var(--c-surface-well)]/46 p-4">
-              <h2 className="text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-[color:var(--c-accent)]">
-                {copy.overallMessage}
-              </h2>
-              <p className="mt-3 text-sm leading-7 text-[color:var(--c-text)]">
-                {copy.threeCardOverallFallback}
-              </p>
-            </section>
-            <section className="rounded-[1.1rem] border border-[color:var(--c-border)] bg-[color:var(--c-surface-well)]/46 p-4">
-              <h2 className="text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-[color:var(--c-accent)]">
-                {copy.practicalGuidance}
-              </h2>
-              <p className="mt-3 text-sm leading-7 text-[color:var(--c-text)]">
-                {copy.threeCardPracticalFallback}
-              </p>
-            </section>
-          </div>
-        </article>
-        ) : null}
-
-        <div className="grid gap-3 sm:grid-cols-2">
-          <button
-            className="ora-guide-button ora-guide-button-surface w-full touch-manipulation select-none opacity-70"
-            disabled
-            type="button"
-          >
-            {copy.saveToJournal}
-          </button>
-          <LuminousActionLink href={homeHref} variant="ghost">
-            {copy.startAnotherReading}
-          </LuminousActionLink>
-        </div>
-
-        <section className="ora-guide-surface rounded-[1.75rem] p-5 backdrop-blur-md">
-          <h2 className="text-xs font-semibold uppercase tracking-[0.26em] text-[color:var(--c-accent)]">
-            {copy.closingNote}
-          </h2>
-          <p className="mt-3 text-sm leading-6 text-[color:var(--c-text-soft)]">
-            {copy.closingReflection}
-          </p>
-          <p className="mt-4 text-xs leading-5 text-[color:var(--c-text-soft)]">
-            {copy.disclaimer}
-          </p>
-        </section>
       </LuminousShell>
     );
   }
@@ -1208,11 +1535,6 @@ export function ResultClient({
   const cardKeywords = getTarotCardKeywords(card, initialLang);
   const questionText = question || copy.noQuestion;
   const resultQuestion = question || "";
-  const reflectionPrompt =
-    card.reflectionQuestion || copy.reflectionFallback;
-  const practicalAdvice = card.practicalAdvice || card.suggestion;
-  const homeHref = withLang("/ai-guide", {}, initialLang);
-  const displayKeywords = cardKeywords.slice(0, 2);
   const aiDisplay = aiReading
     ? normalizeAiReadingForDisplay(aiReading)
     : undefined;
@@ -1227,58 +1549,12 @@ export function ResultClient({
     clarifyFocus,
     clarifyNote,
   })}:followUp:v1`;
-  const fullReadingText = aiDisplay
-    ? firstText(
-        aiDisplay.fullReading,
-        buildFallbackFullReading(aiDisplay),
-      )
-    : "";
-  const readingParagraphs = fullReadingText
-    ? splitReadingParagraphs(fullReadingText)
-    : [];
-  const referenceItems =
-    initialLang === "zh"
-      ? [
-          {
-            title: copy.coreInterpretation,
-            body: `${cardTitle}的辅助关键词是：${cardKeywords
-              .slice(0, 4)
-              .join("、")}。牌面资料只作为参考，具体判断以上方本次解读为主。`,
-          },
-          {
-            title: copy.situationMapping,
-            body: "先观察这些关键词是否对应你正在经历的处境，不要把牌义当成固定答案。",
-          },
-          {
-            title: copy.reflectionPrompt,
-            body: copy.reflectionFallback,
-          },
-          {
-            title: copy.quietSuggestion,
-            body: "把最有触动的一个关键词写下来，再对照你的问题看它指向哪个选择、边界或行动。",
-          },
-        ]
-      : [
-          {
-            title: copy.coreInterpretation,
-            body: cleanParagraph(card.coreMeaning),
-          },
-          {
-            title: copy.situationMapping,
-            body: cleanParagraph(card.uprightMessage),
-          },
-          {
-            title: copy.reflectionPrompt,
-            body: cleanParagraph(reflectionPrompt).replace(
-              /^Ask yourself:\s*/i,
-              "",
-            ),
-          },
-          {
-            title: copy.quietSuggestion,
-            body: cleanParagraph(practicalAdvice),
-          },
-        ];
+  const passportChips = [
+    `${modeLabel} / ${orientationLabel}`,
+    ...cardKeywords.slice(0, 3),
+    clarifyLabel || clarifyFocus,
+    clarifyNote,
+  ].filter(Boolean);
   return (
     <LuminousShell lang={initialLang}>
       <header className="flex items-center justify-between gap-4 text-[0.66rem] font-semibold uppercase tracking-[0.28em] text-[color:var(--c-accent)]">
@@ -1292,93 +1568,27 @@ export function ResultClient({
         <ReadingNav lang={initialLang} />
       </div>
 
-      <LuminousPanel className="rounded-b-none p-5 sm:p-6">
-        <div className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full border border-[color:var(--c-accent)]/20" />
-        <div className="grid gap-5 sm:grid-cols-[auto_1fr] sm:items-center">
-          <div className="flex items-center gap-4">
-            <div className="w-16 shrink-0 sm:w-20">
-              {card.image ? (
-                <Image
-                  src={card.image}
-                  alt={`${cardTitle} tarot card`}
-                  width={320}
-                  height={569}
-                  priority
-                  className="block h-auto w-full rounded-[0.7rem] border border-[color:var(--c-border)]/50 object-cover shadow-[0_18px_36px_rgba(116,83,36,0.16)]"
-                />
-              ) : (
-                <div className="flex aspect-[9/16] w-full items-center justify-center rounded-[0.7rem] border border-[color:var(--c-border)]/50 bg-[color:var(--c-surface)]/86 p-1 shadow-[0_18px_36px_rgba(116,83,36,0.14)]">
-                  <div className="flex h-full w-full items-center justify-center rounded-[0.5rem] border border-[color:var(--c-border)]/48 p-1 text-center">
-                    <span className="font-serif text-[0.68rem] leading-tight text-[color:var(--c-text)]">
-                      {cardTitle}
-                    </span>
-                  </div>
-                </div>
-              )}
-            </div>
-            <div className="min-w-0">
-              <p className="text-[0.62rem] font-semibold uppercase tracking-[0.26em] text-[color:var(--c-accent)]">
-                {copy.theCard}
-              </p>
-              <h1 className="mt-1 font-serif text-2xl leading-tight text-[color:var(--c-text)] sm:text-3xl">
-                {cardTitle}
-              </h1>
-              <p className="mt-1 text-xs leading-5 text-[color:var(--c-text-soft)]">
-                {cardLabel}
-              </p>
-            </div>
-          </div>
-
-          <div className="min-w-0 border-t border-[color:var(--c-border)]/35 pt-4 sm:border-l sm:border-t-0 sm:pl-5 sm:pt-0">
-            <h2 className="text-[0.62rem] font-semibold uppercase tracking-[0.26em] text-[color:var(--c-accent)]">
-              {copy.yourQuestion}
-            </h2>
-            <p className="mt-2 text-sm leading-7 text-[color:var(--c-text)] sm:text-base">
-              {questionText}
-            </p>
-            <div className="mt-4 flex flex-wrap gap-2">
-              <LuminousTag>{modeLabel} / {orientationLabel}</LuminousTag>
-              {displayKeywords.map((keyword) => (
-                <LuminousTag
-                  key={keyword}
-                  className="bg-[color:var(--c-surface)]/82 text-[color:var(--c-text-soft)]"
-                >
-                  {keyword}
-                </LuminousTag>
-              ))}
-            </div>
-          </div>
-        </div>
-      </LuminousPanel>
-
-      {hasClarifyContext ? (
-        <div className="mx-auto w-full max-w-[820px] px-1 text-xs leading-5 text-[color:var(--c-text-soft)]">
-          {isCustomNoteOnly ? (
-            <p>
-              {clarifyUi.noteOnlyLabel} {clarifyFocus}
-            </p>
-          ) : (
-            <>
-              {clarifyLabel || clarifyFocus ? (
-                <p>
-                  {clarifyUi.focusLabel} {clarifyLabel || clarifyFocus}
-                </p>
-              ) : null}
-              {clarifyNote ? (
-                <p className="mt-1">
-                  {clarifyUi.noteLabel} {clarifyNote}
-                </p>
-              ) : null}
-            </>
-          )}
-        </div>
-      ) : null}
+      <ReadingStage
+        cards={[
+          {
+            id: card.id,
+            image: card.image,
+            label: cardLabel,
+            title: cardTitle,
+          },
+        ]}
+        chips={passportChips}
+        lang={initialLang}
+        question={questionText}
+        spreadLabel={copy.singleCardReading}
+      />
 
       <section className="mx-auto w-full max-w-[820px]">
         {aiReadingStatus === "loading" ? (
           <LuminousThinkingState
-            subtitle={copy.aiReadingLoading}
-            title={copy.aiReadingTitle}
+            cardImage={card.image}
+            cardTitle={cardTitle}
+            lang={initialLang}
           />
         ) : null}
 
@@ -1421,48 +1631,23 @@ export function ResultClient({
         ) : null}
 
         {aiReadingStatus === "ready" && aiDisplay ? (
-          <article className="ora-guide-dossier mt-6 overflow-hidden rounded-[2rem] px-5 py-7 backdrop-blur-md sm:px-8 sm:py-9 lg:px-10 lg:py-10">
-            <p className="text-[0.68rem] font-semibold uppercase tracking-[0.28em] text-[color:var(--c-accent)]">
-              {copy.aiPersonalizedReading}
-            </p>
-            <h2 className="mt-3 font-serif text-3xl leading-tight text-[color:var(--c-text)] sm:text-4xl">
-              {copy.aiReadingTitle}
-            </h2>
-
-            {isFallbackDisplay ? (
-              <div className="mt-5 rounded-[1.35rem] border border-[color:var(--c-border)]/42 bg-[color:var(--c-surface)]/76 p-4 text-sm leading-6 text-[color:var(--c-text-soft)]">
-                <p className="text-[0.64rem] font-semibold uppercase tracking-[0.2em] text-[color:var(--c-accent)]">
-                  {copy.aiFallbackNoticeTitle}
-                </p>
-                <p className="mt-2">{copy.aiFallbackNoticeBody}</p>
-              </div>
-            ) : null}
-
-            {aiDisplay.summary ? (
-              <p className="mt-6 border-l border-[color:var(--c-accent)]/55 bg-[color:var(--c-surface)]/72 py-2 pl-4 font-serif text-[1.15rem] leading-8 text-[color:var(--c-text)] sm:text-[1.35rem] sm:leading-9">
-                {aiDisplay.summary}
-              </p>
-            ) : null}
-
-            <div className="mt-7 space-y-6 text-[15px] leading-8 text-[color:var(--c-text)] sm:text-base sm:leading-9">
-              {readingParagraphs.map((paragraph, index) => (
-                <p key={`${index}-${paragraph.slice(0, 16)}`}>
-                  {paragraph}
-                </p>
-              ))}
-            </div>
-
-            {aiDisplay.reflectionQuestion ? (
-              <div className="mt-8 border-t border-[color:var(--c-border)]/42 pt-5">
-                <p className="text-[0.68rem] font-semibold uppercase tracking-[0.26em] text-[color:var(--c-accent)]">
-                  {copy.aiReflectionQuestion}
-                </p>
-                <p className="mt-3 text-sm leading-7 text-[color:var(--c-text)] sm:text-base">
-                  {aiDisplay.reflectionQuestion}
-                </p>
-              </div>
-            ) : null}
-
+          <>
+            <AiReadingBlocks
+              display={aiDisplay}
+              isFallback={isFallbackDisplay}
+              isThreeCard={false}
+              lang={initialLang}
+              question={questionText}
+              stageCards={[
+                {
+                  arcana: card.arcana,
+                  keywords: cardKeywords,
+                  rank: card.rank,
+                  suit: cardLabel,
+                  title: cardTitle,
+                },
+              ]}
+            />
             {!isFallbackDisplay ? (
               <ResultFollowUpPanel
                 cardId={card.id}
@@ -1475,60 +1660,10 @@ export function ResultClient({
                 storageKey={followUpStorageKey}
               />
             ) : null}
-          </article>
+          </>
         ) : null}
       </section>
 
-      <details className="ora-guide-panel relative mt-1 overflow-hidden rounded-[1.5rem] p-5 backdrop-blur-md">
-        <summary className="cursor-pointer select-none list-none">
-          <span className="block text-xs font-semibold uppercase tracking-[0.26em] text-[color:var(--c-accent)]">
-            {copy.cardReference}
-          </span>
-          <span className="mt-2 block text-sm leading-6 text-[color:var(--c-text-soft)]">
-            {copy.showCardReference}
-          </span>
-        </summary>
-        <div className="mt-5 grid gap-4 lg:grid-cols-2">
-          {referenceItems.map((item) => (
-            <section
-              key={item.title}
-              className="border-t border-[color:var(--c-border)]/38 pt-4"
-            >
-              <h3 className="text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-[color:var(--c-accent)]">
-                {item.title}
-              </h3>
-              <p className="mt-2 text-sm leading-6 text-[color:var(--c-text-soft)]">
-                {item.body}
-              </p>
-            </section>
-          ))}
-        </div>
-      </details>
-
-      <div className="grid gap-3 sm:grid-cols-2">
-        <LuminousActionLink
-          href={`/ai-guide/ask?mode=${
-            mode ?? "physical"
-          }&spread=single&orientation=upright&lang=${initialLang}`}
-        >
-          {copy.continueToQuestion}
-        </LuminousActionLink>
-        <LuminousActionLink href={homeHref} variant="ghost">
-          {copy.startAnotherReading}
-        </LuminousActionLink>
-      </div>
-
-      <section className="ora-guide-surface rounded-[1.75rem] p-5 backdrop-blur-md">
-        <h2 className="text-xs font-semibold uppercase tracking-[0.26em] text-[color:var(--c-accent)]">
-          {copy.closingNote}
-        </h2>
-        <p className="mt-3 text-sm leading-6 text-[color:var(--c-text-soft)]">
-          {copy.closingReflection}
-        </p>
-        <p className="mt-4 text-xs leading-5 text-[color:var(--c-text-soft)]">
-          {copy.disclaimer}
-        </p>
-      </section>
     </LuminousShell>
   );
 }

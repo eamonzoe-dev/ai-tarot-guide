@@ -1,12 +1,11 @@
-import { ActivationCodePanel } from "@/components/ai-guide/ActivationCodePanel";
-import { ReadingNav } from "@/components/ai-guide/ReadingNav";
-import { normalizeLanguage, text } from "@/lib/ai-guide/i18n";
+import Link from "next/link";
+
+import { normalizeLanguage, withLang } from "@/lib/ai-guide/i18n";
 import { PrepareRitualStepClient } from "./PrepareRitualStepClient";
 
 type ReadingMode = "physical" | "online";
 type Spread = "single" | "three-card";
 type Orientation = "upright";
-type RitualStep = "breath" | "settle" | "ready";
 
 function normalizeMode(mode: string | string[] | undefined): ReadingMode {
   const value = Array.isArray(mode) ? mode[0] : mode;
@@ -17,11 +16,6 @@ function normalizeValue(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] ?? "" : value ?? "";
 }
 
-function normalizeStep(step: string | string[] | undefined): RitualStep {
-  const value = Array.isArray(step) ? step[0] : step;
-  return value === "settle" || value === "ready" ? value : "breath";
-}
-
 export default async function PreparePage({
   searchParams,
 }: {
@@ -30,95 +24,90 @@ export default async function PreparePage({
     spread?: string | string[];
     orientation?: string | string[];
     lang?: string | string[];
-    step?: string | string[];
+    question?: string | string[];
+    clarifyId?: string | string[];
+    clarifyLabel?: string | string[];
+    clarifyFocus?: string | string[];
+    clarifyNote?: string | string[];
+    clarifyDetail?: string | string[];
+    clarifyMood?: string | string[];
+    mood?: string | string[];
+    ritual?: string | string[];
+    preparation?: string | string[];
   }>;
 }) {
+  const allParams = await searchParams;
   const {
     mode: modeParam,
     spread: spreadParam,
     orientation: orientationParam,
     lang: langParam,
-    step: stepParam,
-  } = await searchParams;
+    question: questionParam,
+  } = allParams;
   const mode = normalizeMode(modeParam);
   const lang = normalizeLanguage(langParam);
-  const copy = text(lang);
   const spreadValue = normalizeValue(spreadParam);
   const orientationValue = normalizeValue(orientationParam);
   const spread: Spread = spreadValue === "three-card" ? "three-card" : "single";
   const orientation: Orientation =
     orientationValue === "upright" ? "upright" : "upright";
-  const step = normalizeStep(stepParam);
-  const baseParams = { mode, spread, orientation, lang };
-  const nextStep = step === "breath" ? "settle" : "ready";
-  const nextParams = new URLSearchParams(
-    step === "ready" ? baseParams : { ...baseParams, step: nextStep },
-  );
-  const nextHref =
-    step === "ready"
-      ? `/ai-guide/ask?${nextParams.toString()}`
-      : `/ai-guide/prepare?${nextParams.toString()}`;
-  const stepContent =
-    step === "breath"
-      ? {
-          main: copy.prepareStepBreathMain,
-          sub: copy.prepareStepBreathSub,
-          button: copy.prepareStepContinue,
-          count: "1 / 3",
-        }
-      : step === "settle"
-        ? {
-            main: copy.prepareStepSettleMain,
-            sub: copy.prepareStepSettleSub,
-            button: copy.prepareStepContinue,
-            count: "2 / 3",
-          }
-        : {
-            main:
-              mode === "physical"
-                ? copy.prepareStepReadyPhysicalMain
-                : copy.prepareStepReadyOnlineMain,
-            sub:
-              mode === "physical"
-                ? copy.prepareStepReadyPhysicalSub
-                : copy.prepareStepReadyOnlineSub,
-            button: copy.continueToQuestion,
-            count: "3 / 3",
-          };
+  const question = normalizeValue(questionParam).trim();
+  const drawParams = new URLSearchParams({
+    mode,
+    spread,
+    orientation,
+    lang,
+  });
+
+  if (question) {
+    drawParams.set("question", question);
+  }
+
+  [
+    "clarifyId",
+    "clarifyLabel",
+    "clarifyFocus",
+    "clarifyNote",
+    "clarifyDetail",
+    "clarifyMood",
+    "mood",
+    "ritual",
+    "preparation",
+  ].forEach((key) => {
+    const value = normalizeValue(allParams[key as keyof typeof allParams]).trim();
+
+    if (value) {
+      drawParams.set(key, value);
+    }
+  });
+
+  const drawHref = `/ai-guide/draw?${drawParams.toString()}`;
+  const exitHref = withLang("/ai-guide", {}, lang);
+  const exitLabel = lang === "zh" ? "退出准备仪式" : "Exit ritual";
 
   return (
-    <main className="ora-guide-shell relative flex min-h-svh flex-1 overflow-hidden px-0 py-0 sm:px-6 sm:py-6 lg:px-8">
+    <main className="ora-guide-shell relative flex h-[100dvh] flex-1 overflow-hidden px-0 py-0">
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_-12%,color-mix(in_srgb,var(--c-surface)_90%,transparent),color-mix(in_srgb,var(--c-bg)_74%,transparent)_34%,transparent_66%),radial-gradient(circle_at_18%_18%,color-mix(in_srgb,var(--c-accent)_14%,transparent),transparent_28%),linear-gradient(180deg,var(--c-bg)_0%,color-mix(in_srgb,var(--c-bg)_78%,var(--c-surface-well))_100%)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_-12%,color-mix(in_srgb,var(--c-surface)_82%,transparent),color-mix(in_srgb,var(--c-bg)_82%,transparent)_38%,transparent_70%),linear-gradient(180deg,var(--c-bg)_0%,color-mix(in_srgb,var(--c-bg)_82%,var(--c-surface-well))_100%)]"
       />
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-[22rem] bg-[linear-gradient(180deg,transparent,color-mix(in_srgb,var(--c-text)_8%,transparent)_100%)]"
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-[34dvh] bg-[linear-gradient(180deg,transparent,color-mix(in_srgb,var(--c-text)_8%,transparent)_100%)]"
       />
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute left-1/2 top-24 h-[24rem] w-[24rem] -translate-x-1/2 rounded-full border border-[color:var(--c-border)]/40"
+        className="pointer-events-none absolute left-1/2 top-1/2 h-[min(58dvh,34rem)] w-[min(58dvh,34rem)] -translate-x-1/2 -translate-y-1/2 rounded-full border border-[color:var(--c-border)]/20"
       />
-      <ActivationCodePanel lang={lang} hasLangParam={Boolean(langParam)} />
+      <Link
+        aria-label={exitLabel}
+        className="group absolute right-4 top-4 z-30 flex h-11 w-11 items-center justify-center rounded-full border border-[color:var(--c-border)] bg-[color:color-mix(in_srgb,var(--c-bg)_74%,transparent)] text-2xl leading-none text-[color:var(--c-text-soft)] shadow-[0_18px_40px_-30px_rgba(0,0,0,.65)] backdrop-blur transition hover:border-[color:var(--c-accent)] hover:text-[color:var(--c-accent)] sm:right-6 sm:top-6"
+        href={exitHref}
+      >
+        <span aria-hidden="true" className="-mt-0.5">×</span>
+      </Link>
 
-      <section className="relative mx-auto flex min-h-svh w-full max-w-[560px] flex-col gap-4 px-5 py-5 sm:min-h-0 sm:px-6">
-        <div className="ora-guide-surface rounded-[1.5rem] px-4 py-3">
-          <ReadingNav lang={lang} />
-        </div>
-
-        <div className="[&_.ritual-prepare-action]:flex [&_.ritual-prepare-action]:justify-center [&_.ritual-prepare-button]:!w-auto [&_.ritual-prepare-button]:min-w-[13rem] [&_.ritual-prepare-card]:!my-4 [&_.ritual-step-indicator]:!text-[color:var(--c-accent)] [&_.ritual-step-indicator]:mb-3 [&_.ritual-step-indicator]:tracking-[0.22em]">
-          <PrepareRitualStepClient
-            button={stepContent.button}
-            count={stepContent.count}
-            main={stepContent.main}
-            nextHref={nextHref}
-            readingRoom={copy.readingRoom}
-            step={step}
-            sub={stepContent.sub}
-          />
-        </div>
-      </section>
+      <PrepareRitualStepClient drawHref={drawHref} lang={lang} question={question} />
     </main>
   );
 }

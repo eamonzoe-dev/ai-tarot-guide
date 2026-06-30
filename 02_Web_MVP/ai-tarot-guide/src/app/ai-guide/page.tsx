@@ -12,17 +12,17 @@ export default async function AiGuidePage({
   const lang = normalizeLanguage(langParam);
   const homeHref = withLang("/ai-guide", {}, lang);
   const physicalHref = withLang(
-    "/ai-guide/prepare",
+    "/ai-guide/ask",
     { mode: "physical", spread: "single", orientation: "upright" },
     lang,
   );
   const onlineHref = withLang(
-    "/ai-guide/prepare",
+    "/ai-guide/ask",
     { mode: "online", spread: "single", orientation: "upright" },
     lang,
   );
   const threeCardHref = withLang(
-    "/ai-guide/prepare",
+    "/ai-guide/ask",
     { mode: "online", spread: "three-card", orientation: "upright" },
     lang,
   );

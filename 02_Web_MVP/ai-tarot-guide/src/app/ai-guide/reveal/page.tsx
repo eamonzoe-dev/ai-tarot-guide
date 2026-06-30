@@ -45,7 +45,6 @@ export default async function RevealPage({
       initialCards={normalizeValue(cards)}
       initialOrientation={normalizeValue(orientation)}
       initialLang={normalizeLanguage(lang)}
-      hasLangParam={Boolean(lang)}
       initialClarifyId={normalizeValue(clarifyId)}
       initialClarifyLabel={normalizeValue(clarifyLabel)}
       initialClarifyFocus={normalizeValue(clarifyFocus)}

@@ -1,4 +1,5 @@
-import { PreDrawClarifier } from "@/components/ai-guide/PreDrawClarifier";
+import { redirect } from "next/navigation";
+
 import { normalizeLanguage } from "@/lib/ai-guide/i18n";
 
 type ReadingMode = "physical" | "online";
@@ -23,32 +24,61 @@ export default async function LensPage({
     orientation?: string | string[];
     question?: string | string[];
     lang?: string | string[];
+    clarifyId?: string | string[];
+    clarifyLabel?: string | string[];
+    clarifyFocus?: string | string[];
+    clarifyNote?: string | string[];
+    clarifyDetail?: string | string[];
+    clarifyMood?: string | string[];
+    mood?: string | string[];
+    ritual?: string | string[];
+    preparation?: string | string[];
   }>;
 }) {
+  const allParams = await searchParams;
   const {
     mode: modeParam,
     spread: spreadParam,
     orientation: orientationParam,
     question: questionParam,
     lang: langParam,
-  } = await searchParams;
+  } = allParams;
 
   const mode = normalizeMode(modeParam);
-  const lang = normalizeLanguage(langParam);
-  const spreadValue = normalizeValue(spreadParam);
-  const spread: Spread = spreadValue === "three-card" ? "three-card" : "single";
-  const orientationValue = normalizeValue(orientationParam);
+  const spread: Spread =
+    normalizeValue(spreadParam) === "three-card" ? "three-card" : "single";
   const orientation: Orientation =
-    orientationValue === "upright" ? "upright" : "upright";
-  const question = normalizeValue(questionParam);
+    normalizeValue(orientationParam) === "upright" ? "upright" : "upright";
+  const lang = normalizeLanguage(langParam);
+  const question = normalizeValue(questionParam).trim();
+  const params = new URLSearchParams({
+    mode,
+    spread,
+    orientation,
+    lang,
+  });
 
-  return (
-    <PreDrawClarifier
-      lang={lang}
-      mode={mode}
-      spread={spread}
-      orientation={orientation}
-      initialQuestion={question}
-    />
-  );
+  if (question) {
+    params.set("question", question);
+  }
+
+  [
+    "clarifyId",
+    "clarifyLabel",
+    "clarifyFocus",
+    "clarifyNote",
+    "clarifyDetail",
+    "clarifyMood",
+    "mood",
+    "ritual",
+    "preparation",
+  ].forEach((key) => {
+    const value = normalizeValue(allParams[key as keyof typeof allParams]).trim();
+
+    if (value) {
+      params.set(key, value);
+    }
+  });
+
+  redirect(`/ai-guide/ask?${params.toString()}`);
 }

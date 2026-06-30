@@ -23,6 +23,8 @@ export default async function AskPage({
     orientation?: string | string[];
     lang?: string | string[];
     question?: string | string[];
+    ritual?: string | string[];
+    preparation?: string | string[];
   }>;
 }) {
   const {
@@ -31,6 +33,8 @@ export default async function AskPage({
     orientation: orientationParam,
     lang: langParam,
     question: questionParam,
+    ritual: ritualParam,
+    preparation: preparationParam,
   } = await searchParams;
   const mode = normalizeMode(modeParam);
   const lang = normalizeLanguage(langParam);
@@ -40,6 +44,8 @@ export default async function AskPage({
   const orientation: Orientation =
     orientationValue === "upright" ? "upright" : "upright";
   const initialQuestion = normalizeValue(questionParam).trim();
+  const ritualValue = normalizeValue(ritualParam) || normalizeValue(preparationParam);
+  const initialRitualEnabled = ritualValue === "1" || ritualValue === "true";
 
   return (
     <AskForm
@@ -49,6 +55,7 @@ export default async function AskPage({
       lang={lang}
       hasLangParam={Boolean(langParam)}
       initialQuestion={initialQuestion}
+      initialRitualEnabled={initialRitualEnabled}
     />
   );
 }

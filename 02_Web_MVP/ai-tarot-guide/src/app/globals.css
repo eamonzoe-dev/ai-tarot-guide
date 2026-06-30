@@ -2178,6 +2178,386 @@ input {
     inset 0 1px 0 color-mix(in srgb, var(--c-surface) 80%, transparent);
 }
 
+.ora-result-stage {
+  overflow: hidden;
+}
+
+.ora-result-stage::after {
+  content: "";
+  position: absolute;
+  inset-block: 0.75rem;
+  inset-inline-end: -2.5rem;
+  width: 5.5rem;
+  border: 1px solid color-mix(in srgb, var(--c-accent) 18%, transparent);
+  border-radius: 999px;
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.ora-result-stage-cards {
+  position: relative;
+}
+
+.ora-result-stage-cards::before {
+  content: "";
+  position: absolute;
+  inset-inline: 8%;
+  bottom: -0.45rem;
+  height: 0.85rem;
+  border-radius: 999px;
+  background: radial-gradient(ellipse, color-mix(in srgb, var(--c-accent) 18%, transparent), transparent 68%);
+  pointer-events: none;
+}
+
+.ora-result-stage-card {
+  position: relative;
+  border: 1px solid color-mix(in srgb, var(--c-border) 72%, transparent);
+  border-radius: 0.95rem;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--c-surface) 82%, transparent), color-mix(in srgb, var(--c-surface-well) 58%, transparent));
+  box-shadow:
+    0 10px 24px color-mix(in srgb, var(--c-text) 7%, transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--c-surface) 66%, transparent);
+}
+
+.ora-result-stage-card > .relative {
+  max-height: 9.25rem;
+}
+
+.ora-result-loading,
+.ora-result-reading {
+  animation: ora-result-fade-in 0.42s ease both;
+}
+
+.ora-result-loading-card {
+  animation: ora-result-breathe 3.8s ease-in-out infinite;
+}
+
+.ora-result-skeleton {
+  position: relative;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--c-border) 48%, transparent);
+}
+
+.ora-result-skeleton::after {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  left: -40%;
+  width: 40%;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--c-surface) 72%, transparent), transparent);
+  animation: ora-result-skeleton 2.2s ease-in-out infinite;
+}
+
+.ora-result-follow-up {
+  border-top: 1px solid color-mix(in srgb, var(--c-border) 46%, transparent);
+  color: var(--c-text);
+  padding-top: 1.25rem;
+}
+
+.ora-result-follow-up-thread,
+.ora-result-composer-shell {
+  margin-left: 3.1rem;
+  max-width: calc(100% - 3.1rem);
+}
+
+.ora-result-composer {
+  border-color: color-mix(in srgb, var(--c-accent) 34%, var(--c-border));
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--c-surface) 94%, var(--c-bg)), color-mix(in srgb, var(--c-surface-well) 66%, var(--c-bg)));
+  box-shadow:
+    0 18px 42px color-mix(in srgb, var(--c-text) 9%, transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--c-surface) 72%, transparent);
+}
+
+.ora-result-composer-input {
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--c-surface) 58%, transparent),
+    0 10px 24px color-mix(in srgb, var(--c-text) 5%, transparent);
+}
+
+.ora-result-conversation {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.ora-result-message-row {
+  display: grid;
+  grid-template-columns: 2.35rem minmax(0, 1fr);
+  align-items: start;
+  gap: 0.75rem;
+}
+
+.ora-result-message-row-user {
+  display: flex;
+  justify-content: flex-end;
+  padding-left: 3.1rem;
+}
+
+.ora-result-avatar {
+  display: grid;
+  width: 2.15rem;
+  height: 2.15rem;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--c-accent) 22%, var(--c-border));
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 50% 34%, color-mix(in srgb, var(--c-accent) 16%, transparent), transparent 64%),
+    color-mix(in srgb, var(--c-surface) 90%, var(--c-surface-well));
+  color: color-mix(in srgb, var(--c-accent) 76%, var(--c-text-soft));
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.ora-result-block {
+  display: grid;
+  grid-template-columns: 2.35rem minmax(0, 1fr);
+  gap: 0.75rem;
+}
+
+.ora-result-block-rail {
+  padding-top: 0.1rem;
+}
+
+.ora-result-block-body {
+  border: 1px solid color-mix(in srgb, var(--c-border) 64%, transparent);
+  border-radius: 1.25rem 1.25rem 1.25rem 0.4rem;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--c-surface) 96%, var(--c-bg)), color-mix(in srgb, var(--c-surface-well) 72%, var(--c-bg)));
+  padding: 1.05rem 1.1rem 1.15rem;
+  color: var(--c-text);
+  box-shadow:
+    0 12px 30px color-mix(in srgb, var(--c-text) 6%, transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--c-surface) 68%, transparent);
+}
+
+.ora-result-block-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--c-border) 38%, transparent);
+  padding-bottom: 0.7rem;
+}
+
+.ora-result-block-title {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.ora-result-block-icon {
+  display: inline-grid;
+  width: 1.55rem;
+  height: 1.55rem;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--c-accent) 34%, var(--c-border));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--c-accent-wash) 58%, transparent);
+  color: var(--c-accent);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.ora-result-block-header h2 {
+  margin: 0;
+  color: var(--c-text);
+  font-family: Georgia, serif;
+  font-size: 1.18rem;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.ora-result-block-body blockquote {
+  margin: 0.95rem 0 0;
+  border-left: 2px solid color-mix(in srgb, var(--c-accent) 72%, transparent);
+  border-radius: 0.75rem;
+  background: color-mix(in srgb, var(--c-accent-wash) 42%, transparent);
+  padding: 0.8rem 0.9rem;
+  color: var(--c-text);
+  font-family: Georgia, serif;
+  font-size: 1.18rem;
+  line-height: 1.62;
+}
+
+.ora-result-block-content {
+  margin-top: 1rem;
+  display: grid;
+  gap: 0.95rem;
+  color: color-mix(in srgb, var(--c-text) 88%, var(--c-text-soft));
+  font-size: 0.96rem;
+  line-height: 1.85;
+}
+
+.ora-result-block-content p {
+  margin: 0;
+}
+
+.ora-result-position-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.ora-result-position-list section {
+  border-top: 1px solid color-mix(in srgb, var(--c-border) 42%, transparent);
+  padding-top: 0.9rem;
+}
+
+.ora-result-position-list section:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.ora-result-position-list h3 {
+  margin: 0 0 0.45rem;
+  color: var(--c-accent);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.ora-result-guidance-list {
+  margin: 0.2rem 0 0;
+  display: grid;
+  gap: 0.65rem;
+  padding-left: 1.2rem;
+}
+
+.ora-result-guidance-list li {
+  padding-left: 0.25rem;
+}
+
+.ora-result-guidance-list li::marker {
+  color: var(--c-accent);
+  font-weight: 700;
+}
+
+.ora-result-guidance-reflection {
+  border-top: 1px solid color-mix(in srgb, var(--c-border) 38%, transparent);
+  padding-top: 0.85rem;
+  color: var(--c-text-soft);
+}
+
+.ora-result-bubble {
+  width: fit-content;
+  max-width: min(100%, 42rem);
+  border: 1px solid color-mix(in srgb, var(--c-border) 78%, transparent);
+  padding: 0.95rem 1rem;
+  font-size: 0.95rem;
+  line-height: 1.8;
+  color: var(--c-text);
+  box-shadow:
+    0 12px 28px color-mix(in srgb, var(--c-text) 6%, transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--c-surface) 62%, transparent);
+}
+
+.ora-result-bubble-ora {
+  border-radius: 1.15rem 1.15rem 1.15rem 0.35rem;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--c-surface) 94%, var(--c-bg)), color-mix(in srgb, var(--c-surface-well) 70%, var(--c-bg)));
+}
+
+.ora-result-bubble-user {
+  margin-left: auto;
+  border-radius: 1.15rem 1.15rem 0.35rem 1.15rem;
+  background: color-mix(in srgb, var(--c-surface-well) 52%, transparent);
+  color: var(--c-text-soft);
+}
+
+.ora-result-bubble-emphasis {
+  border-color: color-mix(in srgb, var(--c-accent) 38%, var(--c-border));
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--c-surface) 96%, var(--c-accent-wash)), color-mix(in srgb, var(--c-surface-well) 72%, var(--c-bg)));
+}
+
+.ora-result-bubble blockquote {
+  margin: 0;
+  border-left: 2px solid color-mix(in srgb, var(--c-accent) 68%, transparent);
+  padding-left: 0.85rem;
+  font-family: Georgia, serif;
+  font-size: 1.15rem;
+  line-height: 1.65;
+}
+
+@keyframes ora-result-breathe {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+    box-shadow: 0 0 30px color-mix(in srgb, var(--c-accent) 12%, transparent);
+  }
+
+  50% {
+    transform: translateY(-4px) scale(1.025);
+    box-shadow: 0 0 46px color-mix(in srgb, var(--c-accent) 22%, transparent);
+  }
+}
+
+@media (max-width: 640px) {
+  .ora-result-message-row {
+    grid-template-columns: 2rem minmax(0, 1fr);
+    gap: 0.6rem;
+  }
+
+  .ora-result-block {
+    grid-template-columns: 2rem minmax(0, 1fr);
+    gap: 0.6rem;
+  }
+
+  .ora-result-block-body {
+    padding: 1rem;
+  }
+
+  .ora-result-block-header {
+    display: block;
+  }
+
+  .ora-result-block-header h2 {
+    margin-top: 0.15rem;
+    font-size: 1.18rem;
+  }
+
+  .ora-result-message-row-user,
+  .ora-result-follow-up-thread,
+  .ora-result-composer-shell {
+    padding-left: 0;
+    margin-left: 0;
+    max-width: 100%;
+  }
+
+  .ora-result-avatar {
+    width: 2rem;
+    height: 2rem;
+  }
+}
+
+@keyframes ora-result-skeleton {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(360%);
+  }
+}
+
+@keyframes ora-result-fade-in {
+  0% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .ora-guide-dossier::before,
 .ora-guide-altar::before {
   content: "";
@@ -2476,7 +2856,11 @@ input {
 @media (prefers-reduced-motion: reduce) {
   .ora-motion-fade-up,
   .ora-motion-ritual-pulse,
-  .ora-motion-soft-glow {
+  .ora-motion-soft-glow,
+  .ora-result-loading,
+  .ora-result-loading-card,
+  .ora-result-reading,
+  .ora-result-skeleton::after {
     animation: none;
   }
 
