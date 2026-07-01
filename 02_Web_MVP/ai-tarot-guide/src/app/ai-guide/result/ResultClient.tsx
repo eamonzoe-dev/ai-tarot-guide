@@ -44,6 +44,10 @@ const resultDisplayCopy = {
       overview: "I",
       card: "II",
       guidance: "III",
+      relationship: "II",
+      situation: "1",
+      challenge: "2",
+      integrated: "6",
       fallback: "!",
     },
     openingSingle: "I am reading this card through the question you brought here.",
@@ -51,6 +55,8 @@ const resultDisplayCopy = {
       "I am reading these three cards as a sequence: what is happening, what asks for attention, and what can guide you forward.",
     coreMessage: "Core message",
     cardAndQuestion: "Card Interpretation",
+    spreadRelationship: "Spread Relationship",
+    integratedGuidance: "Integrated Guidance",
     currentReminder: "Current reminder",
     nextSuggestion: "Guidance",
     overallReading: "Reading Overview",
@@ -75,6 +81,10 @@ const resultDisplayCopy = {
       overview: "I",
       card: "II",
       guidance: "III",
+      relationship: "II",
+      situation: "1",
+      challenge: "2",
+      integrated: "6",
       fallback: "!",
     },
     openingSingle: "我会把你带来的问题，放回这张牌里一起看。",
@@ -82,6 +92,8 @@ const resultDisplayCopy = {
       "我会把这三张牌读成一个顺序：正在发生什么、哪里需要被看见，以及接下来可以怎样往前走。",
     coreMessage: "核心提示",
     cardAndQuestion: "牌面解读",
+    spreadRelationship: "牌阵关系",
+    integratedGuidance: "综合建议",
     currentReminder: "当前提醒",
     nextSuggestion: "指引与建议",
     overallReading: "解读概览",
@@ -758,6 +770,44 @@ function UserQuestionBubble({
   );
 }
 
+function getThreeCardRelationLine({
+  cardTitle,
+  lang,
+  otherCards,
+  position,
+}: {
+  cardTitle: string;
+  lang: Language;
+  otherCards: string[];
+  position?: string;
+}) {
+  const otherCardText = otherCards.join(lang === "zh" ? "、" : " and ");
+
+  if (lang === "zh") {
+    return `放在整组牌里，${cardTitle}不是单独给答案；它需要和${otherCardText}一起读，承担「${position || "当前位置"}」这一步的作用。`;
+  }
+
+  return `Within the full spread, ${cardTitle} is not read in isolation; it works with ${otherCardText} and carries the role of ${position || "this position"}.`;
+}
+
+function formatThreeCardBlockTitle({
+  index,
+  lang,
+  position,
+  title,
+}: {
+  index: number;
+  lang: Language;
+  position?: string;
+  title: string;
+}) {
+  if (lang === "zh") {
+    return `第${index + 1}张牌：${position || ""} · ${title}`;
+  }
+
+  return `Card ${index + 1}: ${position || ""} · ${title}`;
+}
+
 function AiReadingBlocks({
   display,
   isFallback,
@@ -807,6 +857,14 @@ function AiReadingBlocks({
           display.challengeReading,
           display.guidanceReading,
         ][index],
+        getThreeCardRelationLine({
+          cardTitle: cardItem.title,
+          lang,
+          otherCards: stageCards
+            .filter((_, cardIndex) => cardIndex !== index)
+            .map((item) => item.title),
+          position: cardItem.position,
+        }),
       ]
         .filter(Boolean)
         .join("\n\n");
@@ -814,7 +872,12 @@ function AiReadingBlocks({
       return body
         ? {
             body,
-            title: `${cardItem.position || ""} · ${cardItem.title}`,
+            title: formatThreeCardBlockTitle({
+              index,
+              lang,
+              position: cardItem.position,
+              title: cardItem.title,
+            }),
           }
         : null;
     })
@@ -825,6 +888,11 @@ function AiReadingBlocks({
     display.hiddenTension,
   ]).join("\n\n");
   const guidanceReflection = firstText(display.reflectionQuestion);
+  const positionIcons = [
+    ui.blockIcons.situation,
+    ui.blockIcons.challenge,
+    ui.blockIcons.guidance,
+  ];
 
   function renderParagraphs(textValue: string) {
     return splitMessageText(textValue, 520).map((paragraph, index) => (
@@ -860,28 +928,63 @@ function AiReadingBlocks({
         {renderParagraphs(overviewBody)}
       </OraReadingBlock>
 
-      {hasInterpretation ? (
+      {isThreeCard ? (
+        <>
+          {display.cardRelationship ? (
+            <OraReadingBlock
+              icon={ui.blockIcons.relationship}
+              label={ui.oraLabel}
+              title={ui.spreadRelationship}
+            >
+              {renderParagraphs(display.cardRelationship)}
+            </OraReadingBlock>
+          ) : null}
+
+          {threeInterpretation.map((item, index) => (
+            <OraReadingBlock
+              icon={positionIcons[index] || ui.blockIcons.card}
+              key={item.title}
+              label={ui.oraLabel}
+              title={item.title}
+            >
+              {renderParagraphs(item.body)}
+            </OraReadingBlock>
+          ))}
+
+          {hasGuidance ? (
+            <OraReadingBlock
+              icon={ui.blockIcons.integrated}
+              label={ui.oraLabel}
+              title={ui.integratedGuidance}
+            >
+              {guidanceItems.length > 0 ? (
+                <ol className="ora-result-guidance-list">
+                  {guidanceItems.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ol>
+              ) : null}
+              {guidanceReflection ? (
+                <p className="ora-result-guidance-reflection">
+                  {guidanceReflection}
+                </p>
+              ) : null}
+            </OraReadingBlock>
+          ) : null}
+        </>
+      ) : null}
+
+      {!isThreeCard && hasInterpretation ? (
         <OraReadingBlock
           icon={ui.blockIcons.card}
           label={ui.oraLabel}
           title={ui.cardAndQuestion}
         >
-          {isThreeCard ? (
-            <div className="ora-result-position-list">
-              {threeInterpretation.map((item) => (
-                <section key={item.title}>
-                  <h3>{item.title}</h3>
-                  {renderParagraphs(item.body)}
-                </section>
-              ))}
-            </div>
-          ) : (
-            renderParagraphs(singleInterpretation)
-          )}
+          {renderParagraphs(singleInterpretation)}
         </OraReadingBlock>
       ) : null}
 
-      {hasGuidance ? (
+      {!isThreeCard && hasGuidance ? (
         <OraReadingBlock
           icon={ui.blockIcons.guidance}
           label={ui.oraLabel}

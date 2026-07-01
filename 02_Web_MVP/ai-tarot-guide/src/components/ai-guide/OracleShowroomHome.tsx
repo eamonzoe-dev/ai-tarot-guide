@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { type CSSProperties, type FormEvent, type MouseEvent, useMemo, useState } from "react";
+import { type CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { ActivationCodePanel } from "@/components/ai-guide/ActivationCodePanel";
 import { type Language } from "@/lib/ai-guide/i18n";
@@ -17,6 +17,39 @@ type OracleShowroomHomeProps = {
 };
 
 type IconProps = { className?: string; style?: CSSProperties };
+
+type SpeechRecognitionResultLike = {
+  isFinal: boolean;
+  0: {
+    transcript: string;
+  };
+};
+
+type SpeechRecognitionEventLike = {
+  resultIndex: number;
+  results: {
+    length: number;
+    [index: number]: SpeechRecognitionResultLike;
+  };
+};
+
+type SpeechRecognitionErrorEventLike = {
+  error: string;
+};
+
+type SpeechRecognitionLike = {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  onend: (() => void) | null;
+  onerror: ((event: SpeechRecognitionErrorEventLike) => void) | null;
+  onresult: ((event: SpeechRecognitionEventLike) => void) | null;
+  abort: () => void;
+  start: () => void;
+  stop: () => void;
+};
+
+type SpeechRecognitionConstructorLike = new () => SpeechRecognitionLike;
 
 function OraMarkIcon({ className, style }: IconProps) {
   return (
@@ -99,19 +132,34 @@ function OraShieldIcon({ className, style }: IconProps) {
   );
 }
 
-function OraLeafIcon({ className, style }: IconProps) {
-  return (
-    <svg className={className} fill="none" stroke="currentColor" strokeWidth="1.25" style={style} viewBox="0 0 48 48">
-      <path d="M12 36c0-14 10-24 24-24 0 14-10 24-24 24Z" strokeLinejoin="round" />
-      <path d="M16 32 32 16" />
-    </svg>
-  );
-}
-
 function ArrowIcon({ className }: { className?: string }) {
   return (
     <svg className={className} fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" viewBox="0 0 24 24">
       <path d="M5 12h14M13 6l6 6-6 6" />
+    </svg>
+  );
+}
+
+function DiceIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" viewBox="0 0 24 24">
+      <rect height="14" rx="3" width="14" x="5" y="5" />
+      <circle cx="9" cy="9" fill="currentColor" r="0.75" stroke="none" />
+      <circle cx="15" cy="9" fill="currentColor" r="0.75" stroke="none" />
+      <circle cx="12" cy="12" fill="currentColor" r="0.75" stroke="none" />
+      <circle cx="9" cy="15" fill="currentColor" r="0.75" stroke="none" />
+      <circle cx="15" cy="15" fill="currentColor" r="0.75" stroke="none" />
+    </svg>
+  );
+}
+
+function MicrophoneIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" viewBox="0 0 24 24">
+      <path d="M12 4a3 3 0 0 0-3 3v5a3 3 0 0 0 6 0V7a3 3 0 0 0-3-3Z" />
+      <path d="M5 11a7 7 0 0 0 14 0" />
+      <path d="M12 18v3" />
+      <path d="M9 21h6" />
     </svg>
   );
 }
@@ -130,37 +178,150 @@ export function OracleShowroomHome({
   readingsHref,
 }: OracleShowroomHomeProps) {
   const isZh = lang === "zh";
-  const [ritualBySpread, setRitualBySpread] = useState<Record<string, boolean>>({});
+  const [activeQuestionCategory, setActiveQuestionCategory] = useState("love");
+  const [heroQuestion, setHeroQuestion] = useState("");
+  const [isListening, setIsListening] = useState(false);
+  const [speechSupported, setSpeechSupported] = useState(false);
+  const [voiceStatus, setVoiceStatus] = useState("");
+  const heroQuestionTextareaRef = useRef<HTMLTextAreaElement>(null);
+  const speechRecognitionRef = useRef<SpeechRecognitionLike | null>(null);
 
   const copy = useMemo(
     () => ({
-      room: isZh ? "Ora Arcana · 阅读室" : "Ora Arcana · Reading Room",
+      room: isZh ? "Ora Arcana · 向卡牌提问" : "Ora Arcana · Ask the Cards",
       sectionNavigationLabel: isZh ? "页面分区导航" : "Section navigation",
       nav: isZh
         ? [
             ["如何开始", "#reading-modes"],
-            ["卡组", "#deck"],
+            ["认识 Ora", "#meet-ora"],
             ["解读日志", "#journal"],
-            ["实体卡组", "#physical"],
             ["说明", "#trust"],
           ]
         : [
             ["Start", "#reading-modes"],
-            ["Deck", "#deck"],
+            ["Meet Ora", "#meet-ora"],
             ["Journal", "#journal"],
-            ["Physical Deck", "#physical"],
             ["Trust", "#trust"],
           ],
-      heroTitle: isZh ? { r1: "向卡牌", r2: "提问" } : { r1: "ASK THE", r2: "CARD" },
-      subtitle: isZh ? "为现代问题准备的一间安静阅读室。" : "A quiet reading room for modern questions.",
+      heroTitle: isZh ? "下午好。" : "Good afternoon.",
+      subtitle: isZh ? "把此刻的问题交给 Ora。" : "Bring this moment's question to Ora.",
       heroBody: isZh
-        ? "在阅读室中选择路径，让一张正位牌安放此刻的问题。"
-        : "Move through the room, choose your path, and let one upright card hold the question.",
-      begin: isZh ? "开始解读" : "Begin a Reading",
+        ? "Ora 会先整理你的语境，再带你抽牌。"
+        : "Ora reads your context first, then guides the draw.",
+      begin: isZh ? "开始解读" : "Start Reading",
+      randomQuestion: isZh ? "随机问题" : "Random question",
+      voiceInput: isZh ? "语音输入" : "Voice input",
+      voiceUnsupported: isZh ? "此浏览器暂不支持语音输入" : "Voice input is not supported in this browser",
+      voicePermissionUnavailable: isZh ? "无法使用麦克风权限" : "Microphone permission is unavailable.",
       physical: isZh ? "使用实体卡组" : "Use Physical Deck",
       explore: isZh ? "浏览卡牌" : "Explore the Cards",
-      questionSlip: isZh ? "问题纸条" : "Question slip",
-      waitingQuestion: isZh ? "此刻等待被问出的是什么？" : "What is waiting to be asked?",
+      questionCategoryLabel: isZh ? "问题方向" : "Question direction",
+      questionPlaceholder: isZh ? "写下你现在想问的问题" : "Write the question you want to ask",
+      questionCategories: isZh
+        ? [
+            {
+              id: "love",
+              label: "爱情",
+              questions: [
+                "我们之间真正的问题是什么？",
+                "这段关系里，我需要看清什么？",
+                "如果我选择自己，这段关系会发生什么变化？",
+                "我现在应该靠近，还是保持距离？",
+              ],
+            },
+            {
+              id: "work",
+              label: "事业",
+              questions: [
+                "我现在的工作方向对吗？",
+                "下一步我应该先处理什么？",
+                "这个机会值得继续投入吗？",
+                "我在事业上真正卡住的地方是什么？",
+              ],
+            },
+            {
+              id: "money",
+              label: "财富",
+              questions: [
+                "我现在对钱的焦虑来自哪里？",
+                "这个财务决定需要注意什么？",
+                "我该保守一点，还是主动争取？",
+                "现在最该调整的消费或投资习惯是什么？",
+              ],
+            },
+            {
+              id: "choice",
+              label: "决策",
+              questions: [
+                "这个选择背后，我最害怕失去什么？",
+                "我现在真正犹豫的是什么？",
+                "如果我继续推进，最大的阻力是什么？",
+                "我应该等待，还是做出行动？",
+              ],
+            },
+            {
+              id: "self",
+              label: "自我",
+              questions: [
+                "我现在最需要听见的提醒是什么？",
+                "我为什么一直重复同一个模式？",
+                "我需要放下什么，才能往前走？",
+                "我忽略了自己哪一部分感受？",
+              ],
+            },
+          ]
+        : [
+            {
+              id: "love",
+              label: "Love",
+              questions: [
+                "What is the real issue between us?",
+                "What do I need to see clearly in this relationship?",
+                "What changes if I choose myself?",
+                "Should I move closer or keep distance?",
+              ],
+            },
+            {
+              id: "work",
+              label: "Work",
+              questions: [
+                "Is my current direction at work right for me?",
+                "What should I handle first next?",
+                "Is this opportunity worth continuing?",
+                "Where am I truly stuck in my work?",
+              ],
+            },
+            {
+              id: "money",
+              label: "Money",
+              questions: [
+                "Where is my anxiety about money coming from?",
+                "What should I notice before this financial decision?",
+                "Should I stay cautious or ask for more?",
+                "What money habit needs adjustment now?",
+              ],
+            },
+            {
+              id: "choice",
+              label: "Choice",
+              questions: [
+                "What am I afraid to lose behind this choice?",
+                "What am I really hesitating about?",
+                "What resistance will I meet if I move forward?",
+                "Should I wait or take action?",
+              ],
+            },
+            {
+              id: "self",
+              label: "Self",
+              questions: [
+                "What reminder do I need most right now?",
+                "Why do I keep repeating the same pattern?",
+                "What do I need to release to move forward?",
+                "What part of myself am I ignoring?",
+              ],
+            },
+          ],
       choosePath: isZh ? "选择你的解读" : "Choose Your Reading",
       wonderingTitle: isZh ? "你正在想什么？" : "What are you wondering?",
       spreads: isZh
@@ -169,7 +330,8 @@ export function OracleShowroomHome({
               id: "single",
               title: "单牌解读",
               body: "一个清晰问题的快速提示。",
-              meta: "1 张牌 · 可用",
+              meta: "1 张牌 · 推荐",
+              cta: "开始单牌解读",
               href: onlineHref,
               icon: OraMarkIcon,
               active: false,
@@ -180,9 +342,10 @@ export function OracleShowroomHome({
               title: "三牌阵",
               body: "围绕处境、挑战与指引展开更深入的解读。",
               meta: "3 张牌 · 可用",
+              cta: "开始三牌阵",
               href: threeCardHref,
               icon: OraPairIcon,
-              active: true,
+              active: false,
               disabled: false,
             },
             {
@@ -190,6 +353,7 @@ export function OracleShowroomHome({
               title: "关系解读",
               body: "用于爱、连接与情感清晰度。",
               meta: "3 张牌 · 即将开放",
+              cta: "",
               href: "",
               icon: OraLinkIcon,
               active: false,
@@ -200,6 +364,7 @@ export function OracleShowroomHome({
               title: "事业解读",
               body: "用于工作、方向与下一次机会。",
               meta: "3 张牌 · 即将开放",
+              cta: "",
               href: "",
               icon: OraPathIcon,
               active: false,
@@ -211,7 +376,8 @@ export function OracleShowroomHome({
               id: "single",
               title: "Single Card Reading",
               body: "A quick message for one clear question.",
-              meta: "1 card · Available",
+              meta: "1 card · Recommended",
+              cta: "Start single-card reading",
               href: onlineHref,
               icon: OraMarkIcon,
               active: false,
@@ -222,9 +388,10 @@ export function OracleShowroomHome({
               title: "Three Card Spread",
               body: "A deeper reading for situation, challenge, and guidance.",
               meta: "3 cards · Available",
+              cta: "Start three-card spread",
               href: threeCardHref,
               icon: OraPairIcon,
-              active: true,
+              active: false,
               disabled: false,
             },
             {
@@ -232,6 +399,7 @@ export function OracleShowroomHome({
               title: "Relationship Reading",
               body: "For love, connection, and emotional clarity.",
               meta: "3 cards · Coming Soon",
+              cta: "",
               href: "",
               icon: OraLinkIcon,
               active: false,
@@ -242,22 +410,15 @@ export function OracleShowroomHome({
               title: "Career Reading",
               body: "For work, direction, and next opportunities.",
               meta: "3 cards · Coming Soon",
+              cta: "",
               href: "",
               icon: OraPathIcon,
               active: false,
               disabled: true,
             },
           ],
-      askOraTitle: isZh ? "向 Ora 提问" : "Ask Ora",
-      askOraDescription: isZh
-        ? "写下你现在想问的一句话，Ora 会带你抽一张牌。"
-        : "Write the one thing you want to ask. Ora will guide you through a draw.",
-      askOraButton: isZh ? "开始这次解读" : "Begin this reading",
-      addRitual: isZh ? "加入准备仪式" : "Add preparation ritual",
-      chips: isZh ? ["关系", "工作", "自我", "选择", "未来"] : ["Love", "Work", "Self", "Decision", "Future"],
-      questionPlaceholder: isZh ? "写下此刻想问的一句话..." : "Write the one thing you want to ask...",
       unfoldsKicker: isZh ? "解读如何展开" : "The Reading Unfolds",
-      unfoldsTitle: isZh ? "五个安静动作，一张正位牌。" : "Five quiet movements, one upright card.",
+      unfoldsTitle: isZh ? "从安顿到回看，流程保持轻盈。" : "From settling to reflection, the path stays light.",
       unfolds: isZh
         ? [
             ["安顿", "抵达这里，让问题周围的杂音慢慢变轻。"],
@@ -292,7 +453,10 @@ export function OracleShowroomHome({
             ["IX", "The Hermit", "Inner light", false],
           ],
       journalKicker: isZh ? "解读日志" : "Reading Journal",
-      journalTitle: isZh ? "你的解读，留成一段可回看的日志。" : "Your readings become a journal you can return to.",
+      journalTitle: isZh ? "Ora 不只给你一次答案。" : "Ora is not only here for one answer.",
+      journalBody: isZh
+        ? "每次阅读都会成为你的情绪、问题与选择脉络。当你第十次回来时，Ora 不应该像第一次见你。"
+        : "Each reading becomes part of your emotional and decision-making archive. When you return for the tenth time, Ora should not meet you like a stranger.",
       journalNotes: isZh
         ? [
             ["安静的模式", "星星", "当问题不再急着取胜，一个更柔和的答案浮现出来。"],
@@ -309,26 +473,86 @@ export function OracleShowroomHome({
       openJournal: isZh ? "打开解读日志" : "Open Journal",
       viewAll: isZh ? "查看全部" : "View All",
       physicalDeckKicker: isZh ? "实体卡组" : "Physical Deck",
-      physicalDeckTitle: isZh ? "为手心而作。\n为感受而作。" : "Made to be held.\nMade to be felt.",
+      physicalDeckTitle: isZh ? "已有实体卡组？\n使用实体卡组解读。" : "Have the physical deck?\nRead with your cards.",
       redeemDeckKicker: isZh ? "兑换你的卡组" : "Redeem Your Deck",
       redeemDeckTitle: isZh ? "解锁实体卡组的线上陪伴体验。" : "Unlock your deck's companion experience.",
       redeemDeckCode: isZh ? "兑换卡组码" : "Redeem Deck Code",
-      trustTitle: isZh ? "这是一件反思工具，不是一台预言机器。" : "A reflective tool, not a prediction machine.",
+      trustTitle: isZh ? "Ora 的边界" : "Ora's Boundaries",
       trustBody: isZh
-        ? "Ora 支持象征性的自我反思与有结构的注意力整理。它不是医疗、法律、财务或心理建议。"
-        : "Ora supports symbolic reflection and structured attention. It is not medical, legal, financial, or psychological advice.",
-      trustItems: isZh
+        ? "Ora 不是医疗、法律、财务或心理治疗建议。她不会替你做决定，也不会承诺未来。她更像一面安静的镜子，帮助你把问题看得更清楚。"
+        : "Ora is not medical, legal, financial, or therapeutic advice. She does not make decisions for you or promise the future. She is a quiet mirror for reflection, helping you see the question more clearly.",
+      storyKicker: isZh ? "Ora 如何完成一次专业解读" : "How Ora Shapes a Professional Reading",
+      storyTitle: isZh ? "一屏一个步骤，看到 Ora 怎样把问题变成解读。" : "One step at a time: how Ora turns a question into a reading.",
+      storySteps: isZh
         ? [
-            ["以隐私为先", "你的提问与解读默认只属于你。Ora 不用于训练，也不会公开展示。"],
-            ["AI 辅助象征解读", "抽牌后，Ora 会结合你的问题与牌面，给出一段贴合当下的象征解读。"],
-            ["用于反思与娱乐", "Ora 用于自我观察与放松，不构成医疗、法律、财务或心理建议。"],
+            {
+              title: "Ora 先听见你的问题。",
+              body: "在抽牌之前，Ora 会先整理你的问题语境。她不会只抓关键词，而是判断你真正想看的，是选择、关系、阻力，还是下一步方向。",
+              kind: "conversation",
+            },
+            {
+              title: "牌阵不是装饰，是问题的结构。",
+              body: "单牌适合一个清晰问题。三牌阵会把问题拆成现状、挑战与指引。Ora 不只是逐张解释牌义，而是看牌与牌之间的关系。",
+              kind: "spread",
+            },
+            {
+              title: "同一张牌，不会只有一种答案。",
+              body: "愚者在新开始里可能是勇气。在关系问题里可能是轻率。在事业问题里可能是准备不足。Ora 会结合问题、牌阵位置和上下文解释牌面。",
+              kind: "card",
+            },
+            {
+              title: "被说中的地方，可以继续问下去。",
+              body: "一次解读不必停在第一段回答。你可以追问某个建议、某张牌、某个不舒服的提醒。Ora 会沿着本次牌面继续展开，而不是重新抽牌。",
+              kind: "follow-up",
+            },
+            {
+              title: "Ora 不只给你一次答案。",
+              body: "每次阅读都会成为你的私人阅读脉络。当你第十次回来时，Ora 不应该像第一次见你。",
+              kind: "journal",
+            },
           ]
         : [
-            ["Private by design", "Your questions and readings are yours by default. Ora is never used for training and never shown publicly."],
-            ["AI-guided symbolism", "After a draw, Ora blends your question with the card to offer symbolism that fits the moment."],
-            ["For reflection and entertainment", "Ora is for self-observation and reflection. It is not medical, legal, financial, or psychological advice."],
+            {
+              title: "Ora first listens to the question.",
+              body: "Before the draw, Ora reads the shape of your question. She does not only scan keywords; she looks for whether you are asking about choice, relationship, resistance, or the next step.",
+              kind: "conversation",
+            },
+            {
+              title: "A spread is not decoration. It is structure.",
+              body: "A single card is for one clear question. A three-card spread separates situation, challenge, and guidance. Ora does not translate cards one by one; she reads the relationship between them.",
+              kind: "spread",
+            },
+            {
+              title: "The same card does not always say the same thing.",
+              body: "The Fool may be courage in a new beginning, carelessness in a relationship, or lack of preparation in a work question. Ora reads the card through the question, the spread position, and the surrounding context.",
+              kind: "card",
+            },
+            {
+              title: "When something lands, you can keep asking.",
+              body: "A reading does not need to stop at the first answer. You can ask about a suggestion, a card, or a line that feels uncomfortable. Ora continues from the same reading instead of drawing again.",
+              kind: "follow-up",
+            },
+            {
+              title: "Ora is not here for only one answer.",
+              body: "Each reading becomes part of your private reading trail. When you return for the tenth time, Ora should not meet you like a stranger.",
+              kind: "journal",
+            },
           ],
-      finalTitle: isZh ? "你的问题正在等待。" : "Your question is waiting.",
+      whyOraKicker: isZh ? "为什么不是普通抽牌" : "Why Ora",
+      whyOraItems: isZh
+        ? [
+            ["不是只抽牌", "Ora 会先整理你的问题，再进入抽牌。"],
+            ["不是固定牌义", "同一张牌，会根据问题、心境和牌阵位置产生不同解读。"],
+            ["不是一次性回答", "你可以继续追问，也可以在日志里回看每次阅读。"],
+            ["不替你决定", "Ora 给出的是反思、方向和下一步建议。"],
+          ]
+        : [
+            ["Not only a draw", "Ora helps shape your question before the card is drawn."],
+            ["Not fixed meanings", "The same card reads differently through question, mood, and spread position."],
+            ["Not one-and-done", "You can continue asking and revisit every reading in your journal."],
+            ["Not a decision-maker", "Ora offers reflection, direction, and next-step suggestions."],
+          ],
+      finalTitle: isZh ? "把你的问题交给 Ora。" : "Bring your question to Ora.",
       footerLinks: isZh
         ? [
             ["隐私", "/privacy"],
@@ -346,6 +570,155 @@ export function OracleShowroomHome({
     [isZh, onlineHref, threeCardHref],
   );
 
+  const activeQuestionGroup =
+    copy.questionCategories.find((category) => category.id === activeQuestionCategory) ?? copy.questionCategories[0];
+
+  const resizeHeroQuestionTextarea = useCallback(() => {
+    const textarea = heroQuestionTextareaRef.current;
+
+    if (!textarea) {
+      return;
+    }
+
+    textarea.style.height = "auto";
+    textarea.style.height = `${textarea.scrollHeight}px`;
+  }, []);
+
+  useEffect(() => {
+    resizeHeroQuestionTextarea();
+  }, [heroQuestion, resizeHeroQuestionTextarea]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const speechWindow = window as Window & {
+      SpeechRecognition?: SpeechRecognitionConstructorLike;
+      webkitSpeechRecognition?: SpeechRecognitionConstructorLike;
+    };
+
+    queueMicrotask(() => {
+      setSpeechSupported(Boolean(speechWindow.SpeechRecognition ?? speechWindow.webkitSpeechRecognition));
+    });
+
+    return () => {
+      speechRecognitionRef.current?.abort();
+      speechRecognitionRef.current = null;
+    };
+  }, []);
+
+  function buildAskHref(question?: string) {
+    const trimmedQuestion = question?.trim();
+    const params = new URLSearchParams({
+      lang,
+      mode: "online",
+      orientation: "upright",
+      spread: "single",
+    });
+
+    if (trimmedQuestion) {
+      params.set("question", trimmedQuestion);
+    }
+
+    return `/ai-guide/ask?${params.toString()}`;
+  }
+
+  function chooseRandomQuestion() {
+    const currentQuestion = heroQuestion.trim();
+    const allQuestions = copy.questionCategories.flatMap((category) => category.questions);
+    const candidateQuestions = allQuestions.filter((question) => question !== currentQuestion);
+    const questions = candidateQuestions.length > 0 ? candidateQuestions : allQuestions;
+    const nextQuestion = questions[Math.floor(Math.random() * questions.length)];
+
+    if (nextQuestion) {
+      setHeroQuestion(nextQuestion);
+    }
+  }
+
+  function appendVoiceTranscript(transcript: string) {
+    const cleanTranscript = transcript.trim();
+
+    if (!cleanTranscript) {
+      return;
+    }
+
+    setHeroQuestion((currentQuestion) => {
+      const trimmedQuestion = currentQuestion.trim();
+
+      if (!trimmedQuestion) {
+        return cleanTranscript;
+      }
+
+      return `${trimmedQuestion}${isZh ? "，" : " "}${cleanTranscript}`;
+    });
+  }
+
+  function toggleVoiceInput() {
+    if (isListening) {
+      speechRecognitionRef.current?.stop();
+      setIsListening(false);
+      return;
+    }
+
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const speechWindow = window as Window & {
+      SpeechRecognition?: SpeechRecognitionConstructorLike;
+      webkitSpeechRecognition?: SpeechRecognitionConstructorLike;
+    };
+    const SpeechRecognitionConstructor = speechWindow.SpeechRecognition ?? speechWindow.webkitSpeechRecognition;
+
+    if (!SpeechRecognitionConstructor) {
+      setSpeechSupported(false);
+      setVoiceStatus(copy.voiceUnsupported);
+      return;
+    }
+
+    const recognition = new SpeechRecognitionConstructor();
+    speechRecognitionRef.current = recognition;
+    recognition.lang = isZh ? "zh-CN" : "en-US";
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.onresult = (event) => {
+      let finalTranscript = "";
+
+      for (let index = event.resultIndex; index < event.results.length; index += 1) {
+        const result = event.results[index];
+
+        if (result?.isFinal) {
+          finalTranscript += result[0]?.transcript ?? "";
+        }
+      }
+
+      appendVoiceTranscript(finalTranscript);
+    };
+    recognition.onerror = (event) => {
+      if (event.error === "not-allowed" || event.error === "permission-denied") {
+        setVoiceStatus(copy.voicePermissionUnavailable);
+      } else if (event.error !== "no-speech") {
+        setVoiceStatus(copy.voiceUnsupported);
+      }
+
+      setIsListening(false);
+    };
+    recognition.onend = () => {
+      setIsListening(false);
+    };
+
+    setVoiceStatus("");
+    setIsListening(true);
+
+    try {
+      recognition.start();
+    } catch {
+      setIsListening(false);
+      setVoiceStatus(copy.voiceUnsupported);
+    }
+  }
+
   function toggleTheme() {
     const currentTheme = document.documentElement.getAttribute("data-theme") === "night" ? "night" : "day";
     const next = currentTheme === "night" ? "day" : "night";
@@ -355,26 +728,6 @@ export function OracleShowroomHome({
     } catch {
       // Storage can be unavailable in restricted browsing modes.
     }
-  }
-
-  function chooseReadingPath(event: FormEvent<HTMLFormElement>) {
-    const form = event.currentTarget;
-    const ritualInput = form.elements.namedItem("ritual");
-
-    form.action = "/ai-guide/ask";
-
-    if (ritualInput instanceof HTMLInputElement) {
-      ritualInput.value = form.dataset.ritualEnabled === "true" ? "1" : "0";
-    }
-  }
-
-  function toggleRitual(event: MouseEvent<HTMLButtonElement>, spreadId: string) {
-    event.preventDefault();
-    event.stopPropagation();
-    setRitualBySpread((current) => ({
-      ...current,
-      [spreadId]: !current[spreadId],
-    }));
   }
 
   return (
@@ -404,51 +757,85 @@ export function OracleShowroomHome({
         <span aria-hidden="true" className="ora-starfield" />
 
         <section className="ora-hero" id="start">
-          <span aria-hidden="true" className="ora-hero-halo" />
-          <div className="ora-wrap ora-hero-grid">
-            <div className="ora-hero-copy">
-              <p className="ora-eyebrow ora-hero-eyebrow">{copy.room}</p>
-              <h1 className="ora-hero-title">
-                <span>{copy.heroTitle.r1}</span>
-                <span>{copy.heroTitle.r2}</span>
-              </h1>
-              <p className="ora-hero-sub">{copy.subtitle}</p>
-              <p className="ora-hero-note">{copy.heroBody}</p>
-              <div className="ora-actions">
-                <Link className="ora-btn ora-btn-primary" href={onlineHref}>
+          <div className="ora-wrap ora-hero-entry">
+            <p className="ora-eyebrow ora-hero-eyebrow">{copy.room}</p>
+            <h1 className="ora-hero-title">{copy.heroTitle}</h1>
+            <p className="ora-hero-sub">{copy.subtitle}</p>
+            <p className="ora-hero-note">{copy.heroBody}</p>
+            <div className="ora-entry-composer">
+              <textarea
+                aria-label={copy.questionPlaceholder}
+                onChange={(event) => {
+                  setHeroQuestion(event.target.value);
+                  resizeHeroQuestionTextarea();
+                }}
+                placeholder={copy.questionPlaceholder}
+                ref={heroQuestionTextareaRef}
+                rows={1}
+                value={heroQuestion}
+              />
+              <div className="ora-entry-actions">
+                <button aria-label={copy.randomQuestion} className="ora-entry-random" onClick={chooseRandomQuestion} title={copy.randomQuestion} type="button">
+                  <DiceIcon />
+                </button>
+                <button
+                  aria-label={copy.voiceInput}
+                  aria-pressed={isListening}
+                  className={cx("ora-entry-voice", isListening && "is-listening")}
+                  disabled={!speechSupported}
+                  onClick={toggleVoiceInput}
+                  title={speechSupported ? copy.voiceInput : copy.voiceUnsupported}
+                  type="button"
+                >
+                  <MicrophoneIcon />
+                </button>
+                <Link className="ora-entry-start" href={buildAskHref(heroQuestion)}>
                   {copy.begin}
-                </Link>
-                <Link className="ora-btn ora-btn-ghost" href={physicalHref}>
-                  {copy.physical}
-                </Link>
-                <Link className="ora-btn-text" href="#deck">
-                  {copy.explore}
                   <ArrowIcon />
                 </Link>
               </div>
             </div>
+            {voiceStatus ? <p className="ora-voice-status">{voiceStatus}</p> : null}
+            <div className="ora-question-starters">
+              <div aria-label={copy.questionCategoryLabel} className="ora-question-tabs" role="tablist">
+                {copy.questionCategories.map((category) => {
+                  const isActive = category.id === activeQuestionGroup.id;
 
-            <div aria-hidden="true" className="ora-deck-cluster">
-              <div className="ora-tcard ora-tcard-one">
-                <span className="ora-card-num">XVII</span>
-                <OraStarIcon className="ora-card-sigil" />
-                <span className="ora-card-name">{isZh ? "星星" : "The Star"}<small>{isZh ? "希望" : "Hope"}</small></span>
+                  return (
+                    <button
+                      aria-selected={isActive}
+                      className={cx("ora-question-tab", isActive && "is-active")}
+                      key={category.id}
+                      onClick={() => setActiveQuestionCategory(category.id)}
+                      role="tab"
+                      type="button"
+                    >
+                      {category.label}
+                    </button>
+                  );
+                })}
               </div>
-              <div className="ora-tcard ora-tcard-dark ora-tcard-two">
-                <span className="ora-card-num">IX</span>
-                <OraMoonIcon className="ora-card-sigil" />
-                <span className="ora-card-name">{isZh ? "隐者" : "The Hermit"}<small>{isZh ? "内在之光" : "Inner light"}</small></span>
+              <div className="ora-question-list">
+                {activeQuestionGroup.questions.slice(0, 4).map((question) => (
+                  <button
+                    className={cx("ora-question-sample", heroQuestion === question && "is-selected")}
+                    key={question}
+                    onClick={() => setHeroQuestion(question)}
+                    type="button"
+                  >
+                    {question}
+                  </button>
+                ))}
               </div>
-              <div className="ora-tcard ora-tcard-three">
-                <span className="ora-card-num">0</span>
-                <OraMarkIcon className="ora-card-sigil" />
-                <span className="ora-card-name">{isZh ? "愚者" : "The Fool"}<small>{isZh ? "开始" : "Beginnings"}</small></span>
-              </div>
-              <div className="ora-question-slip">
-                <span className="ora-slip-tape" />
-                <p>{copy.questionSlip}</p>
-                <strong>{copy.waitingQuestion}</strong>
-              </div>
+            </div>
+            <div className="ora-hero-minor-links">
+              <Link className="ora-btn-text" href={physicalHref}>
+                {copy.physical}
+              </Link>
+              <Link className="ora-btn-text" href="#deck">
+                {copy.explore}
+                <ArrowIcon />
+              </Link>
             </div>
           </div>
         </section>
@@ -464,29 +851,17 @@ export function OracleShowroomHome({
             <div className="ora-spreads">
               {copy.spreads.map((spread) => {
                 const Icon = spread.icon;
-                const isRitualEnabled = Boolean(ritualBySpread[spread.id]);
                 const card = (
-                  <article className={cx("ora-spread", spread.active && "is-active", spread.disabled && "is-soon", isRitualEnabled && "is-ritual")}>
-                    {!spread.disabled && spread.href ? (
-                      <button aria-label={spread.title} className="ora-spread-hitarea" type="submit" />
-                    ) : null}
+                  <article className={cx("ora-spread", spread.active && "is-active", spread.disabled && "is-soon")}>
                     <Icon className="ora-spread-icon" />
                     <span className="ora-spread-meta">{spread.meta}</span>
                     <h3>{spread.title}</h3>
                     <p>{spread.body}</p>
                     {!spread.disabled && spread.href ? (
-                      <div className="ora-ritual-footer">
-                        <span>{copy.addRitual}</span>
-                        <button
-                          aria-label={copy.addRitual}
-                          aria-pressed={isRitualEnabled}
-                          className="ora-ritual-switch"
-                          onClick={(event) => toggleRitual(event, spread.id)}
-                          type="button"
-                        >
-                          <span />
-                        </button>
-                      </div>
+                      <span className="ora-spread-cta">
+                        {spread.cta}
+                        <ArrowIcon />
+                      </span>
                     ) : null}
                   </article>
                 );
@@ -496,43 +871,107 @@ export function OracleShowroomHome({
                     {card}
                   </div>
                 ) : (
-                  <form
-                    action="/ai-guide/ask"
+                  <Link
                     className="ora-spread-link"
-                    data-ritual-enabled={isRitualEnabled ? "true" : "false"}
+                    href={spread.href}
                     key={spread.id}
-                    method="get"
-                    onSubmit={chooseReadingPath}
                   >
-                    <input name="lang" type="hidden" value={lang} />
-                    <input name="mode" type="hidden" value="online" />
-                    <input name="spread" type="hidden" value={spread.id} />
-                    <input name="orientation" type="hidden" value="upright" />
-                    <input name="ritual" type="hidden" value={isRitualEnabled ? "1" : "0"} />
                     {card}
-                  </form>
+                  </Link>
                 );
               })}
             </div>
+          </div>
+        </section>
 
-            <div className="ora-askbox" id="ask-ora">
-              <p className="ora-ask-label">{copy.askOraTitle}</p>
-              <p>{copy.askOraDescription}</p>
-              <div className="ora-chips">
-                {copy.chips.map((chip) => (
-                  <span key={chip}>{chip}</span>
-                ))}
-              </div>
-              <form action="/ai-guide/ask" method="get">
-                <input name="lang" type="hidden" value={lang} />
-                <input name="mode" type="hidden" value="online" />
-                <input name="spread" type="hidden" value="single" />
-                <input name="orientation" type="hidden" value="upright" />
-                <textarea name="question" placeholder={copy.questionPlaceholder} rows={3} />
-                <button className="ora-btn ora-btn-primary" type="submit">
-                  {copy.askOraButton}
-                </button>
-              </form>
+        <section className="ora-section ora-section-story" id="meet-ora">
+          <div className="ora-wrap">
+            <div className="ora-section-head">
+              <p className="ora-eyebrow">{copy.storyKicker}</p>
+              <h2>{copy.storyTitle}</h2>
+            </div>
+            <div className="ora-story-stack">
+              {copy.storySteps.map((step, index) => (
+                <article
+                  className={cx("ora-story-panel", index % 2 === 1 && "is-reversed")}
+                  key={step.title}
+                >
+                  <div className="ora-story-copy">
+                    <span>{String(index + 1).padStart(2, "0")}</span>
+                    <h3>{step.title}</h3>
+                    <p>{step.body}</p>
+                  </div>
+                  <div className="ora-story-mock" aria-hidden="true">
+                    {step.kind === "conversation" ? (
+                      <div className="ora-mock-chat">
+                        <p className="ora-mock-user">{isZh ? "我这次的项目会顺利吗？" : "Will this project go smoothly?"}</p>
+                        <p className="ora-mock-ora">
+                          {isZh
+                            ? "我听到的不是简单的成败，而是你想确认下一步是否值得继续投入。"
+                            : "I hear more than success or failure. You are asking whether the next step is worth more energy."}
+                        </p>
+                      </div>
+                    ) : null}
+
+                    {step.kind === "spread" ? (
+                      <div className="ora-mock-spread">
+                        {[isZh ? "现状" : "Situation", isZh ? "挑战" : "Challenge", isZh ? "指引" : "Guidance"].map((label) => (
+                          <div className="ora-mock-card" key={label}>
+                            <OraMarkIcon />
+                            <span>{label}</span>
+                          </div>
+                        ))}
+                      </div>
+                    ) : null}
+
+                    {step.kind === "card" ? (
+                      <div className="ora-mock-card-context">
+                        <div className="ora-mock-focus-card">
+                          <span>0</span>
+                          <OraMarkIcon />
+                          <strong>{isZh ? "愚者" : "The Fool"}</strong>
+                        </div>
+                        <div className="ora-mock-chips">
+                          {(isZh ? ["新开始", "关系", "事业"] : ["New beginning", "Relationship", "Work"]).map((chip) => (
+                            <span key={chip}>{chip}</span>
+                          ))}
+                        </div>
+                      </div>
+                    ) : null}
+
+                    {step.kind === "follow-up" ? (
+                      <div className="ora-mock-chat ora-mock-follow">
+                        <p className="ora-mock-ora">{isZh ? "这张牌提醒你先确认边界。" : "This card asks you to name the boundary first."}</p>
+                        <p className="ora-mock-user">{isZh ? "这个建议具体怎么落地？" : "How can I apply this advice?"}</p>
+                        <p className="ora-mock-ora">{isZh ? "从一个最小行动开始，不要一次处理全部压力。" : "Start with one smallest action, not the whole pressure at once."}</p>
+                      </div>
+                    ) : null}
+
+                    {step.kind === "journal" ? (
+                      <div className="ora-mock-journal">
+                        <span>{isZh ? "上一次的问题" : "Previous question"}</span>
+                        <h4>{isZh ? "我应该继续投入这个方向吗？" : "Should I keep investing in this direction?"}</h4>
+                        <p>{isZh ? "抽到的牌：星星" : "Card drawn: The Star"}</p>
+                        <p>{isZh ? "Ora 留下的提醒：先恢复信心，再决定速度。" : "Ora's note: restore trust before deciding speed."}</p>
+                      </div>
+                    ) : null}
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="ora-section ora-section-why-lite">
+          <div className="ora-wrap">
+            <p className="ora-eyebrow">{copy.whyOraKicker}</p>
+            <div className="ora-why-lite-grid">
+              {copy.whyOraItems.map(([title, body]) => (
+                <article className="ora-why-lite-card" key={title}>
+                  <h3>{title}</h3>
+                  <p>{body}</p>
+                </article>
+              ))}
             </div>
           </div>
         </section>
@@ -551,6 +990,33 @@ export function OracleShowroomHome({
                   <p>{note}</p>
                 </article>
               ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="ora-section" id="journal">
+          <div className="ora-wrap">
+            <div className="ora-section-head">
+              <p className="ora-eyebrow">{copy.journalKicker}</p>
+              <h2>{copy.journalTitle}</h2>
+              <p className="ora-lead">{copy.journalBody}</p>
+            </div>
+            <div className="ora-modes">
+              {copy.journalNotes.map(([label, card, note]) => (
+                <article className="ora-mode" key={label}>
+                  <span>{label}</span>
+                  <h3>{card}</h3>
+                  <p>{note}</p>
+                </article>
+              ))}
+            </div>
+            <div className="ora-actions ora-journal-actions">
+              <Link className="ora-btn ora-btn-primary" href={readingsHref}>
+                {copy.openJournal}
+              </Link>
+              <Link className="ora-btn ora-btn-surface" href={readingsHref}>
+                {copy.viewAll}
+              </Link>
             </div>
           </div>
         </section>
@@ -577,34 +1043,6 @@ export function OracleShowroomHome({
           </div>
         </section>
 
-        <SigilRule />
-
-        <section className="ora-section" id="journal">
-          <div className="ora-wrap">
-            <div className="ora-section-head">
-              <p className="ora-eyebrow">{copy.journalKicker}</p>
-              <h2>{copy.journalTitle}</h2>
-            </div>
-            <div className="ora-modes">
-              {copy.journalNotes.map(([label, card, note]) => (
-                <article className="ora-mode" key={label}>
-                  <span>{label}</span>
-                  <h3>{card}</h3>
-                  <p>{note}</p>
-                </article>
-              ))}
-            </div>
-            <div className="ora-actions ora-journal-actions">
-              <Link className="ora-btn ora-btn-primary" href={readingsHref}>
-                {copy.openJournal}
-              </Link>
-              <Link className="ora-btn ora-btn-surface" href={readingsHref}>
-                {copy.viewAll}
-              </Link>
-            </div>
-          </div>
-        </section>
-
         <section className="ora-section ora-section-physical" id="physical">
           <div className="ora-wrap ora-physical">
             <article className="ora-panel ora-panel-paper">
@@ -627,17 +1065,9 @@ export function OracleShowroomHome({
         <section className="ora-section" id="trust">
           <div className="ora-wrap">
             <h2 className="ora-statement">{copy.trustTitle}</h2>
-            <div className="ora-features">
-              {copy.trustItems.map(([title, body], index) => {
-                const Icon = index === 0 ? OraShieldIcon : index === 1 ? OraMarkIcon : OraLeafIcon;
-                return (
-                  <article className="ora-feature" key={title}>
-                    <Icon className="ora-feature-icon" />
-                    <h3>{title}</h3>
-                    <p>{body}</p>
-                  </article>
-                );
-              })}
+            <div className="ora-boundary">
+              <OraShieldIcon className="ora-feature-icon" />
+              <p>{copy.trustBody}</p>
             </div>
           </div>
         </section>
@@ -646,11 +1076,8 @@ export function OracleShowroomHome({
           <div className="ora-wrap">
             <h2>{copy.finalTitle}</h2>
             <div className="ora-actions ora-cta-actions">
-              <Link className="ora-btn ora-btn-primary" href={onlineHref}>
+              <Link className="ora-btn ora-btn-primary" href="#reading-modes">
                 {copy.begin}
-              </Link>
-              <Link className="ora-btn ora-btn-ghost-on-ink" href={physicalHref}>
-                {copy.physical}
               </Link>
             </div>
           </div>
@@ -803,68 +1230,205 @@ export function OracleShowroomHome({
         .ora-hero {
           position: relative;
           overflow: hidden;
-          padding: clamp(3rem, 7vw, 6rem) 0 clamp(3.5rem, 8vw, 6.5rem);
+          padding: clamp(2.35rem, 5vw, 4.3rem) 0 clamp(1.6rem, 3.5vw, 2.6rem);
         }
 
-        .ora-hero-halo {
-          position: absolute;
-          right: 6%;
-          top: 20%;
-          width: min(720px, 80vw);
-          aspect-ratio: 1;
-          border-radius: 50%;
-          background: radial-gradient(circle, var(--c-halo), transparent 62%);
-          pointer-events: none;
-        }
-
-        [data-theme="night"] .ora-hero-halo {
-          background: radial-gradient(circle, rgba(216,178,90,.16), rgba(60,85,71,.06) 42%, transparent 66%);
-        }
-
-        .ora-hero-grid {
+        .ora-hero-entry {
           position: relative;
           z-index: 1;
           display: grid;
-          grid-template-columns: 1.05fr 0.95fr;
-          gap: 3rem;
-          align-items: center;
+          max-width: min(var(--ora-container), 860px);
+          justify-items: center;
+          text-align: center;
         }
 
         .ora-hero-eyebrow {
-          margin-bottom: 1.5rem;
+          margin-bottom: 1.15rem;
         }
 
         .ora-hero-title {
-          margin: 0 0 1.5rem;
+          max-width: 100%;
+          margin: 0 0 0.9rem;
           color: var(--c-text);
           font-family: "Noto Serif SC", Georgia, serif;
-          font-size: clamp(3.2rem, 9.5vw, 7rem);
+          font-size: clamp(3rem, 6.9vw, 5.35rem);
           font-weight: 600;
-          letter-spacing: -0.01em;
-          line-height: 0.92;
-        }
-
-        .ora-hero-title span {
-          display: block;
-        }
-
-        .ora-hero-title span + span {
-          margin-top: -0.06em;
-          padding-left: 0.9em;
+          letter-spacing: 0;
+          line-height: 1.02;
+          white-space: nowrap;
         }
 
         .ora-hero-sub {
-          margin: 0 0 0.75rem;
+          margin: 0 0 0.6rem;
           color: var(--c-text);
           font-family: "Noto Serif SC", Georgia, serif;
           font-size: clamp(1.1rem, 2.4vw, 1.5rem);
         }
 
         .ora-hero-note {
-          max-width: 32ch;
-          margin: 0 0 2rem;
+          max-width: 42rem;
+          margin: 0 0 1rem;
           color: var(--c-text-soft);
           line-height: 1.8;
+        }
+
+        .ora-entry-composer {
+          display: grid;
+          width: min(100%, 730px);
+          max-width: 100%;
+          min-height: 5.2rem;
+          grid-template-columns: minmax(0, 1fr) auto;
+          align-items: flex-end;
+          gap: 1.1rem;
+          border: 1px solid color-mix(in srgb, var(--c-accent) 24%, var(--c-border));
+          border-radius: 30px;
+          background:
+            linear-gradient(180deg, color-mix(in srgb, var(--c-surface) 97%, transparent), color-mix(in srgb, var(--c-surface-well) 78%, transparent));
+          box-shadow: 0 24px 56px -46px rgba(20,16,8,.58), inset 0 1px 0 color-mix(in srgb, #fff 34%, transparent);
+          padding: 0.7rem 0.75rem 0.7rem 1.55rem;
+          text-align: left;
+          transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.08s ease;
+        }
+
+        .ora-entry-composer:hover,
+        .ora-entry-composer:focus-within {
+          border-color: color-mix(in srgb, var(--c-accent) 58%, var(--c-border));
+          box-shadow: 0 26px 60px -44px rgba(20,16,8,.66), 0 0 0 2px color-mix(in srgb, var(--c-accent) 8%, transparent);
+        }
+
+        .ora-entry-composer textarea {
+          display: block;
+          width: 100%;
+          min-width: 0;
+          min-height: 1.45em;
+          align-self: center;
+          border: 0;
+          background: transparent;
+          color: var(--c-text-soft);
+          font-family: "Noto Serif SC", Georgia, serif;
+          font-size: clamp(1.06rem, 2vw, 1.22rem);
+          line-height: 1.45;
+          outline: none;
+          overflow-x: hidden;
+          overflow-y: hidden;
+          resize: none;
+          overflow-wrap: anywhere;
+          word-break: break-word;
+        }
+
+        .ora-entry-composer textarea:not(:placeholder-shown) {
+          color: var(--c-text);
+        }
+
+        .ora-entry-composer textarea::placeholder {
+          color: var(--c-text-soft);
+          opacity: 0.92;
+        }
+
+        .ora-entry-actions {
+          display: flex;
+          flex: 0 0 auto;
+          align-items: center;
+          justify-content: flex-end;
+          gap: 0.55rem;
+        }
+
+        .ora-entry-random,
+        .ora-entry-voice {
+          display: inline-flex;
+          width: 3rem;
+          height: 3rem;
+          flex: 0 0 auto;
+          align-items: center;
+          justify-content: center;
+          border: 1px solid color-mix(in srgb, var(--c-border-strong) 72%, transparent);
+          border-radius: 999px;
+          background: color-mix(in srgb, var(--c-surface) 76%, transparent);
+          color: var(--c-accent-text);
+          cursor: pointer;
+          transition: border-color 0.18s ease, background 0.18s ease, color 0.18s ease, transform 0.08s ease;
+        }
+
+        .ora-entry-random:hover,
+        .ora-entry-random:focus-visible,
+        .ora-entry-voice:hover,
+        .ora-entry-voice:focus-visible,
+        .ora-entry-voice.is-listening {
+          border-color: color-mix(in srgb, var(--c-accent) 58%, var(--c-border));
+          background: var(--c-accent-wash);
+          color: var(--c-text);
+          outline: none;
+        }
+
+        .ora-entry-voice.is-listening {
+          box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c-accent) 28%, transparent);
+        }
+
+        .ora-entry-random:active,
+        .ora-entry-voice:active {
+          transform: translateY(1px);
+        }
+
+        .ora-entry-voice:disabled,
+        .ora-entry-voice:disabled:hover,
+        .ora-entry-voice:disabled:focus-visible {
+          border-color: color-mix(in srgb, var(--c-border-strong) 72%, transparent);
+          background: color-mix(in srgb, var(--c-surface) 76%, transparent);
+          color: var(--c-accent-text);
+          cursor: not-allowed;
+          opacity: 0.48;
+        }
+
+        .ora-entry-random svg,
+        .ora-entry-voice svg {
+          width: 1.1rem;
+          height: 1.1rem;
+        }
+
+        .ora-voice-status {
+          max-width: min(100%, 700px);
+          margin: 0.55rem 0 0;
+          color: var(--c-text-dim);
+          font-size: 0.78rem;
+          line-height: 1.5;
+          text-align: center;
+        }
+
+        .ora-entry-start {
+          display: inline-flex;
+          min-width: 8.4rem;
+          min-height: 3rem;
+          flex: 0 0 auto;
+          align-items: center;
+          justify-content: center;
+          gap: 0.5rem;
+          border: 1px solid transparent;
+          border-radius: 999px;
+          background: var(--c-accent);
+          padding: 0.95rem 1.65rem;
+          color: var(--c-on-accent);
+          font-family: "Noto Sans SC", Arial, sans-serif;
+          font-size: 0.92rem;
+          font-weight: 600;
+          letter-spacing: 0.06em;
+          line-height: 1;
+          white-space: nowrap;
+          transition: background 0.18s ease, transform 0.08s ease;
+        }
+
+        .ora-entry-start:hover,
+        .ora-entry-start:focus-visible {
+          background: var(--c-accent-hover);
+          outline: none;
+        }
+
+        .ora-entry-start:active {
+          transform: translateY(1px);
+        }
+
+        .ora-entry-start svg {
+          width: 15px;
+          height: 15px;
         }
 
         .ora-actions {
@@ -872,6 +1436,95 @@ export function OracleShowroomHome({
           flex-wrap: wrap;
           align-items: center;
           gap: 1rem;
+        }
+
+        .ora-hero-minor-links {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 1rem;
+          justify-content: center;
+          margin-top: 0.8rem;
+        }
+
+        .ora-question-starters {
+          width: min(100%, 700px);
+          margin-top: 0.9rem;
+        }
+
+        .ora-question-tabs {
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: center;
+          gap: 0.45rem;
+        }
+
+        .ora-question-tab {
+          border: 1px solid color-mix(in srgb, var(--c-border-strong) 78%, transparent);
+          border-radius: 999px;
+          background: color-mix(in srgb, var(--c-surface) 80%, transparent);
+          padding: 0.5rem 0.88rem;
+          color: color-mix(in srgb, var(--c-text) 82%, var(--c-text-soft));
+          cursor: pointer;
+          font: inherit;
+          font-size: 0.82rem;
+          font-weight: 400;
+          line-height: 1.2;
+          transition: border-color 0.18s ease, color 0.18s ease, background 0.18s ease;
+        }
+
+        .ora-question-tab:hover,
+        .ora-question-tab:focus-visible,
+        .ora-question-tab.is-active {
+          border-color: color-mix(in srgb, var(--c-accent) 58%, var(--c-border));
+          background: color-mix(in srgb, var(--c-accent-wash) 92%, var(--c-surface));
+          color: var(--c-text);
+          outline: none;
+        }
+
+        .ora-question-tab.is-active {
+          box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c-accent) 22%, transparent);
+        }
+
+        .ora-question-list {
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: center;
+          gap: 0.58rem;
+          margin-top: 0.7rem;
+          transition: opacity 0.18s ease;
+        }
+
+        .ora-question-sample {
+          border: 1px solid color-mix(in srgb, var(--c-border-strong) 62%, transparent);
+          border-radius: 14px;
+          background: color-mix(in srgb, var(--c-surface) 86%, transparent);
+          box-shadow: 0 10px 26px -24px rgba(20,16,8,.5);
+          padding: 0.68rem 0.9rem;
+          color: color-mix(in srgb, var(--c-text) 86%, var(--c-text-soft));
+          cursor: pointer;
+          font: inherit;
+          font-size: 0.88rem;
+          line-height: 1.42;
+          text-align: left;
+          transition: border-color 0.18s ease, color 0.18s ease, background 0.18s ease, transform 0.08s ease, box-shadow 0.18s ease;
+        }
+
+        .ora-question-sample:hover,
+        .ora-question-sample:focus-visible,
+        .ora-question-sample.is-selected {
+          border-color: var(--c-accent);
+          background: var(--c-accent-wash);
+          color: var(--c-text);
+          box-shadow: 0 14px 30px -22px rgba(20,16,8,.58);
+          outline: none;
+        }
+
+        .ora-question-sample.is-selected {
+          box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c-accent) 22%, transparent), 0 14px 30px -22px rgba(20,16,8,.58);
+        }
+
+        .ora-question-sample:active {
+          transform: translateY(1px);
         }
 
         .ora-btn {
@@ -953,11 +1606,6 @@ export function OracleShowroomHome({
           height: 15px;
         }
 
-        .ora-deck-cluster {
-          position: relative;
-          height: clamp(360px, 42vw, 460px);
-        }
-
         .ora-tcard {
           position: absolute;
           display: flex;
@@ -1017,76 +1665,15 @@ export function OracleShowroomHome({
           font-size: 10px;
         }
 
-        .ora-tcard-one {
-          left: 2%;
-          top: 14%;
-          transform: rotate(-13deg);
-        }
-
-        .ora-tcard-two {
-          right: 6%;
-          top: 6%;
-          transform: rotate(11deg);
-        }
-
-        .ora-tcard-three {
-          left: 50%;
-          top: 0;
-          z-index: 3;
-          transform: translateX(-50%) rotate(-1deg);
-        }
-
-        .ora-question-slip {
-          position: absolute;
-          right: 0;
-          bottom: -4%;
-          z-index: 4;
-          width: clamp(220px, 26vw, 290px);
-          border: 1px solid var(--c-border);
-          border-radius: 14px;
-          background: var(--c-surface);
-          box-shadow: 0 20px 40px -26px rgba(20,16,8,.5);
-          padding: 18px 20px;
-          transform: rotate(2deg);
-        }
-
-        .ora-slip-tape {
-          position: absolute;
-          left: 24px;
-          top: -9px;
-          width: 54px;
-          height: 18px;
-          border: 1px solid var(--c-border);
-          background: var(--c-accent-wash);
-          opacity: 0.9;
-          transform: rotate(-4deg);
-        }
-
-        .ora-question-slip p {
-          margin: 0 0 8px;
-          color: var(--c-accent-text);
-          font-size: 11px;
-          font-weight: 500;
-          letter-spacing: 0.16em;
-          text-transform: uppercase;
-        }
-
-        .ora-question-slip strong {
-          color: var(--c-text);
-          font-family: "Noto Serif SC", Georgia, serif;
-          font-size: 1.05rem;
-          font-weight: 400;
-          line-height: 1.5;
-        }
-
         .ora-rule {
           display: flex;
-          max-width: var(--ora-container);
+          max-width: min(var(--ora-container), 760px);
           align-items: center;
-          gap: 1.5rem;
+          gap: 1rem;
           margin: 0 auto;
           padding: 0 var(--ora-gutter);
           color: var(--c-border-strong);
+          opacity: 0.66;
         }
 
         .ora-rule::before,
@@ -1098,8 +1685,8 @@ export function OracleShowroomHome({
         }
 
         .ora-rule svg {
-          width: 24px;
-          height: 24px;
+          width: 18px;
+          height: 18px;
           color: var(--c-accent);
         }
 
@@ -1119,6 +1706,19 @@ export function OracleShowroomHome({
           padding-bottom: clamp(3.25rem, 6.5vw, 5rem);
         }
 
+        .ora-section-spreads {
+          padding-top: clamp(2.2rem, 5vw, 3.7rem);
+        }
+
+        .ora-section-spreads .ora-section-head {
+          margin-bottom: clamp(1.5rem, 3.5vw, 2.25rem);
+        }
+
+        .ora-section-story {
+          border-top: 1px solid var(--c-border);
+          background: color-mix(in srgb, var(--c-surface) 54%, transparent);
+        }
+
         .ora-section-head {
           max-width: 48ch;
           margin-bottom: 3rem;
@@ -1136,6 +1736,240 @@ export function OracleShowroomHome({
           font-size: clamp(1.5rem, 3vw, 1.75rem);
           font-weight: 500;
           line-height: 1.3;
+        }
+
+        .ora-story-stack {
+          display: grid;
+          gap: clamp(1.25rem, 3vw, 2rem);
+        }
+
+        .ora-story-panel {
+          display: grid;
+          grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+          gap: clamp(1.25rem, 4vw, 3rem);
+          align-items: center;
+          border: 1px solid var(--c-border);
+          border-radius: calc(var(--ora-radius) + 6px);
+          background: color-mix(in srgb, var(--c-bg) 54%, var(--c-surface));
+          padding: clamp(1.25rem, 3vw, 2rem);
+        }
+
+        .ora-story-panel.is-reversed .ora-story-copy {
+          order: 2;
+        }
+
+        .ora-story-copy > span {
+          display: block;
+          margin-bottom: 1rem;
+          color: var(--c-accent-text);
+          font-family: "Spectral", Georgia, serif;
+          font-size: 1.25rem;
+          line-height: 1;
+        }
+
+        .ora-story-copy h3 {
+          margin: 0 0 0.85rem;
+          color: var(--c-text);
+          font-family: "Noto Serif SC", Georgia, serif;
+          font-size: clamp(1.35rem, 2.6vw, 2rem);
+          font-weight: 500;
+          line-height: 1.35;
+        }
+
+        .ora-story-copy p {
+          margin: 0;
+          color: var(--c-text-soft);
+          font-size: 0.98rem;
+          line-height: 1.85;
+        }
+
+        .ora-story-mock {
+          border: 1px solid var(--c-border);
+          border-radius: var(--ora-radius);
+          background:
+            linear-gradient(180deg, color-mix(in srgb, var(--c-surface) 94%, transparent), color-mix(in srgb, var(--c-surface-well) 70%, transparent));
+          box-shadow: 0 18px 38px color-mix(in srgb, var(--c-text) 7%, transparent);
+          padding: clamp(1rem, 2.4vw, 1.5rem);
+        }
+
+        .ora-mock-chat {
+          display: grid;
+          gap: 0.8rem;
+        }
+
+        .ora-mock-chat p,
+        .ora-mock-journal p {
+          margin: 0;
+        }
+
+        .ora-mock-user,
+        .ora-mock-ora {
+          width: fit-content;
+          max-width: 86%;
+          border: 1px solid var(--c-border);
+          border-radius: 1rem;
+          padding: 0.8rem 0.9rem;
+          font-size: 0.86rem;
+          line-height: 1.65;
+        }
+
+        .ora-mock-user {
+          justify-self: end;
+          border-bottom-right-radius: 0.3rem;
+          background: color-mix(in srgb, var(--c-surface-well) 62%, transparent);
+          color: var(--c-text-soft);
+        }
+
+        .ora-mock-ora {
+          justify-self: start;
+          border-bottom-left-radius: 0.3rem;
+          background: color-mix(in srgb, var(--c-surface) 90%, var(--c-accent-wash));
+          color: var(--c-text);
+        }
+
+        .ora-mock-spread {
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 0.75rem;
+        }
+
+        .ora-mock-card {
+          display: grid;
+          min-height: 9.5rem;
+          place-items: center;
+          border: 1px solid var(--c-border-strong);
+          border-radius: 0.85rem;
+          background: var(--card-face);
+          padding: 0.75rem;
+          text-align: center;
+        }
+
+        .ora-mock-card svg,
+        .ora-mock-focus-card svg {
+          width: 2.1rem;
+          height: 2.1rem;
+          color: var(--c-accent);
+        }
+
+        .ora-mock-card span {
+          color: var(--c-text-soft);
+          font-size: 0.75rem;
+        }
+
+        .ora-mock-card-context {
+          display: grid;
+          grid-template-columns: 9rem minmax(0, 1fr);
+          gap: 1rem;
+          align-items: center;
+        }
+
+        .ora-mock-focus-card {
+          display: flex;
+          min-height: 13rem;
+          flex-direction: column;
+          align-items: center;
+          justify-content: space-between;
+          border: 1px solid var(--c-border-strong);
+          border-radius: 1rem;
+          background: var(--card-face);
+          padding: 1rem;
+          text-align: center;
+        }
+
+        .ora-mock-focus-card span {
+          align-self: flex-start;
+          color: var(--c-accent-text);
+          font-family: "Spectral", Georgia, serif;
+        }
+
+        .ora-mock-focus-card strong {
+          color: var(--c-text);
+          font-family: "Noto Serif SC", Georgia, serif;
+          font-weight: 500;
+        }
+
+        .ora-mock-chips {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.55rem;
+        }
+
+        .ora-mock-chips span {
+          border: 1px solid var(--c-border);
+          border-radius: 999px;
+          background: color-mix(in srgb, var(--c-surface) 72%, transparent);
+          padding: 0.45rem 0.7rem;
+          color: var(--c-text-soft);
+          font-size: 0.78rem;
+        }
+
+        .ora-mock-journal {
+          border-left: 2px solid var(--c-accent);
+          padding-left: 1rem;
+        }
+
+        .ora-mock-journal span {
+          color: var(--c-accent-text);
+          font-size: 0.68rem;
+          font-weight: 600;
+          letter-spacing: 0.16em;
+          text-transform: uppercase;
+        }
+
+        .ora-mock-journal h4 {
+          margin: 0.55rem 0 0.9rem;
+          color: var(--c-text);
+          font-family: "Noto Serif SC", Georgia, serif;
+          font-size: 1.2rem;
+          font-weight: 500;
+          line-height: 1.45;
+        }
+
+        .ora-mock-journal p {
+          color: var(--c-text-soft);
+          font-size: 0.86rem;
+          line-height: 1.65;
+        }
+
+        .ora-mock-journal p + p {
+          margin-top: 0.55rem;
+        }
+
+        .ora-section-why-lite {
+          padding-block: clamp(2.75rem, 5vw, 4.25rem);
+        }
+
+        .ora-section-why-lite .ora-eyebrow {
+          margin-bottom: 1rem;
+        }
+
+        .ora-why-lite-grid {
+          display: grid;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: 1rem;
+        }
+
+        .ora-why-lite-card {
+          border: 1px solid var(--c-border);
+          border-radius: var(--ora-radius);
+          background: color-mix(in srgb, var(--c-surface) 86%, transparent);
+          padding: 1.2rem;
+        }
+
+        .ora-why-lite-card h3 {
+          margin: 0 0 0.5rem;
+          color: var(--c-text);
+          font-family: "Noto Serif SC", Georgia, serif;
+          font-size: 1.05rem;
+          font-weight: 500;
+          line-height: 1.35;
+        }
+
+        .ora-why-lite-card p {
+          margin: 0;
+          color: var(--c-text-soft);
+          font-size: 0.84rem;
+          line-height: 1.7;
         }
 
         .ora-spreads {
@@ -1160,22 +1994,6 @@ export function OracleShowroomHome({
           background: var(--c-surface);
           padding: 1.5rem;
           transition: border-color 0.2s ease, transform 0.2s ease;
-        }
-
-        .ora-spread-hitarea {
-          position: absolute;
-          inset: 0;
-          z-index: 1;
-          border: 0;
-          border-radius: inherit;
-          background: transparent;
-          cursor: pointer;
-        }
-
-        .ora-spread > :not(.ora-spread-hitarea) {
-          position: relative;
-          z-index: 2;
-          pointer-events: none;
         }
 
         .ora-spread-link:hover .ora-spread {
@@ -1235,129 +2053,34 @@ export function OracleShowroomHome({
           opacity: 0.45;
         }
 
-        .ora-ritual-footer {
-          display: flex;
-          min-height: 2rem;
-          align-items: center;
-          justify-content: space-between;
-          gap: 0.75rem;
-          margin-top: 1rem;
-          border-top: 1px solid color-mix(in srgb, var(--c-border) 78%, transparent);
-          padding-top: 0.85rem;
-          color: var(--c-text-soft);
-          font-size: 0.75rem;
-          font-weight: 400;
-          line-height: 1.35;
-          pointer-events: auto;
-          transition: border-color 0.18s ease, color 0.18s ease;
-        }
-
-        .ora-ritual-switch {
-          position: relative;
+        .ora-spread-cta {
           display: inline-flex;
-          width: 2.65rem;
-          height: 1.34rem;
-          flex: 0 0 auto;
+          width: fit-content;
           align-items: center;
-          border: 1px solid color-mix(in srgb, var(--c-text-soft) 34%, var(--c-border));
-          border-radius: 999px;
-          background: transparent;
-          padding: 2px;
-          cursor: pointer;
-          pointer-events: auto;
-          transition: background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+          gap: 0.45rem;
+          margin-top: auto;
+          padding-top: 1.15rem;
+          color: var(--c-accent);
+          font-size: 0.76rem;
+          font-weight: 600;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
         }
 
-        .ora-ritual-switch span {
-          display: block;
-          width: 0.78rem;
-          height: 0.78rem;
-          border: 1px solid color-mix(in srgb, var(--c-text-soft) 48%, transparent);
-          border-radius: 999px;
-          background: transparent;
-          box-shadow: none;
-          transform: translateX(0);
-          transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+        .ora-spread-cta svg {
+          width: 1rem;
+          height: 1rem;
+          transition: transform 0.18s ease;
         }
 
-        .ora-ritual-switch::after {
-          content: "";
-          position: absolute;
-          right: 0.38rem;
-          width: 0.34rem;
-          height: 0.34rem;
-          border-bottom: 1px solid transparent;
-          border-right: 1px solid transparent;
-          opacity: 0;
-          transform: rotate(45deg);
-          transition: opacity 0.18s ease;
+        .ora-spread-link:hover .ora-spread-cta svg {
+          transform: translateX(3px);
         }
 
-        .ora-spread.is-ritual .ora-ritual-footer {
-          border-top-color: color-mix(in srgb, var(--c-accent) 46%, var(--c-border));
-          color: var(--c-text);
+        .ora-spread.is-active .ora-spread-cta {
+          color: #d8b25a;
         }
 
-        .ora-spread.is-ritual .ora-ritual-switch {
-          border-color: var(--c-accent);
-          background: color-mix(in srgb, var(--c-accent) 34%, var(--c-surface));
-          box-shadow: 0 0 0 3px color-mix(in srgb, var(--c-accent) 13%, transparent);
-        }
-
-        .ora-spread.is-ritual .ora-ritual-switch span {
-          border-color: var(--c-accent);
-          background: var(--c-accent);
-          box-shadow: 0 0 10px color-mix(in srgb, var(--c-accent) 42%, transparent);
-          transform: translateX(1.28rem);
-        }
-
-        .ora-spread.is-ritual .ora-ritual-switch::after {
-          border-color: color-mix(in srgb, var(--c-on-accent) 86%, var(--c-text));
-          opacity: 1;
-        }
-
-        .ora-spread.is-active .ora-ritual-footer {
-          border-top-color: rgba(216, 178, 90, 0.28);
-          color: #d8d1bd;
-        }
-
-        .ora-spread.is-active .ora-ritual-switch {
-          border-color: rgba(239, 233, 219, 0.34);
-          background: transparent;
-        }
-
-        .ora-spread.is-active .ora-ritual-switch span {
-          border-color: rgba(239, 233, 219, 0.62);
-          background: transparent;
-        }
-
-        .ora-spread.is-active.is-ritual .ora-ritual-footer {
-          border-top-color: rgba(216, 178, 90, 0.46);
-          color: #efe7d1;
-        }
-
-        .ora-spread.is-active.is-ritual .ora-ritual-switch {
-          border-color: #d8b25a;
-          background: rgba(216, 178, 90, 0.28);
-          box-shadow: 0 0 0 3px rgba(216, 178, 90, 0.16);
-        }
-
-        .ora-spread.is-active.is-ritual .ora-ritual-switch span {
-          border-color: #d8b25a;
-          background: #d8b25a;
-          box-shadow: 0 0 12px rgba(216, 178, 90, 0.38);
-        }
-
-        .ora-askbox {
-          max-width: var(--ora-measure);
-          margin-top: 3rem;
-          border: 1px solid var(--c-border);
-          border-radius: var(--ora-radius);
-          background: var(--c-surface);
-          padding: 2rem;
-        }
-
-        .ora-ask-label,
         .ora-panel p {
           margin: 0 0 6px;
           color: var(--c-accent-text);
@@ -1367,57 +2090,18 @@ export function OracleShowroomHome({
           text-transform: uppercase;
         }
 
-        .ora-askbox > p:not(.ora-ask-label) {
-          margin: 0 0 1.25rem;
-          color: var(--c-text-soft);
-          font-size: 0.95rem;
-        }
-
-        .ora-chips {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 0.5rem;
-          margin-bottom: 1.5rem;
-        }
-
-        .ora-chips span {
-          border: 1px solid var(--c-border-strong);
-          border-radius: 999px;
-          padding: 6px 16px;
-          color: var(--c-text-soft);
-          font-size: 0.8rem;
-        }
-
-        .ora-askbox form {
-          display: grid;
-          gap: 1.25rem;
-        }
-
-        .ora-askbox textarea {
-          min-height: 64px;
-          width: 100%;
-          resize: vertical;
-          border: 1px solid var(--c-border-strong);
-          border-radius: 12px;
-          background: var(--c-surface-well);
-          color: var(--c-text);
-          padding: 1rem;
-          font: inherit;
-          outline: none;
-        }
-
-        .ora-askbox textarea::placeholder {
-          color: var(--c-text-dim);
-        }
-
-        .ora-askbox textarea:focus {
-          border-color: var(--c-accent);
-        }
-
         .ora-section-ink,
         .ora-cta {
           background: var(--c-green);
           color: #e9e1ce;
+        }
+
+        .ora-section-ink {
+          padding: clamp(2rem, 4.5vw, 3.25rem) 0;
+        }
+
+        .ora-section-ink .ora-section-head {
+          margin-bottom: 0;
         }
 
         .ora-section-ink .ora-eyebrow,
@@ -1434,17 +2118,17 @@ export function OracleShowroomHome({
           display: grid;
           grid-template-columns: repeat(5, minmax(0, 1fr));
           gap: 1.5rem;
-          margin-top: 3rem;
+          margin-top: 1.5rem;
           border-top: 1px solid rgba(255,255,255,.14);
-          padding-top: 2rem;
+          padding-top: 1.25rem;
         }
 
         .ora-step span {
           display: block;
-          margin-bottom: 0.75rem;
+          margin-bottom: 0.45rem;
           color: #d8b25a;
           font-family: "Spectral", Georgia, serif;
-          font-size: 2.4rem;
+          font-size: 1.25rem;
           line-height: 1;
         }
 
@@ -1452,15 +2136,15 @@ export function OracleShowroomHome({
           margin: 0 0 0.5rem;
           color: var(--c-ritual-text);
           font-family: "Noto Serif SC", Georgia, serif;
-          font-size: 1.15rem;
+          font-size: 1rem;
           font-weight: 500;
         }
 
         .ora-step p {
           margin: 0;
           color: #bcc4b3;
-          font-size: 0.85rem;
-          line-height: 1.7;
+          font-size: 0.78rem;
+          line-height: 1.55;
         }
 
         .ora-browse,
@@ -1523,7 +2207,7 @@ export function OracleShowroomHome({
         }
 
         .ora-mode,
-        .ora-feature {
+        .ora-boundary {
           border: 1px solid var(--c-border);
           border-radius: var(--ora-radius);
           background: var(--c-surface);
@@ -1540,8 +2224,7 @@ export function OracleShowroomHome({
           text-transform: uppercase;
         }
 
-        .ora-mode h3,
-        .ora-feature h3 {
+        .ora-mode h3 {
           margin: 0 0 8px;
           color: var(--c-text);
           font-family: "Noto Serif SC", Georgia, serif;
@@ -1550,7 +2233,7 @@ export function OracleShowroomHome({
         }
 
         .ora-mode p,
-        .ora-feature p {
+        .ora-boundary p {
           margin: 0;
           color: var(--c-text-soft);
           font-size: 0.9rem;
@@ -1561,9 +2244,13 @@ export function OracleShowroomHome({
           margin-top: 2rem;
         }
 
+        .ora-section-physical {
+          padding-top: clamp(2.5rem, 5vw, 4rem);
+        }
+
         .ora-panel {
           border-radius: var(--ora-radius);
-          padding: clamp(2rem, 4vw, 3rem);
+          padding: clamp(1.5rem, 3vw, 2.2rem);
         }
 
         .ora-panel-paper {
@@ -1608,12 +2295,6 @@ export function OracleShowroomHome({
           line-height: 1.35;
         }
 
-        .ora-features {
-          display: grid;
-          grid-template-columns: repeat(3, minmax(0, 1fr));
-          gap: 1.25rem;
-        }
-
         .ora-feature-icon {
           width: 30px;
           height: 30px;
@@ -1621,8 +2302,16 @@ export function OracleShowroomHome({
           color: var(--c-accent);
         }
 
-        .ora-feature h3 {
-          font-size: 1.2rem;
+        .ora-boundary {
+          display: grid;
+          max-width: 48rem;
+          grid-template-columns: auto minmax(0, 1fr);
+          gap: 1rem;
+          align-items: start;
+        }
+
+        .ora-boundary .ora-feature-icon {
+          margin-bottom: 0;
         }
 
         .ora-cta {
@@ -1641,16 +2330,6 @@ export function OracleShowroomHome({
 
         .ora-cta-actions {
           justify-content: center;
-        }
-
-        .ora-btn-ghost-on-ink {
-          border-color: rgba(237,228,206,.4);
-          background: transparent;
-          color: #ede4ce;
-        }
-
-        .ora-btn-ghost-on-ink:hover {
-          border-color: rgba(237,228,206,.85);
         }
 
         .ora-footer {
@@ -1713,6 +2392,37 @@ export function OracleShowroomHome({
           background: radial-gradient(circle at 60% 30%, rgba(216,178,90,.16), transparent 62%), var(--c-surface);
         }
 
+        [data-theme="night"] .ora-spread:not(.is-soon) {
+          border-color: rgba(239,233,219,.2);
+          background:
+            linear-gradient(180deg, rgba(37,43,38,.92), rgba(24,30,27,.9));
+        }
+
+        [data-theme="night"] .ora-spread:not(.is-soon) h3 {
+          color: #f2ead8;
+        }
+
+        [data-theme="night"] .ora-spread:not(.is-soon) p {
+          color: rgba(239,233,219,.74);
+        }
+
+        [data-theme="night"] .ora-spread:not(.is-soon) .ora-spread-meta {
+          color: rgba(216,178,90,.86);
+        }
+
+        [data-theme="night"] .ora-spread:not(.is-soon) .ora-spread-cta {
+          color: #e0bc68;
+        }
+
+        [data-theme="night"] .ora-spread.is-soon {
+          border-color: rgba(239,233,219,.1);
+          background: rgba(23,28,25,.5);
+        }
+
+        [data-theme="night"] .ora-spread.is-soon > * {
+          opacity: 0.58;
+        }
+
         [data-theme="night"] .ora-spread.is-active h3 {
           color: var(--c-accent-hover);
         }
@@ -1732,27 +2442,21 @@ export function OracleShowroomHome({
             display: none;
           }
 
-          .ora-hero-grid,
           .ora-browse,
-          .ora-physical {
+          .ora-physical,
+          .ora-story-panel {
             grid-template-columns: 1fr;
           }
 
-          .ora-deck-cluster {
-            width: 100%;
-            max-width: 420px;
-            height: 380px;
-            margin: 0 auto;
+          .ora-story-panel.is-reversed .ora-story-copy {
+            order: 0;
           }
 
           .ora-spreads,
           .ora-steps,
-          .ora-modes {
+          .ora-modes,
+          .ora-why-lite-grid {
             grid-template-columns: repeat(2, minmax(0, 1fr));
-          }
-
-          .ora-features {
-            grid-template-columns: 1fr;
           }
 
           .ora-browse-strip {
@@ -1767,12 +2471,62 @@ export function OracleShowroomHome({
 
           .ora-spreads,
           .ora-steps,
-          .ora-modes {
+          .ora-modes,
+          .ora-why-lite-grid {
+            grid-template-columns: 1fr;
+          }
+
+          .ora-boundary {
+            grid-template-columns: 1fr;
+          }
+
+          .ora-mock-spread,
+          .ora-mock-card-context {
             grid-template-columns: 1fr;
           }
 
           .ora-hero-title {
-            font-size: clamp(3rem, 18vw, 4.9rem);
+            font-size: clamp(2.35rem, 12.5vw, 4.2rem);
+            white-space: normal;
+          }
+
+          .ora-entry-composer {
+            width: 100%;
+            min-height: 0;
+            grid-template-columns: 1fr;
+            align-items: stretch;
+            border-radius: 24px;
+            padding: 1rem;
+            text-align: center;
+          }
+
+          .ora-entry-composer textarea {
+            width: 100%;
+            text-align: left;
+          }
+
+          .ora-entry-actions {
+            justify-content: flex-end;
+          }
+
+          .ora-entry-start {
+            min-width: 0;
+          }
+
+          .ora-question-tabs {
+            flex-wrap: nowrap;
+            justify-content: flex-start;
+            overflow-x: auto;
+            padding-bottom: 0.25rem;
+            scrollbar-width: none;
+          }
+
+          .ora-question-tabs::-webkit-scrollbar {
+            display: none;
+          }
+
+          .ora-question-tab {
+            flex: 0 0 auto;
           }
 
           .ora-browse-strip {
@@ -1784,8 +2538,7 @@ export function OracleShowroomHome({
 
         @media (prefers-reduced-motion: reduce) {
           .ora-btn,
-          .ora-ritual-switch,
-          .ora-ritual-switch span,
+          .ora-spread-cta svg,
           .ora-spread {
             transition: none;
           }
